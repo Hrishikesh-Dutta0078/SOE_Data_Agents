@@ -5,6 +5,9 @@ server/public/
 node_modules/
 client/node_modules/
 
+# Claude Code local settings
+.claude/settings.local.json
+
 # Local-only docs and files
 CLAUDE.md
 deployment_checklist.md
