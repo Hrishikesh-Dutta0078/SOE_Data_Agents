@@ -1,0 +1,6 @@
+server/.env
+server/cert.pem
+server/key.pem
+server/public/
+node_modules/
+client/node_modules/

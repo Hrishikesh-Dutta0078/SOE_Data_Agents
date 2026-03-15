@@ -1,0 +1,4374 @@
+{
+  "vw_td_ebi_region_rpt": {
+    "description": "Reporting view for geographic/sales regions, territories, and rep assignments.",
+    "columns": {
+      "REGION_ID": {
+        "type": "INT",
+        "description": "unique region identifier",
+        "pk": true,
+        "fk": true
+      },
+      "SALES_TEAM": {
+        "type": "NVARCHAR",
+        "description": "named sales team",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_TEAM_ALIAS": {
+        "type": "NVARCHAR",
+        "description": "alias for the sales team",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_REGION": {
+        "type": "NVARCHAR",
+        "description": "sales region name",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_LEADER": {
+        "type": "NVARCHAR",
+        "description": "sales leader name",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_LEADER_LDAP": {
+        "type": "NVARCHAR",
+        "description": "sales leader LDAP identifier",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_LEADER_PSS": {
+        "type": "VARCHAR",
+        "description": "sales leader PSS name",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_LEADER_LDAP_PSS": {
+        "type": "VARCHAR",
+        "description": "sales leader PSS LDAP identifier",
+        "pk": false,
+        "fk": false
+      },
+      "TERR_ID": {
+        "type": "NVARCHAR",
+        "description": "territory identifier",
+        "pk": false,
+        "fk": true
+      },
+      "TERR_NAME": {
+        "type": "NVARCHAR",
+        "description": "territory display name",
+        "pk": false,
+        "fk": false
+      },
+      "TERR_IDENT": {
+        "type": "VARCHAR",
+        "description": "territory identifier code",
+        "pk": false,
+        "fk": false
+      },
+      "REP_ID": {
+        "type": "INT",
+        "description": "sales rep identifier (replaces EMP_ID from base table)",
+        "pk": false,
+        "fk": true
+      },
+      "REP_NAME": {
+        "type": "NVARCHAR",
+        "description": "sales rep display name",
+        "pk": false,
+        "fk": false
+      },
+      "REP_LDAP": {
+        "type": "NVARCHAR",
+        "description": "sales rep LDAP identifier",
+        "pk": false,
+        "fk": false
+      },
+      "REP_SFDC_USER_ID": {
+        "type": "NVARCHAR",
+        "description": "Salesforce user identifier",
+        "pk": false,
+        "fk": false
+      },
+      "MGR_EMP_ID": {
+        "type": "INT",
+        "description": "manager employee identifier",
+        "pk": false,
+        "fk": true
+      },
+      "MGR_EMP_NAME": {
+        "type": "NVARCHAR",
+        "description": "manager name",
+        "pk": false,
+        "fk": false
+      },
+      "MGR_EMP_LDAP": {
+        "type": "NVARCHAR",
+        "description": "manager LDAP identifier",
+        "pk": false,
+        "fk": false
+      },
+      "GLOBAL_REGION": {
+        "type": "NVARCHAR",
+        "description": "top-level geo; valid filtering candidates in vw_td_ebi_region_rpt: AMERICAS, EMEA, APAC, WW",
+        "pk": false,
+        "fk": false
+      },
+      "REGION": {
+        "type": "NVARCHAR",
+        "description": "region name",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_REGION": {
+        "type": "NVARCHAR",
+        "description": "geographic sub-region",
+        "pk": false,
+        "fk": false
+      },
+      "TERRITORY": {
+        "type": "NVARCHAR",
+        "description": "territory grouping",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_TERRITORY": {
+        "type": "NVARCHAR",
+        "description": "sub-territory grouping",
+        "pk": false,
+        "fk": false
+      },
+      "AREA": {
+        "type": "NVARCHAR",
+        "description": "area grouping",
+        "pk": false,
+        "fk": false
+      },
+      "EMP_ROLE_TYPE": {
+        "type": "NVARCHAR",
+        "description": "role type (AccountManager, BDR, SE)",
+        "pk": false,
+        "fk": false
+      },
+      "EMP_ROLE_NAME": {
+        "type": "NVARCHAR",
+        "description": "role display name",
+        "pk": false,
+        "fk": false
+      },
+      "FLM": {
+        "type": "NVARCHAR",
+        "description": "First Line Manager name",
+        "pk": false,
+        "fk": false
+      },
+      "FLM_LDAP": {
+        "type": "NVARCHAR",
+        "description": "FLM LDAP identifier",
+        "pk": false,
+        "fk": false
+      },
+      "FLM_TERR_ID": {
+        "type": "NVARCHAR",
+        "description": "FLM territory identifier",
+        "pk": false,
+        "fk": true
+      },
+      "FLM_ID": {
+        "type": "INT",
+        "description": "First Line Manager identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SLM": {
+        "type": "NVARCHAR",
+        "description": "Second Line Manager name",
+        "pk": false,
+        "fk": false
+      },
+      "SLM_LDAP": {
+        "type": "NVARCHAR",
+        "description": "SLM LDAP identifier",
+        "pk": false,
+        "fk": false
+      },
+      "SLM_TERR_ID": {
+        "type": "NVARCHAR",
+        "description": "SLM territory identifier",
+        "pk": false,
+        "fk": true
+      },
+      "TLM": {
+        "type": "NVARCHAR",
+        "description": "Third Line Manager name",
+        "pk": false,
+        "fk": false
+      },
+      "TLM_LDAP": {
+        "type": "NVARCHAR",
+        "description": "TLM LDAP identifier",
+        "pk": false,
+        "fk": false
+      },
+      "TLM_TERR_ID": {
+        "type": "NVARCHAR",
+        "description": "TLM territory identifier",
+        "pk": false,
+        "fk": true
+      },
+      "LEADER": {
+        "type": "NVARCHAR",
+        "description": "top-level sales leader name",
+        "pk": false,
+        "fk": false
+      },
+      "LEADER_LDAP": {
+        "type": "NVARCHAR",
+        "description": "leader LDAP identifier",
+        "pk": false,
+        "fk": false
+      },
+      "LEADER_TERR_ID": {
+        "type": "NVARCHAR",
+        "description": "leader territory identifier",
+        "pk": false,
+        "fk": true
+      },
+      "AVP_SALES_TEAM": {
+        "type": "VARCHAR",
+        "description": "AVP sales team",
+        "pk": false,
+        "fk": false
+      },
+      "MARKET_SEGMENT": {
+        "type": "NVARCHAR",
+        "description": "market segment",
+        "pk": false,
+        "fk": false
+      },
+      "MARKET_AREA": {
+        "type": "NVARCHAR",
+        "description": "market area",
+        "pk": false,
+        "fk": false
+      },
+      "MAJOR_TERRITORY": {
+        "type": "NVARCHAR",
+        "description": "major territory grouping",
+        "pk": false,
+        "fk": false
+      },
+      "ROLE_TYPE_ID": {
+        "type": "INT",
+        "description": "role type identifier",
+        "pk": false,
+        "fk": true
+      },
+      "REPORTING_HIERARCHY_ID": {
+        "type": "INT",
+        "description": "reporting hierarchy identifier",
+        "pk": false,
+        "fk": true
+      },
+      "REPORTING_HIERARCHY": {
+        "type": "VARCHAR",
+        "description": "reporting hierarchy name",
+        "pk": false,
+        "fk": false
+      },
+      "GTM_MOTION_ID": {
+        "type": "INT",
+        "description": "go-to-market motion identifier",
+        "pk": false,
+        "fk": true
+      },
+      "POSITION_ID": {
+        "type": "NVARCHAR",
+        "description": "position identifier",
+        "pk": false,
+        "fk": true
+      },
+      "PHCOUNT": {
+        "type": "INT",
+        "description": "position headcount",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_TEAM_FLAG": {
+        "type": "VARCHAR",
+        "description": "sales team flag",
+        "pk": false,
+        "fk": false
+      },
+      "TA_START_DATE": {
+        "type": "DATE",
+        "description": "territory assignment start date",
+        "pk": false,
+        "fk": false
+      },
+      "TA_END_DATE": {
+        "type": "DATE",
+        "description": "territory assignment end date",
+        "pk": false,
+        "fk": false
+      },
+      "CREATE_DTTM": {
+        "type": "DATETIME",
+        "description": "record creation datetime",
+        "pk": false,
+        "fk": false
+      },
+      "EMP_HIRE_DATE": {
+        "type": "DATE",
+        "description": "employee hire date",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_ROLE_START_DATE": {
+        "type": "DATE",
+        "description": "current role start date",
+        "pk": false,
+        "fk": false
+      },
+      "AT_EMP_STATUS": {
+        "type": "NVARCHAR",
+        "description": "employee status",
+        "pk": false,
+        "fk": false
+      },
+      "REP_IN_PLACE": {
+        "type": "VARCHAR",
+        "description": "flag: rep in place",
+        "pk": false,
+        "fk": false
+      },
+      "IS_ACTIVE": {
+        "type": "BIT",
+        "description": "active flag",
+        "pk": false,
+        "fk": false
+      },
+      "IS_TRUE_FLM": {
+        "type": "BIT",
+        "description": "flag for true First Line Manager",
+        "pk": false,
+        "fk": false
+      },
+      "IS_TRUE_SLM": {
+        "type": "BIT",
+        "description": "flag for true Second Line Manager",
+        "pk": false,
+        "fk": false
+      },
+      "IS_TRUE_TLM": {
+        "type": "BIT",
+        "description": "flag for true Third Line Manager",
+        "pk": false,
+        "fk": false
+      },
+      "IS_LATEST_EMP": {
+        "type": "BIT",
+        "description": "flag for latest employee record",
+        "pk": false,
+        "fk": false
+      },
+      "IS_MANUAL_ENTRY": {
+        "type": "BIT",
+        "description": "flag for manual entry",
+        "pk": false,
+        "fk": false
+      },
+      "TO_SHOW_IN_RTB": {
+        "type": "BIT",
+        "description": "flag: show in RTB",
+        "pk": false,
+        "fk": false
+      },
+      "ROLE_TYPE_DISPLAY": {
+        "type": "VARCHAR",
+        "description": "role type display name",
+        "pk": false,
+        "fk": false
+      },
+      "ROLE_TYPE": {
+        "type": "VARCHAR",
+        "description": "role type code",
+        "pk": false,
+        "fk": false
+      },
+      "IS_CY_QUOTA_AVAILABLE": {
+        "type": "BIT",
+        "description": "flag: current year quota available",
+        "pk": false,
+        "fk": false
+      },
+      "VERTICAL_MARKET_SEGMENT": {
+        "type": "NVARCHAR",
+        "description": "vertical market segment",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_TEAM_GROUPED": {
+        "type": "NVARCHAR",
+        "description": "grouped sales team",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_TEAM_BU": {
+        "type": "NVARCHAR",
+        "description": "sales team business unit",
+        "pk": false,
+        "fk": false
+      },
+      "REP_GTM_MOTION": {
+        "type": "VARCHAR",
+        "description": "representative GTM motion",
+        "pk": false,
+        "fk": false
+      },
+      "SUPER_GEO": {
+        "type": "VARCHAR",
+        "description": "super-geo grouping",
+        "pk": false,
+        "fk": false
+      },
+      "NEW_SUB_REGION": {
+        "type": "NVARCHAR",
+        "description": "new sub-region grouping",
+        "pk": false,
+        "fk": false
+      },
+      "TBH_STATUS": {
+        "type": "NVARCHAR",
+        "description": "to-be-hired status",
+        "pk": false,
+        "fk": false
+      },
+      "POOL_GHOST": {
+        "type": "INT",
+        "description": "pool/ghost indicator",
+        "pk": false,
+        "fk": false
+      },
+      "GLOBAL_SALES_REGION_SORT": {
+        "type": "INT",
+        "description": "global sales region sort order",
+        "pk": false,
+        "fk": false
+      },
+      "GLOBAL_REGION_SORT": {
+        "type": "INT",
+        "description": "global region sort order",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_LEADER_SORT": {
+        "type": "INT",
+        "description": "sales leader sort order",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_TEAM_SORT": {
+        "type": "INT",
+        "description": "sales team sort order",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_REGION_SORT": {
+        "type": "INT",
+        "description": "sales region sort order",
+        "pk": false,
+        "fk": false
+      },
+      "VERTICAL_MARKET_SEGMENT_SORT": {
+        "type": "INT",
+        "description": "vertical market segment sort order",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "vw_TF_EBI_P2S": {
+    "description": "Fact table for Pipeline-to-Sales (P2S) conversion metrics. Central fact table used for most pipeline and booking analyses.",
+    "columns": {
+      "P2S_ID": {
+        "type": "BIGINT",
+        "description": "unique row identifier",
+        "pk": true,
+        "fk": true
+      },
+      "OPP_ID": {
+        "type": "INT",
+        "description": "opportunity identifier, links to vw_TD_EBI_OPP",
+        "pk": false,
+        "fk": true
+      },
+      "ACCOUNT_ID": {
+        "type": "INT",
+        "description": "account identifier, links to vw_TD_EBI_ACCOUNT",
+        "pk": false,
+        "fk": true
+      },
+      "PAY_MEASURE_ID": {
+        "type": "INT",
+        "description": "pay measure identifier",
+        "pk": false,
+        "fk": true
+      },
+      "OPG_ID": {
+        "type": "INT",
+        "description": "product group identifier, links to vw_EBI_OPG",
+        "pk": false,
+        "fk": true
+      },
+      "SEGMENT_ID": {
+        "type": "INT",
+        "description": "segment identifier",
+        "pk": false,
+        "fk": true
+      },
+      "REGION_ID": {
+        "type": "INT",
+        "description": "region identifier, links to vw_td_ebi_region_rpt",
+        "pk": false,
+        "fk": true
+      },
+      "CREATOR_TYPE_ID": {
+        "type": "INT",
+        "description": "creator type identifier, links to vw_EBI_CREATOR_TYPE",
+        "pk": false,
+        "fk": true
+      },
+      "SALES_STAGE_ID": {
+        "type": "INT",
+        "description": "sales stage, links to vw_ebi_sales_stage",
+        "pk": false,
+        "fk": true
+      },
+      "DEAL_TYPE_ID": {
+        "type": "INT",
+        "description": "deal type identifier, links to TD_EBI_DEAL_TYPE",
+        "pk": false,
+        "fk": true
+      },
+      "OPP_CLOSE_DATE_ID": {
+        "type": "INT",
+        "description": "opportunity close date key, links to vw_EBI_CALDATE",
+        "pk": false,
+        "fk": true
+      },
+      "OPP_CREATE_DATE_ID": {
+        "type": "INT",
+        "description": "opportunity create date key, links to vw_EBI_CALDATE",
+        "pk": false,
+        "fk": true
+      },
+      "SNAPSHOT_DATE_ID": {
+        "type": "INT",
+        "description": "snapshot date key, links to vw_EBI_CALDATE",
+        "pk": false,
+        "fk": true
+      },
+      "SNAPSHOT_DATE": {
+        "type": "DATETIME",
+        "description": "snapshot date value",
+        "pk": false,
+        "fk": false
+      },
+      "REPORTING_HIERARCHY_ID": {
+        "type": "INT",
+        "description": "reporting hierarchy identifier",
+        "pk": false,
+        "fk": true
+      },
+      "DERIVED_CLOSURE_DATE_ID": {
+        "type": "INT",
+        "description": "derived closure date key, links to vw_EBI_CALDATE",
+        "pk": false,
+        "fk": true
+      },
+      "DEAL_BAND_ID": {
+        "type": "INT",
+        "description": "deal band identifier",
+        "pk": false,
+        "fk": true
+      },
+      "DEAL_BAND": {
+        "type": "VARCHAR",
+        "description": "deal band label",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_BAND_25K": {
+        "type": "VARCHAR",
+        "description": "deal band 25K label",
+        "pk": false,
+        "fk": false
+      },
+      "ORIGINAL_REGION_ID": {
+        "type": "INT",
+        "description": "original region identifier, links to vw_td_ebi_region_rpt",
+        "pk": false,
+        "fk": true
+      },
+      "ORIGINAL_SEGMENT_ID": {
+        "type": "INT",
+        "description": "original segment identifier",
+        "pk": false,
+        "fk": true
+      },
+      "PARTNER_TYPE": {
+        "type": "NVARCHAR",
+        "description": "partner type",
+        "pk": false,
+        "fk": false
+      },
+      "PARTNER_CREATED_ID_BY_DEAL": {
+        "type": "INT",
+        "description": "partner created by deal identifier",
+        "pk": false,
+        "fk": true
+      },
+      "PARTNER_CATEGORY": {
+        "type": "NVARCHAR",
+        "description": "partner category",
+        "pk": false,
+        "fk": false
+      },
+      "PARTNER_CREATED_ID_BY_PARTNER": {
+        "type": "INT",
+        "description": "partner created by partner identifier",
+        "pk": false,
+        "fk": true
+      },
+      "CHILD_PARTNER_ID": {
+        "type": "NVARCHAR",
+        "description": "child partner identifier",
+        "pk": false,
+        "fk": false
+      },
+      "CHILD_PARTNER_NAME": {
+        "type": "NVARCHAR",
+        "description": "child partner name",
+        "pk": false,
+        "fk": false
+      },
+      "CONSULTING_SEGMENT_ID": {
+        "type": "INT",
+        "description": "consulting segment identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SALES_MOTION_ID": {
+        "type": "INT",
+        "description": "sales motion identifier",
+        "pk": false,
+        "fk": true
+      },
+      "FOCUS_VERTICAL_ID": {
+        "type": "INT",
+        "description": "focus vertical identifier",
+        "pk": false,
+        "fk": true
+      },
+      "REVENUE_TYPE_ID": {
+        "type": "INT",
+        "description": "revenue type identifier",
+        "pk": false,
+        "fk": true
+      },
+      "QUARTER_CATEGORY_ID": {
+        "type": "INT",
+        "description": "quarter category identifier",
+        "pk": false,
+        "fk": true
+      },
+      "ADJ_COMMITMENT": {
+        "type": "VARCHAR",
+        "description": "adjusted commitment level",
+        "pk": false,
+        "fk": false
+      },
+      "GEO_ADJ_COMMIT": {
+        "type": "NVARCHAR",
+        "description": "geo adjusted commitment",
+        "pk": false,
+        "fk": false
+      },
+      "ACS_MANAGER_ADJUSTED_COMMIT": {
+        "type": "NVARCHAR",
+        "description": "ACS manager adjusted commitment",
+        "pk": false,
+        "fk": false
+      },
+      "MGR_ADJ_COMMIT": {
+        "type": "NVARCHAR",
+        "description": "manager adjusted commitment",
+        "pk": false,
+        "fk": false
+      },
+      "REGION_ADJ_COMMIT": {
+        "type": "NVARCHAR",
+        "description": "region adjusted commitment",
+        "pk": false,
+        "fk": false
+      },
+      "ADJ_COMMITMENT_GROUP": {
+        "type": "VARCHAR",
+        "description": "commitment group",
+        "pk": false,
+        "fk": false
+      },
+      "ADJ_COMMITMENT_SUBGROUP": {
+        "type": "VARCHAR",
+        "description": "commitment subgroup",
+        "pk": false,
+        "fk": false
+      },
+      "ADJ_COMMITMENT_SORT": {
+        "type": "INT",
+        "description": "commitment sort order",
+        "pk": false,
+        "fk": false
+      },
+      "DAYS_SINCE_NEXT_STEPS_MODIFIED": {
+        "type": "INT",
+        "description": "days since next steps were last modified",
+        "pk": false,
+        "fk": false
+      },
+      "DAYS_SINCE_NEXT_STEPS_MODIFIED_BAND": {
+        "type": "VARCHAR",
+        "description": "days since next steps modified band",
+        "pk": false,
+        "fk": false
+      },
+      "STALLED_BUT_INACTIVE": {
+        "type": "NVARCHAR",
+        "description": "stalled/inactive deal indicator",
+        "pk": false,
+        "fk": false
+      },
+      "WIN_LOSS_THRESHOLD_FLAG": {
+        "type": "VARCHAR",
+        "description": "win/loss threshold flag",
+        "pk": false,
+        "fk": false
+      },
+      "OLI_PRODUCT_DEAL_TYPE": {
+        "type": "NVARCHAR",
+        "description": "OLI product deal type",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_TEAM_MEMBER_ROLE": {
+        "type": "NVARCHAR",
+        "description": "sales team member role",
+        "pk": false,
+        "fk": false
+      },
+      "STAGE_DURATION_ID": {
+        "type": "INT",
+        "description": "stage duration identifier",
+        "pk": false,
+        "fk": true
+      },
+      "STAGE_DURATION": {
+        "type": "NVARCHAR",
+        "description": "stage duration label",
+        "pk": false,
+        "fk": false
+      },
+      "STAGE_DURATION_GRP_ID": {
+        "type": "INT",
+        "description": "stage duration group identifier",
+        "pk": false,
+        "fk": true
+      },
+      "STAGE_DURATION_GROUP": {
+        "type": "NVARCHAR",
+        "description": "stage duration group label",
+        "pk": false,
+        "fk": false
+      },
+      "STAGE_DURATION_GROUP_SORT": {
+        "type": "INT",
+        "description": "stage duration group sort order",
+        "pk": false,
+        "fk": false
+      },
+      "PS_ALIGNED": {
+        "type": "NVARCHAR",
+        "description": "partner/services aligned indicator",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_AGE": {
+        "type": "INT",
+        "description": "age of the deal in days",
+        "pk": false,
+        "fk": false
+      },
+      "IN_PIPELINE": {
+        "type": "INT",
+        "description": "flag: 1 if deal is in pipeline",
+        "pk": false,
+        "fk": false
+      },
+      "IS_FLAT_RENEWAL": {
+        "type": "BIT",
+        "description": "flag: flat renewal deal",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_DURATION": {
+        "type": "INT",
+        "description": "total deal duration",
+        "pk": false,
+        "fk": false
+      },
+      "AGE_BAND": {
+        "type": "VARCHAR",
+        "description": "deal age band category",
+        "pk": false,
+        "fk": false
+      },
+      "LICENSING_RENEWAL_TYPE": {
+        "type": "NVARCHAR",
+        "description": "licensing renewal type",
+        "pk": false,
+        "fk": false
+      },
+      "UPDATED_DATE": {
+        "type": "DATETIME",
+        "description": "record last updated date",
+        "pk": false,
+        "fk": false
+      },
+      "SFDC_P2S_ID": {
+        "type": "NVARCHAR",
+        "description": "Salesforce P2S identifier",
+        "pk": false,
+        "fk": false
+      },
+      "STAGE_AGE": {
+        "type": "INT",
+        "description": "number of days in current stage",
+        "pk": false,
+        "fk": false
+      },
+      "IS_BOQ": {
+        "type": "VARCHAR",
+        "description": "beginning of quarter indicator",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_CREATOR_CRITERIA": {
+        "type": "NVARCHAR",
+        "description": "sub-creator criteria",
+        "pk": false,
+        "fk": false
+      },
+      "IS_EOQ": {
+        "type": "VARCHAR",
+        "description": "end of quarter indicator",
+        "pk": false,
+        "fk": false
+      },
+      "TP_ASV": {
+        "type": "MONEY",
+        "description": "total pipeline ASV amount",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_DRIVER_CRITERIA": {
+        "type": "NVARCHAR",
+        "description": "opportunity driver criteria",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_DRIVER_ID": {
+        "type": "INT",
+        "description": "opportunity driver identifier",
+        "pk": false,
+        "fk": true
+      },
+      "GTM_MOTION_ID": {
+        "type": "INT",
+        "description": "go-to-market motion identifier",
+        "pk": false,
+        "fk": true
+      },
+      "MUST_WIN_OVERLAY": {
+        "type": "NVARCHAR",
+        "description": "must-win overlay indicator",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_BAND_5M": {
+        "type": "VARCHAR",
+        "description": "deal band 5M label",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_BAND_5M_SORT": {
+        "type": "INT",
+        "description": "deal band 5M sort order",
+        "pk": false,
+        "fk": false
+      },
+      "MULTI_SOLUTION_FLAG_DESC": {
+        "type": "VARCHAR",
+        "description": "multi-solution flag description",
+        "pk": false,
+        "fk": false
+      },
+      "PARTNER_ID": {
+        "type": "INT",
+        "description": "partner identifier",
+        "pk": false,
+        "fk": true
+      },
+      "PARTNER_CREATOR_TYPE": {
+        "type": "VARCHAR",
+        "description": "partner creator type",
+        "pk": false,
+        "fk": false
+      },
+      "GLOBAL_PARENT_PARTNER_GPC": {
+        "type": "VARCHAR",
+        "description": "global parent partner GPC",
+        "pk": false,
+        "fk": false
+      },
+      "PARTNER_COHORT_ATT": {
+        "type": "VARCHAR",
+        "description": "partner cohort attribution",
+        "pk": false,
+        "fk": false
+      },
+      "PARTNER_COHORT_ATT_GLOBAL": {
+        "type": "VARCHAR",
+        "description": "global partner cohort attribution",
+        "pk": false,
+        "fk": false
+      },
+      "PARTNER_COHORT_GPC": {
+        "type": "VARCHAR",
+        "description": "partner cohort GPC",
+        "pk": false,
+        "fk": false
+      },
+      "PARTNER_COHORT_GPC_GLOBAL": {
+        "type": "VARCHAR",
+        "description": "global partner cohort GPC",
+        "pk": false,
+        "fk": false
+      },
+      "UPSELL_TYPE_ID": {
+        "type": "INT",
+        "description": "upsell type identifier",
+        "pk": false,
+        "fk": true
+      },
+      "CUSTOMER_HEALTH_ID": {
+        "type": "INT",
+        "description": "customer health identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SOLUTION_HEALTH_ID": {
+        "type": "INT",
+        "description": "solution health identifier",
+        "pk": false,
+        "fk": true
+      },
+      "MULTI_SOL_FLAG_GT_0_ASV": {
+        "type": "BIT",
+        "description": "flag: multi-solution with ASV > 0",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_BAND_NEW": {
+        "type": "VARCHAR",
+        "description": "new deal band label",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_BAND_NEW_SORT": {
+        "type": "INT",
+        "description": "new deal band sort order",
+        "pk": false,
+        "fk": false
+      },
+      "PARTNER_COHORT_GPC_SORT": {
+        "type": "INT",
+        "description": "partner cohort GPC sort order",
+        "pk": false,
+        "fk": false
+      },
+      "PARTNER_COHORT_ATT_SORT": {
+        "type": "INT",
+        "description": "partner cohort attribution sort order",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_COUNTRY_ID": {
+        "type": "INT",
+        "description": "account country identifier",
+        "pk": false,
+        "fk": true
+      },
+      "TPT_ID": {
+        "type": "INT",
+        "description": "TPT identifier, links to TF_EBI_TPT_INFO",
+        "pk": false,
+        "fk": true
+      },
+      "AE_REGION_ID": {
+        "type": "INT",
+        "description": "AE region identifier, links to vw_td_ebi_region_rpt",
+        "pk": false,
+        "fk": true
+      },
+      "SOURCE_NAME": {
+        "type": "VARCHAR",
+        "description": "data source name",
+        "pk": false,
+        "fk": false
+      },
+      "OPG_ARR_AVG_USD_CURR_FY": {
+        "type": "MONEY",
+        "description": "OPG ARR average USD for current FY",
+        "pk": false,
+        "fk": false
+      },
+      "OPG_TWELVE_MONTH_ENTRY_USD_CURR_FY": {
+        "type": "MONEY",
+        "description": "OPG 12-month entry USD current FY",
+        "pk": false,
+        "fk": false
+      },
+      "OPG_TWELVE_MONTH_EXIT_USD_CURR_FY": {
+        "type": "MONEY",
+        "description": "OPG 12-month exit USD current FY",
+        "pk": false,
+        "fk": false
+      },
+      "AES_SCORE_ID": {
+        "type": "INT",
+        "description": "AES score identifier",
+        "pk": false,
+        "fk": true
+      },
+      "OPP_RECON_IND": {
+        "type": "BIT",
+        "description": "opportunity reconciliation indicator",
+        "pk": false,
+        "fk": false
+      },
+      "COMMIT_FLAG": {
+        "type": "VARCHAR",
+        "description": "commit flag",
+        "pk": false,
+        "fk": false
+      },
+      "CQ_RISK_CATEGORY": {
+        "type": "VARCHAR",
+        "description": "current quarter risk category",
+        "pk": false,
+        "fk": false
+      },
+      "UCP_ICP_SCORE_ID": {
+        "type": "INT",
+        "description": "UCP/ICP score identifier, links to vw_TD_ICP_UCP_SCORES",
+        "pk": false,
+        "fk": true
+      },
+      "SALES_PLAY_ID": {
+        "type": "INT",
+        "description": "sales play identifier",
+        "pk": false,
+        "fk": true
+      },
+      "STRATEGIC_SALES_PLAY": {
+        "type": "VARCHAR",
+        "description": "strategic sales play",
+        "pk": false,
+        "fk": false
+      },
+      "APPLICATION_SALES_TACTIC": {
+        "type": "VARCHAR",
+        "description": "application sales tactic",
+        "pk": false,
+        "fk": false
+      },
+      "PORTFOLIO_SALES_PLAY": {
+        "type": "VARCHAR",
+        "description": "portfolio sales play",
+        "pk": false,
+        "fk": false
+      },
+      "OPPTY": {
+        "type": "FLOAT",
+        "description": "opportunity dollar amount",
+        "pk": false,
+        "fk": false
+      },
+      "DS_SCORE": {
+        "type": "INT",
+        "description": "deal score",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_MA_ID": {
+        "type": "INT",
+        "description": "sub market area identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SUB_MA_SOLUTION_ID": {
+        "type": "INT",
+        "description": "sub market area solution identifier",
+        "pk": false,
+        "fk": true
+      },
+      "S4_PROGRESSION_ASV": {
+        "type": "MONEY",
+        "description": "S4 stage progression ASV",
+        "pk": false,
+        "fk": false
+      },
+      "ROLE_COVERAGE_ID": {
+        "type": "INT",
+        "description": "role coverage identifier, links to vw_TD_EBI_ROLE_Coverage",
+        "pk": false,
+        "fk": true
+      },
+      "PARENT_BAND_ID": {
+        "type": "INT",
+        "description": "parent band identifier",
+        "pk": false,
+        "fk": true
+      }
+    }
+  },
+  "vw_TF_EBI_QUOTA": {
+    "description": "Quota and target data by territory and time period.",
+    "columns": {
+      "QUOTA_ID": {
+        "type": "INT",
+        "description": "unique quota row identifier",
+        "pk": true,
+        "fk": false
+      },
+      "QUOTA_ACTUAL": {
+        "type": "MONEY",
+        "description": "actual quota amount",
+        "pk": false,
+        "fk": false
+      },
+      "QUOTA_REQ": {
+        "type": "MONEY",
+        "description": "required quota amount",
+        "pk": false,
+        "fk": false
+      },
+      "QUOTA_REQ_SS5": {
+        "type": "MONEY",
+        "description": "required quota at SS5 stage",
+        "pk": false,
+        "fk": false
+      },
+      "QUOTA_REQ_SS4": {
+        "type": "MONEY",
+        "description": "required quota at SS4 stage",
+        "pk": false,
+        "fk": false
+      },
+      "IN_QTR_GC_TARGET": {
+        "type": "MONEY",
+        "description": "in-quarter generation/coverage target",
+        "pk": false,
+        "fk": false
+      },
+      "IN_QTR_GC_TARGET_SS5": {
+        "type": "MONEY",
+        "description": "in-quarter GC target at SS5",
+        "pk": false,
+        "fk": false
+      },
+      "IN_QTR_GC_TARGET_SS4": {
+        "type": "DECIMAL",
+        "description": "in-quarter GC target at SS4",
+        "pk": false,
+        "fk": false
+      },
+      "SURVIVAL_RATIO": {
+        "type": "DECIMAL",
+        "description": "survival ratio metric",
+        "pk": false,
+        "fk": false
+      },
+      "PIPE_TARGET_SURVIVAL_RATE": {
+        "type": "MONEY",
+        "description": "pipeline target survival rate",
+        "pk": false,
+        "fk": false
+      },
+      "PIPE_TARGET_SURVIVAL_RATE_SS5": {
+        "type": "MONEY",
+        "description": "pipeline target survival rate at SS5",
+        "pk": false,
+        "fk": false
+      },
+      "PIPE_TARGET_SURVIVAL_RATE_SS4": {
+        "type": "DECIMAL",
+        "description": "pipeline target survival rate at SS4",
+        "pk": false,
+        "fk": false
+      },
+      "REGION_ID": {
+        "type": "INT",
+        "description": "region identifier, links to vw_td_ebi_region_rpt",
+        "pk": false,
+        "fk": true
+      },
+      "ORIGINAL_REGION_ID": {
+        "type": "INT",
+        "description": "original region identifier",
+        "pk": false,
+        "fk": true
+      },
+      "OPG_ID": {
+        "type": "INT",
+        "description": "product group identifier, links to vw_EBI_OPG",
+        "pk": false,
+        "fk": true
+      },
+      "QUOTA_FISCAL_QUARTER_ID": {
+        "type": "INT",
+        "description": "fiscal quarter date key, links to vw_EBI_CALDATE",
+        "pk": false,
+        "fk": true
+      },
+      "SNAPSHOT_DATE_ID": {
+        "type": "INT",
+        "description": "snapshot date key, links to vw_EBI_CALDATE",
+        "pk": false,
+        "fk": true
+      },
+      "PAY_MEASURE_ID": {
+        "type": "INT",
+        "description": "pay measure identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SEGMENT_ID": {
+        "type": "INT",
+        "description": "segment identifier",
+        "pk": false,
+        "fk": true
+      },
+      "DEAL_TYPE_ID": {
+        "type": "INT",
+        "description": "deal type identifier, links to TD_EBI_DEAL_TYPE",
+        "pk": false,
+        "fk": true
+      },
+      "CREATOR_TYPE_ID": {
+        "type": "INT",
+        "description": "creator type identifier",
+        "pk": false,
+        "fk": true
+      },
+      "FOCUS_VERTICAL_ID": {
+        "type": "INT",
+        "description": "focus vertical identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SALES_MOTION_ID": {
+        "type": "INT",
+        "description": "sales motion identifier",
+        "pk": false,
+        "fk": true
+      },
+      "ROLE_TYPE_ID": {
+        "type": "INT",
+        "description": "role type identifier",
+        "pk": false,
+        "fk": true
+      },
+      "REVENUE_TYPE_ID": {
+        "type": "INT",
+        "description": "revenue type identifier",
+        "pk": false,
+        "fk": true
+      },
+      "GTM_MOTION_ID": {
+        "type": "INT",
+        "description": "go-to-market motion identifier",
+        "pk": false,
+        "fk": true
+      },
+      "REPORTING_HIERARCHY_ID": {
+        "type": "INT",
+        "description": "reporting hierarchy identifier",
+        "pk": false,
+        "fk": true
+      },
+      "ROLE_COVERAGE_ID": {
+        "type": "INT",
+        "description": "role coverage identifier",
+        "pk": false,
+        "fk": true
+      },
+      "IS_ACTIVE": {
+        "type": "INT",
+        "description": "active flag",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "vw_TD_EBI_OPP": {
+    "description": "Opportunity (deal/pipeline) details including stage, partners, competitors, deal scores, and sales execution metadata.",
+    "columns": {
+      "OPP_ID": {
+        "type": "INT",
+        "description": "unique opportunity identifier",
+        "pk": true,
+        "fk": true
+      },
+      "SFDC_OPP_ID": {
+        "type": "VARCHAR",
+        "description": "Salesforce opportunity identifier",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_NAME": {
+        "type": "NVARCHAR",
+        "description": "opportunity display name",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_STAGE": {
+        "type": "VARCHAR",
+        "description": "current sales stage code",
+        "pk": false,
+        "fk": true
+      },
+      "HIGHEST_STAGE": {
+        "type": "VARCHAR",
+        "description": "highest stage ever reached",
+        "pk": false,
+        "fk": false
+      },
+      "CLOSED_FROM_STAGE": {
+        "type": "VARCHAR",
+        "description": "stage from which the deal was closed",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_ID": {
+        "type": "INT",
+        "description": "account identifier, links to vw_TD_EBI_ACCOUNT",
+        "pk": false,
+        "fk": true
+      },
+      "ORIGINAL_OPP_CREATE_DATE": {
+        "type": "DATE",
+        "description": "original opportunity creation date",
+        "pk": false,
+        "fk": false
+      },
+      "ORIGINAL_OPP_CREATE_DATE_ID": {
+        "type": "INT",
+        "description": "original creation date key, links to vw_EBI_CALDATE",
+        "pk": false,
+        "fk": true
+      },
+      "ORIGINAL_OPP_CLOSE_DATE": {
+        "type": "DATE",
+        "description": "original opportunity close date",
+        "pk": false,
+        "fk": false
+      },
+      "CLOSURE_DATE": {
+        "type": "DATE",
+        "description": "actual closure date",
+        "pk": false,
+        "fk": false
+      },
+      "STAGE_DURATION": {
+        "type": "VARCHAR",
+        "description": "duration in current stage",
+        "pk": false,
+        "fk": false
+      },
+      "REASON": {
+        "type": "NVARCHAR",
+        "description": "win/loss reason",
+        "pk": false,
+        "fk": false
+      },
+      "CLOSE_REASON_DETAIL": {
+        "type": "VARCHAR",
+        "description": "detailed close reason",
+        "pk": false,
+        "fk": false
+      },
+      "CLOSE_DATE_CHANGE_REASON": {
+        "type": "VARCHAR",
+        "description": "reason for close date change",
+        "pk": false,
+        "fk": false
+      },
+      "RECORD_OWNER": {
+        "type": "NVARCHAR",
+        "description": "opportunity record owner",
+        "pk": false,
+        "fk": false
+      },
+      "SOURCE_OF_LEAD": {
+        "type": "NVARCHAR",
+        "description": "lead source",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_PLAY": {
+        "type": "VARCHAR",
+        "description": "primary sales play",
+        "pk": false,
+        "fk": false
+      },
+      "SECONDARY_SALES_PLAY": {
+        "type": "VARCHAR",
+        "description": "secondary sales play",
+        "pk": false,
+        "fk": false
+      },
+      "STRATEGIC_SALES_PLAY": {
+        "type": "NVARCHAR",
+        "description": "strategic sales play",
+        "pk": false,
+        "fk": false
+      },
+      "PORTFOLIO_SALES_PLAY": {
+        "type": "NVARCHAR",
+        "description": "portfolio sales play",
+        "pk": false,
+        "fk": false
+      },
+      "APPLICATION_SALES_TACTIC": {
+        "type": "NVARCHAR",
+        "description": "application sales tactic",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_CAMPAIGN": {
+        "type": "VARCHAR",
+        "description": "sales campaign",
+        "pk": false,
+        "fk": false
+      },
+      "PRIMARY_USE_CASE": {
+        "type": "VARCHAR",
+        "description": "primary use case",
+        "pk": false,
+        "fk": false
+      },
+      "SECONDARY_USE_CASE": {
+        "type": "VARCHAR",
+        "description": "secondary use case",
+        "pk": false,
+        "fk": false
+      },
+      "PRIMARY_COMPETITOR": {
+        "type": "VARCHAR",
+        "description": "primary competitor name",
+        "pk": false,
+        "fk": false
+      },
+      "PRIMARY_COMPETITOR_SOLUTION": {
+        "type": "VARCHAR",
+        "description": "primary competitor solution",
+        "pk": false,
+        "fk": false
+      },
+      "SECONDARY_COMPETITOR": {
+        "type": "VARCHAR",
+        "description": "secondary competitor name",
+        "pk": false,
+        "fk": false
+      },
+      "SECONDARY_COMPETITOR_SOLUTION": {
+        "type": "VARCHAR",
+        "description": "secondary competitor solution",
+        "pk": false,
+        "fk": false
+      },
+      "COMPETITOR": {
+        "type": "VARCHAR",
+        "description": "competitor field",
+        "pk": false,
+        "fk": false
+      },
+      "COMPETITOR_FLAG": {
+        "type": "VARCHAR",
+        "description": "competitor flag",
+        "pk": false,
+        "fk": false
+      },
+      "PRIMARY_INCUMBENT": {
+        "type": "VARCHAR",
+        "description": "primary incumbent vendor",
+        "pk": false,
+        "fk": false
+      },
+      "SECONDARY_INCUMBENT": {
+        "type": "VARCHAR",
+        "description": "secondary incumbent vendor",
+        "pk": false,
+        "fk": false
+      },
+      "CO_SELLING_PARTNER_NAME": {
+        "type": "NVARCHAR",
+        "description": "co-selling partner name",
+        "pk": false,
+        "fk": false
+      },
+      "SOURCING_PARTNER_NAME": {
+        "type": "NVARCHAR",
+        "description": "sourcing partner name",
+        "pk": false,
+        "fk": false
+      },
+      "SELLING_PARTNER_ID": {
+        "type": "VARCHAR",
+        "description": "selling partner identifier",
+        "pk": false,
+        "fk": false
+      },
+      "SOURCING_PARTNER_ID": {
+        "type": "VARCHAR",
+        "description": "sourcing partner identifier",
+        "pk": false,
+        "fk": false
+      },
+      "FULFILLMENT_PARTNER_ID": {
+        "type": "VARCHAR",
+        "description": "fulfillment partner identifier",
+        "pk": false,
+        "fk": false
+      },
+      "FULFILLMENT_PARTNER_NAME": {
+        "type": "NVARCHAR",
+        "description": "fulfillment partner name",
+        "pk": false,
+        "fk": false
+      },
+      "PARTNER_SOURCE": {
+        "type": "VARCHAR",
+        "description": "partner source",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_REG_ID": {
+        "type": "VARCHAR",
+        "description": "deal registration identifier",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_REG_IND": {
+        "type": "VARCHAR",
+        "description": "deal registration indicator",
+        "pk": false,
+        "fk": false
+      },
+      "LICENSING_PROGRAM": {
+        "type": "VARCHAR",
+        "description": "licensing program",
+        "pk": false,
+        "fk": false
+      },
+      "LICENSING_PROGRAM_TYPE": {
+        "type": "VARCHAR",
+        "description": "licensing program type",
+        "pk": false,
+        "fk": false
+      },
+      "ETLA_FLAG": {
+        "type": "VARCHAR",
+        "description": "ETLA flag",
+        "pk": false,
+        "fk": false
+      },
+      "ETLA_TYPE": {
+        "type": "VARCHAR",
+        "description": "ETLA type",
+        "pk": false,
+        "fk": false
+      },
+      "MUST_WIN": {
+        "type": "NVARCHAR",
+        "description": "must-win designation",
+        "pk": false,
+        "fk": false
+      },
+      "MUST_WIN_OVERLAY": {
+        "type": "NVARCHAR",
+        "description": "must-win overlay indicator",
+        "pk": false,
+        "fk": false
+      },
+      "FINAL_ELIGIBILITY": {
+        "type": "VARCHAR",
+        "description": "final eligibility status",
+        "pk": false,
+        "fk": false
+      },
+      "CONTRACT_STATUS": {
+        "type": "NVARCHAR",
+        "description": "contract status",
+        "pk": false,
+        "fk": false
+      },
+      "AGREEMENT_STATUS": {
+        "type": "VARCHAR",
+        "description": "agreement status",
+        "pk": false,
+        "fk": false
+      },
+      "RENEWAL": {
+        "type": "BIT",
+        "description": "renewal indicator",
+        "pk": false,
+        "fk": false
+      },
+      "PUSHED_COUNT": {
+        "type": "INT",
+        "description": "number of times deal was pushed",
+        "pk": false,
+        "fk": false
+      },
+      "PUSH_COUNT": {
+        "type": "SMALLINT",
+        "description": "push count",
+        "pk": false,
+        "fk": false
+      },
+      "NEXT_STEP": {
+        "type": "NVARCHAR",
+        "description": "next step text",
+        "pk": false,
+        "fk": false
+      },
+      "DAYS_SINCE_NEXT_STEPS_MODIFIED": {
+        "type": "INT",
+        "description": "days since next steps were updated",
+        "pk": false,
+        "fk": false
+      },
+      "BUSINESS_VALUE": {
+        "type": "VARCHAR",
+        "description": "MEDDPICC business value",
+        "pk": false,
+        "fk": false
+      },
+      "AUTHORITY": {
+        "type": "VARCHAR",
+        "description": "MEDDPICC authority",
+        "pk": false,
+        "fk": false
+      },
+      "BUDGET": {
+        "type": "VARCHAR",
+        "description": "MEDDPICC budget",
+        "pk": false,
+        "fk": false
+      },
+      "SUCCESS": {
+        "type": "VARCHAR",
+        "description": "MEDDPICC success criteria",
+        "pk": false,
+        "fk": false
+      },
+      "TECHNICAL_FIT": {
+        "type": "VARCHAR",
+        "description": "MEDDPICC technical fit",
+        "pk": false,
+        "fk": false
+      },
+      "TIMING": {
+        "type": "VARCHAR",
+        "description": "MEDDPICC timing",
+        "pk": false,
+        "fk": false
+      },
+      "BUSINESS_VALUE_RISK_DETAILS": {
+        "type": "NVARCHAR",
+        "description": "business value risk details",
+        "pk": false,
+        "fk": false
+      },
+      "TECHNICAL_FIT_RISK_DETAILS": {
+        "type": "NVARCHAR",
+        "description": "technical fit risk details",
+        "pk": false,
+        "fk": false
+      },
+      "TIMING_RISK_DETAILS": {
+        "type": "NVARCHAR",
+        "description": "timing risk details",
+        "pk": false,
+        "fk": false
+      },
+      "AUTHORITY_RISK_DETAILS": {
+        "type": "NVARCHAR",
+        "description": "authority risk details",
+        "pk": false,
+        "fk": false
+      },
+      "BUDGET_RISK_DETAILS": {
+        "type": "NVARCHAR",
+        "description": "budget risk details",
+        "pk": false,
+        "fk": false
+      },
+      "SUCCESS_RISK_DETAILS": {
+        "type": "NVARCHAR",
+        "description": "success risk details",
+        "pk": false,
+        "fk": false
+      },
+      "MUTUAL_PLAN_STATUS": {
+        "type": "VARCHAR",
+        "description": "mutual plan status",
+        "pk": false,
+        "fk": false
+      },
+      "BUSINESS_CASE_STATUS": {
+        "type": "VARCHAR",
+        "description": "business case status",
+        "pk": false,
+        "fk": false
+      },
+      "TECHNICAL_CASE_STATUS": {
+        "type": "VARCHAR",
+        "description": "technical case status",
+        "pk": false,
+        "fk": false
+      },
+      "SUCCESS_PLAN_STATUS": {
+        "type": "VARCHAR",
+        "description": "success plan status",
+        "pk": false,
+        "fk": false
+      },
+      "PROPOSAL_STATUS": {
+        "type": "VARCHAR",
+        "description": "proposal status",
+        "pk": false,
+        "fk": false
+      },
+      "IPOV_STATUS": {
+        "type": "VARCHAR",
+        "description": "iPOV status",
+        "pk": false,
+        "fk": false
+      },
+      "DECISION_MAPPING_STATUS": {
+        "type": "VARCHAR",
+        "description": "decision mapping status",
+        "pk": false,
+        "fk": false
+      },
+      "INTERNAL_CLOSE_PLAN_STATUS": {
+        "type": "VARCHAR",
+        "description": "internal close plan status",
+        "pk": false,
+        "fk": false
+      },
+      "DS_SCORE": {
+        "type": "INT",
+        "description": "deal score",
+        "pk": false,
+        "fk": false
+      },
+      "DS_MAX_POINT": {
+        "type": "INT",
+        "description": "deal score max points",
+        "pk": false,
+        "fk": false
+      },
+      "DS_SCORE_GAP": {
+        "type": "INT",
+        "description": "deal score gap",
+        "pk": false,
+        "fk": false
+      },
+      "DS_EXPLANATION": {
+        "type": "NVARCHAR",
+        "description": "deal score explanation",
+        "pk": false,
+        "fk": false
+      },
+      "DS_NEXT_BEST_ACTIONS": {
+        "type": "NVARCHAR",
+        "description": "deal score next best actions",
+        "pk": false,
+        "fk": false
+      },
+      "DS_HAS_CHANGE": {
+        "type": "BIT",
+        "description": "flag: deal score changed",
+        "pk": false,
+        "fk": false
+      },
+      "DS_HAS_SCORE": {
+        "type": "BIT",
+        "description": "flag: has deal score",
+        "pk": false,
+        "fk": false
+      },
+      "DS_PRIORITY_SCORE": {
+        "type": "FLOAT",
+        "description": "deal score priority",
+        "pk": false,
+        "fk": false
+      },
+      "DRD_STAGE_DURATION": {
+        "type": "INT",
+        "description": "DRD stage duration",
+        "pk": false,
+        "fk": false
+      },
+      "TECH_RISK_RATING": {
+        "type": "NVARCHAR",
+        "description": "technical risk rating",
+        "pk": false,
+        "fk": false
+      },
+      "TECH_RISK_SUMMARY": {
+        "type": "NVARCHAR",
+        "description": "technical risk summary",
+        "pk": false,
+        "fk": false
+      },
+      "TECH_DRIVER": {
+        "type": "NVARCHAR",
+        "description": "technical driver",
+        "pk": false,
+        "fk": false
+      },
+      "CLOUD_TECH_TYPE": {
+        "type": "VARCHAR",
+        "description": "cloud technology type",
+        "pk": false,
+        "fk": false
+      },
+      "COMPELLING_EVENT": {
+        "type": "NVARCHAR",
+        "description": "compelling event",
+        "pk": false,
+        "fk": false
+      },
+      "COMPELLING_EVENT_DETAILS": {
+        "type": "NVARCHAR",
+        "description": "compelling event details",
+        "pk": false,
+        "fk": false
+      },
+      "BUSINESS_DRIVER": {
+        "type": "VARCHAR",
+        "description": "business driver name",
+        "pk": false,
+        "fk": false
+      },
+      "BUSINESS_DRIVER_ID": {
+        "type": "VARCHAR",
+        "description": "business driver identifier",
+        "pk": false,
+        "fk": false
+      },
+      "BUSINESS_DRIVER_LDAP": {
+        "type": "VARCHAR",
+        "description": "business driver LDAP",
+        "pk": false,
+        "fk": false
+      },
+      "BUSINESS_DRIVER_ROLE": {
+        "type": "VARCHAR",
+        "description": "business driver role",
+        "pk": false,
+        "fk": false
+      },
+      "BUSINESS_ISSUE": {
+        "type": "NVARCHAR",
+        "description": "business issue",
+        "pk": false,
+        "fk": false
+      },
+      "GEO_FORECAST_NOTES": {
+        "type": "NVARCHAR",
+        "description": "geo forecast notes",
+        "pk": false,
+        "fk": false
+      },
+      "MGR_FORECAST_NOTES": {
+        "type": "NVARCHAR",
+        "description": "manager forecast notes",
+        "pk": false,
+        "fk": false
+      },
+      "REGION_FORECAST_NOTES": {
+        "type": "NVARCHAR",
+        "description": "region forecast notes",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_REVIEWED_BY": {
+        "type": "VARCHAR",
+        "description": "deal reviewer",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_REVIEW_NOTES": {
+        "type": "NVARCHAR",
+        "description": "deal review notes",
+        "pk": false,
+        "fk": false
+      },
+      "DATE_LAST_REVIEWED": {
+        "type": "DATE",
+        "description": "date of last deal review",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_EXECUTION_SPONSOR": {
+        "type": "VARCHAR",
+        "description": "deal execution sponsor",
+        "pk": false,
+        "fk": false
+      },
+      "EXECUTIVE_SPONSOR": {
+        "type": "NVARCHAR",
+        "description": "executive sponsor",
+        "pk": false,
+        "fk": false
+      },
+      "EXECUTIVE_SPONSOR_NAME": {
+        "type": "VARCHAR",
+        "description": "executive sponsor name",
+        "pk": false,
+        "fk": false
+      },
+      "EXECUTIVE_TEAM_ENGAGED": {
+        "type": "NVARCHAR",
+        "description": "executive team engaged",
+        "pk": false,
+        "fk": false
+      },
+      "S3_Created": {
+        "type": "DATE",
+        "description": "date S3 stage created",
+        "pk": false,
+        "fk": false
+      },
+      "S4_Created": {
+        "type": "DATE",
+        "description": "date S4 stage created",
+        "pk": false,
+        "fk": false
+      },
+      "S5_Created": {
+        "type": "DATE",
+        "description": "date S5 stage created",
+        "pk": false,
+        "fk": false
+      },
+      "S6_Created": {
+        "type": "DATE",
+        "description": "date S6 stage created",
+        "pk": false,
+        "fk": false
+      },
+      "S7_Created": {
+        "type": "DATE",
+        "description": "date S7 stage created",
+        "pk": false,
+        "fk": false
+      },
+      "SFDC_OPP_URL": {
+        "type": "VARCHAR",
+        "description": "Salesforce opportunity URL",
+        "pk": false,
+        "fk": false
+      },
+      "PANORAMA_URL": {
+        "type": "VARCHAR",
+        "description": "Panorama URL",
+        "pk": false,
+        "fk": false
+      },
+      "EMEA_MARKET_AREA": {
+        "type": "VARCHAR",
+        "description": "EMEA market area",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_ADDRESS_COUNTRY": {
+        "type": "VARCHAR",
+        "description": "account address country",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_OPS_RECONCILED": {
+        "type": "INT",
+        "description": "sales ops reconciled flag",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_OPS_EXCLUDE": {
+        "type": "VARCHAR",
+        "description": "sales ops exclude flag",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "vw_TD_EBI_ACCOUNT": {
+    "description": "Account master data — customer profiles, segments, identifiers, health summaries, and DX segmentation.",
+    "columns": {
+      "ACCOUNT_ID": {
+        "type": "INT",
+        "description": "unique account identifier",
+        "pk": true,
+        "fk": true
+      },
+      "SFDC_ACCOUNT_ID": {
+        "type": "NVARCHAR",
+        "description": "Salesforce account identifier",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_NAME": {
+        "type": "NVARCHAR",
+        "description": "account display name",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_SUB_ID": {
+        "type": "INT",
+        "description": "sub-account identifier",
+        "pk": false,
+        "fk": true
+      },
+      "PARENT_ID": {
+        "type": "INT",
+        "description": "parent account identifier",
+        "pk": false,
+        "fk": true
+      },
+      "PARENT_NAME": {
+        "type": "NVARCHAR",
+        "description": "parent account name",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_ID": {
+        "type": "INT",
+        "description": "subsidiary identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SUB_NAME": {
+        "type": "NVARCHAR",
+        "description": "subsidiary name",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_TYPE": {
+        "type": "VARCHAR",
+        "description": "account type",
+        "pk": false,
+        "fk": false
+      },
+      "INDUSTRY": {
+        "type": "VARCHAR",
+        "description": "industry classification",
+        "pk": false,
+        "fk": false
+      },
+      "INDUSTRY_CATEGORY": {
+        "type": "NVARCHAR",
+        "description": "industry category grouping",
+        "pk": false,
+        "fk": false
+      },
+      "FOCUS_VERTICAL": {
+        "type": "VARCHAR",
+        "description": "focus vertical",
+        "pk": false,
+        "fk": false
+      },
+      "MARKET_AREA": {
+        "type": "VARCHAR",
+        "description": "market area",
+        "pk": false,
+        "fk": false
+      },
+      "PARENT_ANNUAL_REV_BAND": {
+        "type": "VARCHAR",
+        "description": "parent account annual revenue band",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_PRIORITY": {
+        "type": "VARCHAR",
+        "description": "account priority designation",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_DX_MINOR_SEGMENT": {
+        "type": "VARCHAR",
+        "description": "current DX minor segment",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_DX_MAJOR_SEGMENT": {
+        "type": "VARCHAR",
+        "description": "current DX major segment",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_FY_DX_MINOR_SEGMENT": {
+        "type": "VARCHAR",
+        "description": "previous FY DX minor segment",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_FY_DX_MAJOR_SEGMENT": {
+        "type": "VARCHAR",
+        "description": "previous FY DX major segment",
+        "pk": false,
+        "fk": false
+      },
+      "AES_SCORE": {
+        "type": "VARCHAR",
+        "description": "Account Engagement Score",
+        "pk": false,
+        "fk": false
+      },
+      "PANORAMA_ACCOUNT_LINK": {
+        "type": "VARCHAR",
+        "description": "Panorama account URL",
+        "pk": false,
+        "fk": false
+      },
+      "CURRENT_SITUATION": {
+        "type": "NVARCHAR",
+        "description": "current situation summary",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_HEALTH_SUMMARY": {
+        "type": "NVARCHAR",
+        "description": "account health summary",
+        "pk": false,
+        "fk": false
+      },
+      "NEXT_ACTION": {
+        "type": "NVARCHAR",
+        "description": "next action text",
+        "pk": false,
+        "fk": false
+      },
+      "NEXT_ACTION_UPDATED_DATE": {
+        "type": "DATETIME",
+        "description": "next action last updated date",
+        "pk": false,
+        "fk": false
+      },
+      "DX_HEALTH_LAST_MODIFIED_BY": {
+        "type": "VARCHAR",
+        "description": "DX health last modified by",
+        "pk": false,
+        "fk": false
+      },
+      "DX_HEALTH_LAST_MODIFIED_DATE": {
+        "type": "DATETIME",
+        "description": "DX health last modified date",
+        "pk": false,
+        "fk": false
+      },
+      "HAVE_ACTIVE_PQ_EOQ_ARR": {
+        "type": "BIT",
+        "description": "flag: has active PQ EOQ ARR",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_TENURE": {
+        "type": "DECIMAL",
+        "description": "account tenure",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_HAS_PAID_SUPPORT": {
+        "type": "SMALLINT",
+        "description": "flag: has paid support",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_HAS_ULTIMATE_SUPPORT": {
+        "type": "SMALLINT",
+        "description": "flag: has ultimate support",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "vw_EBI_OPG": {
+    "description": "Outlook Product Group (OPG) dimension view. Groups products into hierarchies for reporting across multiple solution taxonomies.",
+    "columns": {
+      "OPG_KEY": {
+        "type": "INT",
+        "description": "unique product group identifier",
+        "pk": true,
+        "fk": true
+      },
+      "PRODUCT_STG": {
+        "type": "VARCHAR",
+        "description": "product stage name",
+        "pk": false,
+        "fk": false
+      },
+      "PRODUCT": {
+        "type": "VARCHAR",
+        "description": "product name",
+        "pk": false,
+        "fk": false
+      },
+      "PRODUCT_GRP": {
+        "type": "VARCHAR",
+        "description": "product group name",
+        "pk": false,
+        "fk": false
+      },
+      "SOLUTION": {
+        "type": "VARCHAR",
+        "description": "solution name",
+        "pk": false,
+        "fk": false
+      },
+      "SOLUTION_GRP": {
+        "type": "VARCHAR",
+        "description": "solution group name",
+        "pk": false,
+        "fk": false
+      },
+      "SOLUTION_GRP_SORT_ORDER": {
+        "type": "INT",
+        "description": "solution group sort order",
+        "pk": false,
+        "fk": false
+      },
+      "BU": {
+        "type": "VARCHAR",
+        "description": "business unit",
+        "pk": false,
+        "fk": false
+      },
+      "BU_DME": {
+        "type": "VARCHAR",
+        "description": "DME business unit",
+        "pk": false,
+        "fk": false
+      },
+      "MOPG1": {
+        "type": "VARCHAR",
+        "description": "Major Outlook Product Group — top-level product grouping",
+        "pk": false,
+        "fk": true
+      },
+      "MOPG2": {
+        "type": "VARCHAR",
+        "description": "second-level Outlook Product Group",
+        "pk": false,
+        "fk": false
+      },
+      "PMBU": {
+        "type": "VARCHAR",
+        "description": "PMBU grouping",
+        "pk": false,
+        "fk": false
+      },
+      "SOLUTION_ABBR": {
+        "type": "VARCHAR",
+        "description": "solution abbreviation",
+        "pk": false,
+        "fk": false
+      },
+      "PMBU_SHORT_DESC": {
+        "type": "VARCHAR",
+        "description": "PMBU short description",
+        "pk": false,
+        "fk": false
+      },
+      "PMBU_DESC": {
+        "type": "VARCHAR",
+        "description": "PMBU description",
+        "pk": false,
+        "fk": false
+      },
+      "SOLUTION_SORT": {
+        "type": "INT",
+        "description": "solution sort order",
+        "pk": false,
+        "fk": false
+      },
+      "PRODUCT_SORT": {
+        "type": "INT",
+        "description": "product sort order",
+        "pk": false,
+        "fk": false
+      },
+      "DIMENSION_TYPE": {
+        "type": "VARCHAR",
+        "description": "dimension type",
+        "pk": false,
+        "fk": false
+      },
+      "PRODUCT_GROUP_SORT": {
+        "type": "INT",
+        "description": "product group sort order",
+        "pk": false,
+        "fk": false
+      },
+      "STRATEGIC_SOLUTION": {
+        "type": "VARCHAR",
+        "description": "strategic solution name",
+        "pk": false,
+        "fk": false
+      },
+      "STRATEGIC_SOLUTION_SORT": {
+        "type": "INT",
+        "description": "strategic solution sort order",
+        "pk": false,
+        "fk": false
+      },
+      "PANORAMA_SOLUTION": {
+        "type": "VARCHAR",
+        "description": "Panorama solution name",
+        "pk": false,
+        "fk": false
+      },
+      "DMX_PRODUCT": {
+        "type": "NVARCHAR",
+        "description": "DMX product name",
+        "pk": false,
+        "fk": false
+      },
+      "DMX_SOLUTION": {
+        "type": "NVARCHAR",
+        "description": "DMX solution name",
+        "pk": false,
+        "fk": false
+      },
+      "DMX_SOLUTION_GROUP": {
+        "type": "NVARCHAR",
+        "description": "DMX solution group name",
+        "pk": false,
+        "fk": false
+      },
+      "DMX_PRODUCT_SORT": {
+        "type": "INT",
+        "description": "DMX product sort order",
+        "pk": false,
+        "fk": false
+      },
+      "DMX_SOLUTION_SORT": {
+        "type": "INT",
+        "description": "DMX solution sort order",
+        "pk": false,
+        "fk": false
+      },
+      "DMX_SOLUTION_GROUP_SORT": {
+        "type": "FLOAT",
+        "description": "DMX solution group sort order",
+        "pk": false,
+        "fk": false
+      },
+      "DME_SOLUTION": {
+        "type": "NVARCHAR",
+        "description": "DME solution name",
+        "pk": false,
+        "fk": false
+      },
+      "DME_SOLUTION_GROUP": {
+        "type": "NVARCHAR",
+        "description": "DME solution group name",
+        "pk": false,
+        "fk": false
+      },
+      "DME_SOLUTION_SORT": {
+        "type": "INT",
+        "description": "DME solution sort order",
+        "pk": false,
+        "fk": false
+      },
+      "DME_SOLUTION_GROUP_SORT": {
+        "type": "INT",
+        "description": "DME solution group sort order",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "vw_EBI_CALDATE": {
+    "description": "Calendar/date dimension view for fiscal and calendar periods.",
+    "columns": {
+      "DATE_KEY": {
+        "type": "INT",
+        "description": "date key (used by all _DATE_ID foreign keys)",
+        "pk": true,
+        "fk": true
+      },
+      "CALENDAR_DATE": {
+        "type": "DATE",
+        "description": "actual calendar date",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR": {
+        "type": "INT",
+        "description": "fiscal year as integer key (Adobe FY starts in December). There is no FISCAL_YR_ID column — use FISCAL_YR.",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR_DESC": {
+        "type": "VARCHAR",
+        "description": "fiscal year description",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR_AND_QTR": {
+        "type": "INT",
+        "description": "fiscal year and quarter as integer key (e.g. 20254). There is no FISCAL_QTR_ID column — use FISCAL_YR_AND_QTR.",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR_AND_QTR_DESC": {
+        "type": "VARCHAR",
+        "description": "fiscal year and quarter description (e.g. '2025-Q4')",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR_AND_WK": {
+        "type": "INT",
+        "description": "fiscal year and week",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR_AND_WK_DESC": {
+        "type": "VARCHAR",
+        "description": "fiscal year and week description",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_WK_AND_QTR_DESC": {
+        "type": "VARCHAR",
+        "description": "fiscal week and quarter description",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_WEEK_NUMBER_BY_QTR": {
+        "type": "VARCHAR",
+        "description": "fiscal week number within the quarter",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_QUARTER_SHORT": {
+        "type": "VARCHAR",
+        "description": "short fiscal quarter label",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR_AND_PER": {
+        "type": "INT",
+        "description": "fiscal year and period",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR_AND_MONTH": {
+        "type": "VARCHAR",
+        "description": "fiscal year and month",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR_QTR_WK": {
+        "type": "VARCHAR",
+        "description": "fiscal year/quarter/week composite",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR_QTR_WeeK": {
+        "type": "VARCHAR",
+        "description": "fiscal year/quarter/week (alternate)",
+        "pk": false,
+        "fk": false
+      },
+      "YEAR": {
+        "type": "INT",
+        "description": "calendar year",
+        "pk": false,
+        "fk": false
+      },
+      "QUARTER": {
+        "type": "VARCHAR",
+        "description": "calendar quarter",
+        "pk": false,
+        "fk": false
+      },
+      "MONTH": {
+        "type": "VARCHAR",
+        "description": "calendar month",
+        "pk": false,
+        "fk": false
+      },
+      "WEEKNUMBER": {
+        "type": "VARCHAR",
+        "description": "calendar week number",
+        "pk": false,
+        "fk": false
+      },
+      "DAY_NAME": {
+        "type": "INT",
+        "description": "day of week as integer",
+        "pk": false,
+        "fk": false
+      },
+      "QTRKEY": {
+        "type": "VARCHAR",
+        "description": "quarter key for sorting/grouping",
+        "pk": false,
+        "fk": false
+      },
+      "MONTHKEY": {
+        "type": "VARCHAR",
+        "description": "month key for sorting/grouping",
+        "pk": false,
+        "fk": false
+      },
+      "WEEK_SORT_ORDER_REVERSE": {
+        "type": "VARCHAR",
+        "description": "Snapshot week bucket (Snapshot_Week_bkt). Use WEEK_SORT_ORDER_REVERSE = 0 for mandatory global filter. In vw_EBI_CALDATE; join from pipeline/quota via SNAPSHOT_DATE_ID = DATE_KEY.",
+        "pk": false,
+        "fk": false
+      },
+      "WEEK_SORT_ORDER_REVERSE_RTB": {
+        "type": "VARCHAR",
+        "description": "reverse week sort order for RTB",
+        "pk": false,
+        "fk": false
+      },
+      "WEEK_SORT_ORDER_REVERSE_Ord": {
+        "type": "BIGINT",
+        "description": "reverse week sort ordinal",
+        "pk": false,
+        "fk": false
+      },
+      "WEEK_SORT_ORDER_REVERSE_RTB_Ord": {
+        "type": "BIGINT",
+        "description": "reverse week sort ordinal for RTB",
+        "pk": false,
+        "fk": false
+      },
+      "QTR_SORT_ORDER_REVERSE": {
+        "type": "BIGINT",
+        "description": "reverse quarter sort order",
+        "pk": false,
+        "fk": false
+      },
+      "DaysToQuarter": {
+        "type": "INT",
+        "description": "days remaining to quarter end",
+        "pk": false,
+        "fk": false
+      },
+      "PeriodShort": {
+        "type": "BIGINT",
+        "description": "short period identifier",
+        "pk": false,
+        "fk": false
+      },
+      "WeekNumberName": {
+        "type": "VARCHAR",
+        "description": "week number display name",
+        "pk": false,
+        "fk": false
+      },
+      "WeekNumberNameRTB": {
+        "type": "VARCHAR",
+        "description": "week number display name for RTB",
+        "pk": false,
+        "fk": false
+      },
+      "QTR_BKT_IND": {
+        "type": "BIGINT",
+        "description": "quarter bucket indicator (0 = current quarter, 1-4 = future quarters)",
+        "pk": false,
+        "fk": false
+      },
+      "WEEK_BKT_NUMBER": {
+        "type": "INT",
+        "description": "week bucket number",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR_BKT_NUMBER": {
+        "type": "INT",
+        "description": "fiscal year bucket number",
+        "pk": false,
+        "fk": false
+      },
+      "MONTH_BKT_NUMBER": {
+        "type": "INT",
+        "description": "month bucket number",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "vw_ebi_sales_stage": {
+    "description": "Sales stage dimension view. SOURCE OF TRUTH for stage mapping (see business-context). Stage name does NOT equal ID (S4=5, S5=4). When filtering by stage name, join and use s.SALES_STAGE = 'S4'. Full mapping: -1=N/A, 1=Closed - Booked, 2=S7, 3=S6, 4=S5, 5=S4, 6=S3, 7=S2, 8=S1, 9-12=Closed variants. Pipeline = IN (2,3,4,5,6).",
+    "columns": {
+      "SALES_STAGE_ID": {
+        "type": "INT",
+        "description": "sales stage identifier (PK). Stage name does NOT equal ID (e.g. S4=5, S5=4). When filtering by stage name, join vw_ebi_sales_stage and use s.SALES_STAGE. Full mapping: -1=N/A, 1=Closed - Booked, 2=S7, 3=S6, 4=S5, 5=S4, 6=S3, 7=S2, 8=S1, 9-12=Closed variants.",
+        "pk": true,
+        "fk": true
+      },
+      "SALES_STAGE": {
+        "type": "NVARCHAR",
+        "description": "sales stage name. Possible values: N/A, Closed - Booked, S7, S6, S5, S4, S3, S2, S1, Closed Lost from Pipe, Closed CleanUp from Pipe, Closed Lost from Non Pipe, Closed CleanUp from Non Pipe.",
+        "pk": false,
+        "fk": false
+      },
+      "SalesStageDisplay": {
+        "type": "NVARCHAR",
+        "description": "display-friendly stage name",
+        "pk": false,
+        "fk": false
+      },
+      "SalesStageGrp": {
+        "type": "NVARCHAR",
+        "description": "stage group (e.g. Open, Closed)",
+        "pk": false,
+        "fk": false
+      },
+      "SalesStageGrp_Sort": {
+        "type": "INT",
+        "description": "stage group sort order",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_STAGE_GRP_1": {
+        "type": "VARCHAR",
+        "description": "reporting-level stage group",
+        "pk": false,
+        "fk": false
+      },
+      "SalesStageGrp1_Sort": {
+        "type": "INT",
+        "description": "reporting group sort order",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "vw_TD_EBI_ROLE_Coverage": {
+    "description": "Role coverage dimension view. Maps role coverage assignments to business units and business unit groups for quota and pipeline reporting.",
+    "columns": {
+      "ROLE_COVERAGE_ID": {
+        "type": "INT",
+        "description": "unique role coverage identifier",
+        "pk": true,
+        "fk": true
+      },
+      "ROLE_COVERAGE": {
+        "type": "VARCHAR",
+        "description": "role coverage name",
+        "pk": false,
+        "fk": false
+      },
+      "ROLE_COVERAGE_BU": {
+        "type": "VARCHAR",
+        "description": "role coverage business unit",
+        "pk": false,
+        "fk": false
+      },
+      "ROLE_COVERAGE_BU_GROUP": {
+        "type": "VARCHAR",
+        "description": "role coverage business unit group",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "vw_EBI_CREATOR_TYPE": {
+    "description": "Creator type dimension view. Categorizes who created an opportunity (e.g., Field, Web, Partner).",
+    "columns": {
+      "ID": {
+        "type": "INT",
+        "description": "unique creator type identifier",
+        "pk": true,
+        "fk": true
+      },
+      "SUB_CREATOR": {
+        "type": "VARCHAR",
+        "description": "sub-creator code",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_CREATOR_DISPLAY": {
+        "type": "VARCHAR",
+        "description": "sub-creator display name",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_CREATOR_DISPLAY_SORT": {
+        "type": "INT",
+        "description": "sub-creator display sort order",
+        "pk": false,
+        "fk": false
+      },
+      "CREATOR": {
+        "type": "VARCHAR",
+        "description": "creator type name",
+        "pk": false,
+        "fk": false
+      },
+      "CREATOR_JOIN": {
+        "type": "NVARCHAR",
+        "description": "creator join key",
+        "pk": false,
+        "fk": false
+      },
+      "GRP_CREATOR_ALL": {
+        "type": "VARCHAR",
+        "description": "grouped creator (all)",
+        "pk": false,
+        "fk": false
+      },
+      "GRP_CREATOR_ALL_SORT": {
+        "type": "INT",
+        "description": "grouped creator sort order",
+        "pk": false,
+        "fk": false
+      },
+      "GRP_PARTNER_CREATED_COSELL": {
+        "type": "VARCHAR",
+        "description": "partner created co-sell group",
+        "pk": false,
+        "fk": false
+      },
+      "GRP_PARTNER_AGG": {
+        "type": "VARCHAR",
+        "description": "partner aggregate group",
+        "pk": false,
+        "fk": false
+      },
+      "GRP_PARTNER_AGG_SORT": {
+        "type": "INT",
+        "description": "partner aggregate sort order",
+        "pk": false,
+        "fk": false
+      },
+      "IS_ACTIVE": {
+        "type": "BIT",
+        "description": "active flag",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "TD_EBI_DEAL_TYPE": {
+    "description": "Deal type dimension (e.g., New Business, Renewal, Expansion).",
+    "columns": {
+      "DEAL_TYPE_ID": {
+        "type": "INT",
+        "description": "deal type identifier",
+        "pk": true,
+        "fk": true
+      },
+      "DEAL_TYPE": {
+        "type": "VARCHAR",
+        "description": "deal type name (New, Cross-Sell, Upsell)",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_TYPE_SORT": {
+        "type": "INT",
+        "description": "deal type sort order",
+        "pk": false,
+        "fk": false
+      },
+      "IS_ACTIVE": {
+        "type": "BIT",
+        "description": "active flag",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "TD_EBI_UCP_COMPETITORS": {
+    "description": "Competitor information associated with accounts, sourced from ZoomInfo (Zi) data.",
+    "columns": {
+      "competitor_id": {
+        "type": "INT",
+        "description": "unique competitor record identifier",
+        "pk": true,
+        "fk": false
+      },
+      "sub_std_name_key": {
+        "type": "FLOAT",
+        "description": "subsidiary key, links to vw_TD_EBI_ACCOUNT.SUB_ID",
+        "pk": false,
+        "fk": true
+      },
+      "sub_country_code": {
+        "type": "VARCHAR",
+        "description": "subsidiary country code",
+        "pk": false,
+        "fk": false
+      },
+      "new_technology": {
+        "type": "NVARCHAR",
+        "description": "new technology detected",
+        "pk": false,
+        "fk": false
+      },
+      "pmbu": {
+        "type": "NVARCHAR",
+        "description": "PMBU grouping",
+        "pk": false,
+        "fk": false
+      },
+      "Zi_Category": {
+        "type": "NVARCHAR",
+        "description": "ZoomInfo technology category",
+        "pk": false,
+        "fk": false
+      },
+      "Zi_Vendor": {
+        "type": "NVARCHAR",
+        "description": "ZoomInfo vendor/competitor name",
+        "pk": false,
+        "fk": false
+      },
+      "Last_Updated_Date": {
+        "type": "DATETIME",
+        "description": "last updated date",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "TF_EBI_Marketing_Trend": {
+    "description": "Marketing engagement and trend metrics by account, with score and benchmark breakdowns.",
+    "columns": {
+      "MARKETING_TREND_ID": {
+        "type": "INT",
+        "description": "unique marketing trend row identifier",
+        "pk": true,
+        "fk": false
+      },
+      "ACCOUNT_SUB_ID": {
+        "type": "INT",
+        "description": "sub-account identifier",
+        "pk": false,
+        "fk": true
+      },
+      "ACCOUNT_COUNTRY_ID": {
+        "type": "INT",
+        "description": "account country identifier",
+        "pk": false,
+        "fk": true
+      },
+      "CUSTOMER_HEALTH_ID": {
+        "type": "INT",
+        "description": "customer health identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SEGMENT_ID": {
+        "type": "INT",
+        "description": "segment identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SNAPSHOT_DATE_ID": {
+        "type": "INT",
+        "description": "snapshot date key, links to vw_EBI_CALDATE",
+        "pk": false,
+        "fk": true
+      },
+      "AES_SCORE_ID": {
+        "type": "INT",
+        "description": "AES score identifier",
+        "pk": false,
+        "fk": true
+      },
+      "Total_Engagement_Score": {
+        "type": "FLOAT",
+        "description": "total engagement score",
+        "pk": false,
+        "fk": false
+      },
+      "Recent_Engagement_Score": {
+        "type": "FLOAT",
+        "description": "recent engagement score",
+        "pk": false,
+        "fk": false
+      },
+      "Marketable_Contacts_Score": {
+        "type": "FLOAT",
+        "description": "marketable contacts score",
+        "pk": false,
+        "fk": false
+      },
+      "Power_Engaged_Score": {
+        "type": "FLOAT",
+        "description": "power engaged score",
+        "pk": false,
+        "fk": false
+      },
+      "non_Power_Engaged_Score": {
+        "type": "FLOAT",
+        "description": "non-power engaged score",
+        "pk": false,
+        "fk": false
+      },
+      "DX_Page_Activity_Score": {
+        "type": "FLOAT",
+        "description": "DX page activity score",
+        "pk": false,
+        "fk": false
+      },
+      "Demand_Activity_Score": {
+        "type": "FLOAT",
+        "description": "demand activity score",
+        "pk": false,
+        "fk": false
+      },
+      "Marketing_Interactions_Score": {
+        "type": "FLOAT",
+        "description": "marketing interactions score",
+        "pk": false,
+        "fk": false
+      },
+      "Event_Attendance_Score": {
+        "type": "FLOAT",
+        "description": "event attendance score",
+        "pk": false,
+        "fk": false
+      },
+      "Total_Engagement_Benchmark": {
+        "type": "FLOAT",
+        "description": "total engagement benchmark",
+        "pk": false,
+        "fk": false
+      },
+      "Recent_Engagement_Benchmark": {
+        "type": "FLOAT",
+        "description": "recent engagement benchmark",
+        "pk": false,
+        "fk": false
+      },
+      "Marketable_Contacts_Benchmark": {
+        "type": "FLOAT",
+        "description": "marketable contacts benchmark",
+        "pk": false,
+        "fk": false
+      },
+      "Power_Engaged_Benchmark": {
+        "type": "FLOAT",
+        "description": "power engaged benchmark",
+        "pk": false,
+        "fk": false
+      },
+      "non_Power_Engaged_Benchmark": {
+        "type": "FLOAT",
+        "description": "non-power engaged benchmark",
+        "pk": false,
+        "fk": false
+      },
+      "DX_Page_Activity_Benchmark": {
+        "type": "FLOAT",
+        "description": "DX page activity benchmark",
+        "pk": false,
+        "fk": false
+      },
+      "Demand_Activity_Benchmark": {
+        "type": "FLOAT",
+        "description": "demand activity benchmark",
+        "pk": false,
+        "fk": false
+      },
+      "Marketing_Interactions_Benchmark": {
+        "type": "FLOAT",
+        "description": "marketing interactions benchmark",
+        "pk": false,
+        "fk": false
+      },
+      "Event_Attendance_Benchmark": {
+        "type": "FLOAT",
+        "description": "event attendance benchmark",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "vw_TF_EBI_PIPE_WALK": {
+    "description": "Pipeline walk analysis — period-over-period pipeline movement tracking current vs previous snapshot values.",
+    "columns": {
+      "WALK_ID": {
+        "type": "INT",
+        "description": "unique walk row identifier",
+        "pk": true,
+        "fk": false
+      },
+      "P2S_ID": {
+        "type": "INT",
+        "description": "P2S identifier, links to vw_TF_EBI_P2S",
+        "pk": false,
+        "fk": true
+      },
+      "SFDC_P2S_ID": {
+        "type": "NVARCHAR",
+        "description": "Salesforce P2S identifier",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_ID": {
+        "type": "INT",
+        "description": "opportunity identifier, links to vw_TD_EBI_OPP",
+        "pk": false,
+        "fk": true
+      },
+      "ACCOUNT_ID": {
+        "type": "INT",
+        "description": "account identifier, links to vw_TD_EBI_ACCOUNT",
+        "pk": false,
+        "fk": true
+      },
+      "REGION_ID": {
+        "type": "INT",
+        "description": "region identifier, links to vw_td_ebi_region_rpt",
+        "pk": false,
+        "fk": true
+      },
+      "OPG_ID": {
+        "type": "INT",
+        "description": "product group identifier, links to vw_EBI_OPG",
+        "pk": false,
+        "fk": true
+      },
+      "SEGMENT_ID": {
+        "type": "INT",
+        "description": "segment identifier",
+        "pk": false,
+        "fk": true
+      },
+      "DEAL_TYPE_ID": {
+        "type": "INT",
+        "description": "deal type identifier, links to TD_EBI_DEAL_TYPE",
+        "pk": false,
+        "fk": true
+      },
+      "SNAPSHOT_DATE_ID": {
+        "type": "INT",
+        "description": "snapshot date key, links to vw_EBI_CALDATE",
+        "pk": false,
+        "fk": true
+      },
+      "CLOSE_DATE_ID": {
+        "type": "INT",
+        "description": "close date key, links to vw_EBI_CALDATE",
+        "pk": false,
+        "fk": true
+      },
+      "TERR_ID": {
+        "type": "NVARCHAR",
+        "description": "territory identifier",
+        "pk": false,
+        "fk": true
+      },
+      "WALK_CONDITION_ID": {
+        "type": "INT",
+        "description": "walk condition identifier",
+        "pk": false,
+        "fk": false
+      },
+      "WALK_COMPOSITE_KEY": {
+        "type": "VARCHAR",
+        "description": "composite key for the walk record",
+        "pk": false,
+        "fk": false
+      },
+      "GROSSASV": {
+        "type": "MONEY",
+        "description": "gross ASV amount for the walk",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_GROSSASV": {
+        "type": "MONEY",
+        "description": "current snapshot gross ASV",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_GROSSASV": {
+        "type": "MONEY",
+        "description": "previous snapshot gross ASV",
+        "pk": false,
+        "fk": false
+      },
+      "STAGEPROGRESSIONASV": {
+        "type": "MONEY",
+        "description": "ASV from stage progression",
+        "pk": false,
+        "fk": false
+      },
+      "BOQ_GROSSASV": {
+        "type": "MONEY",
+        "description": "beginning of quarter gross ASV",
+        "pk": false,
+        "fk": false
+      },
+      "WALK_CATEGORY": {
+        "type": "VARCHAR",
+        "description": "walk movement category (Added, Pulled In, Pushed Out, Lost, etc.)",
+        "pk": false,
+        "fk": false
+      },
+      "WALK_GROUP": {
+        "type": "VARCHAR",
+        "description": "walk group classification",
+        "pk": false,
+        "fk": false
+      },
+      "WALK_GEN_GROUP": {
+        "type": "VARCHAR",
+        "description": "walk general group",
+        "pk": false,
+        "fk": false
+      },
+      "BOQ_WALK_CATEGORY": {
+        "type": "VARCHAR",
+        "description": "BOQ walk category",
+        "pk": false,
+        "fk": false
+      },
+      "BOQ_GEN_GROUP": {
+        "type": "VARCHAR",
+        "description": "BOQ general group",
+        "pk": false,
+        "fk": false
+      },
+      "BOQ_GEN_GROUP_SORT": {
+        "type": "INT",
+        "description": "BOQ general group sort order",
+        "pk": false,
+        "fk": false
+      },
+      "GROUP_ORDER": {
+        "type": "FLOAT",
+        "description": "walk group sort order",
+        "pk": false,
+        "fk": false
+      },
+      "CATEGORY_ORDER": {
+        "type": "FLOAT",
+        "description": "walk category sort order",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_SALES_STAGE": {
+        "type": "NVARCHAR",
+        "description": "current sales stage",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_SALES_STAGE": {
+        "type": "NVARCHAR",
+        "description": "previous sales stage",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_SALES_STAGE_DERIVED": {
+        "type": "VARCHAR",
+        "description": "current derived sales stage",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_SALES_STAGE_DERIVED": {
+        "type": "VARCHAR",
+        "description": "previous derived sales stage",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_SALES_STAGE_DERIVED_SORT": {
+        "type": "INT",
+        "description": "current derived stage sort order",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_SALES_STAGE_DERIVED_SORT": {
+        "type": "INT",
+        "description": "previous derived stage sort order",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_SALES_STAGE_GROUP_SORT": {
+        "type": "INT",
+        "description": "current stage group sort",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_SALES_STAGE_GROUP_SORT": {
+        "type": "INT",
+        "description": "previous stage group sort",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_CLOSE_QTR": {
+        "type": "INT",
+        "description": "current close quarter",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_CLOSE_QTR": {
+        "type": "INT",
+        "description": "previous close quarter",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_CLOSE_DATE": {
+        "type": "DATE",
+        "description": "current close date",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_CLOSE_DATE": {
+        "type": "DATE",
+        "description": "previous close date",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_ADJ_COMMITMENT": {
+        "type": "VARCHAR",
+        "description": "current adjusted commitment",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_ADJ_COMMITMENT": {
+        "type": "VARCHAR",
+        "description": "previous adjusted commitment",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_MGR_ADJ_COMMIT": {
+        "type": "NVARCHAR",
+        "description": "current manager adjusted commitment",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_MGR_ADJ_COMMIT": {
+        "type": "NVARCHAR",
+        "description": "previous manager adjusted commitment",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_GEO_ADJ_COMMIT": {
+        "type": "NVARCHAR",
+        "description": "current geo adjusted commitment",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_GEO_ADJ_COMMIT": {
+        "type": "NVARCHAR",
+        "description": "previous geo adjusted commitment",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_OPP_DRIVER": {
+        "type": "NVARCHAR",
+        "description": "current opportunity driver",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_OPP_DRIVER": {
+        "type": "NVARCHAR",
+        "description": "previous opportunity driver",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_REASON": {
+        "type": "NVARCHAR",
+        "description": "current reason",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_IN_PIPELINE": {
+        "type": "INT",
+        "description": "current in-pipeline flag",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_IN_PIPELINE": {
+        "type": "INT",
+        "description": "previous in-pipeline flag",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_EMP_ID": {
+        "type": "INT",
+        "description": "current employee identifier",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_EMP_ID": {
+        "type": "INT",
+        "description": "previous employee identifier",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_SALES_TEAM": {
+        "type": "NVARCHAR",
+        "description": "current sales team",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_SALES_TEAM": {
+        "type": "NVARCHAR",
+        "description": "previous sales team",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_SNAPSHOT_DATE": {
+        "type": "DATE",
+        "description": "current snapshot date",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_SNAPSHOT_DATE": {
+        "type": "DATE",
+        "description": "previous snapshot date",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_DEAL_BAND_ID": {
+        "type": "INT",
+        "description": "current deal band identifier",
+        "pk": false,
+        "fk": false
+      },
+      "CURR_DEAL_BAND_NEW": {
+        "type": "VARCHAR",
+        "description": "current deal band label",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_DEAL_BAND_ID": {
+        "type": "INT",
+        "description": "previous deal band identifier",
+        "pk": false,
+        "fk": false
+      },
+      "PREV_DEAL_BAND_NEW": {
+        "type": "VARCHAR",
+        "description": "previous deal band label",
+        "pk": false,
+        "fk": false
+      },
+      "IS_STAGE_CHANGED": {
+        "type": "VARCHAR",
+        "description": "flag: stage changed between snapshots",
+        "pk": false,
+        "fk": false
+      },
+      "IS_CLOSE_QTR_CHANGED": {
+        "type": "VARCHAR",
+        "description": "flag: close quarter changed",
+        "pk": false,
+        "fk": false
+      },
+      "IS_GEO_ADJ_COMMIT_CHANGED": {
+        "type": "VARCHAR",
+        "description": "flag: geo adjusted commitment changed",
+        "pk": false,
+        "fk": false
+      },
+      "IS_WALK_VALUE_CHANGED": {
+        "type": "VARCHAR",
+        "description": "flag: walk value changed",
+        "pk": false,
+        "fk": false
+      },
+      "PROJECTED_FINISH_MOVEMENT": {
+        "type": "VARCHAR",
+        "description": "projected finish movement",
+        "pk": false,
+        "fk": false
+      },
+      "IS_IN_QTR_OPP": {
+        "type": "BIT",
+        "description": "flag: in-quarter opportunity",
+        "pk": false,
+        "fk": false
+      },
+      "SNAPSHOT_TREND": {
+        "type": "DATE",
+        "description": "snapshot trend date",
+        "pk": false,
+        "fk": false
+      },
+      "SNAPSHOT_DATE": {
+        "type": "DATE",
+        "description": "snapshot date value",
+        "pk": false,
+        "fk": false
+      },
+      "CLOSE_DATE": {
+        "type": "DATE",
+        "description": "close date value",
+        "pk": false,
+        "fk": false
+      },
+      "GLOBAL_REGION": {
+        "type": "NVARCHAR",
+        "description": "global region; for consistency with region reporting prefer filter values: AMERICAS, EMEA, APAC, WW",
+        "pk": false,
+        "fk": false
+      },
+      "FISCALWEEKNUMBER": {
+        "type": "VARCHAR",
+        "description": "fiscal week number",
+        "pk": false,
+        "fk": false
+      },
+      "FISCAL_YR_QTR_WK": {
+        "type": "VARCHAR",
+        "description": "fiscal year/quarter/week",
+        "pk": false,
+        "fk": false
+      },
+      "DAY_FLAG": {
+        "type": "NVARCHAR",
+        "description": "day flag",
+        "pk": false,
+        "fk": false
+      },
+      "FREQUENCY": {
+        "type": "NVARCHAR",
+        "description": "walk frequency",
+        "pk": false,
+        "fk": false
+      },
+      "OFFSET_FLAG": {
+        "type": "BIT",
+        "description": "offset flag",
+        "pk": false,
+        "fk": false
+      },
+      "PIPE_FLAG": {
+        "type": "VARCHAR",
+        "description": "pipeline flag",
+        "pk": false,
+        "fk": false
+      },
+      "FINAL_ELIGIBILTY_WALK_TREND": {
+        "type": "VARCHAR",
+        "description": "final eligibility walk trend",
+        "pk": false,
+        "fk": false
+      },
+      "DEAL_REG_ID": {
+        "type": "VARCHAR",
+        "description": "deal registration identifier",
+        "pk": false,
+        "fk": false
+      },
+      "MULTI_SOLUTION_FLAG_DESC": {
+        "type": "VARCHAR",
+        "description": "multi-solution flag description",
+        "pk": false,
+        "fk": false
+      },
+      "PS_ALIGNED": {
+        "type": "NVARCHAR",
+        "description": "partner/services aligned indicator",
+        "pk": false,
+        "fk": false
+      },
+      "STAGE_AGE": {
+        "type": "INT",
+        "description": "stage age in days",
+        "pk": false,
+        "fk": false
+      },
+      "STALLED_BUT_INACTIVE": {
+        "type": "NVARCHAR",
+        "description": "stalled/inactive indicator",
+        "pk": false,
+        "fk": false
+      },
+      "ROLE_COVERAGE_ID": {
+        "type": "INT",
+        "description": "role coverage identifier",
+        "pk": false,
+        "fk": true
+      },
+      "CONSULTING_SEGMENT_ID": {
+        "type": "INT",
+        "description": "consulting segment identifier",
+        "pk": false,
+        "fk": true
+      }
+    }
+  },
+  "TF_EBI_TPT_INFO": {
+    "description": "Territory/account planning team (TPT) information, account tiers, account plans, and pipeline availability flags.",
+    "columns": {
+      "TPT_ID": {
+        "type": "INT",
+        "description": "TPT identifier",
+        "pk": true,
+        "fk": true
+      },
+      "ACCOUNT_SUB_ID": {
+        "type": "INT",
+        "description": "sub-account identifier",
+        "pk": false,
+        "fk": true
+      },
+      "OPG_ID": {
+        "type": "INT",
+        "description": "product group identifier, links to vw_EBI_OPG",
+        "pk": false,
+        "fk": true
+      },
+      "COUNTRY_ID": {
+        "type": "INT",
+        "description": "country identifier",
+        "pk": false,
+        "fk": false
+      },
+      "SEGMENT_ID": {
+        "type": "INT",
+        "description": "segment identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SUB_MOPG1_CNTRY": {
+        "type": "VARCHAR",
+        "description": "subsidiary + product + country key",
+        "pk": false,
+        "fk": true
+      },
+      "UCP_ICP_SCORE_ID": {
+        "type": "INT",
+        "description": "UCP/ICP score identifier",
+        "pk": false,
+        "fk": true
+      },
+      "AES_SCORE_ID": {
+        "type": "INT",
+        "description": "AES score identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SUB_MA_ID": {
+        "type": "INT",
+        "description": "subsidiary market area identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SUB_MA_SOLUTION_ID": {
+        "type": "INT",
+        "description": "subsidiary market area solution identifier",
+        "pk": false,
+        "fk": true
+      },
+      "OPP_FOCUS_TIER": {
+        "type": "VARCHAR",
+        "description": "opportunity focus tier",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_SALES_PLAY": {
+        "type": "VARCHAR",
+        "description": "opportunity sales play",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_OWNER": {
+        "type": "VARCHAR",
+        "description": "opportunity owner",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_ACCOUNT_PLAN_URL": {
+        "type": "VARCHAR",
+        "description": "account plan URL",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_ACCOUNT_PLAN_QUALITY": {
+        "type": "VARCHAR",
+        "description": "account plan quality rating",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_ACCOUNT_PLAN_EXECUTION": {
+        "type": "VARCHAR",
+        "description": "account plan execution rating",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_ACCOUNT_PLAN_STATUS": {
+        "type": "VARCHAR",
+        "description": "account plan status",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_TARGET": {
+        "type": "FLOAT",
+        "description": "opportunity target",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_TARGET_NO_PIPE": {
+        "type": "FLOAT",
+        "description": "opportunity target without pipeline",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_CUSTOMER_PRIORITY": {
+        "type": "VARCHAR",
+        "description": "customer priority",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_PORTFOLIO_PLAY": {
+        "type": "VARCHAR",
+        "description": "portfolio play",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_PARTNER_PRIMARY": {
+        "type": "VARCHAR",
+        "description": "primary partner",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_PARTNER_SECONDARY": {
+        "type": "VARCHAR",
+        "description": "secondary partner",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_EXEC_ACCESS": {
+        "type": "BIT",
+        "description": "executive access flag",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_PARENT_TIER": {
+        "type": "VARCHAR",
+        "description": "parent account tier",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_PARENT_OWNER": {
+        "type": "VARCHAR",
+        "description": "parent account owner",
+        "pk": false,
+        "fk": false
+      },
+      "OPP_PARENT_TARGET": {
+        "type": "FLOAT",
+        "description": "parent account target",
+        "pk": false,
+        "fk": false
+      },
+      "PARENT_TIER": {
+        "type": "VARCHAR",
+        "description": "parent tier",
+        "pk": false,
+        "fk": false
+      },
+      "PARENT_ACCOUNT_PLAN_URL": {
+        "type": "VARCHAR",
+        "description": "parent account plan URL",
+        "pk": false,
+        "fk": false
+      },
+      "PARENT_AP_COMPLETION_STATUS": {
+        "type": "VARCHAR",
+        "description": "parent account plan completion status",
+        "pk": false,
+        "fk": false
+      },
+      "PARENT_ACCOUNT_PLAN_QUALITY": {
+        "type": "VARCHAR",
+        "description": "parent account plan quality",
+        "pk": false,
+        "fk": false
+      },
+      "PARENT_OWNER": {
+        "type": "VARCHAR",
+        "description": "parent owner",
+        "pk": false,
+        "fk": false
+      },
+      "CLEANED_PARENT_TIER": {
+        "type": "VARCHAR",
+        "description": "cleaned parent tier",
+        "pk": false,
+        "fk": false
+      },
+      "CLEANED_SUB_TIER": {
+        "type": "VARCHAR",
+        "description": "cleaned subsidiary tier",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_TIER_OPP_FOCUS_TIER": {
+        "type": "VARCHAR",
+        "description": "subsidiary tier opportunity focus tier",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_TIER_OPP_ACCOUNT_PLAN_URL": {
+        "type": "VARCHAR",
+        "description": "subsidiary tier account plan URL",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_TIER_OPP_ACCOUNT_PLAN_QUALITY": {
+        "type": "VARCHAR",
+        "description": "subsidiary tier account plan quality",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_CNTRY": {
+        "type": "VARCHAR",
+        "description": "subsidiary country",
+        "pk": false,
+        "fk": false
+      },
+      "PRNT_CNTRY": {
+        "type": "VARCHAR",
+        "description": "parent country",
+        "pk": false,
+        "fk": false
+      },
+      "BDR_ACCOUNT_STATUS": {
+        "type": "VARCHAR",
+        "description": "BDR account status",
+        "pk": false,
+        "fk": false
+      },
+      "BDR_NOTES": {
+        "type": "NVARCHAR",
+        "description": "BDR notes",
+        "pk": false,
+        "fk": false
+      },
+      "AP_COMPLETION_STATUS": {
+        "type": "VARCHAR",
+        "description": "account plan completion status",
+        "pk": false,
+        "fk": false
+      },
+      "ASSESSED_ACCOUNT": {
+        "type": "VARCHAR",
+        "description": "assessed account flag",
+        "pk": false,
+        "fk": false
+      },
+      "PREDICTION_TYPE": {
+        "type": "VARCHAR",
+        "description": "prediction type",
+        "pk": false,
+        "fk": false
+      },
+      "IS_PIPE_AT_PRNT": {
+        "type": "INT",
+        "description": "flag: pipeline exists at parent",
+        "pk": false,
+        "fk": false
+      },
+      "IS_PIPE_AT_SUB": {
+        "type": "INT",
+        "description": "flag: pipeline exists at subsidiary",
+        "pk": false,
+        "fk": false
+      },
+      "IS_PIPE_AVL": {
+        "type": "INT",
+        "description": "flag: pipeline available",
+        "pk": false,
+        "fk": false
+      },
+      "IS_PIPE_AT_PRNT_CNTRY": {
+        "type": "INT",
+        "description": "flag: pipeline at parent country",
+        "pk": false,
+        "fk": false
+      },
+      "IS_PIPE_AT_SUB_MOPG1_CNTRY": {
+        "type": "INT",
+        "description": "flag: pipeline at sub + product + country",
+        "pk": false,
+        "fk": false
+      },
+      "HAS_PIPE_ARR_RBOB_OPP_TARGET_AT_SUB": {
+        "type": "INT",
+        "description": "flag: has pipeline/ARR/RBOB target at sub",
+        "pk": false,
+        "fk": false
+      },
+      "HAS_PIPE_ARR_RBOB_OPP_TARGET_AT_PRNT": {
+        "type": "INT",
+        "description": "flag: has pipeline/ARR/RBOB target at parent",
+        "pk": false,
+        "fk": false
+      },
+      "To_SHOW_IN_DV": {
+        "type": "INT",
+        "description": "flag: show in data visualization",
+        "pk": false,
+        "fk": false
+      },
+      "IS_ACTIVE": {
+        "type": "INT",
+        "description": "active flag",
+        "pk": false,
+        "fk": false
+      },
+      "IS_DELETED": {
+        "type": "BIT",
+        "description": "deleted flag",
+        "pk": false,
+        "fk": false
+      },
+      "TPT_LAST_MODIFIED_DATE": {
+        "type": "DATETIME",
+        "description": "last modified date",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "TD_EBI_CUSTOMER_HEALTH": {
+    "description": "Customer health dimension — health score definitions and tiers across multiple health categories.",
+    "columns": {
+      "CUSTOMER_HEALTH_ID": {
+        "type": "INT",
+        "description": "customer health identifier",
+        "pk": true,
+        "fk": true
+      },
+      "CUSTOMER_HEALTH": {
+        "type": "VARCHAR",
+        "description": "overall customer health rating",
+        "pk": false,
+        "fk": false
+      },
+      "PRODUCT_HEALTH": {
+        "type": "VARCHAR",
+        "description": "product health rating",
+        "pk": false,
+        "fk": false
+      },
+      "USAGE_ADOPTION_HEALTH": {
+        "type": "VARCHAR",
+        "description": "usage/adoption health rating",
+        "pk": false,
+        "fk": false
+      },
+      "COMMERCIALS_HEALTH": {
+        "type": "VARCHAR",
+        "description": "commercials health rating",
+        "pk": false,
+        "fk": false
+      },
+      "RELATIONSHIP_HEALTH": {
+        "type": "VARCHAR",
+        "description": "relationship health rating",
+        "pk": false,
+        "fk": false
+      },
+      "PREDICTIVE_HEALTH": {
+        "type": "VARCHAR",
+        "description": "predictive health rating",
+        "pk": false,
+        "fk": false
+      },
+      "SOURCE_SYSTEM": {
+        "type": "VARCHAR",
+        "description": "source system",
+        "pk": false,
+        "fk": false
+      },
+      "CUSTOMER_HEALTH_SORT": {
+        "type": "INT",
+        "description": "health sort order",
+        "pk": false,
+        "fk": false
+      },
+      "IS_ACTIVE": {
+        "type": "BIT",
+        "description": "active flag",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT": {
+    "description": "Solution-level health score movement over time, tracking health and movement IDs per account/solution.",
+    "columns": {
+      "ACCOUNT_ID": {
+        "type": "INT",
+        "description": "account identifier, links to vw_TD_EBI_ACCOUNT",
+        "pk": false,
+        "fk": true
+      },
+      "OPG_ID": {
+        "type": "INT",
+        "description": "product group identifier, links to vw_EBI_OPG",
+        "pk": false,
+        "fk": true
+      },
+      "SEGMENT_ID": {
+        "type": "INT",
+        "description": "segment identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SNAPSHOT_MONTH_ID": {
+        "type": "INT",
+        "description": "monthly snapshot date key, links to vw_EBI_CALDATE.DATE_KEY",
+        "pk": false,
+        "fk": true
+      },
+      "SOURCE_SYSTEM": {
+        "type": "VARCHAR",
+        "description": "source system",
+        "pk": false,
+        "fk": false
+      },
+      "CUSTOMER_SOLUTION_HEALTH_ID": {
+        "type": "INT",
+        "description": "customer solution health identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SOLUTION_HEALTH_MOVEMENT_ID": {
+        "type": "INT",
+        "description": "solution health movement identifier",
+        "pk": false,
+        "fk": false
+      },
+      "REGION_ID": {
+        "type": "INT",
+        "description": "region identifier, links to vw_td_ebi_region_rpt",
+        "pk": false,
+        "fk": true
+      },
+      "AE_REGION_ID": {
+        "type": "INT",
+        "description": "AE region identifier, links to vw_td_ebi_region_rpt",
+        "pk": false,
+        "fk": true
+      },
+      "HAVE_ACTIVE_PQ_EOQ_ARR": {
+        "type": "BIT",
+        "description": "flag: has active PQ EOQ ARR",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "TF_EBI_CUSTOMER_HEALTH": {
+    "description": "Customer health fact — health ratings per account/solution over time with narrative fields.",
+    "columns": {
+      "CUSTOMER_HEALTH_FACT_ID": {
+        "type": "INT",
+        "description": "unique fact row identifier",
+        "pk": true,
+        "fk": false
+      },
+      "ACCOUNT_ID": {
+        "type": "INT",
+        "description": "account identifier, links to vw_TD_EBI_ACCOUNT",
+        "pk": false,
+        "fk": true
+      },
+      "OPG_ID": {
+        "type": "INT",
+        "description": "product group identifier, links to vw_EBI_OPG",
+        "pk": false,
+        "fk": true
+      },
+      "SEGMENT_ID": {
+        "type": "INT",
+        "description": "segment identifier",
+        "pk": false,
+        "fk": true
+      },
+      "SNAPSHOT_MONTH_ID": {
+        "type": "INT",
+        "description": "monthly snapshot date key, links to vw_EBI_CALDATE.DATE_KEY",
+        "pk": false,
+        "fk": true
+      },
+      "CUSTOMER_HEALTH_ID": {
+        "type": "INT",
+        "description": "links to TD_EBI_CUSTOMER_HEALTH",
+        "pk": false,
+        "fk": true
+      },
+      "CUSTOMER_HEALTH": {
+        "type": "VARCHAR",
+        "description": "overall customer health rating",
+        "pk": false,
+        "fk": false
+      },
+      "PREDICTIVE_HEALTH": {
+        "type": "VARCHAR",
+        "description": "predictive health rating",
+        "pk": false,
+        "fk": false
+      },
+      "HEALTH_MOVEMENT_ID": {
+        "type": "INT",
+        "description": "health movement identifier",
+        "pk": false,
+        "fk": false
+      },
+      "CURRENT_SITUATION": {
+        "type": "NVARCHAR",
+        "description": "current situation narrative",
+        "pk": false,
+        "fk": false
+      },
+      "ACCOUNT_HEALTH_SUMMARY": {
+        "type": "NVARCHAR",
+        "description": "account health summary narrative",
+        "pk": false,
+        "fk": false
+      },
+      "NEXT_ACTION": {
+        "type": "NVARCHAR",
+        "description": "next action narrative",
+        "pk": false,
+        "fk": false
+      },
+      "NEXT_ACTION_UPDATED_DATE": {
+        "type": "DATETIME",
+        "description": "next action last updated date",
+        "pk": false,
+        "fk": false
+      },
+      "LAST_MODIFIED_BY": {
+        "type": "VARCHAR",
+        "description": "last modified by user",
+        "pk": false,
+        "fk": false
+      },
+      "LAST_MODIFIED_DATE": {
+        "type": "DATETIME",
+        "description": "last modified date",
+        "pk": false,
+        "fk": false
+      },
+      "SOURCE_SYSTEM": {
+        "type": "VARCHAR",
+        "description": "source system",
+        "pk": false,
+        "fk": false
+      },
+      "IS_ACTIVE": {
+        "type": "BIT",
+        "description": "active flag",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "vw_TD_ICP_UCP_SCORES": {
+    "description": "ICP (Ideal Customer Profile) and UCP (Unified Customer Profile) scores with fit ratings and assessment details.",
+    "columns": {
+      "SCORE_ID": {
+        "type": "INT",
+        "description": "unique score row identifier",
+        "pk": true,
+        "fk": false
+      },
+      "ACCOUNT_SUB_ID": {
+        "type": "INT",
+        "description": "sub-account identifier",
+        "pk": false,
+        "fk": true
+      },
+      "OPG_ID": {
+        "type": "INT",
+        "description": "product group identifier, links to vw_EBI_OPG",
+        "pk": false,
+        "fk": true
+      },
+      "SUB_ID": {
+        "type": "INT",
+        "description": "subsidiary identifier, links to vw_TD_EBI_ACCOUNT.SUB_ID",
+        "pk": false,
+        "fk": true
+      },
+      "GEO": {
+        "type": "VARCHAR",
+        "description": "geographic region",
+        "pk": false,
+        "fk": false
+      },
+      "MOPG1": {
+        "type": "VARCHAR",
+        "description": "Major Outlook Product Group — top-level product grouping",
+        "pk": false,
+        "fk": false
+      },
+      "FIT_SCORE": {
+        "type": "VARCHAR",
+        "description": "ICP fit score label",
+        "pk": false,
+        "fk": false
+      },
+      "FIT_SCORE_NUM": {
+        "type": "FLOAT",
+        "description": "numeric ICP fit score",
+        "pk": false,
+        "fk": false
+      },
+      "PREDICTION_TYPE": {
+        "type": "NVARCHAR",
+        "description": "prediction type",
+        "pk": false,
+        "fk": false
+      },
+      "WILLINGNESS_TO_ENGAGE": {
+        "type": "NVARCHAR",
+        "description": "willingness to engage score",
+        "pk": false,
+        "fk": false
+      },
+      "SAM": {
+        "type": "FLOAT",
+        "description": "serviceable addressable market",
+        "pk": false,
+        "fk": false
+      },
+      "PROPENSITY_TO_BUY": {
+        "type": "NVARCHAR",
+        "description": "propensity score (high propensity > '0.8')",
+        "pk": false,
+        "fk": false
+      },
+      "ABM_FIT_RATING": {
+        "type": "FLOAT",
+        "description": "ABM fit rating",
+        "pk": false,
+        "fk": false
+      },
+      "ADOBE_FOOTPRINT_RATING": {
+        "type": "FLOAT",
+        "description": "Adobe footprint rating",
+        "pk": false,
+        "fk": false
+      },
+      "CAPACITY_TO_ACQUIRE_RATING": {
+        "type": "FLOAT",
+        "description": "capacity to acquire rating",
+        "pk": false,
+        "fk": false
+      },
+      "DIGITAL_MARKETING_MATURITY_RATING": {
+        "type": "FLOAT",
+        "description": "digital marketing maturity rating",
+        "pk": false,
+        "fk": false
+      },
+      "TECHNOLOGY_STACK_RATING": {
+        "type": "NVARCHAR",
+        "description": "technology stack rating",
+        "pk": false,
+        "fk": false
+      },
+      "ABM_Fit_Assessment": {
+        "type": "VARCHAR",
+        "description": "ABM fit assessment detail",
+        "pk": false,
+        "fk": false
+      },
+      "Adobe_Footprint_Assessment": {
+        "type": "VARCHAR",
+        "description": "Adobe footprint assessment detail",
+        "pk": false,
+        "fk": false
+      },
+      "Capacity_to_Acquire_Assessment": {
+        "type": "VARCHAR",
+        "description": "capacity to acquire assessment detail",
+        "pk": false,
+        "fk": false
+      },
+      "Digital_Marketing_Maturity_Assessment": {
+        "type": "VARCHAR",
+        "description": "digital marketing maturity assessment detail",
+        "pk": false,
+        "fk": false
+      },
+      "Technology_Stack_Assessment": {
+        "type": "VARCHAR",
+        "description": "technology stack assessment detail",
+        "pk": false,
+        "fk": false
+      },
+      "HIGH_UCP_ICP": {
+        "type": "BIT",
+        "description": "flag: high UCP or ICP score",
+        "pk": false,
+        "fk": false
+      },
+      "HIGH_ICP": {
+        "type": "BIT",
+        "description": "flag: 1 if ICP score above threshold",
+        "pk": false,
+        "fk": false
+      },
+      "HIGH_UCP": {
+        "type": "BIT",
+        "description": "flag: 1 if UCP score above threshold",
+        "pk": false,
+        "fk": false
+      },
+      "HIGH_AES": {
+        "type": "BIT",
+        "description": "flag: 1 if AES above threshold",
+        "pk": false,
+        "fk": false
+      },
+      "HIGH_UCP_ICP_AES": {
+        "type": "BIT",
+        "description": "flag: high UCP/ICP and AES",
+        "pk": false,
+        "fk": false
+      },
+      "HIGH_AES_UCP_OR_ICP": {
+        "type": "BIT",
+        "description": "flag: high AES with UCP or ICP",
+        "pk": false,
+        "fk": false
+      },
+      "HIGH_UCP_OR_ICP": {
+        "type": "BIT",
+        "description": "flag: high UCP or high ICP",
+        "pk": false,
+        "fk": false
+      }
+    }
+  },
+  "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG": {
+    "description": "DX account profile by OPG — product of interest and MQA flags per subsidiary/parent and product.",
+    "columns": {
+      "ID": {
+        "type": "INT",
+        "description": "unique row identifier",
+        "pk": true,
+        "fk": false
+      },
+      "SUB_MOPG1_MA": {
+        "type": "VARCHAR",
+        "description": "subsidiary + product + market area composite key",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_ID": {
+        "type": "INT",
+        "description": "subsidiary identifier, links to vw_TD_EBI_ACCOUNT.SUB_ID",
+        "pk": false,
+        "fk": true
+      },
+      "SUB_NAME": {
+        "type": "VARCHAR",
+        "description": "subsidiary name",
+        "pk": false,
+        "fk": false
+      },
+      "MAJOR_OPG1": {
+        "type": "VARCHAR",
+        "description": "Major Outlook Product Group, links to vw_EBI_OPG.MOPG1",
+        "pk": false,
+        "fk": true
+      },
+      "MARKET_AREA": {
+        "type": "VARCHAR",
+        "description": "market area",
+        "pk": false,
+        "fk": false
+      },
+      "PRNT_ID": {
+        "type": "INT",
+        "description": "parent identifier, links to vw_TD_EBI_ACCOUNT.PARENT_ID",
+        "pk": false,
+        "fk": true
+      },
+      "PRNT_NAME": {
+        "type": "VARCHAR",
+        "description": "parent name",
+        "pk": false,
+        "fk": false
+      },
+      "PRODUCT_OF_INTEREST_STATUS": {
+        "type": "VARCHAR",
+        "description": "product of interest status (Hot = high intent)",
+        "pk": false,
+        "fk": false
+      },
+      "PERSISTENT_MQA_FLAG": {
+        "type": "VARCHAR",
+        "description": "persistent MQA flag",
+        "pk": false,
+        "fk": false
+      },
+      "CREATED_DATE": {
+        "type": "DATETIME",
+        "description": "record creation date",
+        "pk": false,
+        "fk": false
+      },
+      "MODIFIED_DATE": {
+        "type": "DATETIME",
+        "description": "record last modified date",
+        "pk": false,
+        "fk": false
+      }
+    }
+  }
+}

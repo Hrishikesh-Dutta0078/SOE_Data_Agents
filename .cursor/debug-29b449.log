@@ -1,0 +1,1 @@
+{"sessionId":"29b449","location":"database.js:getDbConfig","message":"NTLM auth config","data":{"userLength":21,"ntlmUserLength":11,"userContainsAt":true,"domain":"adobenet","hypothesisId":"H1"},"hypothesisId":"H1","timestamp":1773323342925}

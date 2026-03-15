@@ -1,0 +1,954 @@
+{
+  "directJoins": [
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.REGION_ID = vw_td_ebi_region_rpt.REGION_ID",
+        "vw_TF_EBI_P2S.ORIGINAL_REGION_ID = vw_td_ebi_region_rpt.REGION_ID",
+        "vw_TF_EBI_P2S.AE_REGION_ID = vw_td_ebi_region_rpt.REGION_ID",
+        "vw_td_ebi_region_rpt.ROLE_TYPE_ID = vw_TF_EBI_P2S.ROLE_TYPE_ID",
+        "vw_td_ebi_region_rpt.REPORTING_HIERARCHY_ID = vw_TF_EBI_P2S.REPORTING_HIERARCHY_ID",
+        "vw_td_ebi_region_rpt.GTM_MOTION_ID = vw_TF_EBI_P2S.GTM_MOTION_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "vw_TF_EBI_QUOTA.REGION_ID = vw_td_ebi_region_rpt.REGION_ID",
+        "vw_TF_EBI_QUOTA.ORIGINAL_REGION_ID = vw_td_ebi_region_rpt.REGION_ID",
+        "vw_td_ebi_region_rpt.ROLE_TYPE_ID = vw_TF_EBI_QUOTA.ROLE_TYPE_ID",
+        "vw_td_ebi_region_rpt.REPORTING_HIERARCHY_ID = vw_TF_EBI_QUOTA.REPORTING_HIERARCHY_ID",
+        "vw_td_ebi_region_rpt.GTM_MOTION_ID = vw_TF_EBI_QUOTA.GTM_MOTION_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "vw_TF_EBI_PIPE_WALK.REGION_ID = vw_td_ebi_region_rpt.REGION_ID",
+        "vw_TF_EBI_PIPE_WALK.TERR_ID = vw_td_ebi_region_rpt.TERR_ID",
+        "vw_td_ebi_region_rpt.ROLE_TYPE_ID = vw_TF_EBI_PIPE_WALK.ROLE_TYPE_ID",
+        "vw_td_ebi_region_rpt.REPORTING_HIERARCHY_ID = vw_TF_EBI_PIPE_WALK.REPORTING_HIERARCHY_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "columns": [
+        "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.REGION_ID = vw_td_ebi_region_rpt.REGION_ID",
+        "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.AE_REGION_ID = vw_td_ebi_region_rpt.REGION_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TF_EBI_P2S",
+      "right_table": "vw_TD_EBI_ACCOUNT",
+      "columns": [
+        "vw_TF_EBI_P2S.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ACCOUNT",
+      "right_table": "vw_TD_EBI_OPP",
+      "columns": [
+        "vw_TD_EBI_OPP.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ACCOUNT",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "vw_TF_EBI_PIPE_WALK.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_CUSTOMER_HEALTH",
+      "right_table": "vw_TD_EBI_ACCOUNT",
+      "columns": [
+        "TF_EBI_CUSTOMER_HEALTH.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ACCOUNT",
+      "right_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "columns": [
+        "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_MARKETING_TREND",
+      "right_table": "vw_TD_EBI_ACCOUNT",
+      "columns": [
+        "TF_EBI_MARKETING_TREND.ACCOUNT_SUB_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_SUB_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ACCOUNT",
+      "right_table": "vw_TD_ICP_UCP_SCORES",
+      "columns": [
+        "vw_TD_ICP_UCP_SCORES.ACCOUNT_SUB_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_SUB_ID",
+        "vw_TD_ICP_UCP_SCORES.SUB_ID = vw_TD_EBI_ACCOUNT.SUB_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_TPT_INFO",
+      "right_table": "vw_TD_EBI_ACCOUNT",
+      "columns": [
+        "TF_EBI_TPT_INFO.ACCOUNT_SUB_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_SUB_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TF_EBI_P2S",
+      "right_table": "vw_TD_EBI_OPP",
+      "columns": [
+        "vw_TF_EBI_P2S.OPP_ID = vw_TD_EBI_OPP.OPP_ID",
+        "vw_TF_EBI_P2S.ACCOUNT_ID = vw_TD_EBI_OPP.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_OPP",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "vw_TF_EBI_PIPE_WALK.OPP_ID = vw_TD_EBI_OPP.OPP_ID",
+        "vw_TD_EBI_OPP.ACCOUNT_ID = vw_TF_EBI_PIPE_WALK.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_OPG",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.OPG_ID = vw_EBI_OPG.OPG_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_OPG",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "vw_TF_EBI_QUOTA.OPG_ID = vw_EBI_OPG.OPG_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_OPG",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "vw_TF_EBI_PIPE_WALK.OPG_ID = vw_EBI_OPG.OPG_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_OPG",
+      "right_table": "TF_EBI_CUSTOMER_HEALTH",
+      "columns": [
+        "TF_EBI_CUSTOMER_HEALTH.OPG_ID = vw_EBI_OPG.OPG_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_OPG",
+      "right_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "columns": [
+        "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.OPG_ID = vw_EBI_OPG.OPG_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_OPG",
+      "right_table": "vw_TD_ICP_UCP_SCORES",
+      "columns": [
+        "vw_TD_ICP_UCP_SCORES.OPG_ID = vw_EBI_OPG.OPG_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_OPG",
+      "right_table": "TF_EBI_TPT_INFO",
+      "columns": [
+        "TF_EBI_TPT_INFO.OPG_ID = vw_EBI_OPG.OPG_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_ebi_sales_stage",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.SALES_STAGE_ID = vw_ebi_sales_stage.SALES_STAGE_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_DEAL_TYPE",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.DEAL_TYPE_ID = TD_EBI_DEAL_TYPE.DEAL_TYPE_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_DEAL_TYPE",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "vw_TF_EBI_QUOTA.DEAL_TYPE_ID = TD_EBI_DEAL_TYPE.DEAL_TYPE_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_DEAL_TYPE",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "vw_TF_EBI_PIPE_WALK.DEAL_TYPE_ID = TD_EBI_DEAL_TYPE.DEAL_TYPE_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_CUSTOMER_HEALTH",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.CUSTOMER_HEALTH_ID = TD_EBI_CUSTOMER_HEALTH.CUSTOMER_HEALTH_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_CUSTOMER_HEALTH",
+      "right_table": "TF_EBI_CUSTOMER_HEALTH",
+      "columns": [
+        "TF_EBI_CUSTOMER_HEALTH.CUSTOMER_HEALTH_ID = TD_EBI_CUSTOMER_HEALTH.CUSTOMER_HEALTH_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_CUSTOMER_HEALTH",
+      "right_table": "TF_EBI_MARKETING_TREND",
+      "columns": [
+        "TF_EBI_MARKETING_TREND.CUSTOMER_HEALTH_ID = TD_EBI_CUSTOMER_HEALTH.CUSTOMER_HEALTH_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_TPT_INFO",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.TPT_ID = TF_EBI_TPT_INFO.TPT_ID",
+        "TF_EBI_TPT_INFO.OPG_ID = vw_TF_EBI_P2S.OPG_ID",
+        "TF_EBI_TPT_INFO.SEGMENT_ID = vw_TF_EBI_P2S.SEGMENT_ID",
+        "TF_EBI_TPT_INFO.AES_SCORE_ID = vw_TF_EBI_P2S.AES_SCORE_ID",
+        "TF_EBI_TPT_INFO.UCP_ICP_SCORE_ID = vw_TF_EBI_P2S.UCP_ICP_SCORE_ID",
+        "TF_EBI_TPT_INFO.SUB_MA_ID = vw_TF_EBI_P2S.SUB_MA_ID",
+        "TF_EBI_TPT_INFO.SUB_MA_SOLUTION_ID = vw_TF_EBI_P2S.SUB_MA_SOLUTION_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_UCP_COMPETITORS",
+      "right_table": "vw_TD_EBI_ACCOUNT",
+      "columns": [
+        "TD_EBI_UCP_COMPETITORS.sub_std_name_key = vw_TD_EBI_ACCOUNT.SUB_ID"
+      ]
+    },
+    {
+      "left_table": "vw_ebi_sales_stage",
+      "right_table": "vw_TD_EBI_OPP",
+      "columns": [
+        "vw_TD_EBI_OPP.OPP_STAGE = vw_ebi_sales_stage.SALES_STAGE"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG",
+      "right_table": "TD_EBI_UCP_COMPETITORS",
+      "columns": [
+        "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.SUB_ID = TD_EBI_UCP_COMPETITORS.sub_std_name_key"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG",
+      "right_table": "vw_TD_EBI_ACCOUNT",
+      "columns": [
+        "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.SUB_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_SUB_ID",
+        "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.PRNT_ID = vw_TD_EBI_ACCOUNT.PARENT_ID",
+        "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.SUB_ID = vw_TD_EBI_ACCOUNT.SUB_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG",
+      "right_table": "TF_EBI_MARKETING_TREND",
+      "columns": [
+        "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.SUB_ID = TF_EBI_MARKETING_TREND.ACCOUNT_SUB_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG",
+      "right_table": "vw_TD_ICP_UCP_SCORES",
+      "columns": [
+        "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.SUB_ID = vw_TD_ICP_UCP_SCORES.ACCOUNT_SUB_ID",
+        "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.SUB_ID = vw_TD_ICP_UCP_SCORES.SUB_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG",
+      "right_table": "TF_EBI_TPT_INFO",
+      "columns": [
+        "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.SUB_ID = TF_EBI_TPT_INFO.ACCOUNT_SUB_ID"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_OPG",
+      "right_table": "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG",
+      "columns": [
+        "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.MAJOR_OPG1 = vw_EBI_OPG.MOPG1"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_CALDATE",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.SNAPSHOT_DATE_ID = vw_EBI_CALDATE.DATE_KEY",
+        "vw_TF_EBI_P2S.OPP_CLOSE_DATE_ID = vw_EBI_CALDATE.DATE_KEY",
+        "vw_TF_EBI_P2S.OPP_CREATE_DATE_ID = vw_EBI_CALDATE.DATE_KEY",
+        "vw_TF_EBI_P2S.DERIVED_CLOSURE_DATE_ID = vw_EBI_CALDATE.DATE_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_CALDATE",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "vw_TF_EBI_QUOTA.SNAPSHOT_DATE_ID = vw_EBI_CALDATE.DATE_KEY",
+        "vw_TF_EBI_QUOTA.QUOTA_FISCAL_QUARTER_ID = vw_EBI_CALDATE.DATE_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_CALDATE",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "vw_TF_EBI_PIPE_WALK.SNAPSHOT_DATE_ID = vw_EBI_CALDATE.DATE_KEY",
+        "vw_TF_EBI_PIPE_WALK.CLOSE_DATE_ID = vw_EBI_CALDATE.DATE_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_CALDATE",
+      "right_table": "TF_EBI_MARKETING_TREND",
+      "columns": [
+        "TF_EBI_MARKETING_TREND.SNAPSHOT_DATE_ID = vw_EBI_CALDATE.DATE_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_CALDATE",
+      "right_table": "vw_TD_EBI_OPP",
+      "columns": [
+        "vw_TD_EBI_OPP.ORIGINAL_OPP_CREATE_DATE_ID = vw_EBI_CALDATE.DATE_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_CALDATE",
+      "right_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "columns": [
+        "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.SNAPSHOT_MONTH_ID = vw_EBI_CALDATE.DATE_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_CALDATE",
+      "right_table": "TF_EBI_CUSTOMER_HEALTH",
+      "columns": [
+        "TF_EBI_CUSTOMER_HEALTH.SNAPSHOT_MONTH_ID = vw_EBI_CALDATE.DATE_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_TF_EBI_P2S",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "vw_TF_EBI_PIPE_WALK.P2S_ID = vw_TF_EBI_P2S.P2S_ID",
+        "vw_TF_EBI_P2S.REGION_ID = vw_TF_EBI_PIPE_WALK.REGION_ID",
+        "vw_TF_EBI_P2S.ACCOUNT_ID = vw_TF_EBI_PIPE_WALK.ACCOUNT_ID",
+        "vw_TF_EBI_P2S.OPP_ID = vw_TF_EBI_PIPE_WALK.OPP_ID",
+        "vw_TF_EBI_P2S.OPG_ID = vw_TF_EBI_PIPE_WALK.OPG_ID",
+        "vw_TF_EBI_P2S.DEAL_TYPE_ID = vw_TF_EBI_PIPE_WALK.DEAL_TYPE_ID",
+        "vw_TF_EBI_P2S.PAY_MEASURE_ID = vw_TF_EBI_PIPE_WALK.PAY_MEASURE_ID",
+        "vw_TF_EBI_P2S.SEGMENT_ID = vw_TF_EBI_PIPE_WALK.SEGMENT_ID",
+        "vw_TF_EBI_P2S.ROLE_TYPE_ID = vw_TF_EBI_PIPE_WALK.ROLE_TYPE_ID",
+        "vw_TF_EBI_P2S.REPORTING_HIERARCHY_ID = vw_TF_EBI_PIPE_WALK.REPORTING_HIERARCHY_ID",
+        "vw_TF_EBI_P2S.FOCUS_VERTICAL_ID = vw_TF_EBI_PIPE_WALK.FOCUS_VERTICAL_ID",
+        "vw_TF_EBI_P2S.SALES_MOTION_ID = vw_TF_EBI_PIPE_WALK.SALES_MOTION_ID",
+        "vw_TF_EBI_P2S.REVENUE_TYPE_ID = vw_TF_EBI_PIPE_WALK.REVENUE_TYPE_ID",
+        "vw_TF_EBI_P2S.CREATOR_TYPE_ID = vw_TF_EBI_PIPE_WALK.CREATOR_TYPE_ID",
+        "vw_TF_EBI_P2S.ROLE_COVERAGE_ID = vw_TF_EBI_PIPE_WALK.ROLE_COVERAGE_ID",
+        "vw_TF_EBI_P2S.CONSULTING_SEGMENT_ID = vw_TF_EBI_PIPE_WALK.CONSULTING_SEGMENT_ID",
+        "vw_TF_EBI_P2S.DEAL_BAND_ID = vw_TF_EBI_PIPE_WALK.DEAL_BAND_ID",
+        "vw_TF_EBI_P2S.SNAPSHOT_DATE_ID = vw_TF_EBI_PIPE_WALK.SNAPSHOT_DATE_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TF_EBI_P2S",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "vw_TF_EBI_P2S.REGION_ID = vw_TF_EBI_QUOTA.REGION_ID",
+        "vw_TF_EBI_P2S.OPG_ID = vw_TF_EBI_QUOTA.OPG_ID",
+        "vw_TF_EBI_P2S.DEAL_TYPE_ID = vw_TF_EBI_QUOTA.DEAL_TYPE_ID",
+        "vw_TF_EBI_P2S.PAY_MEASURE_ID = vw_TF_EBI_QUOTA.PAY_MEASURE_ID",
+        "vw_TF_EBI_P2S.SEGMENT_ID = vw_TF_EBI_QUOTA.SEGMENT_ID",
+        "vw_TF_EBI_P2S.ROLE_TYPE_ID = vw_TF_EBI_QUOTA.ROLE_TYPE_ID",
+        "vw_TF_EBI_P2S.REPORTING_HIERARCHY_ID = vw_TF_EBI_QUOTA.REPORTING_HIERARCHY_ID",
+        "vw_TF_EBI_P2S.GTM_MOTION_ID = vw_TF_EBI_QUOTA.GTM_MOTION_ID",
+        "vw_TF_EBI_P2S.FOCUS_VERTICAL_ID = vw_TF_EBI_QUOTA.FOCUS_VERTICAL_ID",
+        "vw_TF_EBI_P2S.SALES_MOTION_ID = vw_TF_EBI_QUOTA.SALES_MOTION_ID",
+        "vw_TF_EBI_P2S.REVENUE_TYPE_ID = vw_TF_EBI_QUOTA.REVENUE_TYPE_ID",
+        "vw_TF_EBI_P2S.CREATOR_TYPE_ID = vw_TF_EBI_QUOTA.CREATOR_TYPE_ID",
+        "vw_TF_EBI_P2S.ROLE_COVERAGE_ID = vw_TF_EBI_QUOTA.ROLE_COVERAGE_ID",
+        "vw_TF_EBI_P2S.ORIGINAL_REGION_ID = vw_TF_EBI_QUOTA.ORIGINAL_REGION_ID",
+        "vw_TF_EBI_P2S.SNAPSHOT_DATE_ID = vw_TF_EBI_QUOTA.SNAPSHOT_DATE_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TF_EBI_P2S",
+      "right_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "columns": [
+        "vw_TF_EBI_P2S.REGION_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.REGION_ID",
+        "vw_TF_EBI_P2S.ACCOUNT_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.ACCOUNT_ID",
+        "vw_TF_EBI_P2S.OPG_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.OPG_ID",
+        "vw_TF_EBI_P2S.SEGMENT_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.SEGMENT_ID",
+        "vw_TF_EBI_P2S.AE_REGION_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.AE_REGION_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TF_EBI_PIPE_WALK",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "vw_TF_EBI_QUOTA.REGION_ID = vw_TF_EBI_PIPE_WALK.REGION_ID",
+        "vw_TF_EBI_QUOTA.OPG_ID = vw_TF_EBI_PIPE_WALK.OPG_ID",
+        "vw_TF_EBI_QUOTA.DEAL_TYPE_ID = vw_TF_EBI_PIPE_WALK.DEAL_TYPE_ID",
+        "vw_TF_EBI_QUOTA.PAY_MEASURE_ID = vw_TF_EBI_PIPE_WALK.PAY_MEASURE_ID",
+        "vw_TF_EBI_QUOTA.SEGMENT_ID = vw_TF_EBI_PIPE_WALK.SEGMENT_ID",
+        "vw_TF_EBI_QUOTA.ROLE_TYPE_ID = vw_TF_EBI_PIPE_WALK.ROLE_TYPE_ID",
+        "vw_TF_EBI_QUOTA.REPORTING_HIERARCHY_ID = vw_TF_EBI_PIPE_WALK.REPORTING_HIERARCHY_ID",
+        "vw_TF_EBI_QUOTA.FOCUS_VERTICAL_ID = vw_TF_EBI_PIPE_WALK.FOCUS_VERTICAL_ID",
+        "vw_TF_EBI_QUOTA.SALES_MOTION_ID = vw_TF_EBI_PIPE_WALK.SALES_MOTION_ID",
+        "vw_TF_EBI_QUOTA.REVENUE_TYPE_ID = vw_TF_EBI_PIPE_WALK.REVENUE_TYPE_ID",
+        "vw_TF_EBI_QUOTA.CREATOR_TYPE_ID = vw_TF_EBI_PIPE_WALK.CREATOR_TYPE_ID",
+        "vw_TF_EBI_QUOTA.ROLE_COVERAGE_ID = vw_TF_EBI_PIPE_WALK.ROLE_COVERAGE_ID",
+        "vw_TF_EBI_QUOTA.SNAPSHOT_DATE_ID = vw_TF_EBI_PIPE_WALK.SNAPSHOT_DATE_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "vw_TF_EBI_QUOTA.REGION_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.REGION_ID",
+        "vw_TF_EBI_QUOTA.OPG_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.OPG_ID",
+        "vw_TF_EBI_QUOTA.SEGMENT_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.SEGMENT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "vw_TF_EBI_PIPE_WALK.REGION_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.REGION_ID",
+        "vw_TF_EBI_PIPE_WALK.ACCOUNT_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.ACCOUNT_ID",
+        "vw_TF_EBI_PIPE_WALK.OPG_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.OPG_ID",
+        "vw_TF_EBI_PIPE_WALK.SEGMENT_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.SEGMENT_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_CUSTOMER_HEALTH",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.ACCOUNT_ID = TF_EBI_CUSTOMER_HEALTH.ACCOUNT_ID",
+        "vw_TF_EBI_P2S.OPG_ID = TF_EBI_CUSTOMER_HEALTH.OPG_ID",
+        "vw_TF_EBI_P2S.CUSTOMER_HEALTH_ID = TF_EBI_CUSTOMER_HEALTH.CUSTOMER_HEALTH_ID",
+        "vw_TF_EBI_P2S.SEGMENT_ID = TF_EBI_CUSTOMER_HEALTH.SEGMENT_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_CUSTOMER_HEALTH",
+      "right_table": "vw_TD_EBI_OPP",
+      "columns": [
+        "vw_TD_EBI_OPP.ACCOUNT_ID = TF_EBI_CUSTOMER_HEALTH.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_OPP",
+      "right_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "columns": [
+        "vw_TD_EBI_OPP.ACCOUNT_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_CUSTOMER_HEALTH",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "vw_TF_EBI_PIPE_WALK.ACCOUNT_ID = TF_EBI_CUSTOMER_HEALTH.ACCOUNT_ID",
+        "vw_TF_EBI_PIPE_WALK.OPG_ID = TF_EBI_CUSTOMER_HEALTH.OPG_ID",
+        "vw_TF_EBI_PIPE_WALK.SEGMENT_ID = TF_EBI_CUSTOMER_HEALTH.SEGMENT_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_CUSTOMER_HEALTH",
+      "right_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "columns": [
+        "TF_EBI_CUSTOMER_HEALTH.ACCOUNT_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.ACCOUNT_ID",
+        "TF_EBI_CUSTOMER_HEALTH.OPG_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.OPG_ID",
+        "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.SEGMENT_ID = TF_EBI_CUSTOMER_HEALTH.SEGMENT_ID",
+        "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.SNAPSHOT_MONTH_ID = TF_EBI_CUSTOMER_HEALTH.SNAPSHOT_MONTH_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_MARKETING_TREND",
+      "right_table": "vw_TD_ICP_UCP_SCORES",
+      "columns": [
+        "TF_EBI_MARKETING_TREND.ACCOUNT_SUB_ID = vw_TD_ICP_UCP_SCORES.ACCOUNT_SUB_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_MARKETING_TREND",
+      "right_table": "TF_EBI_TPT_INFO",
+      "columns": [
+        "TF_EBI_TPT_INFO.ACCOUNT_SUB_ID = TF_EBI_MARKETING_TREND.ACCOUNT_SUB_ID",
+        "TF_EBI_TPT_INFO.SEGMENT_ID = TF_EBI_MARKETING_TREND.SEGMENT_ID",
+        "TF_EBI_TPT_INFO.AES_SCORE_ID = TF_EBI_MARKETING_TREND.AES_SCORE_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_TPT_INFO",
+      "right_table": "vw_TD_ICP_UCP_SCORES",
+      "columns": [
+        "TF_EBI_TPT_INFO.ACCOUNT_SUB_ID = vw_TD_ICP_UCP_SCORES.ACCOUNT_SUB_ID",
+        "TF_EBI_TPT_INFO.OPG_ID = vw_TD_ICP_UCP_SCORES.OPG_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TF_EBI_P2S",
+      "right_table": "vw_TD_ICP_UCP_SCORES",
+      "columns": [
+        "vw_TF_EBI_P2S.OPG_ID = vw_TD_ICP_UCP_SCORES.OPG_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_CUSTOMER_HEALTH",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "vw_TF_EBI_QUOTA.OPG_ID = TF_EBI_CUSTOMER_HEALTH.OPG_ID",
+        "vw_TF_EBI_QUOTA.SEGMENT_ID = TF_EBI_CUSTOMER_HEALTH.SEGMENT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_ICP_UCP_SCORES",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "vw_TF_EBI_QUOTA.OPG_ID = vw_TD_ICP_UCP_SCORES.OPG_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_ICP_UCP_SCORES",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "vw_TF_EBI_PIPE_WALK.OPG_ID = vw_TD_ICP_UCP_SCORES.OPG_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_CUSTOMER_HEALTH",
+      "right_table": "vw_TD_ICP_UCP_SCORES",
+      "columns": [
+        "TF_EBI_CUSTOMER_HEALTH.OPG_ID = vw_TD_ICP_UCP_SCORES.OPG_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_ICP_UCP_SCORES",
+      "right_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "columns": [
+        "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.OPG_ID = vw_TD_ICP_UCP_SCORES.OPG_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_TPT_INFO",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "TF_EBI_TPT_INFO.OPG_ID = vw_TF_EBI_QUOTA.OPG_ID",
+        "TF_EBI_TPT_INFO.SEGMENT_ID = vw_TF_EBI_QUOTA.SEGMENT_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_TPT_INFO",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "TF_EBI_TPT_INFO.OPG_ID = vw_TF_EBI_PIPE_WALK.OPG_ID",
+        "TF_EBI_TPT_INFO.SEGMENT_ID = vw_TF_EBI_PIPE_WALK.SEGMENT_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_CUSTOMER_HEALTH",
+      "right_table": "TF_EBI_TPT_INFO",
+      "columns": [
+        "TF_EBI_TPT_INFO.OPG_ID = TF_EBI_CUSTOMER_HEALTH.OPG_ID",
+        "TF_EBI_TPT_INFO.SEGMENT_ID = TF_EBI_CUSTOMER_HEALTH.SEGMENT_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_TPT_INFO",
+      "right_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "columns": [
+        "TF_EBI_TPT_INFO.OPG_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.OPG_ID",
+        "TF_EBI_TPT_INFO.SEGMENT_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.SEGMENT_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_MARKETING_TREND",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.CUSTOMER_HEALTH_ID = TF_EBI_MARKETING_TREND.CUSTOMER_HEALTH_ID",
+        "vw_TF_EBI_P2S.SEGMENT_ID = TF_EBI_MARKETING_TREND.SEGMENT_ID",
+        "vw_TF_EBI_P2S.SNAPSHOT_DATE_ID = TF_EBI_MARKETING_TREND.SNAPSHOT_DATE_ID",
+        "vw_TF_EBI_P2S.ACCOUNT_COUNTRY_ID = TF_EBI_MARKETING_TREND.ACCOUNT_COUNTRY_ID",
+        "vw_TF_EBI_P2S.AES_SCORE_ID = TF_EBI_MARKETING_TREND.AES_SCORE_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_CUSTOMER_HEALTH",
+      "right_table": "TF_EBI_MARKETING_TREND",
+      "columns": [
+        "TF_EBI_CUSTOMER_HEALTH.CUSTOMER_HEALTH_ID = TF_EBI_MARKETING_TREND.CUSTOMER_HEALTH_ID",
+        "TF_EBI_MARKETING_TREND.SEGMENT_ID = TF_EBI_CUSTOMER_HEALTH.SEGMENT_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_MARKETING_TREND",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "vw_TF_EBI_QUOTA.SEGMENT_ID = TF_EBI_MARKETING_TREND.SEGMENT_ID",
+        "vw_TF_EBI_QUOTA.SNAPSHOT_DATE_ID = TF_EBI_MARKETING_TREND.SNAPSHOT_DATE_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_MARKETING_TREND",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "TF_EBI_MARKETING_TREND.SEGMENT_ID = vw_TF_EBI_PIPE_WALK.SEGMENT_ID",
+        "TF_EBI_MARKETING_TREND.SNAPSHOT_DATE_ID = vw_TF_EBI_PIPE_WALK.SNAPSHOT_DATE_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_MARKETING_TREND",
+      "right_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "columns": [
+        "TF_EBI_MARKETING_TREND.SEGMENT_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.SEGMENT_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_UCP_COMPETITORS",
+      "right_table": "vw_TD_ICP_UCP_SCORES",
+      "columns": [
+        "TD_EBI_UCP_COMPETITORS.sub_std_name_key = vw_TD_ICP_UCP_SCORES.SUB_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ROLE_Coverage",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.ROLE_COVERAGE_ID = vw_TD_EBI_ROLE_Coverage.ROLE_COVERAGE_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ROLE_Coverage",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "columns": [
+        "vw_TF_EBI_QUOTA.ROLE_COVERAGE_ID = vw_TD_EBI_ROLE_Coverage.ROLE_COVERAGE_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ROLE_Coverage",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "columns": [
+        "vw_TF_EBI_PIPE_WALK.ROLE_COVERAGE_ID = vw_TD_EBI_ROLE_Coverage.ROLE_COVERAGE_ID"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_CREATOR_TYPE",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.CREATOR_TYPE_ID = vw_EBI_CREATOR_TYPE.ID"
+      ]
+    }
+  ],
+  "multihopJoins": [
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "TF_EBI_TPT_INFO",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.TPT_ID = TF_EBI_TPT_INFO.TPT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "vw_TD_EBI_ACCOUNT",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "vw_TD_EBI_OPP",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.OPP_ID = vw_TD_EBI_OPP.OPP_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "vw_EBI_OPG",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.OPG_ID = vw_EBI_OPG.OPG_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "TD_EBI_DEAL_TYPE",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.DEAL_TYPE_ID = TD_EBI_DEAL_TYPE.DEAL_TYPE_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "vw_ebi_sales_stage",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.SALES_STAGE_ID = vw_ebi_sales_stage.SALES_STAGE_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "vw_EBI_CALDATE",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.SNAPSHOT_DATE_ID = vw_EBI_CALDATE.DATE_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "TD_EBI_CUSTOMER_HEALTH",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.CUSTOMER_HEALTH_ID = TD_EBI_CUSTOMER_HEALTH.CUSTOMER_HEALTH_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "TF_EBI_CUSTOMER_HEALTH",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.ACCOUNT_ID = TF_EBI_CUSTOMER_HEALTH.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "TF_EBI_MARKETING_TREND",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.CUSTOMER_HEALTH_ID = TF_EBI_MARKETING_TREND.CUSTOMER_HEALTH_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "vw_TD_ICP_UCP_SCORES",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.OPG_ID = vw_TD_ICP_UCP_SCORES.OPG_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_OPP",
+      "right_table": "vw_EBI_OPG",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_TD_EBI_OPP.OPP_ID = vw_TF_EBI_P2S.OPP_ID",
+        "vw_TF_EBI_P2S.OPG_ID = vw_EBI_OPG.OPG_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_OPP",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_TD_EBI_OPP.OPP_ID = vw_TF_EBI_P2S.OPP_ID",
+        "vw_TF_EBI_P2S.REGION_ID = vw_TF_EBI_QUOTA.REGION_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_OPP",
+      "right_table": "TD_EBI_DEAL_TYPE",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_TD_EBI_OPP.OPP_ID = vw_TF_EBI_P2S.OPP_ID",
+        "vw_TF_EBI_P2S.DEAL_TYPE_ID = TD_EBI_DEAL_TYPE.DEAL_TYPE_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_OPP",
+      "right_table": "TF_EBI_MARKETING_TREND",
+      "bridge_table": "vw_TD_EBI_ACCOUNT",
+      "steps": [
+        "vw_TD_EBI_OPP.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID",
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_SUB_ID = TF_EBI_MARKETING_TREND.ACCOUNT_SUB_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_OPP",
+      "right_table": "TF_EBI_TPT_INFO",
+      "bridge_table": "vw_TD_EBI_ACCOUNT",
+      "steps": [
+        "vw_TD_EBI_OPP.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID",
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_SUB_ID = TF_EBI_TPT_INFO.ACCOUNT_SUB_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_OPP",
+      "right_table": "vw_TD_ICP_UCP_SCORES",
+      "bridge_table": "vw_TD_EBI_ACCOUNT",
+      "steps": [
+        "vw_TD_EBI_OPP.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID",
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_SUB_ID = vw_TD_ICP_UCP_SCORES.ACCOUNT_SUB_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_OPP",
+      "right_table": "TD_EBI_UCP_COMPETITORS",
+      "bridge_table": "vw_TD_EBI_ACCOUNT",
+      "steps": [
+        "vw_TD_EBI_OPP.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID",
+        "vw_TD_EBI_ACCOUNT.SUB_ID = TD_EBI_UCP_COMPETITORS.sub_std_name_key"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_OPP",
+      "right_table": "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG",
+      "bridge_table": "vw_TD_EBI_ACCOUNT",
+      "steps": [
+        "vw_TD_EBI_OPP.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID",
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_SUB_ID = TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.SUB_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ACCOUNT",
+      "right_table": "vw_EBI_OPG",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_ID = vw_TF_EBI_P2S.ACCOUNT_ID",
+        "vw_TF_EBI_P2S.OPG_ID = vw_EBI_OPG.OPG_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ACCOUNT",
+      "right_table": "vw_EBI_CALDATE",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_ID = vw_TF_EBI_P2S.ACCOUNT_ID",
+        "vw_TF_EBI_P2S.SNAPSHOT_DATE_ID = vw_EBI_CALDATE.DATE_KEY"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ACCOUNT",
+      "right_table": "TD_EBI_DEAL_TYPE",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_ID = vw_TF_EBI_P2S.ACCOUNT_ID",
+        "vw_TF_EBI_P2S.DEAL_TYPE_ID = TD_EBI_DEAL_TYPE.DEAL_TYPE_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ACCOUNT",
+      "right_table": "vw_ebi_sales_stage",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_ID = vw_TF_EBI_P2S.ACCOUNT_ID",
+        "vw_TF_EBI_P2S.SALES_STAGE_ID = vw_ebi_sales_stage.SALES_STAGE_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ACCOUNT",
+      "right_table": "TD_EBI_CUSTOMER_HEALTH",
+      "bridge_table": "TF_EBI_CUSTOMER_HEALTH",
+      "steps": [
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_ID = TF_EBI_CUSTOMER_HEALTH.ACCOUNT_ID",
+        "TF_EBI_CUSTOMER_HEALTH.CUSTOMER_HEALTH_ID = TD_EBI_CUSTOMER_HEALTH.CUSTOMER_HEALTH_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ACCOUNT",
+      "right_table": "vw_TF_EBI_QUOTA",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_ID = vw_TF_EBI_P2S.ACCOUNT_ID",
+        "vw_TF_EBI_P2S.REGION_ID = vw_TF_EBI_QUOTA.REGION_ID"
+      ]
+    },
+    {
+      "left_table": "vw_ebi_sales_stage",
+      "right_table": "vw_TF_EBI_PIPE_WALK",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_ebi_sales_stage.SALES_STAGE_ID = vw_TF_EBI_P2S.SALES_STAGE_ID",
+        "vw_TF_EBI_P2S.P2S_ID = vw_TF_EBI_PIPE_WALK.P2S_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_DEAL_TYPE",
+      "right_table": "vw_TD_EBI_OPP",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "TD_EBI_DEAL_TYPE.DEAL_TYPE_ID = vw_TF_EBI_P2S.DEAL_TYPE_ID",
+        "vw_TF_EBI_P2S.OPP_ID = vw_TD_EBI_OPP.OPP_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_DEAL_TYPE",
+      "right_table": "vw_TD_EBI_ACCOUNT",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "TD_EBI_DEAL_TYPE.DEAL_TYPE_ID = vw_TF_EBI_P2S.DEAL_TYPE_ID",
+        "vw_TF_EBI_P2S.ACCOUNT_ID = vw_TD_EBI_ACCOUNT.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_OPG",
+      "right_table": "TD_EBI_UCP_COMPETITORS",
+      "bridge_table": "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG",
+      "steps": [
+        "vw_EBI_OPG.MOPG1 = TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.MAJOR_OPG1",
+        "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG.SUB_ID = TD_EBI_UCP_COMPETITORS.sub_std_name_key"
+      ]
+    },
+    {
+      "left_table": "vw_EBI_OPG",
+      "right_table": "TF_EBI_MARKETING_TREND",
+      "bridge_table": "TF_EBI_TPT_INFO",
+      "steps": [
+        "vw_EBI_OPG.OPG_KEY = TF_EBI_TPT_INFO.OPG_ID",
+        "TF_EBI_TPT_INFO.ACCOUNT_SUB_ID = TF_EBI_MARKETING_TREND.ACCOUNT_SUB_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_UCP_COMPETITORS",
+      "right_table": "vw_TF_EBI_P2S",
+      "bridge_table": "vw_TD_EBI_ACCOUNT",
+      "steps": [
+        "TD_EBI_UCP_COMPETITORS.sub_std_name_key = vw_TD_EBI_ACCOUNT.SUB_ID",
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_ID = vw_TF_EBI_P2S.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_UCP_COMPETITORS",
+      "right_table": "TF_EBI_CUSTOMER_HEALTH",
+      "bridge_table": "vw_TD_EBI_ACCOUNT",
+      "steps": [
+        "TD_EBI_UCP_COMPETITORS.sub_std_name_key = vw_TD_EBI_ACCOUNT.SUB_ID",
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_ID = TF_EBI_CUSTOMER_HEALTH.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "TD_EBI_UCP_COMPETITORS",
+      "right_table": "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+      "bridge_table": "vw_TD_EBI_ACCOUNT",
+      "steps": [
+        "TD_EBI_UCP_COMPETITORS.sub_std_name_key = vw_TD_EBI_ACCOUNT.SUB_ID",
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.ACCOUNT_ID"
+      ]
+    }
+  ]
+}

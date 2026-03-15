@@ -1,0 +1,183 @@
+[
+  {
+    "id": "dashboard__pipeline_overview",
+    "scenario": "Pipeline overview with coverage and stage mix from 2 data sources",
+    "dataSources": [
+      { "question": "Pipeline coverage by quarter", "columns": ["Close_Qtr", "BU", "Quota", "Pipe", "Coverage_Ratio", "Coverage_Quality"] },
+      { "question": "Pipeline by stage mix", "columns": ["SALES_STAGE", "GLOBAL_REGION", "BU", "Deal_Count", "Pipe"] }
+    ],
+    "spec": {
+      "title": "Pipeline Overview",
+      "description": "Pipeline coverage and stage mix across quarters and regions.",
+      "slicers": [
+        { "id": "slicer-1", "dimension": "BU", "values": [], "defaultValue": null }
+      ],
+      "tiles": [
+        {
+          "id": "tile-1", "type": "kpi", "title": "Total Pipeline",
+          "sourceIndex": 0,
+          "config": { "valueColumn": "Pipe", "aggregation": "sum", "prefix": "$", "suffix": "" },
+          "layout": { "x": 0, "y": 0, "w": 3, "h": 2 },
+          "filterDimensions": ["BU"]
+        },
+        {
+          "id": "tile-2", "type": "kpi", "title": "Total Quota",
+          "sourceIndex": 0,
+          "config": { "valueColumn": "Quota", "aggregation": "sum", "prefix": "$", "suffix": "" },
+          "layout": { "x": 3, "y": 0, "w": 3, "h": 2 },
+          "filterDimensions": ["BU"]
+        },
+        {
+          "id": "tile-3", "type": "chart", "title": "Coverage by Quarter",
+          "sourceIndex": 0,
+          "config": {
+            "chartType": "bar",
+            "xAxis": { "key": "Close_Qtr", "label": "Quarter" },
+            "yAxis": [{ "key": "Pipe", "label": "Pipeline" }, { "key": "Quota", "label": "Quota" }],
+            "groupBy": "Close_Qtr", "aggregation": "sum"
+          },
+          "layout": { "x": 0, "y": 2, "w": 6, "h": 4 },
+          "filterDimensions": ["BU"]
+        },
+        {
+          "id": "tile-4", "type": "insight", "title": "Coverage Insight",
+          "sourceIndex": 0,
+          "config": { "markdown": "Pipeline coverage shows the ratio of active pipeline to quota targets. Green (>=2.5x) indicates healthy coverage, Yellow (2.0-2.5x) needs attention, and Red (<2.0x) requires immediate action." },
+          "layout": { "x": 6, "y": 2, "w": 6, "h": 4 },
+          "filterDimensions": []
+        },
+        {
+          "id": "tile-5", "type": "chart", "title": "Pipeline by Stage",
+          "sourceIndex": 1,
+          "config": {
+            "chartType": "stacked_bar",
+            "xAxis": { "key": "SALES_STAGE", "label": "Stage" },
+            "yAxis": [{ "key": "Pipe", "label": "Pipeline ($)" }],
+            "groupBy": "SALES_STAGE", "aggregation": "sum"
+          },
+          "layout": { "x": 0, "y": 6, "w": 6, "h": 4 },
+          "filterDimensions": ["BU"]
+        }
+      ]
+    }
+  },
+  {
+    "id": "dashboard__coverage_health",
+    "scenario": "Coverage health dashboard from a single coverage data source",
+    "dataSources": [
+      { "question": "Pipe coverage performance", "columns": ["TERR_ID", "REP_NAME", "Close_Qtr", "BU", "ROLE_COVERAGE_BU", "Quota", "Pipe", "Coverage_Ratio", "Coverage_Quality"] }
+    ],
+    "spec": {
+      "title": "Coverage Health",
+      "description": "Pipeline coverage ratios and quality breakdown by quarter and business unit.",
+      "slicers": [],
+      "tiles": [
+        {
+          "id": "tile-1", "type": "kpi", "title": "Avg Coverage Ratio",
+          "sourceIndex": 0,
+          "config": { "valueColumn": "Coverage_Ratio", "aggregation": "avg", "prefix": "", "suffix": "x" },
+          "layout": { "x": 0, "y": 0, "w": 3, "h": 2 },
+          "filterDimensions": []
+        },
+        {
+          "id": "tile-2", "type": "kpi", "title": "Total Pipeline",
+          "sourceIndex": 0,
+          "config": { "valueColumn": "Pipe", "aggregation": "sum", "prefix": "$", "suffix": "" },
+          "layout": { "x": 3, "y": 0, "w": 3, "h": 2 },
+          "filterDimensions": []
+        },
+        {
+          "id": "tile-3", "type": "chart", "title": "Coverage Quality Distribution",
+          "sourceIndex": 0,
+          "config": {
+            "chartType": "pie",
+            "xAxis": { "key": "Coverage_Quality", "label": "Quality" },
+            "yAxis": [{ "key": "Pipe", "label": "Pipeline ($)" }],
+            "groupBy": "Coverage_Quality", "aggregation": "sum"
+          },
+          "layout": { "x": 0, "y": 2, "w": 6, "h": 4 },
+          "filterDimensions": []
+        },
+        {
+          "id": "tile-4", "type": "insight", "title": "Coverage Analysis",
+          "sourceIndex": 0,
+          "config": { "markdown": "The coverage quality distribution reveals how many territories are at healthy (Green), marginal (Yellow), or at-risk (Red) levels. Focus coaching efforts on Red territories to improve pipeline generation." },
+          "layout": { "x": 6, "y": 2, "w": 6, "h": 4 },
+          "filterDimensions": []
+        },
+        {
+          "id": "tile-5", "type": "chart", "title": "Pipeline by BU",
+          "sourceIndex": 0,
+          "config": {
+            "chartType": "bar",
+            "xAxis": { "key": "BU", "label": "Business Unit" },
+            "yAxis": [{ "key": "Pipe", "label": "Pipeline ($)" }],
+            "groupBy": "BU", "aggregation": "sum"
+          },
+          "layout": { "x": 0, "y": 6, "w": 6, "h": 4 },
+          "filterDimensions": []
+        }
+      ]
+    }
+  },
+  {
+    "id": "dashboard__deal_focus",
+    "scenario": "Deal prioritization dashboard from deals and pipeline walk data",
+    "dataSources": [
+      { "question": "Top deals by Deal Sensei score", "columns": ["OPP_NAME", "REP_NAME", "SALES_STAGE", "GLOBAL_REGION", "ARR", "DS_SCORE", "DS_Priority"] },
+      { "question": "Pipeline walk for this quarter", "columns": ["WALK_CATEGORY", "Walk_Amount"] }
+    ],
+    "spec": {
+      "title": "Deal Focus & Pipeline Movement",
+      "description": "Deal prioritization by DS score and pipeline movement categories.",
+      "slicers": [],
+      "tiles": [
+        {
+          "id": "tile-1", "type": "kpi", "title": "Total ARR in Focus",
+          "sourceIndex": 0,
+          "config": { "valueColumn": "ARR", "aggregation": "sum", "prefix": "$", "suffix": "" },
+          "layout": { "x": 0, "y": 0, "w": 3, "h": 2 },
+          "filterDimensions": []
+        },
+        {
+          "id": "tile-2", "type": "kpi", "title": "Avg DS Score",
+          "sourceIndex": 0,
+          "config": { "valueColumn": "DS_SCORE", "aggregation": "avg", "prefix": "", "suffix": "" },
+          "layout": { "x": 3, "y": 0, "w": 3, "h": 2 },
+          "filterDimensions": []
+        },
+        {
+          "id": "tile-3", "type": "chart", "title": "Deal Priority Distribution",
+          "sourceIndex": 0,
+          "config": {
+            "chartType": "pie",
+            "xAxis": { "key": "DS_Priority", "label": "Priority" },
+            "yAxis": [{ "key": "ARR", "label": "ARR ($)" }],
+            "groupBy": "DS_Priority", "aggregation": "sum"
+          },
+          "layout": { "x": 0, "y": 2, "w": 6, "h": 4 },
+          "filterDimensions": []
+        },
+        {
+          "id": "tile-4", "type": "chart", "title": "Pipeline Walk",
+          "sourceIndex": 1,
+          "config": {
+            "chartType": "bar",
+            "xAxis": { "key": "WALK_CATEGORY", "label": "Category" },
+            "yAxis": [{ "key": "Walk_Amount", "label": "Amount ($)" }],
+            "groupBy": "WALK_CATEGORY", "aggregation": "sum"
+          },
+          "layout": { "x": 6, "y": 2, "w": 6, "h": 4 },
+          "filterDimensions": []
+        },
+        {
+          "id": "tile-5", "type": "insight", "title": "Action Items",
+          "sourceIndex": 0,
+          "config": { "markdown": "Focus on 'At Risk' deals with high ARR values for maximum impact. Deals with DS Score below 40 need immediate manager attention. Cross-reference with pipeline walk to understand net movement trends." },
+          "layout": { "x": 0, "y": 6, "w": 12, "h": 3 },
+          "filterDimensions": []
+        }
+      ]
+    }
+  }
+]

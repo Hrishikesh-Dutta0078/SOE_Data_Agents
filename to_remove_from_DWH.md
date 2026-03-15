@@ -1,0 +1,24 @@
+# Tables to Remove from DWH
+
+- vw_td_ebi_deal_band
+- vw_td_ebi_region_rpt
+- vw_TF_EBI_P2S
+- vw_TF_EBI_QUOTA
+- vw_TD_EBI_OPP
+- vw_TD_EBI_ACCOUNT
+- vw_EBI_OPG
+- vw_EBI_CALDATE
+- vw_ebi_sales_stage
+- vw_TD_EBI_ROLE_Coverage
+- vw_EBI_CREATOR_TYPE
+- TD_EBI_DEAL_TYPE
+- TD_EBI_UCP_COMPETITORS
+- TF_EBI_Marketing_Trend
+- vw_TF_EBI_PIPE_WALK
+- TF_EBI_TPT_INFO
+- TD_EBI_CUSTOMER_HEALTH
+- vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT
+- TF_EBI_CUSTOMER_HEALTH
+- vw_TD_ICP_UCP_SCORES
+- TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG
+- bridge_emp_lookup

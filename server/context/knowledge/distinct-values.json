@@ -1,0 +1,4673 @@
+{
+  "vw_td_ebi_region_rpt": {
+    "REGION_ID": [
+      95,
+      71,
+      84,
+      82,
+      180
+    ],
+    "SALES_TEAM": [
+      "AMER CORP PREMIER SUPPORT",
+      "AMER DX ENT PUB SEC FED",
+      "AMER GROWTH",
+      "AMER CORP LATAM SOL IB",
+      "AMER DME ENT"
+    ],
+    "SALES_TEAM_ALIAS": [
+      "AMER DME ENT PUB SEC SLG",
+      "AMER IND CANADA",
+      null,
+      "AMER CORP LATAM SOL GF",
+      "AMER DME ENT EDU"
+    ],
+    "SALES_REGION": [
+      "ANZ",
+      "APAC",
+      "C&B APAC",
+      "EMEA FY22",
+      "AMER TERRITORY"
+    ],
+    "SALES_LEADER": [
+      "C&B",
+      "Goodman, Ben",
+      "C&B AMERICAS",
+      "APAC FY22",
+      "AMERICAS FY22"
+    ],
+    "SALES_LEADER_LDAP": [
+      "C&B JAPAN",
+      "EHOZUMI",
+      "EMEA",
+      "INTLHQ",
+      "C&B"
+    ],
+    "SALES_LEADER_PSS": [
+      "#N/A"
+    ],
+    "SALES_LEADER_LDAP_PSS": [
+      "#N/A"
+    ],
+    "TERR_ID": [
+      "1483984",
+      "1483991",
+      "1484007",
+      "1484022",
+      "#N/A_RSS"
+    ],
+    "TERR_NAME": [
+      "2021-AMERICAS BDR CJM SMB 1-EWAGNER-20210307",
+      "2021-AMERICAS BDR CJM SMB 1-91827280",
+      "2021-AMERICAS BDR CJM FIELD 1-PMORGAN",
+      "2021-A1PAC ANZ DME PS/SC-SNICHOLS 20210802",
+      "2021-AMERICAS BDR CJM SMB 1-91828755"
+    ],
+    "TERR_IDENT": [
+      "TLM",
+      null,
+      "VP",
+      "FLM",
+      "AE"
+    ],
+    "REP_ID": [
+      3662,
+      3573,
+      -1,
+      6854,
+      6728
+    ],
+    "REP_NAME": [
+      "91810110, POOL AMERICAS ENT PSS DX/DME",
+      "91810055, PH USER",
+      "91700285, PH USER AMERICAS",
+      "., Sidrah",
+      "., Pragya"
+    ],
+    "REP_LDAP": [
+      "91700011",
+      "91700053",
+      "91700070",
+      "91700086",
+      "91700006"
+    ],
+    "REP_SFDC_USER_ID": [
+      "0051400000BAdR6AAL",
+      "0051400000BAGEIAA5",
+      "0051400000BaeWNAAZ",
+      "0051400000BAeRRAA1",
+      "0051400000Bae15AAB"
+    ],
+    "MGR_EMP_ID": [
+      8313,
+      6596,
+      8294,
+      11125,
+      9117
+    ],
+    "MGR_EMP_NAME": [
+      "91810357, PH USER AMERICAS",
+      "Allen, Hunter",
+      "Aiken, Molly",
+      "91810591, PH USER AMERICAS",
+      "91812357, PH USER AMERICAS"
+    ],
+    "MGR_EMP_LDAP": [
+      "91700211",
+      "91701194",
+      "91700323",
+      "91700885",
+      "91700181"
+    ],
+    "GLOBAL_REGION": [
+      "AMERICAS",
+      "EMEA",
+      "APAC",
+      "WW"
+    ],
+    "REGION": [
+      "AMER SOLUTION",
+      "AMER PUB SEC",
+      "ANZ",
+      "AMERICAS BDR",
+      "AMERICAS COMM 1"
+    ],
+    "SUB_REGION": [
+      "AMER ACS SALES USS",
+      "AMER ACS SALES VERT 2",
+      "AMER BDR GREENFIELD",
+      "AMER BDR SL",
+      "AAC"
+    ],
+    "TERRITORY": [
+      "AMER ACS DSS AMER SOL-LED SC",
+      "AMER ACS CSM SOL DX",
+      "AMER ACS PSS SA VERT 2",
+      "AMER ACS PSS SA",
+      "ACS EMEA CUSTOMER ENGINEERING"
+    ],
+    "SUB_TERRITORY": [
+      "AMER ACS CSM SOLUTION",
+      "AAC AMER 1",
+      "AMER ACS DSS AMER SALES VELOCITY INTL",
+      "AAC 1 AMER 2",
+      "AMER ACS PSS SA"
+    ],
+    "AREA": [
+      "DME",
+      "AMERICAS F22",
+      "DX",
+      "DX/CONNECT",
+      "PPBU"
+    ],
+    "EMP_ROLE_TYPE": [
+      "DALP BDR",
+      "BDR",
+      "PROF SERVICES SALES MGMT",
+      "INTERIM TEAM MEMBER",
+      "SALES MANAGER"
+    ],
+    "EMP_ROLE_NAME": [
+      "2021-ACCOUNT MANAGER-AA+TARGET+ASSETS+FORMS+SITES+ALL CAMPAIGN+MARKETO+MAGENTO",
+      "2021-ACCOUNT MANAGER-Magento",
+      "2021-ACCOUNT MANAGER-AA+CJA+AAM+RT CDP+Target",
+      "2021-BDM-AA+CJA+AAM+RT CDP+Target+AEP+IS Attribution AI+IS Customer AI",
+      "2021-ACCOUNT MANAGER-Digital Media incl: Captivate Prime+PPBU"
+    ],
+    "FLM": [
+      "91810539, PH USER AMERICAS",
+      "91812108, PH USER INTL",
+      "Agarwal, Anika",
+      "#N/A",
+      "Amadeo, Andrea"
+    ],
+    "FLM_LDAP": [
+      "91700217",
+      "91700725",
+      "91701247",
+      "91700532",
+      "#N/A"
+    ],
+    "FLM_TERR_ID": [
+      "1484181",
+      "1484137",
+      "1484092",
+      "1484180_FLM",
+      "1484218"
+    ],
+    "FLM_ID": [
+      10062,
+      6969,
+      9469,
+      3573,
+      9921
+    ],
+    "SLM": [
+      "AMERICAS 91810731, PH USER",
+      "AMERICAS 91700173, PH User",
+      "AMERICAS 91812562, PH USER",
+      "91826070, POOL AMERICAS DX/DME",
+      "Americas 91812316, PH USER"
+    ],
+    "SLM_LDAP": [
+      "91700173",
+      "91810357",
+      "91810093",
+      "91700949",
+      "91700217"
+    ],
+    "SLM_TERR_ID": [
+      "1484137",
+      "1484233_FLM_Dummy",
+      "1484161",
+      "1484104",
+      "1484074"
+    ],
+    "TLM": [
+      "Alnet, Romain",
+      "Agarwal, Richa",
+      "AMERICAS 91813741, PH User",
+      "AMERICAS 91816551, PH USER",
+      "AMERICAS 92314957, PH User"
+    ],
+    "TLM_LDAP": [
+      "91813835",
+      "91810759",
+      "91812469",
+      "91810655",
+      "91813081"
+    ],
+    "TLM_TERR_ID": [
+      "1484233",
+      "1484797",
+      "1485173",
+      "#N/A",
+      "1484899"
+    ],
+    "LEADER": [
+      "AMERICAS 92317350, PH User",
+      "Chan, Elaine",
+      "Bourdeaux, Suzanne",
+      "Ben-Israel, Rotem",
+      "AMERICAS 91827740, PH User"
+    ],
+    "LEADER_LDAP": [
+      "91826021",
+      "91827740",
+      "91827947",
+      "91815979",
+      "92317466"
+    ],
+    "LEADER_TERR_ID": [
+      "1487387",
+      "1484651",
+      "1488224",
+      "1488981",
+      "1488590"
+    ],
+    "AVP_SALES_TEAM": [
+      "1484179IBERICA DX",
+      "1485424INDIA DX",
+      "1484257ANZ DX IND FSI",
+      "1484366AMER US GREENFIELD",
+      "1484759ANZ DX ENT & SCALE"
+    ],
+    "MARKET_SEGMENT": [
+      "#N/A",
+      "COMMERCIAL",
+      "EDUCATION",
+      "GOVERNMENT",
+      "OTHER"
+    ],
+    "MARKET_AREA": [
+      "INTERNATIONAL",
+      "APAC DME",
+      "France (MA)",
+      "CANADA",
+      "PPBU"
+    ],
+    "MAJOR_TERRITORY": [
+      "AMER ACS SALES PSSi VERT 3 CP",
+      "AMER ACS DELIVERY BDO",
+      "AMER ACS PSS SA VERT 3",
+      "AMER ACS SALES PSSI VERT 1 LS",
+      "AMER ACS PSS SA PUB SEC"
+    ],
+    "ROLE_TYPE_ID": [
+      1,
+      2,
+      6,
+      10,
+      11
+    ],
+    "REPORTING_HIERARCHY_ID": [
+      1,
+      17,
+      43,
+      50,
+      8
+    ],
+    "REPORTING_HIERARCHY": [
+      "AMER ENT DX",
+      "AMER IND T&H",
+      "AMER SLSM DX",
+      "AMER IND PS DX",
+      "AMER DX"
+    ],
+    "GTM_MOTION_ID": [
+      3,
+      19,
+      12,
+      14,
+      13
+    ],
+    "POSITION_ID": [
+      "91700068",
+      "91700080",
+      "91700003",
+      "91700034",
+      "91700016"
+    ],
+    "PHCOUNT": [
+      -1,
+      0,
+      1
+    ],
+    "SALES_TEAM_FLAG": [
+      "#N/A",
+      "ENTERPRISE SALES TEAM"
+    ],
+    "TA_START_DATE": [
+      "2021-01-23T00:00:00.000Z",
+      "2020-12-15T00:00:00.000Z",
+      "2021-01-04T00:00:00.000Z",
+      "2021-01-01T00:00:00.000Z",
+      "2020-12-10T00:00:00.000Z"
+    ],
+    "TA_END_DATE": [
+      "2020-12-21T00:00:00.000Z",
+      "2020-12-05T00:00:00.000Z",
+      "2021-01-01T00:00:00.000Z",
+      "2020-12-10T00:00:00.000Z",
+      "2021-01-17T00:00:00.000Z"
+    ],
+    "CREATE_DTTM": [
+      "2020-11-03T14:17:26.000Z",
+      "2020-11-03T14:17:47.000Z",
+      "2020-11-03T14:17:19.000Z",
+      "2020-11-03T14:17:04.000Z",
+      "2020-11-03T14:17:49.000Z"
+    ],
+    "EMP_HIRE_DATE": [
+      "1997-03-01T00:00:00.000Z",
+      "2003-12-01T00:00:00.000Z",
+      "2004-05-01T00:00:00.000Z",
+      "1998-07-01T00:00:00.000Z",
+      "1995-10-28T00:00:00.000Z"
+    ],
+    "CURR_ROLE_START_DATE": [
+      "2014-09-01T00:00:00.000Z",
+      "2015-02-02T00:00:00.000Z",
+      "2014-04-21T00:00:00.000Z",
+      "2015-02-09T00:00:00.000Z",
+      "2014-12-13T00:00:00.000Z"
+    ],
+    "AT_EMP_STATUS": [
+      "#N/A",
+      "Active",
+      "Inactive"
+    ],
+    "REP_IN_PLACE": [
+      null,
+      "In Place",
+      "Open"
+    ],
+    "IS_ACTIVE": [
+      true
+    ],
+    "IS_TRUE_FLM": [
+      null,
+      false,
+      true
+    ],
+    "IS_TRUE_SLM": [
+      null,
+      false,
+      true
+    ],
+    "IS_TRUE_TLM": [
+      null,
+      false,
+      true
+    ],
+    "IS_LATEST_EMP": [
+      null,
+      false,
+      true
+    ],
+    "IS_MANUAL_ENTRY": [
+      false,
+      true
+    ],
+    "TO_SHOW_IN_RTB": [
+      false,
+      true
+    ],
+    "ROLE_TYPE_DISPLAY": [
+      "AE",
+      "PS",
+      "PSSC",
+      "RSS",
+      "SAM"
+    ],
+    "ROLE_TYPE": [
+      "ACCOUNT MANAGER",
+      "PRODUCT SPECIALIST",
+      "PROF SERVICES SALES",
+      "RENEWAL SPECIALIST",
+      "SAM"
+    ],
+    "IS_CY_QUOTA_AVAILABLE": [
+      null,
+      false,
+      true
+    ],
+    "VERTICAL_MARKET_SEGMENT": [
+      "EASTERN EUROPE",
+      "0",
+      "CSC/COMM",
+      "DME",
+      "AMER DX"
+    ],
+    "SALES_TEAM_GROUPED": [
+      "AMER CANADA DX",
+      "AMER DME ENT",
+      "AMER SOL SAE COMM",
+      "AMER PUB SEC SLG EAST",
+      "AMER IND RSS & SUM DX"
+    ],
+    "SALES_TEAM_BU": [
+      "#N/A",
+      "DME",
+      "DX",
+      "DX/DME",
+      "WW"
+    ],
+    "REP_GTM_MOTION": [
+      "#N/A",
+      "",
+      "Not Applicable",
+      "Non Scaled",
+      "Scale"
+    ],
+    "SUPER_GEO": [
+      "AMERICAS",
+      "GLOBAL DME ENT",
+      "INTERNATIONAL"
+    ],
+    "NEW_SUB_REGION": [
+      "EMEA OFFSHORE",
+      "C&B",
+      "C&B EMEA",
+      "AMER SOL",
+      "AMER SPA"
+    ],
+    "TBH_STATUS": [
+      "#N/A",
+      "Active",
+      "INACTIVE",
+      "TBH"
+    ],
+    "POOL_GHOST": [
+      0,
+      1
+    ],
+    "GLOBAL_SALES_REGION_SORT": [
+      6,
+      14,
+      18,
+      15,
+      1
+    ],
+    "GLOBAL_REGION_SORT": [
+      1,
+      5,
+      4,
+      99,
+      3
+    ],
+    "SALES_LEADER_SORT": [
+      33,
+      28,
+      27,
+      10,
+      34
+    ],
+    "SALES_TEAM_SORT": [
+      48,
+      11,
+      22,
+      28,
+      10
+    ],
+    "SALES_REGION_SORT": [
+      31,
+      55,
+      7,
+      8,
+      25
+    ],
+    "VERTICAL_MARKET_SEGMENT_SORT": [
+      18,
+      15,
+      16,
+      20,
+      46
+    ]
+  },
+  "vw_TF_EBI_P2S": {
+    "P2S_ID": [
+      175,
+      125,
+      112,
+      244,
+      113
+    ],
+    "OPP_ID": [
+      870658,
+      885216,
+      725949,
+      874844,
+      846114
+    ],
+    "ACCOUNT_ID": [
+      26435,
+      20423,
+      9541,
+      25969,
+      10787
+    ],
+    "PAY_MEASURE_ID": [
+      0,
+      1,
+      2,
+      3,
+      11
+    ],
+    "OPG_ID": [
+      99,
+      104,
+      107,
+      76,
+      109
+    ],
+    "SEGMENT_ID": [
+      43,
+      42,
+      15,
+      40,
+      39
+    ],
+    "REGION_ID": [
+      1370835,
+      1371872,
+      1371710,
+      1373399,
+      1373276
+    ],
+    "CREATOR_TYPE_ID": [
+      12,
+      13,
+      -1,
+      1,
+      4
+    ],
+    "SALES_STAGE_ID": [
+      9,
+      5,
+      1,
+      6,
+      4
+    ],
+    "DEAL_TYPE_ID": [
+      -1,
+      1,
+      2,
+      3
+    ],
+    "OPP_CLOSE_DATE_ID": [
+      20241002,
+      20240929,
+      20241012,
+      20241006,
+      20241010
+    ],
+    "OPP_CREATE_DATE_ID": [
+      20141103,
+      20170605,
+      20170301,
+      20170203,
+      20141027
+    ],
+    "SNAPSHOT_DATE_ID": [
+      20250926,
+      20250516,
+      20250718,
+      20250509,
+      20251121
+    ],
+    "SNAPSHOT_DATE": [
+      "2025-06-06T00:00:00.000Z",
+      "2025-04-18T00:00:00.000Z",
+      "2025-10-24T00:00:00.000Z",
+      "2025-11-28T00:00:00.000Z",
+      "2025-09-26T00:00:00.000Z"
+    ],
+    "REPORTING_HIERARCHY_ID": [
+      12,
+      74,
+      67,
+      35,
+      54
+    ],
+    "DERIVED_CLOSURE_DATE_ID": [
+      20230207,
+      20221021,
+      20221208,
+      20210624,
+      20230305
+    ],
+    "DEAL_BAND_ID": [
+      13,
+      11,
+      17,
+      21,
+      6
+    ],
+    "DEAL_BAND": [
+      "<0.1M",
+      "0.1M+",
+      "0.25M+",
+      "0.5M+",
+      "1M+"
+    ],
+    "DEAL_BAND_25K": [
+      "<25K",
+      ">=25K"
+    ],
+    "ORIGINAL_REGION_ID": [
+      1362783,
+      1362771,
+      1362743,
+      1362764,
+      1362794
+    ],
+    "ORIGINAL_SEGMENT_ID": [
+      33,
+      24,
+      14,
+      39,
+      41
+    ],
+    "PARTNER_TYPE": [
+      "CO_SELLING",
+      "NO PARTNER",
+      "SECOND_CO_SELLING",
+      "SOURCING"
+    ],
+    "PARTNER_CREATED_ID_BY_DEAL": [
+      7,
+      10,
+      9,
+      1,
+      4
+    ],
+    "PARTNER_CATEGORY": [
+      "Community",
+      "Named",
+      "NO PARTNER",
+      "Top 5"
+    ],
+    "PARTNER_CREATED_ID_BY_PARTNER": [
+      3,
+      6,
+      9
+    ],
+    "CHILD_PARTNER_ID": [
+      "0011400001aSNypAAG",
+      "0011400001fFu45AAC",
+      "0011400001aVJWZAA4",
+      "0011400001dFd2kAAC",
+      "0011400001dFW2TAAW"
+    ],
+    "CHILD_PARTNER_NAME": [
+      "Accenture Federal Services LLC",
+      "Accenture AG",
+      "Accenture SL",
+      "Accrease",
+      "Accenture Company Limited"
+    ],
+    "CONSULTING_SEGMENT_ID": [
+      -1
+    ],
+    "SALES_MOTION_ID": [
+      -1,
+      45,
+      46,
+      47,
+      48
+    ],
+    "FOCUS_VERTICAL_ID": [
+      11,
+      9,
+      13,
+      14,
+      8
+    ],
+    "REVENUE_TYPE_ID": [
+      1,
+      2,
+      5,
+      3,
+      10
+    ],
+    "QUARTER_CATEGORY_ID": [
+      3,
+      5,
+      6,
+      7,
+      1
+    ],
+    "ADJ_COMMITMENT": [
+      "Clean Up",
+      "Forecast",
+      "Lost",
+      "Upside",
+      "Won"
+    ],
+    "GEO_ADJ_COMMIT": [
+      "Won",
+      "Forecast",
+      "Upside - Targeted",
+      "Lost",
+      "Upside"
+    ],
+    "ACS_MANAGER_ADJUSTED_COMMIT": [
+      "Upside",
+      "Upside - Targeted",
+      "N/A",
+      "Clean Up",
+      "Lost"
+    ],
+    "MGR_ADJ_COMMIT": [
+      "Upside - Committed",
+      "Won",
+      "Upside - Targeted",
+      "Lost",
+      "Forecast"
+    ],
+    "REGION_ADJ_COMMIT": [
+      "Lost",
+      "Forecast",
+      "Upside - Committed",
+      "Clean Up",
+      "N/A"
+    ],
+    "ADJ_COMMITMENT_GROUP": [
+      "Closed",
+      "Open"
+    ],
+    "ADJ_COMMITMENT_SUBGROUP": [
+      "Closed",
+      "Forecast",
+      "No Commit",
+      "Upside"
+    ],
+    "ADJ_COMMITMENT_SORT": [
+      1,
+      2,
+      4,
+      5,
+      6
+    ],
+    "DAYS_SINCE_NEXT_STEPS_MODIFIED": [
+      40,
+      44,
+      10,
+      46,
+      42
+    ],
+    "DAYS_SINCE_NEXT_STEPS_MODIFIED_BAND": [
+      "0 - 15 days",
+      "15 - 30 days",
+      "30+ days"
+    ],
+    "STALLED_BUT_INACTIVE": [
+      "Active",
+      "Stalled & Inactive"
+    ],
+    "WIN_LOSS_THRESHOLD_FLAG": [
+      null,
+      "No",
+      "Yes"
+    ],
+    "OLI_PRODUCT_DEAL_TYPE": [
+      "Cross-sell",
+      "Not Determined",
+      "Renewal",
+      null,
+      "New"
+    ],
+    "SALES_TEAM_MEMBER_ROLE": [
+      "2024-ACCOUNT MANAGER-ALL DI+TARGET+ALL CONT+WKFT+CP AO",
+      "2024-ACCOUNT MANAGER-PPBU+COLDFUSION+CAPTIVATE PRIME",
+      "103901",
+      "2023-PRODUCT SPECIALIST-ALL CREATIVE+STOCK",
+      "2024-ACCOUNT MANAGER-ALL DME+ALL PPBU(ex. PRMTIME+CP AO) NAM APAC"
+    ],
+    "STAGE_DURATION_ID": [
+      49,
+      50,
+      51,
+      52,
+      53
+    ],
+    "STAGE_DURATION": [
+      "0-30 days",
+      "180-270 days",
+      "270+ days",
+      "30-90 days",
+      "90-180 days"
+    ],
+    "STAGE_DURATION_GRP_ID": [
+      54,
+      55,
+      56,
+      57
+    ],
+    "STAGE_DURATION_GROUP": [
+      "Active (30 D)",
+      "Nurture (30-90 D)",
+      "Requalify/Clean >180 D",
+      "Stalled (90-180 D)"
+    ],
+    "STAGE_DURATION_GROUP_SORT": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "PS_ALIGNED": [
+      "Lost",
+      "Upside - Targeted",
+      "No Commit",
+      "Clean Up",
+      "Upside"
+    ],
+    "DEAL_AGE": [
+      -73,
+      -88,
+      -95,
+      -74,
+      -285
+    ],
+    "IN_PIPELINE": [
+      0,
+      1
+    ],
+    "IS_FLAT_RENEWAL": [
+      false
+    ],
+    "DEAL_DURATION": [
+      -271,
+      -222,
+      -230,
+      -226,
+      -220
+    ],
+    "AGE_BAND": [
+      "120 - 270 days",
+      "270+ days",
+      "60 - 120 days",
+      "60 days"
+    ],
+    "LICENSING_RENEWAL_TYPE": [
+      "STOCK",
+      "Greenfield",
+      "ETLA Renewal Upsell",
+      "VIP/CLP",
+      null
+    ],
+    "UPDATED_DATE": [
+      "2026-03-01T00:00:00.000Z"
+    ],
+    "SFDC_P2S_ID": [
+      "10841630",
+      "11930586",
+      "10699787",
+      "10886347",
+      "10841633"
+    ],
+    "STAGE_AGE": [
+      -396,
+      -452,
+      -350,
+      -322,
+      -410
+    ],
+    "IS_BOQ": [
+      "FALSE",
+      "TRUE"
+    ],
+    "SUB_CREATOR_CRITERIA": [
+      "GTM Strategy Rules",
+      "N/A",
+      "Point in Time Role"
+    ],
+    "IS_EOQ": [
+      "FALSE",
+      "TRUE"
+    ],
+    "TP_ASV": [
+      -576000,
+      -1588224.331,
+      -479857.003,
+      -2500444.6927,
+      -3051927.358
+    ],
+    "OPP_DRIVER_CRITERIA": [
+      "Business Driver Role",
+      "GTM Strategy Rules",
+      "N/A"
+    ],
+    "OPP_DRIVER_ID": [
+      -1,
+      65,
+      66,
+      67,
+      68
+    ],
+    "GTM_MOTION_ID": [
+      -1
+    ],
+    "MUST_WIN_OVERLAY": {
+      "error": "Query timeout expired"
+    },
+    "DEAL_BAND_5M": [
+      "500K-1M",
+      "5M+",
+      "100K-250K",
+      "250K-500K",
+      "<50K"
+    ],
+    "DEAL_BAND_5M_SORT": [
+      2,
+      1,
+      5,
+      4,
+      7
+    ],
+    "MULTI_SOLUTION_FLAG_DESC": [
+      "Multi",
+      "Single"
+    ],
+    "PARTNER_ID": [
+      9963,
+      487,
+      7986,
+      9900,
+      4370
+    ],
+    "PARTNER_CREATOR_TYPE": [
+      "Non Partner",
+      "Partner Co-Sell",
+      "Partner Created"
+    ],
+    "GLOBAL_PARENT_PARTNER_GPC": [
+      "Astral Web Taiwan",
+      "Amadeus",
+      null,
+      "AFTIA Solutions",
+      "Accenture S.p.A."
+    ],
+    "PARTNER_COHORT_ATT": [
+      "Strategic",
+      "Cloud Tech Pure",
+      "N/A",
+      null,
+      "Tier 1"
+    ],
+    "PARTNER_COHORT_ATT_GLOBAL": [
+      "Strategic",
+      "Growth",
+      "Regional",
+      "Hub",
+      null
+    ],
+    "PARTNER_COHORT_GPC": [
+      "GSI",
+      "Tier1",
+      "None",
+      "Regional Hub",
+      "Tier 1"
+    ],
+    "PARTNER_COHORT_GPC_GLOBAL": [
+      "N/A",
+      "Strategic",
+      null,
+      "Hub",
+      "Growth"
+    ],
+    "UPSELL_TYPE_ID": [
+      -1,
+      1,
+      2
+    ],
+    "CUSTOMER_HEALTH_ID": [
+      782,
+      779,
+      407,
+      54,
+      780
+    ],
+    "SOLUTION_HEALTH_ID": [
+      42,
+      17,
+      5,
+      7,
+      36
+    ],
+    "MULTI_SOL_FLAG_GT_0_ASV": [
+      false,
+      true
+    ],
+    "DEAL_BAND_NEW": [
+      "4M-5M",
+      "500K-750K",
+      "9M-10M",
+      "5M-6M",
+      "75K-100K"
+    ],
+    "DEAL_BAND_NEW_SORT": [
+      10,
+      4,
+      14,
+      9,
+      2
+    ],
+    "PARTNER_COHORT_GPC_SORT": [
+      1,
+      8,
+      3,
+      4,
+      2
+    ],
+    "PARTNER_COHORT_ATT_SORT": [
+      99,
+      5,
+      2,
+      8,
+      3
+    ],
+    "ACCOUNT_COUNTRY_ID": [
+      83,
+      15,
+      48,
+      20,
+      54
+    ],
+    "TPT_ID": [
+      1456,
+      39,
+      319,
+      1394,
+      598
+    ],
+    "AE_REGION_ID": [
+      1362779,
+      1362733,
+      1362764,
+      1362774,
+      1362776
+    ],
+    "SOURCE_NAME": [
+      "NDR",
+      "P2S"
+    ],
+    "OPG_ARR_AVG_USD_CURR_FY": [
+      -17906.7,
+      -12709.12,
+      -287899.68,
+      -62718.2,
+      -14512.9644
+    ],
+    "OPG_TWELVE_MONTH_ENTRY_USD_CURR_FY": [
+      -165245205.1486,
+      null,
+      -349695.4701,
+      -246634634.5502,
+      -81389429.4016
+    ],
+    "OPG_TWELVE_MONTH_EXIT_USD_CURR_FY": [
+      -145200,
+      -246634634.5502,
+      -1450891.5327,
+      -27720,
+      -169049.8525
+    ],
+    "AES_SCORE_ID": [
+      -1,
+      1,
+      2,
+      3,
+      4
+    ],
+    "OPP_RECON_IND": [
+      false,
+      true
+    ],
+    "COMMIT_FLAG": [
+      null,
+      "FQ",
+      "Outlook CQ",
+      "Upside CQ"
+    ],
+    "CQ_RISK_CATEGORY": [
+      null,
+      "High Risk",
+      "Low Risk",
+      "Medium Risk"
+    ],
+    "UCP_ICP_SCORE_ID": [
+      588,
+      23,
+      553,
+      544,
+      263
+    ],
+    "SALES_PLAY_ID": [
+      107,
+      138,
+      159,
+      148,
+      40
+    ],
+    "STRATEGIC_SALES_PLAY": [
+      "AM: Asset Management;CA: Customer Acquisition;CE: Intelligent Customer Engagement;CLE: Content-Led Experiences;OCA: Omnichannel Content Activation;RI: Reporting & Insights;WP: Workflow & Planning",
+      "AM: Asset Management;CA: Customer Acquisition;CE: Intelligent Customer Engagement;CLE: Content-Led Experiences;Conversion Optimization",
+      "AM: Asset Management;Account Orchestration",
+      "ABA: Agentic Brand Activation;CA: Campaign Acceleration;WP: Workflows, Planning, and Metadata",
+      "AM: Asset Management;ABA: Agentic Brand Activation;CI: Content Insights"
+    ],
+    "APPLICATION_SALES_TACTIC": [
+      "AA/CJA: Customer Journey Intelligence (Maturity up);AA: Closing the Experience Gap with Digital Intelligence",
+      "AA: Digital Rip & Replace",
+      "AA: Maturity & Volume Growth;AEMA: Cloud Modernization",
+      "AA/CJA: Customer Journey Intelligence (Maturity up)",
+      "AA: Maturity & Volume Growth;AA: Rip & Replace - New"
+    ],
+    "PORTFOLIO_SALES_PLAY": [
+      "Personalized Insights and Engagement",
+      null,
+      "PORT: Personalization at Scale - Journeys",
+      "AAC: Search, Social, Commerce",
+      "AAC: DSP"
+    ],
+    "OPPTY": [
+      -14046235.92,
+      -7819676.2954,
+      -22070866.805,
+      -7836095.52,
+      -14213602.2773
+    ],
+    "DS_SCORE": [
+      21,
+      43,
+      22,
+      10,
+      27
+    ],
+    "SUB_MA_ID": [
+      95,
+      1,
+      76,
+      54,
+      77
+    ],
+    "SUB_MA_SOLUTION_ID": [
+      42,
+      31,
+      23,
+      25,
+      50
+    ],
+    "S4_PROGRESSION_ASV": [
+      -86131.99,
+      -187832.0244,
+      -691832.961,
+      -1330200,
+      -127552.253
+    ],
+    "ROLE_COVERAGE_ID": [
+      1,
+      -1,
+      7,
+      6,
+      3
+    ],
+    "PARENT_BAND_ID": [
+      1,
+      2,
+      6,
+      12,
+      8
+    ]
+  },
+  "vw_TF_EBI_QUOTA": {
+    "QUOTA_ID": [
+      1271344968,
+      1271344967,
+      1271345001,
+      1271344982,
+      1271344990
+    ],
+    "QUOTA_ACTUAL": [
+      null,
+      -33233714.8,
+      -14225324.34,
+      -17636463.4,
+      -15049616.72
+    ],
+    "QUOTA_REQ": [
+      -34467715.2375,
+      -63836936.7752,
+      -49944237,
+      -53144481.375,
+      -32151138.1125
+    ],
+    "QUOTA_REQ_SS5": [
+      -235962290.925,
+      -90142390.83,
+      -46377261.7876,
+      -66217537.4626,
+      -62430296.25
+    ],
+    "QUOTA_REQ_SS4": [
+      -52909390.2,
+      -42515585.1,
+      -42022289.625,
+      -112677988.5375,
+      -53344966.275
+    ],
+    "IN_QTR_GC_TARGET": [
+      -4777849.3443,
+      -9575540.5163,
+      -8047064.652,
+      -5513536.6094,
+      -6736040.5283
+    ],
+    "IN_QTR_GC_TARGET_SS5": [
+      -2460052.1602,
+      -2553477.471,
+      -4782863.9021,
+      -3464751.3669,
+      -5183550.5369
+    ],
+    "IN_QTR_GC_TARGET_SS4": [
+      -2070317.8715625,
+      -2000973.145397,
+      -3594533.386464,
+      -6776560.112708,
+      -2454286.008816
+    ],
+    "SURVIVAL_RATIO": [
+      0.4638777102607695,
+      null,
+      0.3166897793267986,
+      0.5883392184530205,
+      0.6185002119060322
+    ],
+    "PIPE_TARGET_SURVIVAL_RATE": [
+      -26511379.7554,
+      -27919747.4653,
+      -28270252.6233,
+      -25463567.5886,
+      -27800965.4992
+    ],
+    "PIPE_TARGET_SURVIVAL_RATE_SS5": [
+      -8120377.2937,
+      -7085105.4368,
+      -9073428.9835,
+      -6818822.5125,
+      -25135093.3932
+    ],
+    "PIPE_TARGET_SURVIVAL_RATE_SS4": [
+      -6927743.287818,
+      -18597544.425,
+      -6736007.657770312,
+      -7754667.70959675,
+      -8033500.313847
+    ],
+    "REGION_ID": [
+      4842647,
+      4842721,
+      4842819,
+      4842735,
+      4842858
+    ],
+    "ORIGINAL_REGION_ID": [
+      4842571,
+      4842875,
+      4842562,
+      4842644,
+      4842624
+    ],
+    "OPG_ID": [
+      68,
+      57,
+      3,
+      97,
+      23
+    ],
+    "QUOTA_FISCAL_QUARTER_ID": [
+      20260228,
+      20270306,
+      20270605,
+      20260829,
+      20260530
+    ],
+    "SNAPSHOT_DATE_ID": {
+      "error": "Query timeout expired"
+    },
+    "PAY_MEASURE_ID": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "SEGMENT_ID": [
+      37
+    ],
+    "DEAL_TYPE_ID": [
+      1,
+      2,
+      3
+    ],
+    "CREATOR_TYPE_ID": [
+      7,
+      3,
+      5,
+      6,
+      8
+    ],
+    "FOCUS_VERTICAL_ID": [
+      13,
+      14
+    ],
+    "SALES_MOTION_ID": [
+      47
+    ],
+    "ROLE_TYPE_ID": [
+      1,
+      2,
+      6,
+      10
+    ],
+    "REVENUE_TYPE_ID": [
+      18
+    ],
+    "GTM_MOTION_ID": [
+      -1
+    ],
+    "REPORTING_HIERARCHY_ID": [
+      116,
+      177,
+      168,
+      176,
+      32
+    ],
+    "ROLE_COVERAGE_ID": [
+      6,
+      4,
+      3,
+      2,
+      1
+    ],
+    "IS_ACTIVE": [
+      1
+    ]
+  },
+  "vw_TD_EBI_OPP": {
+    "OPP_ID": [
+      306,
+      255,
+      304,
+      248,
+      256
+    ],
+    "SFDC_OPP_ID": [
+      "00614000019eaR6AAI",
+      "00614000019ebtcAAA",
+      "00614000019ea6XAAQ",
+      "00614000019ebbJAAQ",
+      "00614000019ebFCAAY"
+    ],
+    "OPP_NAME": [
+      "- MCCGLC - IT - CS6",
+      "- Dept wide",
+      "- Carr Riggs & Ingram LLC IT-AB- CLP",
+      "- Q2'23 - Attrition - AJINOMOTO CO., INC - PREMIER SUPPORT",
+      "- Mashable - CCT/DC"
+    ],
+    "OPP_STAGE": [
+      "03 - Opportunity Qualification",
+      "Closed - CleanUp",
+      "6 - Customer Commit",
+      "Stage 2 - Prospect",
+      "2 - Qualified"
+    ],
+    "HIGHEST_STAGE": [
+      null,
+      "Closed Won - Not Paid",
+      "160 - Opportunity Qualification",
+      "Closed - Booked",
+      "161 - Opportunity Qualification"
+    ],
+    "CLOSED_FROM_STAGE": [
+      "Qualification",
+      "N/A - Not Synced",
+      "Discovery / Pitch",
+      "07 - Execute to Close",
+      "Closed - Cleanup"
+    ],
+    "ACCOUNT_ID": [
+      7,
+      8,
+      40,
+      35,
+      10
+    ],
+    "ORIGINAL_OPP_CREATE_DATE": [
+      "2008-12-09T00:00:00.000Z",
+      "2008-12-30T00:00:00.000Z",
+      "2008-12-31T00:00:00.000Z",
+      "2008-12-20T00:00:00.000Z",
+      "2009-01-01T00:00:00.000Z"
+    ],
+    "ORIGINAL_OPP_CREATE_DATE_ID": [
+      20090109,
+      20081210,
+      20081225,
+      20081214,
+      20090113
+    ],
+    "ORIGINAL_OPP_CLOSE_DATE": [
+      "2009-01-10T00:00:00.000Z",
+      "2008-12-27T00:00:00.000Z",
+      "2008-12-29T00:00:00.000Z",
+      "2009-01-25T00:00:00.000Z",
+      "2009-01-16T00:00:00.000Z"
+    ],
+    "CLOSURE_DATE": [
+      "2015-01-30T00:00:00.000Z",
+      "2015-01-24T00:00:00.000Z",
+      "2015-01-21T00:00:00.000Z",
+      "2015-01-17T00:00:00.000Z",
+      "2015-01-12T00:00:00.000Z"
+    ],
+    "STAGE_DURATION": [
+      "30-90 days",
+      "180-270 days",
+      "#N/A",
+      "90-180 days",
+      "0-30 days"
+    ],
+    "REASON": [
+      "ADM - No Progression",
+      "AAC: Product - Feature Request",
+      "AAC: Relationship - Brand",
+      "AAC: Relationship - DX",
+      "AAC: Economic Uncertainty - Other"
+    ],
+    "CLOSE_REASON_DETAIL": [
+      "Agency to Marketo Direct",
+      "Business Model Change/M&A",
+      "AAC: Relationship - DX",
+      "Deal Reg Duplicate",
+      "AAC: Relationship - Agency"
+    ],
+    "CLOSE_DATE_CHANGE_REASON": [
+      "#N/A",
+      "Project Delayed/Cancelled",
+      "Technical Validation",
+      "Power Not Identified",
+      "No Compelling Reason"
+    ],
+    "RECORD_OWNER": [
+      "2, Jaya",
+      "@FigLeaf, Connect Sales Team",
+      "., 닷넷소프트",
+      "., Ayan Pal",
+      "., Anvi"
+    ],
+    "SOURCE_OF_LEAD": [
+      "Display Ad",
+      "AAC: DX Inbound",
+      "Adobe",
+      "Field Event",
+      "Paid Social"
+    ],
+    "SALES_PLAY": [
+      "AA: Point-to-new-migration",
+      "AA: Upsell New Capabilities",
+      null,
+      "AA: Upsell Volume & Migration",
+      "AA/CJA: Customer Journey Intelligence (Maturity up)"
+    ],
+    "SECONDARY_SALES_PLAY": [
+      "AAC: CTV Reach Planner (DSP)",
+      "AAC: Cross to AA",
+      "AAC: New TV Anywhere",
+      "AAC: Cross-sell DSP/Full-Stack to AA",
+      "AAC: Fuel Weighted Objectives with Adobe Analytics (SSC)"
+    ],
+    "STRATEGIC_SALES_PLAY": [
+      "AM: Asset Management;CA: Customer Acquisition;CE: Intelligent Customer Engagement;CLE: Content-Led Experiences",
+      "AM: Asset Management",
+      "ABA: Agentic Brand Activation;MO: Marketing Orchestration",
+      "AM: Asset Management;CA: Customer Acquisition;Account Orchestration",
+      "AM: Asset Management;CA: Customer Acquisition"
+    ],
+    "PORTFOLIO_SALES_PLAY": [
+      "Personalized Insights and Engagement",
+      "PORT: Personalization at Scale - Future of Work",
+      "B2B Portfolio Play",
+      "Personalization at Scale",
+      "AAC: Search, Social, Commerce"
+    ],
+    "APPLICATION_SALES_TACTIC": [
+      "AA: Closing the Experience Gap with Digital Intelligence;CDP: Audience Creation and Activation",
+      "AA/CJA: Customer Journey Intelligence (Maturity up);AA: Upsell Volume & Migration",
+      "AA/CJA: Customer Journey Intelligence (Maturity up);AA: Closing the Experience Gap with Digital Intelligence",
+      "AA: Maturity & Volume Growth",
+      "-"
+    ],
+    "SALES_CAMPAIGN": [
+      "Amer CCE WMS from ABoB",
+      "APAC BDR Outbound (Retired) DC API",
+      "APAC BDR Outbound (Retired) CC Edu Design Faculty",
+      "Americas Q4 Pushed",
+      "2014 Summit"
+    ],
+    "PRIMARY_USE_CASE": [
+      "Digital Enrollment",
+      "CF: Per Instance, Cloud.",
+      "Express - On-brand DMe",
+      "Demand Marketing",
+      "CM - On-Brand Character / Product Development"
+    ],
+    "SECONDARY_USE_CASE": [
+      "Customer Acquisition",
+      "Cross-Channel Marketing",
+      "Fan Engagement",
+      "#N/A",
+      "ALM: Employee Education & Partner Education"
+    ],
+    "PRIMARY_COMPETITOR": [
+      "Amplience",
+      "Amperity",
+      "4C",
+      "Acxiom (LiveRamp IdentityLink)",
+      "A/B Tasty"
+    ],
+    "PRIMARY_COMPETITOR_SOLUTION": [
+      "Mix Modeler",
+      "AEM Forms",
+      "Marketo",
+      "Workfront",
+      "AEM Sites"
+    ],
+    "SECONDARY_COMPETITOR": [
+      "AT Internet",
+      "Bazzarvoice",
+      "Bronto",
+      "Ad Roll",
+      "Aprimo (formerly Adam Software)"
+    ],
+    "SECONDARY_COMPETITOR_SOLUTION": [
+      "Campaign",
+      "Analytics",
+      "AEM Forms",
+      "AAM",
+      "Target"
+    ],
+    "COMPETITOR": [
+      "[Other];Responsys",
+      "[Other];Salesforce (ExactTarget, Pardot)",
+      "[Other];RichRelevance",
+      "[Other];Google;Oracle",
+      "[Other];AT Internet"
+    ],
+    "COMPETITOR_FLAG": [
+      "#N/A",
+      "Both",
+      "No Competitor",
+      "Primary Competitor",
+      "Secondary Competitor"
+    ],
+    "PRIMARY_INCUMBENT": [
+      "Adobe/Neolane",
+      "Absorb LMS",
+      "Aprimo",
+      "Amazon Redshift",
+      "Amobee (Turn, Videology)"
+    ],
+    "SECONDARY_INCUMBENT": [
+      "Bloomreach/Hippo",
+      "Bynder (formerly WebDAM)",
+      "Build/In-house",
+      "ActionIQ",
+      "Amazon"
+    ],
+    "CO_SELLING_PARTNER_NAME": [
+      "Accenture",
+      "36 Blocks LLC",
+      "AbelsonTaylor",
+      "ABM Knowledgeware Limited",
+      "8awake GmbH"
+    ],
+    "SOURCING_PARTNER_NAME": [
+      "Absolute Design",
+      "121eCommerce LLC",
+      "A2K Technologies",
+      "abc EUROPE",
+      "7thSENSE GmbH"
+    ],
+    "SELLING_PARTNER_ID": [
+      "0011400001aSSnhAAG",
+      "0011400001aTfYkAAK",
+      "0011400001aSm7uAAC",
+      "#N/A",
+      "0011400001aT90hAAC"
+    ],
+    "SOURCING_PARTNER_ID": [
+      "0011400001aT8rzAAC",
+      "0011400001aSKaBAAW",
+      "0011400001aSA5YAAW",
+      "0011400001aT3KBAA0",
+      "0011400001a8rB8AAI"
+    ],
+    "FULFILLMENT_PARTNER_ID": [
+      "0011400001aTExpAAG",
+      "0011400001aTp8mAAC",
+      "0011400001aSP4oAAG",
+      "0011400001aSzzjAAC",
+      "0011400001aTs1yAAC"
+    ],
+    "FULFILLMENT_PARTNER_NAME": [
+      "3rdmill Pty Ltd",
+      ".Digital Environment for It",
+      "121eCommerce LLC",
+      "3TI Solutions, Inc",
+      "360 I"
+    ],
+    "PARTNER_SOURCE": [
+      null,
+      "#N/A",
+      "Adobe Sourced",
+      "Direct",
+      "Partner Sourced"
+    ],
+    "DEAL_REG_ID": [
+      "0061C00000af4twQAA",
+      "0061C00000agliXQAQ",
+      "0061500000TBEz0AAH",
+      "0061C00000aggYAQAY",
+      "0061C00000ag7OWQAY"
+    ],
+    "DEAL_REG_IND": [
+      null,
+      "#N/A",
+      "N",
+      "Y"
+    ],
+    "LICENSING_PROGRAM": [
+      "New EA",
+      "ETLA - Access",
+      "ETLA- Standard",
+      "ETLA",
+      "VIP LGA 7"
+    ],
+    "LICENSING_PROGRAM_TYPE": [
+      "addon",
+      null,
+      "Consortium",
+      "Comp Attrition",
+      "Partner Reassignment"
+    ],
+    "ETLA_FLAG": [
+      "#N/A",
+      "ETLA",
+      "NON ETLA"
+    ],
+    "ETLA_TYPE": [
+      null,
+      "#N/A",
+      "Renewal",
+      "Standalone"
+    ],
+    "MUST_WIN": [
+      "MSSE - 2",
+      "MSSE - 4",
+      "MSSE - 10",
+      "MSSE - 6",
+      "MSSE - 1"
+    ],
+    "MUST_WIN_OVERLAY": [
+      "AEP - PS;AEM - PS;AJO - PS;CJM - PS;D+I - PS",
+      "DSG;Industry Strategy;Leadership",
+      "AEM - PS",
+      "Partner",
+      "AEM - PS;Blitz"
+    ],
+    "FINAL_ELIGIBILITY": [
+      null,
+      "#N/A",
+      "No",
+      "Yes"
+    ],
+    "CONTRACT_STATUS": [
+      "Adobe Signs First",
+      null,
+      "--None--",
+      "Pending Additional Contract(s)",
+      "Contract Received and on Hold"
+    ],
+    "AGREEMENT_STATUS": [
+      "A000001057-Cancelled, A000001058-Executed",
+      "A000001018-Terminated",
+      "A000001055-Cancelled",
+      "A000001074-Expired",
+      "A000001082-Signatures"
+    ],
+    "RENEWAL": [
+      false,
+      true
+    ],
+    "PUSHED_COUNT": [
+      15,
+      12,
+      3,
+      11,
+      16
+    ],
+    "PUSH_COUNT": [
+      0,
+      18,
+      1,
+      13,
+      9
+    ],
+    "NEXT_STEP": [
+      "- 10/10 AG:\nRBoB: 89,590\nNASV: 31k\nNext Steps: Adding in one agency instance and 250k of db.",
+      "-          No more CS6 via volume licensing program or shrink wrapped packages wef 1st June 2014.\n-          Price increase for CCT wef 1st Sep 2014 – up to USD$120 per year per user\n-          USD$480 Price lock promotion valid till 30th August 2014 (last extension!)\n \nI would also like to share with you our latest Adobe Creative Cloud promotion.\n\nTo begin I would like to share the following with you:\n\n1. The timelines for Adobe Creative Suite CS6. \nAs we know Creative Suite CS6 is already 2 years old and there isn't any feature update since then!\nRecently, Adobe announced that from 1 June 2014 Adobe Creative Suite CS6 will not be available from retail market!\n(Means more creative companies will deploy Creative Cloud and explore the benefits of using Creative Cloud).\n\n2. Adobe Creative Cloud for Team \"CCT\"\nCreative Cloud for Teams Complete is a subscription based business model which includes all the creative software for Design, Web & Video, so you will have all the tools ready for you to use when you need them. Things are moving at a rapid pace so do the software we use daily. Now all updates and new features for Creative Cloud software are release sooner then before, so users can enjoy the new functions to empower their creativity and productivity. All updates and services for Creative Cloud are free!\n(There are more than 500 new features and updates from Creative Cloud since launch and more to come, these updates are to empower your creativity and productivity)\n\n3. Creative cloud also come with great services:\n• Typekit: Typekit includes more than 800 font libraries. Formerly this fonts could cost over $20k. \n• Cloud Storage: Each license comes with 100Gb of Cloud storage for file storing, sharing.\n•  DPS Single Edition: Digital publishing  for creating iPad app. \n• Expert Advise: 2 sessions per year 1:1 advise from Adobe Expert.\n\n4. Easy software deployment & license Compliance and there is no software key to remember.\n\n5. Predictable budget\n\n6. Creative Cloud",
+      "- 0 TU reported-",
+      "- 0$ addendum for 3 months for PS LFS availability during dev & del phase.",
+      "- 08/09/22 : Julian from ostlab is a service provider for bauwerk4. He confirmed that their client have 18 employees and only 1 employee using 1x creative cloud all apps. He also mentioned that in the next couple of months his client thinking to opt in for adobe sign (transactional).\n- Customer is out of office until 5th of September 2022.  \n-Follow up email sent\n-Customer not answering their phone. \n-Report Updated.\n-Customer contact details needed / No report available."
+    ],
+    "DAYS_SINCE_NEXT_STEPS_MODIFIED": [
+      19,
+      46,
+      26,
+      28,
+      36
+    ],
+    "BUSINESS_VALUE": [
+      "Customer Confirmed Value",
+      "Addressed",
+      "Customer Evaluating Value",
+      null,
+      "Need Ecosystem Support"
+    ],
+    "AUTHORITY": [
+      "Identified",
+      "In Progress",
+      "Compelling Event Validated",
+      "Addressed",
+      "Unknown"
+    ],
+    "BUDGET": [
+      "Customer Discovery",
+      "Identified",
+      "Unknown",
+      "Lack Compelling Event",
+      "Customer Confirmed Challenge"
+    ],
+    "SUCCESS": [
+      "Identified",
+      "Addressed",
+      "Need Ecosystem Support",
+      "In Progress",
+      "Unknown"
+    ],
+    "TECHNICAL_FIT": [
+      "Addressed",
+      "In Progress",
+      "Customer Discovery",
+      "Need Ecosystem Support",
+      null
+    ],
+    "TIMING": [
+      "Addressed",
+      "Need Ecosystem Support",
+      null,
+      "Compelling Event Validated",
+      "In Progress"
+    ],
+    "BUSINESS_VALUE_RISK_DETAILS": [
+      "- Adobe CJA Select Healthcare has been demonstrated on how this solution will address their key business issues and quantified the impact of the investment in purchasing the solution.",
+      "--",
+      "- Add Frame will be of great benefit",
+      "- 500 light users is plenty for them\n- We integrate fully with BlueCherry\n- Want to see in a demo:\nFolder structure\nUploading, tagging, and metadata\nEnd user customer success \nAdding assets to InDesign/Photoshop",
+      "⏳"
+    ],
+    "TECHNICAL_FIT_RISK_DETAILS": [
+      "-  Allow quick access  to assets from internal and external users\n- Reduce search time\n- Allow quick collaboration\n- Increase findability and reduce repeat creation of assets",
+      "-",
+      "- 120+ reports with the ability to subscribe to reports to automate the tracking process. \n- The entire training overall can be automated using Learning Plans. \n\nOther key features that they are looking at are: \n- Mobile Learning \n- Ability for self enrollment \n- In built authoring would be good to have but not a must have. \n- Integration with True North.",
+      "- 500k+ Transactions,\n- several 100 Templates\n- 30.000 Users\n- Integrations: Successfactors, AQDB, Ariba, Fieldglass, CPQ, CMS, Icertis (which will be replaced by internal solution mid-term), Anaqua, Rainbfocus\n- currently focus on internal use cases / discussions ongoing to extend to embed and GTM use cases",
+      "- A comprehensive, integrated customer profile, along with the ability to automate multi-touch, multi-wave, triggered cross-channel campaigns from one native user interface.\n- A mobile- and tablet-friendly UI, streamlined asset management, and audience sharing with the Adobe Experience\nCloud.\n- Enhanced targeting and effectiveness, so that you send fewer but more targeted and personalized emails and messages, driving higher click-through rates, conversions, and revenue"
+    ],
+    "TIMING_RISK_DETAILS": [
+      "- 1/31 - Live Legal Review - Adobe to send updated AEM SOs - one with China, one without\n- Week of 2/3 - Work with Office of CIO team to secure Accenture China geo lead approval, make any updates to China SO (as needed) - deliver certified copy\n- 2/5 - Alan and Jarrett to meet with Penelope Prettifying, Jason Warnke, and Melissa Summers - introduction to new CIO, update on Adobe partnership/footprint\n- 2/14 - Accenture approvals and budget finalized for AEM \n- 2/21 - Execute SO, deliver PO",
+      "- 03/09 - First structured conversation to better understand their needs and to present how Adobe could help them with these needs - done.\n- 03/12 - Discovery meeting with the Marketing and Business teams to fine tune the executive.\n- 03/17- Executive meeting with Barbara Ruiz (eComm Director) and mktg and biz teams.\n- 03/18 - Meeting results: Barbara Ruiz (eComm Director) recognized the business fit, and although we asked for an initial mutual plan in order to fulfill customer timing requirements, she understands that CVC needs to move forward with a deeper AT evaluation.\n- 04/06 - New meeting with the technical team and CMS executives to discuss AT and AEM together. The meeting with Adobe was postponed due a customer request\n- 04/06 - Armando will meet the IT Director and CMS leaders to discuss the expanded project next steps (AT + AEM) and he'll propose a meeting with Adobe and Conexio (partner) to showcase the solution along with the consulting services that will be provided by Conexio.\n\nTBC - Technical and security discussion with the IT team.\nTBD - Define the mutual agreement - in this past meeting I shared they shall consider at least a 3 weeks term to approve deal conditions, agreement release and execution, order booking and the solution provisioning.\nTBD - Service scope will run along with steps 2,3 and 4.",
+      "- 1/13: BDR Invited AB team to Summit \n- 2/4: Mary Alice, Samantha and 5 other reps from AB registered for in person summit. \n- 2/10: Adobe Team coordinated with Mary Alice for onsite meeting \n- 2/\n\nRisk: Historically Pinki has been very unengaged with the Adobe team and has leaned on Mary Alice to handle the relationship. To clearly demonstrate the value of not just CJA but the whole Personalized Insights and Engagement portfolio, Pinki must be pulled into the evaluations. \n\nStrategy: Inviting Pinki to NYC based events to connect her to Bill Sellers. Adobe team planning onsite with IT team for conversations around AEM Move to cloud. The goal is to get Pinki in those decisions to influence bigger motions",
+      "-      Web Demo in the beginning of July\n-\tMaximilian Bruijnen to send over some use-cases",
+      "- 10/27- sending over info and videos on DTM and Attribution\n- week of 10/30- set up demo to show value of upgrading from sitecat to AA select with DTM and great attribution.\n- Get approvals & contract signed by end of November."
+    ],
+    "AUTHORITY_RISK_DETAILS": [
+      "-  Richy Mishra (Sr Manager, Marketing Technologies) \r\n- We are also very closely linked with CMO, Jennifer Johnson who is currently registered for US Open 2025",
+      "---",
+      "-  Tom Murray - Dir. Marketing\n -  Silvija Papka - Dir. Strategic Planning (Marketing)\n -  Gavin Pavlic - IT Project Manager (Team Lead) at Snap-on Tools\n -  Joel Meyer - Associate Business System Analyst at Snap-on Tools",
+      "-   Key stakeholders identified:\r\n    -   **Monica Gaston** – VP Product Marketing; manages Gen Studio alongside Tony; primary lead for this motion\r\n    -   **Tony Robson** – Head of Marketing Operations & Transformation; aligned with Monica on Gen Studio; attended the QBR\r\n    -   **Vikki Nowak** – VP Prospect Experience; Adobe's biggest internal champion at UoPX; involved at a high level but may not have a direct stake in this specific motion\r\n    -   **Michael Gramlich** – VP Performance Marketing; controls a $159M paid media budget; does not currently interact with Adobe — identified as a future expansion target\r\n    -   **Steve Gross** – CMO; known to be cautious (\"slow play,\" \"don't go crazy with agents\"); executive leadership is pushing back on over-investment in AI\r\n-   Jenny has a strong existing relationship with Vicki and the broader UoPX team\r\n-   ⚠️ **Gap:** No confirmed executive sponsor or economic buyer has been formally engaged for this specific Content Marketing deal. The CMO is known to be conservative. Adobe has not yet had a direct conversation with Vicki about Content Marketing specifically. Access to the economic decision-maker for this budget needs to be established before the renewal conversation",
+      "-  Ivan Choi - Director of Marketing RB(0) BB(+)\n-  Sachin Geol - CTO RB(0) BB(+)\n-  Prashant Argawal - Head of Digital Marketing AIA Group RB(+) BB(+)\n-  Jeffrey Liu - Head of Infra RB(+) BB(+)\n-  Cristal Hui - Head of Data Analytics - RB(+) BB(0)\n-  Jay Bose - Lead, Digital Marketing, AIA Group RB(+) BB(+)\n-  Ontario Ip, Associate Director, Digital & e-Commerce \nStrategy, Business Strategy, AIA HK, RB(+) BB(+)\n-  Dan Roberts - Director, TDA, PMO, RB(0), BB(+)"
+    ],
+    "BUDGET_RISK_DETAILS": [
+      "-   Need to drive more single-game ticket sales and maximize ROAS, especially as the Steph Curry era nears its end and urgency to sell tickets increases.\r\n-   Limited testing and variation in creative; typically receive “one set of assets” from creative, so they’re not meaningfully testing many versions (e.g., 30+ variations).\r\n-   Audience strategy is underdeveloped; they acknowledge they “could probably do a little better” with audience segmentation and matchup-specific audiences, and are interested in untapped segments and insights.\r\n-   Lack of granular creative insight today; agency reporting is focused on high-level performance (ticket sales, ROAS) rather than what specific creative attributes (jersey color, player, background, tone, etc.) are driving performance.\r\n-   Speed-to-market and control: content and optimization live heavily with the agency; teams increasingly want more direct control and faster reaction to big moments or opportunities in-game and around marquee matchups.\r\n-   Complexity across multiple brands (Warriors, Valkyries, Chase Center, etc.) increases operational overhead; smaller brands get less attention despite similar workflows.",
+      "- 10% uplift in loyalty sign-ups\n- Operational overhead reduction by headcount \n- PR with WooliesX accelerating competitive advantage against Amazon by AI driven automated personalisation \n- Personal value of promotion to Director Loyalty",
+      "-  Reduce the time spent on managing a solution that does not meet the needs of the customer and has a heavy IT influence\n\t-  Be a leader in technology for the State of New York \n\t- Put New Yorkers to work and create more circulation for the state and more tax dollars for further projects to help the state of New York\n\t- Implement a flexible solution that will scale with the organization as they continue to \nAdaptive forms platforms will allow more forms to be customer facing, will enhance operational efficiencies.  More forms completed = more effective system and built-in workflows will allow their department to process more applications and put more people to work at a faster rate",
+      "' - Increased speed to market - specifically meeting promised development deadlines and staying within budget\n- Reduction in claim settlement time - i.e. via reduced manual intervention and handling.\n- Positive citizen feedback \n- Reduction in call centre calls\n- Reduction in complaints to media, politicians,and ombudsman",
+      "- $56k spend on AA Select\n----- 30mil Server Calls/month\n\n- $154k Workfront\n\nunknown on Target budget\n\n180mil Page Views/year is $100k List Price for AT Standard"
+    ],
+    "SUCCESS_RISK_DETAILS": [
+      null,
+      "- \r\n- planned go live in the market (Sep 2025)",
+      "- 9/8: Meeting w/Partner\r\n- 9/22: Partner to provide update and schedule introduction\r\n- Validate additional next steps like meeting w/Adobe Architect, etc...\r\n- Nov/Dec: Begin work on migration\r\n- Have to be off Contentful by next August/September",
+      "- Accordant Media at Carat NYC which currently owns programmatic budgets.",
+      "- Accenture, supported by APS, is completing 20 week Discovery and Design program to finalise scope, roadmap and costs.\n- Qantas plan to go back to market for implementation services."
+    ],
+    "MUTUAL_PLAN_STATUS": [
+      "Not Required",
+      null,
+      "Completed - Delivered",
+      "Planning",
+      "Help Needed"
+    ],
+    "BUSINESS_CASE_STATUS": [
+      "Planning",
+      "Customer Approved",
+      null,
+      "Completed - Delivered",
+      "Not Required"
+    ],
+    "TECHNICAL_CASE_STATUS": [
+      "In Progress",
+      "Completed - Not Delivered",
+      "Completed - Delivered",
+      "Not Required",
+      null
+    ],
+    "SUCCESS_PLAN_STATUS": [
+      "Planning",
+      "CSP Planning",
+      "Handoff - Customer Approved",
+      "Handoff Completed - Delivered",
+      "Completed - Not Delivered"
+    ],
+    "PROPOSAL_STATUS": [
+      "Next Step - Present It",
+      "Complete - Customer Accepted",
+      "Complete - Not Moving Forward",
+      "Next Step - Build It",
+      "Not Started"
+    ],
+    "IPOV_STATUS": [
+      "Not Required",
+      null,
+      "In Progress",
+      "Customer Approved",
+      "Presented – revisions based on customer feedback"
+    ],
+    "DECISION_MAPPING_STATUS": [
+      "Completed - Delivered",
+      "In Progress",
+      null,
+      "Not Required",
+      "Customer Approved"
+    ],
+    "INTERNAL_CLOSE_PLAN_STATUS": [
+      "In Progress",
+      "Not Required",
+      "Planning",
+      "Help Needed",
+      "Completed - Not Delivered"
+    ],
+    "DS_SCORE": [
+      30,
+      43,
+      6,
+      35,
+      2
+    ],
+    "DS_MAX_POINT": [
+      null,
+      100
+    ],
+    "DS_SCORE_GAP": [
+      12,
+      48,
+      35,
+      20,
+      23
+    ],
+    "DS_EXPLANATION": [
+      "- A lack of a mutual plan or clear responsibilities hinders progress and customer alignment with Sharkmob A.  \n- The absence of budget discussions and unclear funding signals no real commitment or urgency from the customer.  \n- Minimal engagement and technical exploration leave Adobe's solution disconnected from the customer's challenges and needs.",
+      "- A lack of clear urgency and unresolved group-level blockers continue to delay customer decision-making.  \n- Persistent technical uncertainties and incomplete milestones undermine customer confidence in the proposed solution.  \n- Budget allocation remains uncertain, hindered by global negotiations and unresolved procurement dependencies.",
+      "- A lack of clear decision timeline and leadership changes weaken deal momentum and urgency.  \n- The absence of a formalized mutual plan hinders alignment on steps, responsibilities, and timelines.  \n- Customer uncertainty around technical validation and existing investments complicates solution adoption.",
+      "- A fragmented plan lacks customer agreement and alignment with PepsiCo's budgeting processes.  \n- The unclear budget allocation and pricing concerns hinder the path to value realization.  \n- Limited engagement with decision-makers risks losing influence and alignment on priorities.",
+      "- A lack of a formalized mutual plan and clear next steps is stalling deal progression.  \n- Absence of urgency and compelling events has delayed decision-making and reduced momentum.  \n- Customer hesitates to transition from Pardot, with unclear alignment of Marketo to their needs."
+    ],
+    "DS_NEXT_BEST_ACTIONS": [
+      "- Address the lack of urgency by quantifying delay costs and proposing time-sensitive value realization benefits.  \n- Co-create a tailored Mutual Plan with customer input, focusing on defining clear milestones and timelines.  \n- Develop a customized business case with DSG, aligning budget needs to solve specific business challenges.",
+      "- Align Darren Chong via leadership support to address plan approval and overcome compliance roadblocks.  \n- Host tailored workshops with product specialists to refine value propositions and counter competitor influence.  \n- Build a customized business case highlighting ROI metrics to secure funding before the April deadline.",
+      "- Build a customized business case and validate it with Gerrit using concrete value metrics by April.  \n- Quantify cost of delay to craft urgency and use March demo to align on decision milestones.  \n- Conduct tailored workshops with SCs to address MAM replacement concerns and refine use cases.",
+      "- Build a business case tailored to ATLÉTICO DE MADRID’s marketing goals and present before the workshop.  \n- Co-create a mutual plan with clear milestones and regular check-ins to maintain progress.  \n- Conduct technical validation workshops and showcase unique benefits using industry-specific case studies.",
+      "- Build a customized business case with DSG to align benefits with Dennis and Colleen's objectives.  \n- Co-create and validate a mutual plan with Dennis, focusing on DAM timelines and procurement steps.  \n- Conduct a tailored technical workshop with Dennis to address DAM storage needs and showcase differentiation."
+    ],
+    "DS_HAS_CHANGE": [
+      null,
+      false,
+      true
+    ],
+    "DS_HAS_SCORE": [
+      null,
+      false,
+      true
+    ],
+    "DS_PRIORITY_SCORE": [
+      3.84,
+      3.906,
+      13.860000000000001,
+      0.04762137459000001,
+      9.9
+    ],
+    "DRD_STAGE_DURATION": [
+      27,
+      13,
+      51,
+      23,
+      32
+    ],
+    "TECH_RISK_RATING": [
+      null,
+      "High",
+      "Low",
+      "Medium"
+    ],
+    "TECH_RISK_SUMMARY": [
+      "- refer to Renewal Opportunitiy -\nDR3626451\nRenewal of DR2742832 for Telefónica O2 (Germany) GmbH And Co Ohg - 2026-Q2\n\nBV: 🟢 EoU: 🟢 ASP: 🟢\n- new DR, CSC part included in this renewal DR -\nOct 22, 2025 (FL), IND SC: Fabian Lotz, XSC: Marion \n\n– Budget for transformational projects canceled, not clear if available in FY 26 – Business will take pay WKFT MVP from their own pocket\n\nTech Risk: Low - Solution accepted, financial risk\n\nStatus: TEF will follow try to push MVP for Work Mgmt only, ACS Lead Boris Jotic and Marion had Workshop with department B2P (smaller dept) to work on value argumentation to invest smaller budget. Client decides to move on with MVP but most likely in January\n\n\nNext steps:\n- prepare MVP scope & content for MVP starting January 2026 together with TEF\n- await early renewal in November including newly added WF licenses to enable WF MVP\n- Adjust presentation for board meeting after TEF-internal alignment with IT\n- EDS demo to TEF IT on Friday, 25th; story aligned to input for board meeting\n\nSC Recommendation: \n- MVP implementation for B2P Team, then expand\n- Follow-up after EDS demo if necessary",
+      "----- Original Message -----\nSent: Wednesday, December 14, 2011 04:02 PM\nSubject: DARPA - Adobe LiveCycle DRM Install\n\nHi All,\n\nI just wanted to inform everyone that we've had a very successful day\ntoday, and we just finished up testing the installation of Adobe LiveCycle\nDocument Rights Management software.\n\nDoug and I worked with David and Vincent to help install and setup DRM on\na Windows Server 2008 VM, with a Microsoft SQL Server 2008 database. DRM\nis also integrated to DARPA's Active Directory (LDAP), so all the users\nand groups are available to DRM for assigning users/groups to policies\nwithin DRM.\n\nWe went ahead and created sample policies and watermarks, and tested a few\nscenarios of protecting documents, enabling/disabling user permissions\n(ability to copy, modify or print docs), revoking a document after it has\nbeen distributed, and preventing users from screen captures and pictures\nvia a custom watermark.",
+      "- Aligned SC: N/A\n- Solution Summary: Acrobat Sign (with MS Office and SFDC integration).\n- Qualification Quality: Medium\n- Tech Sale Complete: Y\n- Tech Risk: L\n- Tech Gap/Blockers: N/A\n- Business Risk: L\n- BU Support Needed: N\n- PSS Align: N\n\nNotes:\nProduct/ solution demo delivered on 20/04/2022 with 3 use cases: (1) Capex request form, (2) Tax Invoice (MS Outlook integration), and (3) SFDC integration (standard NDA form). \n\nThe key user provided a positive feedback on our great user experience and integration capability.\n\nThis is Rip & Replace DocuSign opportunity.",
+      "- PREWORK - Had internal call with Becca O; prepped for demo of SharePoint integration and Webforms\n\n- DELIVERABLE - Provided demo 4/13\n\n- RESULTS - Waiting for requestor to close the deal",
+      "'- PREWORK - Had internal call with Joshua Phelps; prepped for demo and Deep Dive into current E-Signature Use Cases, Integration & API Requirements and Document retention & Organizational Requirements\n\n- DELIVERABLE - Provided 1st demo 4/26 \n\n- RESUL..."
+    ],
+    "TECH_DRIVER": [
+      "Abbas Rizvi",
+      "Abbie Lenhoff-Cucci",
+      "Ahleia Qureshi",
+      "Adrienne Embery-Good",
+      "Adam Fayne"
+    ],
+    "CLOUD_TECH_TYPE": [
+      "Created",
+      "MSFT Created",
+      "Existing",
+      "#N/A",
+      "AWS Co-Sell"
+    ],
+    "COMPELLING_EVENT": [
+      "Identified",
+      "Not Started",
+      "Agreed to by Client",
+      "In Progress",
+      "Agreed to by Customer"
+    ],
+    "COMPELLING_EVENT_DETAILS": [
+      "- 25+ web properties many of which are not complex\n- complexity comes from thew TMX money site which they are looking to combine with matrix site over next 8-12 months\n- New, high end, corporate CMS to be developed. Desire to let bu's manage their own content. Lowmaps, intranet site.\n- AWS private cloud.\n- When tickets come in two bodies dedicated. Editing a sentence requires a request. Compliance. Workflows.\n- Glenn has Drupal background. Beast in terms of security patches, and configurations. Not a fan.\n- Stale content that doesn't get maintained. Web ecosystem follows how ecosystem is broken up. Very silo'd. Content gets pushed to respective areas. Sporadic content talking about the same thing. Little re-use.\n- Don't have a DAM - pain point\n- Late to the GA game. Have only been pushing the tagging of content and reporting on it in the last year or so.\n- Same document on TSX and Money.\n\nBusiness impacts:\n- Productivity\n- Lack of business provided to business, brochure type sites, calls to action\n- Missing an option to allow BU's to engage through digital properties\n- Have great content, all the right pieces and people developing it, but don't know what to do with it. Piecemeal decision on\nwhat to do with it.\n- User journey, finding more of similar types of content, do have a common footer",
+      "- 606 COST SAVINGS POTENTIAL / MORE WITH LESS\n- Contract with IBM is up May 2021 and in order to have enough time to migrate/implement, they need to act soon",
+      "- \"Long iteration cycle from planning -> developing -> launching digital experiences\" \n- Can't tap into AI nor machine learning \n- Foundation of in-house ESP, CMS, Analytics tools that don't scale to manage all their brands (100+ websites, Millions of web pages) \n- Need to increase member retention\n- Need to use tools from 1 site to another + use learnings from that site to another",
+      "----",
+      "- 6 different websites - 6 different reports for each site, inconsistent\n- Currently have checkout problems - can't get through check out every day\n- inconsistent support from IBM\n- Using 12-year-old code for website/ecommerce\n- inability to be creative/flexible with site changes/design"
+    ],
+    "BUSINESS_DRIVER": [
+      "., Shubham",
+      "Adamson, Brennan",
+      "Abainza, Anthony",
+      "Adelman, Simon",
+      "Abadi, Maya"
+    ],
+    "BUSINESS_DRIVER_ID": [
+      "0051400000BAJaHAAX",
+      "0051400000BafomAAB",
+      "0051400000BabE6AAJ",
+      "0051400000BAGIUAA5",
+      "0051400000BACAHAA5"
+    ],
+    "BUSINESS_DRIVER_LDAP": [
+      "92314611",
+      "aafshar",
+      null,
+      "aakisanya",
+      "92314323"
+    ],
+    "BUSINESS_DRIVER_ROLE": [
+      "ADM",
+      "SALES TEAM MEMBER",
+      "AGS",
+      "DALP CSM",
+      "SOLUTION CONSULTANT"
+    ],
+    "BUSINESS_ISSUE": [
+      "- Aiming to get acquired, need to demonstrate digital transformation.\n- Need to generate another 30M EUR revenue\n- Poor performing, unegaging website\n- Need to optimise targeting for different types of cruise-takers",
+      "- Avoid customer frustration with campaings with very low ROI because of poor personalization capabilities. \n- Amadeus is concerned that frustration could lead to customer loss.",
+      "- Automate all banners/catalogues for Digital and Retail channels.\n- Unlock the potential of Adobe Firefly at Tesco Mobile for all marketing campaigns.\n- Drive Tesco Mobile to become more efficient and effective with the use of Adobe Express.",
+      "- Agency integration, predominantly hinged around creative cloud and assets moving fwd\n\t- Campaign and brief management - what wraps around the assets being shuffled between agency\n\t- Approvals - both external to internal, as well as internal compliance approvals (large hot spot) \n\t- Taking it up a level:\n\t\t○ Resourcing and the associated budget planning \n\t\t○ Resourcing- identifying resource pinch points for campaigns (often overlooked) \n\t\t○ Budgeting\n\t- In terms of approvals area:\n\tThis is a huge value point for them\n\tApprovals are run by email and excel\n\t- Another area Renee mentioned:\n\t\t- Workflow templates \n\t\t- Different overall task flows\n\t\t- Having different workflows and stakeholders associated with them \n\t\t- Eg doing a TV ad vs a Digital display add: different people required\nThe fact that there is a system of record sitting in the dam",
+      null
+    ],
+    "GEO_FORECAST_NOTES": [
+      "1.27 (TQ) CTO was let go this week.  Need to rip out SiteCore.  IT is owning.",
+      "1 Oct: Call review with MSFT country manager around mutual strategy - timing risk - we were not on the BOD meeting at the end of September. Could organise a special board meeting but moved to upside.\n\nDeal Review- Have hired to implement this project which are standing still. Need to discuss end of Sept at Board meeting, we have support however needs full board agreement, there are two rounds and then approval will be given. WCup qualification rounds/streaming compelling event.\n\n17 Sept: Kimberley Morris COO, can get access to ad hoc board reviews, meeting at beginning of Oct - RISK",
+      "11 Aug (Astellas phase 2): Tracking well \n\n4 Aug (Astellas): On track \n\nAstellas, Casio, SMCC are phase 2 of implementation. In requirements gathering phase . Once they define requirements then go to implementation.",
+      "1 Nov: Signing today\n\n20 Sept: Customer progressing on their side to expediate process, could possibly avoid going to BOD meeting in November, possibly sign October. Tech win. Will know in 2 weeks if signing in Oct\n\n12 Sept: Call Monday, legals are with them\n\n6 Sept: Two month POC, review in two weeks time, could sign October, potential November; risk if they do not win the Lloyds piece",
+      "--"
+    ],
+    "MGR_FORECAST_NOTES": [
+      "- Budget/ pricing à finaliser \n- rechallenge Critizr - now goodays - challenge en cours dans le cadre d'un RFP \n- Salvator avait l'air intéressé mais bcp de custo",
+      "\"\"\"10/16/25\n\nStatus: Working on consolidating 4 VIP's into ETLA. Working with deal desk to formulate pricing - waiting on approval and present pricing with customer - earlier stages but customer is engaged.\"\" Identified perpetual licenses and positioned consolidation as the main driver for the ETLA\n\nEconomic Buyer - VP IT\nGrowth: $30, 000\n\nNext steps: Call with customer on 10/17 to discuss with VIP are going to roll into the ETLA. \n\n\n\n\n\"10/9/25\n\nStatus: Working on consolidating 4 VIP's into ETLA. Working with deal desk to formulate pricing - waiting on approval and present pricing with customer - earlier stages but customer is engaged.\"\" Identified perpetual licenses and positioned consolidation as the main driver for the ETLA\n\nEconomic Buyer - VP IT\nGrowth: $30, 000\n\nNext steps: Finalize ETLA quote with DD and discuss contract options with customer\n\n\n\n10/2/25\n\nStatus: Working on consolidating 4 VIP's into ETLA. Working with deal desk to formulate pricing - waiting on approval and present pricing with customer - earlier stages but customer is engaged.\"\"\"",
+      null,
+      "- partner driven deal ecx.io\n- meeting w Klöckner and customer in April",
+      "\"\"\"10/9:  Next call is 10/10.  danny to have 2-3 offers prepped for $$ amounts. PD/Sophie engaged on highest level\n\"\"\"\"9/29: Next cx call to align on numbers and counts - with 22k employees, but they are talking 2500 DC seats.  Who do we pitch Studio to?  IT or sales leaders?  Next call is Friday.\n\"\"\"\"\"\"\"\"9/25: CX call next week to re-approach with DC solution over competitors.  2600 foxit licenses and 20k sign trx\nLaura Galindo\nSr. Director, IT Governance\"\"\"\"\"\"\"\"\"\"\"\"\"\"\""
+    ],
+    "REGION_FORECAST_NOTES": [
+      "(14Aug) Updating to forecast, expecting next week.",
+      "$0 ASV; tracking; has executable",
+      "\"9/16 customer doing internal review of processes and programs. delaying decision on DPS. Business plan being built to continue with DEMAND, but larger deal unlikely til 2015\n\" 9/9: Invite to 9/15 executive event.",
+      "(10/Mar) UC\nUlt Success pricing - structure pricing justification as percentage of license.  AT is budgeted.  Budget is available but price of Ult Success increased - price lock as per last yr (Amount change: ~$110K -> $130K)",
+      "$84K\nClose date : working towards 24 Nov"
+    ],
+    "DEAL_REVIEWED_BY": [
+      "Altmann, Isabell",
+      "Banda, Kristiina",
+      "Afzalirad, Ali",
+      "Angelo, Robert",
+      "Auberton-herve, Alexis"
+    ],
+    "DEAL_REVIEW_NOTES": [
+      "- Approval sought from Jeremy on free POC\r\n- Neil to prepare the solution tech case along with partner\r\n- Sign-off from client on success criteria of POC",
+      "- Blocker - Salesforce is locked into the contract\n- Action - Schedule onsite with team to phase out personalization at scale\n- Timing - No true compelling event; nailing down with client what the true sense of timing is",
+      "- broaden stakeholder management, ideas for getting their engagement (via SCs from Bootcamp?)\r\n- close alignment with Like Reply concerning mutual close plan\r\n- iPOV creation as next step",
+      "- build up arguments vs. aprimo and tactics to include them in conversation \n- deep dive in pricing, requiring light users with added access or standard users that can be limited in usage to match competitive pricing per user",
+      "- Blocker: RFP, so little access to evaluation team and execs.\n- Action: Completing final RFP questions and scheduling initial demo. Building buyer map + looking for executive relationships.\n- Timing: Scheduling initial demo for week of 7/22. CMO will be on. Executive alignment play after.\n\n\nTR 6/17/24 - Submitted RFP response about a month ago. Sent an invite to US open. We were supposed to hear back after a couple weeks. Was not blind. Did disco. \n\nTR 5/13/24 - Early stage, blind RFP opened 5/13. Response completed 5/20 for review by sales. Submitting this week."
+    ],
+    "DATE_LAST_REVIEWED": [
+      "2017-01-01T00:00:00.000Z",
+      "2017-01-02T00:00:00.000Z",
+      "2017-01-27T00:00:00.000Z",
+      "2017-01-10T00:00:00.000Z",
+      "2016-11-15T00:00:00.000Z"
+    ],
+    "DEAL_EXECUTION_SPONSOR": [
+      "Adetoye, Donald",
+      "Allen, Hunter",
+      "Angelo, Robert",
+      "Anderson, Sahar",
+      "Augustin, Florian"
+    ],
+    "EXECUTIVE_SPONSOR": [
+      "Varun Dandona",
+      "Amit Ahuja",
+      "Katrina Troughton",
+      "Luc Dammann",
+      "Nadine Wolanke"
+    ],
+    "EXECUTIVE_SPONSOR_NAME": [
+      "Cynthia Stoddard",
+      "Andrea Faz",
+      "David Nuescheler",
+      "Amit Ahuja",
+      "Abhay Parasnis"
+    ],
+    "EXECUTIVE_TEAM_ENGAGED": [
+      null,
+      "Anil Chakravarthy",
+      "David Wadhwani",
+      "Shantanu Narayen"
+    ],
+    "S3_Created": [
+      "2014-03-04T00:00:00.000Z",
+      "2015-06-17T00:00:00.000Z",
+      "2016-12-15T00:00:00.000Z",
+      "2016-03-08T00:00:00.000Z",
+      "2014-08-26T00:00:00.000Z"
+    ],
+    "S4_Created": [
+      "2013-09-18T00:00:00.000Z",
+      "2012-07-18T00:00:00.000Z",
+      "2019-09-25T00:00:00.000Z",
+      "2013-07-15T00:00:00.000Z",
+      "2019-03-29T00:00:00.000Z"
+    ],
+    "S5_Created": [
+      "2012-07-01T00:00:00.000Z",
+      "2019-10-29T00:00:00.000Z",
+      "2019-07-31T00:00:00.000Z",
+      "2019-06-25T00:00:00.000Z",
+      "2015-08-26T00:00:00.000Z"
+    ],
+    "S6_Created": [
+      "2011-08-15T00:00:00.000Z",
+      "2016-11-21T00:00:00.000Z",
+      "2022-09-26T00:00:00.000Z",
+      null,
+      "2016-06-07T00:00:00.000Z"
+    ],
+    "S7_Created": [
+      "2022-04-19T00:00:00.000Z",
+      "2021-02-14T00:00:00.000Z",
+      "2020-08-10T00:00:00.000Z",
+      "2021-10-03T00:00:00.000Z",
+      "2020-04-15T00:00:00.000Z"
+    ],
+    "SFDC_OPP_URL": [
+      "57|20",
+      "https://adobe.my.salesforce.com/00614000019eaB3AAI",
+      "https://adobe.my.salesforce.com/00614000019ebhWAAQ",
+      "https://adobe.my.salesforce.com/00614000019ebCIAAY",
+      "https://adobe.my.salesforce.com/00614000019eaqLAAQ"
+    ],
+    "PANORAMA_URL": [
+      "https://pmg.corP.adobe.com/Panorama/Index.html#/app/AccountView?t=4314B8F5B6C737DF67ABD11FFEE83FBDBEB3003211167090&Level=Account&LevelValue=0011400001a7BlYAAU",
+      "https://pmg.corP.adobe.com/Panorama/Index.html#/app/AccountView?t=4314B8F5B6C737DF67ABD11FFEE83FBDBEB3003211167090&Level=Account&LevelValue=0011400001a8qWeAAI",
+      "https://pmg.corP.adobe.com/Panorama/Index.html#/app/AccountView?t=4314B8F5B6C737DF67ABD11FFEE83FBDBEB3003211167090&Level=Account&LevelValue=0011400001a8rA2AAI",
+      "https://pmg.corP.adobe.com/Panorama/Index.html#/app/AccountView?t=4314B8F5B6C737DF67ABD11FFEE83FBDBEB3003211167090&Level=Account&LevelValue=0011400001a8qZCAAY",
+      "#N/A"
+    ],
+    "EMEA_MARKET_AREA": [
+      "Benelux",
+      "Hong Kong & Taiwan",
+      "SEA",
+      "Middle East",
+      "Nordic"
+    ],
+    "ACCOUNT_ADDRESS_COUNTRY": [
+      "CA",
+      "BA",
+      "CG",
+      "CO",
+      "AQ"
+    ],
+    "SALES_OPS_RECONCILED": [
+      0,
+      1
+    ],
+    "SALES_OPS_EXCLUDE": [
+      null,
+      "0",
+      "1"
+    ]
+  },
+  "vw_TD_EBI_ACCOUNT": {
+    "ACCOUNT_ID": [
+      21,
+      12,
+      38,
+      41,
+      14
+    ],
+    "SFDC_ACCOUNT_ID": [
+      "0011400001a8rA2AAI",
+      "0011400001a8pMmAAI",
+      "0011400001a8qwsAAA",
+      "0011400001a8qmxAAA",
+      "0011400001a7COzAAM"
+    ],
+    "ACCOUNT_NAME": [
+      "- Atos India Pvt.Ltd..",
+      "- Arbore Editoracao Novo",
+      " Hume Taylor & Co",
+      " Enroque Transportaion Services",
+      " AFCD-AMOD"
+    ],
+    "ACCOUNT_SUB_ID": [
+      51,
+      44,
+      52,
+      62,
+      63
+    ],
+    "PARENT_ID": [
+      90,
+      31,
+      94,
+      109,
+      36
+    ],
+    "PARENT_NAME": [
+      " B K A FACILITIES MANAGEMENT SERVIC",
+      " KLJ ORGANIC LTD.",
+      " CEFA NCC-28727",
+      "- Compañía Inmobiliaria Agricola De",
+      " Enroque Transportaion Services"
+    ],
+    "SUB_ID": [
+      13,
+      29,
+      68,
+      56,
+      59
+    ],
+    "SUB_NAME": [
+      " Demo Customer Ebusiness NCC-28684",
+      "- Laboratoire Geriico (Ulr 4073)",
+      "-",
+      " AFCD-AMOD",
+      " Almas Al Malaky"
+    ],
+    "ACCOUNT_TYPE": [
+      null,
+      "Adobe Admin",
+      "Non-Adobe Admin"
+    ],
+    "INDUSTRY": [
+      "387590025",
+      "Higher Education",
+      "Automotive",
+      "Education - Higher Ed",
+      "Engineering/Management services"
+    ],
+    "INDUSTRY_CATEGORY": [
+      "Commercial",
+      "Education",
+      "Government",
+      "Inactive",
+      "N/A"
+    ],
+    "FOCUS_VERTICAL": [
+      "Tech",
+      "Other",
+      "Retail",
+      "T&H",
+      "Inactive"
+    ],
+    "MARKET_AREA": [
+      "Benelux",
+      "United States",
+      "Eastern Europe",
+      "ANZ",
+      "Japan"
+    ],
+    "PARENT_ANNUAL_REV_BAND": [
+      "3 >=$500M",
+      "2 >=$1B",
+      "1 >=$5B",
+      "7 Not Reported",
+      "5 >=$1M"
+    ],
+    "ACCOUNT_PRIORITY": [
+      "Focus Account",
+      "N/A"
+    ],
+    "CURR_DX_MINOR_SEGMENT": [
+      "Public Sector",
+      "Transformational",
+      null,
+      "Enterprise Greenfield",
+      "SMB"
+    ],
+    "CURR_DX_MAJOR_SEGMENT": [
+      "Industry Led",
+      null,
+      "Solution Led",
+      "Scale",
+      "Generalist Led"
+    ],
+    "PREV_FY_DX_MINOR_SEGMENT": [
+      "Public Sector",
+      "Core",
+      "Solution Led Greenfield",
+      "Solution Led High",
+      "Transformational"
+    ],
+    "PREV_FY_DX_MAJOR_SEGMENT": [
+      "MINOR_GL_SMB",
+      "MINOR_GL_ENTGF",
+      "MINOR_IND_T1",
+      "MINOR_GL_CORE",
+      "MINOR_SL_ENT"
+    ],
+    "AES_SCORE": [
+      "AE STAGE 0",
+      "AE STAGE 1",
+      "AE STAGE 2",
+      "AE STAGE 3",
+      "N/A"
+    ],
+    "PANORAMA_ACCOUNT_LINK": [
+      "https://pmg.corp.adobe.com/PanoramaECJ/accountpage/0011400001aT2mPAAS/Account/China",
+      "https://pmg.corp.adobe.com/PanoramaECJ/accountpage/0011400001aSkTtAAK/Account/Canada",
+      "https://pmg.corp.adobe.com/PanoramaECJ/accountpage/0011400001aSEXpAAO/Account/United%20States",
+      "https://pmg.corp.adobe.com/PanoramaECJ/accountpage/0011400001aTl2lAAC/Account/United%20States",
+      "https://pmg.corp.adobe.com/PanoramaECJ/accountpage/0011400001aUBaCAAW/Account/United%20States"
+    ],
+    "CURRENT_SITUATION": [
+      "- asked the Partner to give a hand in order to talk again with the customer and understand his intentions",
+      "- AEM Forms renewed flat.\n",
+      "- Deployed via Federated ID\n- Hosted first Adobe Day and will be looking at this to be an annual event\n\n",
+      "- Grants and Contributions Forms Portal due to go live Q3\n- Forms Portal Project for external use in progress \n",
+      "- Have NUD deployed for CC and DC (services and cloud storage enabled)\n- Have low usage of Sign due to limited use cases\n- New to Pro entitlement and working on awareness\n"
+    ],
+    "ACCOUNT_HEALTH_SUMMARY": [
+      "- relationship established due to some issues they had with a ticket opened to our support in the last months",
+      "- Customer will stop its Russian instance due to Russia/ukraine war",
+      "- Relationship established and first call done\n- Customer is happy with the platform even if experienced many issues in the past\n- Customer is unhappy with the Partner Filoblu who managed the platform",
+      "- Relationship not established yet but had alignment with Partner Filoblu who works on this project\n- Customer is happy with our platform, no concern at the moment",
+      "- New people joining JTI Teams, relationship improves\n- Ongoing Field Services helped with Support complaints\n- AMS Basic limits the required rapid support and the time it takes for RCA analysis "
+    ],
+    "NEXT_ACTION": [
+      "-",
+      "- AEM Guides configuration changes - Work front and AEM S&A API \n- Mayo Labs B2B use case review. AI Legal review and compliance",
+      "- Contractual review in progress with Renewal Specialist as renewal is for Q4 21",
+      "- AEM Content Hub deployment, CS support - Close Ultimate Success opportunity",
+      "- BDR planning to prospect into the account to try and get further reach"
+    ],
+    "NEXT_ACTION_UPDATED_DATE": [
+      "2019-07-29T10:39:13.000Z",
+      "2019-11-21T06:25:11.000Z",
+      "2018-10-15T00:31:28.000Z",
+      "2019-08-06T23:36:22.000Z",
+      "2019-07-11T07:43:09.000Z"
+    ],
+    "DX_HEALTH_LAST_MODIFIED_BY": [
+      "Alex Chen",
+      "Alex Hvass",
+      "Aileen Northern",
+      "Alastair Graver",
+      "Agnes Richard"
+    ],
+    "DX_HEALTH_LAST_MODIFIED_DATE": [
+      "2019-08-06T23:35:50.000Z",
+      "2019-08-06T23:37:43.000Z",
+      "2018-11-28T07:25:32.000Z",
+      "2019-08-06T23:38:35.000Z",
+      "2019-08-06T23:37:18.000Z"
+    ],
+    "HAVE_ACTIVE_PQ_EOQ_ARR": [
+      false,
+      true
+    ],
+    "ACCOUNT_TENURE": [
+      0.3,
+      0.7,
+      3,
+      1.8,
+      2.5
+    ],
+    "ACCOUNT_HAS_PAID_SUPPORT": [
+      null,
+      0,
+      1
+    ],
+    "ACCOUNT_HAS_ULTIMATE_SUPPORT": [
+      null,
+      0,
+      1
+    ]
+  },
+  "vw_EBI_OPG": {
+    "OPG_KEY": [
+      14,
+      -1,
+      99,
+      80,
+      91
+    ],
+    "PRODUCT_STG": [
+      "DX PT GROWTH",
+      "ACROBAT READER AI",
+      "DME GS FOR PERF MKTG",
+      "CCE E4 PLUS",
+      "DME GS PERF MKTG DME"
+    ],
+    "PRODUCT": [
+      "AEP ADD-ON: PRIVACY AND SECURITY SHIELD",
+      "CONTENT ANALYTICS",
+      "ACROBAT",
+      "DCE TRANSACTION",
+      "DME GS FOR PERF MKTG"
+    ],
+    "PRODUCT_GRP": [
+      "AEP + APPS",
+      "N/A",
+      "AD CLOUD",
+      "SIGN DX",
+      "PUBLISHING"
+    ],
+    "SOLUTION": [
+      "AJO B2B EDITION",
+      "UCX AND B2B FDE ENGAGEMENT",
+      "TARGET",
+      "ACROBAT",
+      "CJA"
+    ],
+    "SOLUTION_GRP": [
+      "PPBU",
+      "CONNECT",
+      "Document Cloud",
+      "Commerce",
+      "Customer Journey"
+    ],
+    "SOLUTION_GRP_SORT_ORDER": [
+      2,
+      8,
+      15,
+      19,
+      1
+    ],
+    "BU": [
+      "DX",
+      "PPBU",
+      "PUB",
+      "DME",
+      "OTHER"
+    ],
+    "BU_DME": [
+      "OTHER",
+      "DME",
+      "N/A",
+      "PUB",
+      "DX"
+    ],
+    "MOPG1": [
+      "SIGN",
+      "FOUNDRY ",
+      "ACS SUBSCRIPTIONS",
+      "DME GENSTUDIO MODULES",
+      "EXPERIENCE SUCCESS"
+    ],
+    "MOPG2": [
+      "OTHER",
+      "SIGN",
+      "DIGITAL EXPERIENCE",
+      "N/A",
+      "DIGITAL MEDIA"
+    ],
+    "PMBU": [
+      "APA",
+      "PLT",
+      "MARKETO",
+      "SIGN DX",
+      "SUPPORT PLAN ACROBAT"
+    ],
+    "SOLUTION_ABBR": [
+      "PPBU",
+      "GENS",
+      "APS",
+      "Firefly",
+      "AT"
+    ],
+    "PMBU_SHORT_DESC": [
+      "MixMod",
+      "DCE",
+      "Magento",
+      "WF",
+      "DXVid"
+    ],
+    "PMBU_DESC": [
+      "DCE",
+      "PROJECT SAPPHIRE",
+      "Journeys",
+      null,
+      "DYNAMIC CHAT"
+    ],
+    "SOLUTION_SORT": [
+      17,
+      37,
+      4,
+      999,
+      9
+    ],
+    "PRODUCT_SORT": [
+      47,
+      7,
+      39,
+      21,
+      13
+    ],
+    "DIMENSION_TYPE": [
+      "BU",
+      "MOPG1",
+      "OPG"
+    ],
+    "PRODUCT_GROUP_SORT": [
+      2,
+      10,
+      999,
+      4,
+      13
+    ],
+    "STRATEGIC_SOLUTION": [
+      "AEP + APPS",
+      "GENSTUDIO",
+      "N/A",
+      "OTHERS"
+    ],
+    "STRATEGIC_SOLUTION_SORT": [
+      null,
+      1,
+      2,
+      3,
+      999
+    ],
+    "PANORAMA_SOLUTION": [
+      "Integrated Services",
+      "FDE",
+      "Oth",
+      "Experience Success",
+      "CJA"
+    ],
+    "DMX_PRODUCT": [
+      "FDEs",
+      "ACS SUBSCRIPTIONS",
+      "CONNECT",
+      "AJO B2B & B2C",
+      "CJA & Mix Modeler"
+    ],
+    "DMX_SOLUTION": [
+      "CONNECT",
+      "Rest of Experience Cloud",
+      "AEP + Apps",
+      "OTHER",
+      "Creative"
+    ],
+    "DMX_SOLUTION_GROUP": [
+      "CONNECT",
+      "Creative Professionals",
+      "OTHER",
+      "PPBU",
+      "Business Professionals + Consumers"
+    ],
+    "DMX_PRODUCT_SORT": [
+      3,
+      19,
+      null,
+      16,
+      17
+    ],
+    "DMX_SOLUTION_SORT": [
+      8,
+      2,
+      15,
+      null,
+      13
+    ],
+    "DMX_SOLUTION_GROUP_SORT": [
+      1,
+      null,
+      5,
+      3,
+      6
+    ],
+    "DME_SOLUTION": [
+      "RTCDP",
+      "DX VIDEO",
+      "CJA",
+      "ADVERTISING",
+      "AJO B2B EDITION"
+    ],
+    "DME_SOLUTION_GROUP": [
+      "DX Classic",
+      "Non-Goals",
+      null,
+      "Business Professionals + Consumers",
+      "PPBU"
+    ],
+    "DME_SOLUTION_SORT": [
+      18,
+      23,
+      3,
+      16,
+      7
+    ],
+    "DME_SOLUTION_GROUP_SORT": [
+      6,
+      1,
+      2,
+      null,
+      4
+    ]
+  },
+  "vw_EBI_CALDATE": {
+    "DATE_KEY": [
+      20081216,
+      20081210,
+      20090110,
+      20081212,
+      20090114
+    ],
+    "CALENDAR_DATE": [
+      "2009-01-06T00:00:00.000Z",
+      "2009-01-13T00:00:00.000Z",
+      "2008-12-28T00:00:00.000Z",
+      "2008-12-11T00:00:00.000Z",
+      "2008-11-30T00:00:00.000Z"
+    ],
+    "FISCAL_YR": [
+      2017,
+      2023,
+      2025,
+      2011,
+      2020
+    ],
+    "FISCAL_YR_DESC": [
+      "2010",
+      "2028",
+      "1900",
+      "2012",
+      "2011"
+    ],
+    "FISCAL_YR_AND_QTR": [
+      20191,
+      20171,
+      20183,
+      20103,
+      20093
+    ],
+    "FISCAL_YR_AND_QTR_DESC": [
+      "2012-Q1",
+      "2012-Q2",
+      "2015-Q3",
+      "2013-Q4",
+      "2016-Q2"
+    ],
+    "FISCAL_YR_AND_WK": [
+      200930,
+      200938,
+      200923,
+      200908,
+      190001
+    ],
+    "FISCAL_YR_AND_WK_DESC": [
+      "2009-13",
+      "2009-07",
+      "2009-43",
+      "2009-46",
+      "1900-01"
+    ],
+    "FISCAL_WK_AND_QTR_DESC": [
+      "2011-02",
+      "2009-13",
+      "2010-11",
+      "2009-07",
+      "2009-05"
+    ],
+    "FISCAL_WEEK_NUMBER_BY_QTR": [
+      "03",
+      "02",
+      "09",
+      "10",
+      "07"
+    ],
+    "FISCAL_QUARTER_SHORT": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4"
+    ],
+    "FISCAL_YR_AND_PER": [
+      201111,
+      201301,
+      201104,
+      201003,
+      201112
+    ],
+    "FISCAL_YR_AND_MONTH": [
+      "Aug 23",
+      "APR 29",
+      "Apr 12",
+      "Apr 15",
+      "Apr 22"
+    ],
+    "FISCAL_YR_QTR_WK": [
+      "2009Q4W02",
+      "2009Q3W01",
+      "2009Q3W11",
+      "2009Q2W06",
+      "2009Q2W05"
+    ],
+    "FISCAL_YR_QTR_WeeK": [
+      "2009-Q3-W10",
+      "2009-Q4-W11",
+      "2009-Q2-W10",
+      "2009-Q1-W3",
+      "2009-Q4-W2"
+    ],
+    "YEAR": [
+      2017,
+      1900,
+      2022,
+      2012,
+      2015
+    ],
+    "QUARTER": [
+      "Q1 19",
+      "Q1 21",
+      "Q2 19",
+      "Q2 23",
+      "Q3 13"
+    ],
+    "MONTH": [
+      "M1",
+      "M2",
+      "M3"
+    ],
+    "WEEKNUMBER": [
+      "W5",
+      "W11",
+      "W14",
+      "W13",
+      "W2"
+    ],
+    "DAY_NAME": [
+      0,
+      1
+    ],
+    "QTRKEY": [
+      "2011Q2",
+      "2010Q3",
+      "2013Q3",
+      "2013Q4",
+      "2011Q1"
+    ],
+    "MONTHKEY": [
+      "2010M11",
+      "2010M5",
+      "1900M1",
+      "2012M12",
+      "2010M8"
+    ],
+    "WEEK_SORT_ORDER_REVERSE": [
+      "-4",
+      "-38",
+      "-19",
+      "-10",
+      "-22"
+    ],
+    "WEEK_SORT_ORDER_REVERSE_RTB": [
+      "-41",
+      "-14",
+      "-29",
+      "-24",
+      "-34"
+    ],
+    "WEEK_SORT_ORDER_REVERSE_Ord": [
+      34,
+      11,
+      16,
+      33,
+      26
+    ],
+    "WEEK_SORT_ORDER_REVERSE_RTB_Ord": [
+      17,
+      -2000,
+      35,
+      38,
+      11
+    ],
+    "QTR_SORT_ORDER_REVERSE": [
+      -5,
+      2000,
+      1,
+      -11,
+      -3
+    ],
+    "DaysToQuarter": [
+      0,
+      21,
+      112,
+      203
+    ],
+    "PeriodShort": [
+      1,
+      2,
+      3
+    ],
+    "WeekNumberName": [
+      "W06",
+      "W05",
+      "W01",
+      "W08",
+      "W09"
+    ],
+    "WeekNumberNameRTB": [
+      "W13",
+      "W04",
+      "W07",
+      "W05",
+      "W11"
+    ],
+    "QTR_BKT_IND": [
+      -2,
+      5,
+      6,
+      2000,
+      -1
+    ],
+    "WEEK_BKT_NUMBER": [
+      -885,
+      -899,
+      -1900,
+      -857,
+      -879
+    ],
+    "FISCAL_YR_BKT_NUMBER": [
+      -2,
+      -12,
+      -4,
+      -17,
+      -16
+    ],
+    "MONTH_BKT_NUMBER": [
+      -164,
+      -166,
+      -194,
+      -172,
+      -193
+    ]
+  },
+  "vw_ebi_sales_stage": {
+    "SALES_STAGE_ID": [
+      -1,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "SALES_STAGE": [
+      "N/A",
+      "Closed - Booked",
+      "S7",
+      "S6",
+      "S5",
+      "S4",
+      "S3",
+      "S2",
+      "S1",
+      "Closed Lost from Pipe",
+      "Closed CleanUp from Pipe",
+      "Closed Lost from Non Pipe",
+      "Closed CleanUp from Non Pipe"
+    ],
+    "SalesStageDisplay": [
+      "Lost",
+      "N/A",
+      "S5",
+      "S1",
+      "S2"
+    ],
+    "SalesStageGrp": [
+      "Booked",
+      "S4",
+      "Cleanup",
+      "S1-S2",
+      "Lost"
+    ],
+    "SalesStageGrp_Sort": [
+      6,
+      5,
+      3,
+      2,
+      7
+    ],
+    "SALES_STAGE_GRP_1": [
+      "S6",
+      "Closed - Lost",
+      "S1",
+      "S2",
+      "S4"
+    ],
+    "SalesStageGrp1_Sort": [
+      2,
+      1,
+      10,
+      6,
+      3
+    ]
+  },
+  "vw_TD_EBI_ROLE_Coverage": {
+    "ROLE_COVERAGE_ID": [
+      2,
+      6,
+      1,
+      3,
+      4
+    ],
+    "ROLE_COVERAGE": [
+      "AE DX",
+      "N/A",
+      "RSS",
+      "QBSR DX",
+      "AE DME"
+    ],
+    "ROLE_COVERAGE_BU": [
+      "DME",
+      "DME Add-On",
+      "DX",
+      "DX/DME",
+      "N/A"
+    ],
+    "ROLE_COVERAGE_BU_GROUP": [
+      "DME",
+      "DMX",
+      "DX/DME",
+      "N/A"
+    ]
+  },
+  "vw_EBI_CREATOR_TYPE": {
+    "ID": [
+      5,
+      9,
+      1,
+      4,
+      12
+    ],
+    "SUB_CREATOR": [
+      "Partner Organic",
+      "ADM Organic",
+      "SAM",
+      "ADM Joint With Partners",
+      "Other"
+    ],
+    "SUB_CREATOR_DISPLAY": [
+      "AE",
+      "Partner Created",
+      "Other",
+      "BDR",
+      "N/A"
+    ],
+    "SUB_CREATOR_DISPLAY_SORT": [
+      1,
+      3,
+      8,
+      2,
+      99
+    ],
+    "CREATOR": [
+      "Sales Organic",
+      "BDR Joint With Partners",
+      "Sales Joint With Partners",
+      "N/A",
+      "Partner Created"
+    ],
+    "CREATOR_JOIN": [
+      "N/A",
+      "ADM Organic",
+      "Sales Organic",
+      "ADM Joint With Partners",
+      "Sales Joint With Partners"
+    ],
+    "GRP_CREATOR_ALL": [
+      "BDR",
+      "N/A",
+      "Partner Created",
+      "Sales"
+    ],
+    "GRP_CREATOR_ALL_SORT": [
+      1,
+      2,
+      3,
+      99
+    ],
+    "GRP_PARTNER_CREATED_COSELL": [
+      "Partner Co-Sell",
+      "Partner Created"
+    ],
+    "GRP_PARTNER_AGG": [
+      "BDR Organic",
+      "N/A",
+      "Partner Aggregate",
+      "Sales Organic"
+    ],
+    "GRP_PARTNER_AGG_SORT": [
+      1,
+      2,
+      3,
+      99
+    ],
+    "IS_ACTIVE": [
+      true
+    ]
+  },
+  "TD_EBI_DEAL_TYPE": {
+    "DEAL_TYPE_ID": [
+      -1,
+      1,
+      2,
+      3
+    ],
+    "DEAL_TYPE": [
+      "Cross-Sell",
+      "N/A",
+      "New",
+      "Upsell"
+    ],
+    "DEAL_TYPE_SORT": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "IS_ACTIVE": [
+      true
+    ]
+  },
+  "TD_EBI_UCP_COMPETITORS": {
+    "competitor_id": [
+      12,
+      24,
+      45,
+      9,
+      25
+    ],
+    "sub_std_name_key": [
+      85,
+      24,
+      74,
+      29,
+      3
+    ],
+    "sub_country_code": [
+      "BO",
+      "CN",
+      "BJ",
+      "AE",
+      "EC"
+    ],
+    "new_technology": [
+      "33Across",
+      "161Media",
+      "3BL Media",
+      "180Fusion",
+      "250ok"
+    ],
+    "pmbu": [
+      null,
+      "GENSTUDIO",
+      "PPBU",
+      "CREATIVE FLAGSHIP",
+      "OTHER"
+    ],
+    "Zi_Category": [
+      "Ad Servers",
+      "DDoS and Bot Protection",
+      "Consent Management",
+      "Customer Relationship Management",
+      "Facilities Management"
+    ],
+    "Zi_Vendor": [
+      "36software",
+      "360pi",
+      "180Fusion",
+      "360insights.com",
+      "1touch.io Inc"
+    ],
+    "Last_Updated_Date": [
+      "2026-01-08T00:00:00.000Z"
+    ]
+  },
+  "TF_EBI_Marketing_Trend": {
+    "MARKETING_TREND_ID": [
+      412799,
+      412815,
+      412779,
+      412809,
+      412807
+    ],
+    "ACCOUNT_SUB_ID": [
+      273,
+      3621,
+      2537,
+      6514,
+      7178
+    ],
+    "ACCOUNT_COUNTRY_ID": [
+      46,
+      54,
+      51,
+      15,
+      52
+    ],
+    "CUSTOMER_HEALTH_ID": [
+      234,
+      709,
+      142,
+      960,
+      143
+    ],
+    "SEGMENT_ID": [
+      40,
+      23,
+      45,
+      24,
+      35
+    ],
+    "SNAPSHOT_DATE_ID": [
+      20250808,
+      20250905,
+      20251024,
+      20260220,
+      20260102
+    ],
+    "AES_SCORE_ID": [
+      -1,
+      1,
+      2,
+      3,
+      4
+    ],
+    "Total_Engagement_Score": [
+      31,
+      0,
+      38,
+      37,
+      43
+    ],
+    "Recent_Engagement_Score": [
+      37,
+      10,
+      48,
+      7,
+      20
+    ],
+    "Marketable_Contacts_Score": [
+      2,
+      22,
+      34,
+      44,
+      47
+    ],
+    "Power_Engaged_Score": [
+      38,
+      0,
+      18,
+      1,
+      35
+    ],
+    "non_Power_Engaged_Score": [
+      15,
+      23,
+      48,
+      35,
+      8
+    ],
+    "DX_Page_Activity_Score": [
+      13,
+      37,
+      47,
+      2,
+      36
+    ],
+    "Demand_Activity_Score": [
+      44,
+      4,
+      35,
+      5,
+      42
+    ],
+    "Marketing_Interactions_Score": [
+      33,
+      10,
+      8,
+      18,
+      17
+    ],
+    "Event_Attendance_Score": [
+      47,
+      11,
+      36,
+      32,
+      2
+    ],
+    "Total_Engagement_Benchmark": [
+      6.5,
+      9.5,
+      26,
+      5.5,
+      25.5
+    ],
+    "Recent_Engagement_Benchmark": [
+      7.5,
+      3,
+      24,
+      25,
+      27
+    ],
+    "Marketable_Contacts_Benchmark": [
+      16,
+      5.5,
+      25.5,
+      5,
+      14.5
+    ],
+    "Power_Engaged_Benchmark": [
+      10,
+      1,
+      3.5,
+      1.5,
+      4.5
+    ],
+    "non_Power_Engaged_Benchmark": [
+      2.5,
+      11,
+      13,
+      10.5,
+      22
+    ],
+    "DX_Page_Activity_Benchmark": [
+      24.5,
+      5,
+      12.5,
+      8,
+      10.5
+    ],
+    "Demand_Activity_Benchmark": [
+      31.5,
+      32.5,
+      34,
+      0,
+      9
+    ],
+    "Marketing_Interactions_Benchmark": [
+      13.5,
+      31,
+      29,
+      14,
+      17
+    ],
+    "Event_Attendance_Benchmark": [
+      12,
+      38,
+      37,
+      42,
+      18
+    ]
+  },
+  "vw_TF_EBI_PIPE_WALK": {
+    "WALK_ID": [
+      12,
+      8,
+      6,
+      3,
+      15
+    ],
+    "P2S_ID": [
+      321,
+      5465,
+      3621,
+      1261,
+      4423
+    ],
+    "SFDC_P2S_ID": [
+      "13604513",
+      "13435638",
+      "10699787",
+      "10699783",
+      "10886348"
+    ],
+    "OPP_ID": [
+      502457,
+      800104,
+      1121372,
+      1041631,
+      1128413
+    ],
+    "ACCOUNT_ID": [
+      35005,
+      27014,
+      5864,
+      44403,
+      33910
+    ],
+    "REGION_ID": [
+      1373276,
+      1373240,
+      1373483,
+      1373456,
+      1370826
+    ],
+    "OPG_ID": [
+      53,
+      104,
+      75,
+      84,
+      89
+    ],
+    "SEGMENT_ID": [
+      45,
+      39,
+      14,
+      47,
+      15
+    ],
+    "DEAL_TYPE_ID": [
+      null,
+      -1,
+      1,
+      2,
+      3
+    ],
+    "SNAPSHOT_DATE_ID": [
+      20251114,
+      20250228,
+      20260116,
+      20250411,
+      20251031
+    ],
+    "CLOSE_DATE_ID": [
+      20250114,
+      20241220,
+      20241201,
+      20250111,
+      20250110
+    ],
+    "TERR_ID": [
+      "1484026",
+      "1484018",
+      "1484011",
+      "1483991",
+      "1484034"
+    ],
+    "WALK_CONDITION_ID": [
+      36,
+      25,
+      1,
+      24,
+      8
+    ],
+    "WALK_COMPOSITE_KEY": [
+      "108416302025-03-07-52-1-1-QTD-RTB-No Change-0-20252-20252-2025-03-07-2025-03-07",
+      "108416332025-05-09-52-1-1-QTD-RTB-No Change-0-20252-20252-2025-05-09-2025-03-07",
+      "108416332025-05-02-52-1-1-QTD-RTB-No Change-0-20252-20252-2025-05-02-2025-03-07",
+      "108416352025-04-04-52-1-1-QTD-RTB-No Change-0-20252-20252-2025-04-04-2025-03-07",
+      "108416352025-04-18-52-1-1-QTD-RTB-No Change-0-20252-20252-2025-04-18-2025-03-07"
+    ],
+    "GROSSASV": [
+      -15197608.0048,
+      -16000000,
+      -32000000,
+      -11404374.9992,
+      -10923295
+    ],
+    "CURR_GROSSASV": [
+      -3440344.74,
+      -304500,
+      -1159317.53,
+      -7412433.34,
+      -1011617.6481
+    ],
+    "PREV_GROSSASV": [
+      -390186.8376,
+      -0.7752,
+      -245859.4,
+      -0.7,
+      -1011031.1862
+    ],
+    "STAGEPROGRESSIONASV": [
+      -6000000,
+      -6180000,
+      -40805000.0002,
+      -30610500.6884,
+      -6852750
+    ],
+    "BOQ_GROSSASV": [
+      -19290322.581,
+      -180000000,
+      -13327712.0754,
+      -12212824.2541,
+      -42023750
+    ],
+    "WALK_CATEGORY": [
+      "Pushed",
+      "Lost",
+      "Creator Out",
+      "Added",
+      "W1 Offset"
+    ],
+    "WALK_GROUP": [
+      "Value Change",
+      "Pushed",
+      "No Change",
+      "S1/S2",
+      "Booked"
+    ],
+    "WALK_GEN_GROUP": [
+      "Pushed",
+      "Clean UP/Lost",
+      "Pulled In",
+      "Value Change",
+      "Created"
+    ],
+    "BOQ_WALK_CATEGORY": [
+      "Value Change",
+      "Deleted",
+      "No Change Pushed to Pipe",
+      "No Change Pushed to NonPipe",
+      "W1 Offset"
+    ],
+    "BOQ_GEN_GROUP": [
+      "Value Change",
+      "Pushed",
+      "Pulled In",
+      "Created",
+      "Clean UP/Lost"
+    ],
+    "BOQ_GEN_GROUP_SORT": [
+      4,
+      6,
+      2,
+      5,
+      1
+    ],
+    "GROUP_ORDER": [
+      5,
+      6,
+      2,
+      1,
+      8
+    ],
+    "CATEGORY_ORDER": [
+      3.3,
+      1.2,
+      8.1,
+      1.1,
+      3.4
+    ],
+    "CURR_SALES_STAGE": [
+      "Booked",
+      "S3",
+      "S7",
+      "S5",
+      "S2"
+    ],
+    "PREV_SALES_STAGE": [
+      "S3",
+      "Lost",
+      "S1",
+      "S4",
+      "S7"
+    ],
+    "CURR_SALES_STAGE_DERIVED": [
+      "S3",
+      "Clean Up",
+      "S4",
+      "Lost",
+      "Booked"
+    ],
+    "PREV_SALES_STAGE_DERIVED": [
+      "S1/S2",
+      "Clean Up",
+      "Lost",
+      "S5+",
+      "Booked"
+    ],
+    "CURR_SALES_STAGE_DERIVED_SORT": [
+      4,
+      3,
+      6,
+      2,
+      10
+    ],
+    "PREV_SALES_STAGE_DERIVED_SORT": [
+      8,
+      1,
+      6,
+      4,
+      5
+    ],
+    "CURR_SALES_STAGE_GROUP_SORT": [
+      2,
+      6,
+      3,
+      null,
+      1
+    ],
+    "PREV_SALES_STAGE_GROUP_SORT": [
+      null,
+      4,
+      2,
+      6,
+      1
+    ],
+    "CURR_CLOSE_QTR": [
+      20263,
+      20301,
+      20261,
+      20273,
+      20271
+    ],
+    "PREV_CLOSE_QTR": [
+      20254,
+      20301,
+      20304,
+      20272,
+      20281
+    ],
+    "CURR_CLOSE_DATE": [
+      "2024-12-01T00:00:00.000Z",
+      "2025-01-10T00:00:00.000Z",
+      "2024-12-06T00:00:00.000Z",
+      "2024-12-13T00:00:00.000Z",
+      "2025-01-17T00:00:00.000Z"
+    ],
+    "PREV_CLOSE_DATE": [
+      "2024-12-20T00:00:00.000Z",
+      "2024-12-12T00:00:00.000Z",
+      "2025-01-02T00:00:00.000Z",
+      "2024-12-05T00:00:00.000Z",
+      "2024-11-30T00:00:00.000Z"
+    ],
+    "CURR_ADJ_COMMITMENT": [
+      "Clean Up",
+      "Upside",
+      "Forecast",
+      "Lost",
+      null
+    ],
+    "PREV_ADJ_COMMITMENT": [
+      "Clean Up",
+      "Upside",
+      "Lost",
+      "Won",
+      "Forecast"
+    ],
+    "CURR_MGR_ADJ_COMMIT": [
+      "Upside - Committed",
+      "Upside - Targeted",
+      "N/A",
+      null,
+      "Forecast"
+    ],
+    "PREV_MGR_ADJ_COMMIT": [
+      "N/A",
+      "Upside",
+      "Lost",
+      "Upside - Committed",
+      null
+    ],
+    "CURR_GEO_ADJ_COMMIT": [
+      "Upside",
+      "Lost",
+      "Upside - Targeted",
+      "Forecast",
+      "Won"
+    ],
+    "PREV_GEO_ADJ_COMMIT": [
+      "Forecast",
+      "Upside",
+      "N/A",
+      "Won",
+      "Upside - Targeted"
+    ],
+    "CURR_OPP_DRIVER": [
+      "AE",
+      null,
+      "SAM",
+      "RSS",
+      "PS"
+    ],
+    "PREV_OPP_DRIVER": [
+      "PS",
+      "AE",
+      null,
+      "N/A",
+      "RSS"
+    ],
+    "CURR_REASON": [
+      "Lack of Access to Power",
+      "Product Fit",
+      "Project Stalled - Competitor Not Selected",
+      "Not qualified - Opportunity Transferred from Other Rep",
+      "General - No Progression"
+    ],
+    "CURR_IN_PIPELINE": [
+      null,
+      0,
+      1
+    ],
+    "PREV_IN_PIPELINE": [
+      null,
+      0,
+      1
+    ],
+    "CURR_EMP_ID": [
+      10268,
+      9922,
+      29410,
+      24455,
+      6789
+    ],
+    "PREV_EMP_ID": [
+      29333,
+      30885,
+      33783,
+      29045,
+      29250
+    ],
+    "CURR_SALES_TEAM": [
+      "AMER IND FSI",
+      "AMER IND TECH KEY",
+      "AMER IND MFG",
+      "AMER IND TECH CORE",
+      "AMER IND M&E"
+    ],
+    "PREV_SALES_TEAM": [
+      "AMER IND RTL CORE",
+      "AMER IND FSI CORE",
+      "AMER IND FSI KEY",
+      "AMER DME ENT STRAT",
+      "AMER CANADA KEY"
+    ],
+    "CURR_SNAPSHOT_DATE": [
+      "2025-05-23T00:00:00.000Z",
+      "2025-07-11T00:00:00.000Z",
+      "2025-09-26T00:00:00.000Z",
+      "2026-01-23T00:00:00.000Z",
+      "2025-11-07T00:00:00.000Z"
+    ],
+    "PREV_SNAPSHOT_DATE": [
+      "2024-12-06T00:00:00.000Z",
+      "2025-03-07T00:00:00.000Z",
+      "2025-06-06T00:00:00.000Z",
+      "2025-09-05T00:00:00.000Z",
+      "2025-12-05T00:00:00.000Z"
+    ],
+    "CURR_DEAL_BAND_ID": [
+      9,
+      8,
+      21,
+      2,
+      16
+    ],
+    "CURR_DEAL_BAND_NEW": [
+      "7M-8M",
+      "10M-15M",
+      "<0K",
+      "9M-10M",
+      "1M-2M"
+    ],
+    "PREV_DEAL_BAND_ID": [
+      7,
+      12,
+      11,
+      2,
+      13
+    ],
+    "PREV_DEAL_BAND_NEW": [
+      "20M+",
+      "1M-2M",
+      "9M-10M",
+      "25K-50K",
+      "8M-9M"
+    ],
+    "IS_STAGE_CHANGED": [
+      "FALSE",
+      "TRUE"
+    ],
+    "IS_CLOSE_QTR_CHANGED": [
+      "FALSE",
+      "TRUE"
+    ],
+    "IS_GEO_ADJ_COMMIT_CHANGED": [
+      "FALSE",
+      "TRUE"
+    ],
+    "IS_WALK_VALUE_CHANGED": [
+      "FALSE",
+      "TRUE"
+    ],
+    "PROJECTED_FINISH_MOVEMENT": [
+      "Moved into PF",
+      "Moved out of PF",
+      "NA",
+      "Remained in PF"
+    ],
+    "IS_IN_QTR_OPP": [
+      false,
+      true
+    ],
+    "SNAPSHOT_TREND": [
+      "2025-11-14T00:00:00.000Z",
+      "2025-07-18T00:00:00.000Z",
+      "2025-11-07T00:00:00.000Z",
+      "2025-05-09T00:00:00.000Z",
+      "2025-06-20T00:00:00.000Z"
+    ],
+    "SNAPSHOT_DATE": [
+      "2025-10-17T00:00:00.000Z",
+      "2025-09-26T00:00:00.000Z",
+      "2025-08-15T00:00:00.000Z",
+      "2025-06-20T00:00:00.000Z",
+      "2025-10-10T00:00:00.000Z"
+    ],
+    "CLOSE_DATE": [
+      "2025-01-14T00:00:00.000Z",
+      "2024-12-06T00:00:00.000Z",
+      "2024-12-22T00:00:00.000Z",
+      "2024-12-23T00:00:00.000Z",
+      "2024-12-13T00:00:00.000Z"
+    ],
+    "GLOBAL_REGION": [
+      "AMERICAS",
+      "EMEA",
+      "APAC",
+      "WW"
+    ],
+    "FISCALWEEKNUMBER": [
+      "W03",
+      "W14",
+      "W08",
+      "W02",
+      "W11"
+    ],
+    "FISCAL_YR_QTR_WK": [
+      "2025Q3W12",
+      "2025Q3W08",
+      "2025Q2W08",
+      "2026Q1W11",
+      "2025Q4W12"
+    ],
+    "DAY_FLAG": [
+      "QTD"
+    ],
+    "FREQUENCY": [
+      "RTB"
+    ],
+    "OFFSET_FLAG": [
+      false,
+      true
+    ],
+    "PIPE_FLAG": [
+      "Non Pipe",
+      "Pipe"
+    ],
+    "FINAL_ELIGIBILTY_WALK_TREND": [
+      "No",
+      "Yes"
+    ],
+    "DEAL_REG_ID": [
+      "DR1953187",
+      "DR2106964",
+      "DR2106915",
+      "DR1861559",
+      "DR1784144"
+    ],
+    "MULTI_SOLUTION_FLAG_DESC": [
+      "Multi",
+      "Single"
+    ],
+    "PS_ALIGNED": [
+      "Upside - Committed",
+      "No Commit",
+      "Upside",
+      "Lost",
+      null
+    ],
+    "STAGE_AGE": [
+      -10,
+      -2,
+      27,
+      -31,
+      15
+    ],
+    "STALLED_BUT_INACTIVE": [
+      null,
+      "Active",
+      "Stalled & Inactive"
+    ],
+    "ROLE_COVERAGE_ID": [
+      6,
+      1,
+      2,
+      5,
+      3
+    ],
+    "CONSULTING_SEGMENT_ID": [
+      null,
+      -1
+    ]
+  },
+  "TF_EBI_TPT_INFO": {
+    "TPT_ID": [
+      51,
+      37,
+      6,
+      46,
+      34
+    ],
+    "ACCOUNT_SUB_ID": [
+      210,
+      122,
+      314,
+      41,
+      99
+    ],
+    "OPG_ID": [
+      118,
+      133,
+      167,
+      212,
+      123
+    ],
+    "COUNTRY_ID": [
+      57,
+      25,
+      29,
+      33,
+      39
+    ],
+    "SEGMENT_ID": [
+      21,
+      47,
+      25,
+      -1,
+      41
+    ],
+    "SUB_MOPG1_CNTRY": [
+      "1_MARKETO_US",
+      "10_CREATIVE EXPRESS_BR",
+      "1_CREATIVE GENSTUDIO PM_US",
+      "10_FORWARD DEPLOYED ENGINEERS_BR",
+      "10_POOLED GEN CREDITS_BR"
+    ],
+    "UCP_ICP_SCORE_ID": [
+      26,
+      37,
+      27,
+      57,
+      23
+    ],
+    "AES_SCORE_ID": [
+      -1,
+      1,
+      2,
+      3,
+      4
+    ],
+    "SUB_MA_ID": [
+      -1,
+      26,
+      44,
+      42,
+      21
+    ],
+    "SUB_MA_SOLUTION_ID": [
+      -1
+    ],
+    "OPP_FOCUS_TIER": [
+      "Tier 3",
+      "Tier 1",
+      null,
+      "DQ",
+      "No Tier Selected"
+    ],
+    "OPP_SALES_PLAY": [
+      "ADC: GenAI Conversations with Dynamic Chat",
+      null,
+      "AEMF: Enroll & Engage",
+      "AEMA: Enterprise DAM",
+      "Cross-sell"
+    ],
+    "OPP_OWNER": [
+      "Partner",
+      "Solution AM",
+      "Prod Specialist",
+      "Marketing",
+      "MSSE"
+    ],
+    "OPP_ACCOUNT_PLAN_URL": [
+      " https://adobe-my.sharepoint.com/:p:/p/chcole/EdA5Tqby54pJh9eX1lEUVG0BT1hJAVDfKR_kntAUsOAhAQ?e=Y5UDFP",
+      " https://adobe-my.sharepoint.com/:p:/p/kalebm/ETBrh4tnJrlAirH9jtKVd9oBbUBKADrBlxNJJLsN8hBQCw?e=T7HrsV",
+      " https://adobe-my.sharepoint.com/:p:/p/chcole/ERE9ymeL81hHpYIyw9QKsisB_f1IC6YWREalLWwZFhW4tA?e=XJzeEQ",
+      " https://adobe-my.sharepoint.com/:p:/p/kalebm/EXy0x_EftJhAkRaI6BAfxTwBmJ5-kTcJSjzsoR90XEtuCg?e=Ca1CPW",
+      ""
+    ],
+    "OPP_ACCOUNT_PLAN_QUALITY": [
+      null,
+      "Yellow",
+      "--",
+      "Green",
+      ""
+    ],
+    "OPP_ACCOUNT_PLAN_EXECUTION": [
+      "--",
+      "Yellow",
+      "",
+      "Select Grade",
+      "Green"
+    ],
+    "OPP_ACCOUNT_PLAN_STATUS": [
+      null
+    ],
+    "OPP_TARGET": [
+      240,
+      15000,
+      20000,
+      75000,
+      183
+    ],
+    "OPP_TARGET_NO_PIPE": [
+      20000,
+      56000,
+      350,
+      85000,
+      78888
+    ],
+    "OPP_CUSTOMER_PRIORITY": [
+      "Bizible Upsell: MNTG:75; Marketo Select Package; Tier 6 (Unknown);  Medium Industry Match",
+      "Bizible Upsell: MNTG:54; Marketo Production Instance; Tier 1 (1B+);  Excellent Industry Match",
+      " : Excellent Industry, MFG; Tier 4 (1M - 99M); Mars Incorporated, Manufacturing - Consumer Goods; $0k",
+      "Bizible Upsell: MNTG:72; Marketo Select Package; Tier 1 (1B+);  Excellent Industry Match",
+      "Bizible Upsell: MNTG:37; Marketo Prime Package; Tier 4 (1M - 99M);  Excellent Industry Match"
+    ],
+    "OPP_PORTFOLIO_PLAY": [
+      "",
+      "B2B Portfolio Play ",
+      "Content Supply Chain",
+      "Public Sector - Experience-Driven Government (P@S/PIE)",
+      "Public Sector - Content Velocity (CSC)"
+    ],
+    "OPP_PARTNER_PRIMARY": [
+      "Havas",
+      "Zee Jay Digital",
+      "",
+      "Freedom Marketing Consulting LLC",
+      "Publicis Groupe"
+    ],
+    "OPP_PARTNER_SECONDARY": [
+      "Amazon",
+      "Slalom, LLC, dba Slalom Consulting",
+      "Konrad Group",
+      "IBM North America",
+      ""
+    ],
+    "OPP_EXEC_ACCESS": [
+      null,
+      false,
+      true
+    ],
+    "OPP_PARENT_TIER": [
+      null,
+      "DQ - No CY Oppty",
+      "Tier 1",
+      "Tier 2",
+      "Tier 3"
+    ],
+    "OPP_PARENT_OWNER": [
+      "AE",
+      "Partner",
+      "RSS",
+      "MSSE",
+      null
+    ],
+    "OPP_PARENT_TARGET": [
+      81000,
+      70000,
+      76000,
+      150,
+      500
+    ],
+    "PARENT_TIER": [
+      null,
+      "DQ - No CY Oppty",
+      "Tier 1",
+      "Tier 2",
+      "Tier 3"
+    ],
+    "PARENT_ACCOUNT_PLAN_URL": [
+      " https://adobe-my.sharepoint.com/:p:/p/dweintraub/EY92OxHRavdGqkq9cugwASUBEnSh1HD0eSIDSBX34uAPBw?e=L176QG",
+      "-https://adobe.sharepoint.com/:f:/r/sites/AmericasStrategicSalesTeam/Shared%20Documents/General/Business%20Planning/FY26/Canada/Porter%20Airlines?csf=1&web=1&e=pgm9ZP",
+      "Account_Penetration_Plan_http___interfoodsusa.com__20260130",
+      " https://adobe-my.sharepoint.com/:p:/p/chcole/EXVDMpyL6UpEqj5noFFydCMBf9uEn31gLXvs3EJqpTKfzQ?e=g7bf7Q",
+      ""
+    ],
+    "PARENT_AP_COMPLETION_STATUS": [
+      "Completed",
+      "Not Completed",
+      "Not Required"
+    ],
+    "PARENT_ACCOUNT_PLAN_QUALITY": [
+      "Yellow",
+      "Red",
+      null,
+      "Not Assessed",
+      "Select Grade"
+    ],
+    "PARENT_OWNER": [
+      "MSSE",
+      "Solution AM",
+      "BDR",
+      "ACS",
+      "SPP"
+    ],
+    "CLEANED_PARENT_TIER": [
+      "DQ - No CY Oppty",
+      "Tier 2",
+      "Tier 1",
+      "",
+      "Tier 3"
+    ],
+    "CLEANED_SUB_TIER": [
+      ""
+    ],
+    "SUB_TIER_OPP_FOCUS_TIER": [
+      null
+    ],
+    "SUB_TIER_OPP_ACCOUNT_PLAN_URL": [
+      null
+    ],
+    "SUB_TIER_OPP_ACCOUNT_PLAN_QUALITY": [
+      null
+    ],
+    "SUB_CNTRY": [
+      null
+    ],
+    "PRNT_CNTRY": [
+      "100032198_US",
+      "10009_JP",
+      "100047863_US",
+      "1_US",
+      "100047860_US"
+    ],
+    "BDR_ACCOUNT_STATUS": [
+      "Content-Led Experiences",
+      "Workflow and Planning",
+      "Select Status",
+      "Reporting and insights",
+      "Contacted"
+    ],
+    "BDR_NOTES": [
+      "AEM M2C - AWM, AWS Connector",
+      "Adidas contacts attended Summit (most from EMEA) - Philly Matos (Product Analytics Manager) reviewed AA/CJA during in-person sessions ",
+      "--",
+      "6.11 - created & sent DC Prime updates on new features with events/resources;",
+      "AEM from EMEA contract"
+    ],
+    "AP_COMPLETION_STATUS": [
+      "Completed",
+      "Not Completed",
+      "Not Required"
+    ],
+    "ASSESSED_ACCOUNT": [
+      "Green",
+      "Not Assessed",
+      "Red",
+      "Yellow"
+    ],
+    "PREDICTION_TYPE": [
+      "Cross-sell",
+      "New",
+      "Upsell"
+    ],
+    "IS_PIPE_AT_PRNT": [
+      0,
+      1
+    ],
+    "IS_PIPE_AT_SUB": [
+      0,
+      1
+    ],
+    "IS_PIPE_AVL": [
+      null,
+      0,
+      1
+    ],
+    "IS_PIPE_AT_PRNT_CNTRY": [
+      0,
+      1
+    ],
+    "IS_PIPE_AT_SUB_MOPG1_CNTRY": [
+      0,
+      1
+    ],
+    "HAS_PIPE_ARR_RBOB_OPP_TARGET_AT_SUB": [
+      0,
+      1
+    ],
+    "HAS_PIPE_ARR_RBOB_OPP_TARGET_AT_PRNT": [
+      0,
+      1
+    ],
+    "To_SHOW_IN_DV": [
+      0,
+      1
+    ],
+    "IS_ACTIVE": [
+      0,
+      1
+    ],
+    "IS_DELETED": [
+      false,
+      true
+    ],
+    "TPT_LAST_MODIFIED_DATE": [
+      "2022-12-14T09:22:36.837Z",
+      "2022-12-02T12:26:30.433Z",
+      "2022-12-13T12:43:36.960Z",
+      "2022-12-13T12:41:04.913Z",
+      "2022-12-02T12:19:38.817Z"
+    ]
+  },
+  "TD_EBI_CUSTOMER_HEALTH": {
+    "CUSTOMER_HEALTH_ID": [
+      44,
+      -2,
+      47,
+      29,
+      24
+    ],
+    "CUSTOMER_HEALTH": [
+      "Yellow",
+      "N/A",
+      "Blue",
+      "NA",
+      "Red"
+    ],
+    "PRODUCT_HEALTH": [
+      "Green",
+      "N/A",
+      "Red",
+      "Yellow"
+    ],
+    "USAGE_ADOPTION_HEALTH": [
+      "Green",
+      "N/A",
+      "Red",
+      "Yellow"
+    ],
+    "COMMERCIALS_HEALTH": [
+      "Green",
+      "N/A",
+      "Red",
+      "Yellow"
+    ],
+    "RELATIONSHIP_HEALTH": [
+      "Green",
+      "N/A",
+      "Red",
+      "Yellow"
+    ],
+    "PREDICTIVE_HEALTH": [
+      "Green",
+      "N/A",
+      "Red",
+      "Yellow"
+    ],
+    "SOURCE_SYSTEM": [
+      "GAINSIGHT",
+      "GAINSIGHT PANORAMA",
+      "N/A",
+      "PANORAMA"
+    ],
+    "CUSTOMER_HEALTH_SORT": [
+      null,
+      3,
+      2,
+      4,
+      5
+    ],
+    "IS_ACTIVE": [
+      true
+    ]
+  },
+  "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT": {
+    "ACCOUNT_ID": [
+      343503,
+      343717,
+      74028,
+      238218,
+      343514
+    ],
+    "OPG_ID": [
+      198,
+      80,
+      194,
+      149,
+      78
+    ],
+    "SEGMENT_ID": [
+      24,
+      21,
+      35,
+      23,
+      30
+    ],
+    "SNAPSHOT_MONTH_ID": [
+      202511,
+      202502,
+      202412,
+      202508,
+      202512
+    ],
+    "SOURCE_SYSTEM": [
+      "GAINSIGHT",
+      "GAINSIGHT PANORAMA",
+      "PANORAMA"
+    ],
+    "CUSTOMER_SOLUTION_HEALTH_ID": [
+      40,
+      39,
+      26,
+      25,
+      -2
+    ],
+    "SOLUTION_HEALTH_MOVEMENT_ID": [
+      5,
+      2,
+      -1,
+      1,
+      6
+    ],
+    "REGION_ID": [
+      4842589,
+      4842575,
+      4842557,
+      4842647,
+      4842571
+    ],
+    "AE_REGION_ID": [
+      4842626,
+      4842830,
+      4842721,
+      4842558,
+      4842743
+    ],
+    "HAVE_ACTIVE_PQ_EOQ_ARR": [
+      false,
+      true
+    ]
+  },
+  "TF_EBI_CUSTOMER_HEALTH": {
+    "CUSTOMER_HEALTH_FACT_ID": [
+      92794,
+      92791,
+      92769,
+      92774,
+      92766
+    ],
+    "ACCOUNT_ID": [
+      89292,
+      230779,
+      315445,
+      259818,
+      33722
+    ],
+    "OPG_ID": [
+      112
+    ],
+    "SEGMENT_ID": [
+      -1,
+      29,
+      38,
+      33,
+      26
+    ],
+    "SNAPSHOT_MONTH_ID": [
+      202604,
+      202602,
+      202410,
+      202601,
+      202411
+    ],
+    "CUSTOMER_HEALTH_ID": [
+      -2,
+      962,
+      231,
+      406,
+      709
+    ],
+    "CUSTOMER_HEALTH": [
+      "Blue",
+      null,
+      "N/A",
+      "Yellow",
+      "Green"
+    ],
+    "PREDICTIVE_HEALTH": [
+      null,
+      "Green",
+      "N/A",
+      "Red",
+      "Yellow"
+    ],
+    "HEALTH_MOVEMENT_ID": [
+      3,
+      1,
+      null,
+      -1,
+      4
+    ],
+    "CURRENT_SITUATION": [
+      "- AEM Environment Review: Delivering has been scheduled - Commerce Environment Review: Deliverable presented to customer, material provided for customers to review internally.  Professional Services engaged to possibly execute technical next steps. PS has review the customer case and is ready to make recommendations. - Launch Advisory for AEP (+AJO, RTCDP): Request on hold. Sazerac has confirmed a delay in implementation (with Bounteous) to mid-year. - AA Adoption Review: Request submitted & received, FE has been assigned. Holding for priority confirmation from Sazerac to engage as preliminary Adoption check before engaging PS on technical execution. -Workfront: Sazerac expressed concerns on access levels & license types, in addition to alternative enablement questions. The team is meeting with Sazerac today (2/14) to further understand the concern before requesting for the correct support path. Specialist is also involved for the possibility of curating a solution overview for Sazerac new users. - Mutual Action Plan Workshop: the MAP has been kicked off and the discussion was productive. Sazerac has agreed to kick of a regular tech+strategic touchpoint to align on day-to-day workstream. They have expressed better ability to outline priorities post-Professional Services discussion.",
+      "- AEP & AJO B2B enablement is progressing with curated learning paths, stakeholder discovery sessions, and recommended ADLS investment to target knowledge and expertise building\n- Adobe and AWS have established a bi-weekly sync cadence to track enablement progress and resolve blockers.\n- Adobe Week (Aug 19–21) is being planned as a strategic milestone to deliver a joint QBR, validate the Mutual Success Plan, showcase roadmap alignment and target enablement workshops to both priorities and surfaced challenges impacting adoption and buy in from Marketing & CCT stakeholders\n- Adobe has proposed a Design Partner Program (DPP) and a cross-functional governance model to address roadmap and intake-to-launch gaps, leveraging the personalization requirements engagement as a way to build transactional trust.\n- Quick-win campaigns such as “Abandoned Sign-Up Nurture” and “Hot Leads Segmentation” are being prioritized to demonstrate early ROI and build internal momentum.\n RCA transparency is being improved via a joint runbook.  AWS has not shared internal KPIs, limiting Adobe’s ability to quantify progress to business outcomes.",
+      "- asked the Partner to give a hand in order to talk again with the customer and understand his intentions",
+      "- Account team completed first onsite QBR on 4/24\n- Main Adobe champion (Jeevan Prakash, Dir Analytics) has sent a summary of follow-ups to improve adoption of products + PIE and CSC use cases to explore further\n- Account team meeting Dir Analytics bi-weekly and working towards deep dive discoveries and solution playbacks before next QBR in July",
+      "- ACID in the finale stages of potentially moving to AMS Enterprise which will give them a CSE which is a solution that would really help with their AEM issues/upgrade management.\n\t- Quite a few of the AICD team have registered for the upcoming AEM User Group which is great. \n\t- Customer has only run into 1/2 issues with AEM in the last 2 months - which is better than what is what previously. We have provided the RCA. \n\t- Mim still working closely with the team and is an advocate for Adobe. She has been pushing this migration deal forward to Vince and the CEO. \nCustomer is not hitting any usage issues with AEM or Commerce (recently tired up to the 50M tier)"
+    ],
+    "ACCOUNT_HEALTH_SUMMARY": [
+      null,
+      "- Currently AEM is used for Europe official website.\n-The project is paused due to customer's BU has some other ideas on UI/UX on official website. \n- Customer would like to engage with Deloitte France or Deloitte of Europe instead of Deloitte China becase they think Deloitte China is not familiar with Europe market.",
+      "- 4cabling is experiencing rapid digital growth and needs support implementing Magento to scale their digital efforts. - They want to upskill their internal team by bringing in front-end developers and training existing staff on dynamic content and personalization. - We showed them how to set up dynamic content, product recommendations, and customer segmentation using behavioral data from platforms like dotdigital. - Integrating customer data from Salesforce into these platforms could help create more meaningful customer segments and personalized experiences. - Implementing features like product recommendations and search through Adobe Commerce could help drive conversions and growth goals. - Transitioning the website to support more B2B features was discussed to better target business customers and increase conversions from paid media spending.",
+      "-  relationship not established yet even if we know that customer hasn't money to spend",
+      "- Customer meeting with Dawn Charangat \n- Account is healthy\n- As part of cloud migration, they are looking for some success architect support from Adobe\n- Interested in Ult Success offering - AE to sell in as part of project"
+    ],
+    "NEXT_ACTION": [
+      "- ACS working w/ client on budget for subsequent phases of AEP roll-out, but immediate sig. unlikely -New focus with AEM & COE roll-out, beginning w/ investment in ADLS for AEM engineers (contract pending sig.) -CSM & AD to collaborate on direction to provide on operating models -Introducing Top 5 Things BLK Should Be Doing list -GenAI session 7/31 w/ Neel Adhya and Scott Roen to speak w/ Emily McReynolds and Chris Young -DDOM (data decision operating model) Matt D to connect w/ Rob Edelman (Head of Analytics)",
+      "- Adobe Analytics Adoption Review + LEAP program \n- Investigating AEP \n- Marketo inspiration session \n- Adobe Commerce Enablement session",
+      "- AA Always On audit - DONE \n- Tune Up to resolve regular AEM issues DONE\n- AA SC workshop to address GA threat and drive adoption DONE\n- Develop learning platform plan w/ ADLS \n- SC engagement to present transformation account POV DONE",
+      "- AEM Assets: Support the successful completion of the Content Hub POC by end of August and prepare a scalability plan for user expansion. Continue collaboration with the customer to define long-term improvement roadmap.\n- Commerce: Prioritize urgent stabilization actions, including infra upsizing and direct technical engagement, to restore trust and enable further strategic discussion.\n- AEM Sites: Discuss with the LG Team on NCMS-related performance impact and renewal plans",
+      "- Account Exec (Scott Travis) meeting with Sales leadership to determine coverage mapping for WPP at Parent Level. Owner: Scott Travis\n- Americas Account Team + UK Account Team continue to partner to identify best way to engage with WPP. Owners: Caroline Steffens (US CSM), Scott Travis (US NAM), Danielle Palumbo (EMEA DME CSM), Fiona Camino (EMEA NAM)"
+    ],
+    "NEXT_ACTION_UPDATED_DATE": [
+      "2019-08-06T23:36:08.000Z",
+      "2019-09-19T01:42:34.000Z",
+      "2019-02-05T08:24:51.000Z",
+      "2018-03-22T05:50:50.000Z",
+      "2019-03-25T04:09:32.000Z"
+    ],
+    "LAST_MODIFIED_BY": [
+      "Ahmidi Fashanau",
+      "Alex Hvass",
+      "Alex Chen",
+      "Aditya kumar",
+      "Abhishek Kumar"
+    ],
+    "LAST_MODIFIED_DATE": [
+      "2019-08-06T23:36:51.000Z",
+      "2019-08-06T23:37:09.000Z",
+      "2019-08-06T23:37:19.000Z",
+      "2019-08-06T23:37:13.000Z",
+      "2019-08-06T23:37:15.000Z"
+    ],
+    "SOURCE_SYSTEM": [
+      "GAINSIGHT",
+      "PANORAMA"
+    ],
+    "IS_ACTIVE": [
+      true
+    ]
+  },
+  "vw_TD_ICP_UCP_SCORES": {
+    "SCORE_ID": {
+      "error": "Query timeout expired"
+    },
+    "ACCOUNT_SUB_ID": [
+      182,
+      143,
+      208,
+      168,
+      234
+    ],
+    "OPG_ID": [
+      144,
+      117,
+      135,
+      176,
+      133
+    ],
+    "SUB_ID": [
+      36,
+      2,
+      31,
+      39,
+      48
+    ],
+    "GEO": [
+      "AMERICAS",
+      "APAC",
+      "EMEA",
+      "JAPAN",
+      "NOT ASSIGNED"
+    ],
+    "MOPG1": [
+      "FORMS",
+      "AJO",
+      "WKFT",
+      "PAID SUPPORT",
+      "MIX MODELER"
+    ],
+    "FIT_SCORE": [
+      null,
+      "High",
+      "Low",
+      "Medium"
+    ],
+    "FIT_SCORE_NUM": [
+      0.36133,
+      0.35785,
+      0.36022,
+      0.36187,
+      0.35953
+    ],
+    "PREDICTION_TYPE": [
+      null,
+      "Cross-sell",
+      "Greenfield",
+      "Upsell"
+    ],
+    "WILLINGNESS_TO_ENGAGE": [
+      "0.000189378",
+      "0",
+      "0.00022032",
+      "0.000208969",
+      "0.000111015"
+    ],
+    "SAM": [
+      1393.9641755595737,
+      1285.236431604652,
+      1489.3824717397815,
+      1000,
+      1637.5994168841012
+    ],
+    "PROPENSITY_TO_BUY": [
+      "0.000294724",
+      "0.000613121",
+      "0.000574383",
+      "0.000564281",
+      null
+    ],
+    "ABM_FIT_RATING": [
+      0.17,
+      0.32,
+      0.35,
+      0.47,
+      0.2
+    ],
+    "ADOBE_FOOTPRINT_RATING": [
+      0.28,
+      0.39,
+      0.01,
+      0.26,
+      0.24
+    ],
+    "CAPACITY_TO_ACQUIRE_RATING": [
+      0.34,
+      0.11,
+      0.07,
+      0.19,
+      0.2
+    ],
+    "DIGITAL_MARKETING_MATURITY_RATING": [
+      0.15,
+      0.34,
+      0.45,
+      0.18,
+      0.32
+    ],
+    "TECHNOLOGY_STACK_RATING": [
+      "0.46",
+      "0.48",
+      "0",
+      "0.16",
+      "0.22"
+    ],
+    "ABM_Fit_Assessment": [
+      "Poor",
+      "Excellent",
+      "Good",
+      "Limited",
+      "Fair"
+    ],
+    "Adobe_Footprint_Assessment": [
+      "Excellent",
+      "Limited",
+      "Good",
+      "Fair",
+      "Poor"
+    ],
+    "Capacity_to_Acquire_Assessment": [
+      null,
+      "Poor",
+      "Excellent",
+      "Fair",
+      "Limited"
+    ],
+    "Digital_Marketing_Maturity_Assessment": [
+      "Poor",
+      null,
+      "Good",
+      "Limited",
+      "Fair"
+    ],
+    "Technology_Stack_Assessment": [
+      "Poor",
+      "Good",
+      "Excellent",
+      "Fair",
+      "Limited"
+    ],
+    "HIGH_UCP_ICP": [
+      false,
+      true
+    ],
+    "HIGH_ICP": [
+      false,
+      true
+    ],
+    "HIGH_UCP": [
+      false,
+      true
+    ],
+    "HIGH_AES": [
+      false,
+      true
+    ],
+    "HIGH_UCP_ICP_AES": [
+      false,
+      true
+    ],
+    "HIGH_AES_UCP_OR_ICP": [
+      false,
+      true
+    ],
+    "HIGH_UCP_OR_ICP": [
+      false,
+      true
+    ]
+  },
+  "TD_EBI_REPORT_DX_ACCOUNT_PROFILE_OPG": {
+    "ID": [
+      17,
+      32,
+      24,
+      29,
+      12
+    ],
+    "SUB_MOPG1_MA": [
+      "100047860_SITES_UNITED STATES",
+      "10_AJO B2B EDITION_BRAZIL",
+      "10_AEP_BRAZIL",
+      "100047860_ASSETS_UNITED STATES",
+      "100009390_AEP_UNITED STATES"
+    ],
+    "SUB_ID": [
+      36,
+      62,
+      67,
+      33,
+      91
+    ],
+    "SUB_NAME": [
+      "'K' Line (Thailand) Ltd",
+      "#Paid",
+      "(OKL740) OKLAHOMA STATE UNIVERSITY",
+      "? ? ? ? ? ?",
+      "? ? ? ? ? ? ? ? ? ? ? ? (Japan)"
+    ],
+    "MAJOR_OPG1": [
+      "ASSETS",
+      "TARGET",
+      "CJA",
+      "AJO B2B EDITION",
+      "EXPERIENCE SUCCESS"
+    ],
+    "MARKET_AREA": [
+      "KOREA",
+      "UNITED STATES",
+      "JAPAN",
+      "UNITED KINGDOM",
+      "SEA"
+    ],
+    "PRNT_ID": [
+      154,
+      133,
+      158,
+      53,
+      38
+    ],
+    "PRNT_NAME": [
+      "(OKL740) OKLAHOMA STATE UNIVERSITY",
+      "? ? ?",
+      "#Paid",
+      "((ALL900)) ALLIANCE FOR CHILDREN'S",
+      "(Institute Des Hautes Études De L'Éducation Et De La Formati"
+    ],
+    "PRODUCT_OF_INTEREST_STATUS": [
+      "Hot",
+      "Low",
+      "Warm"
+    ],
+    "PERSISTENT_MQA_FLAG": [
+      "N",
+      "Unknown",
+      "Y"
+    ],
+    "CREATED_DATE": [
+      "2026-02-22T16:58:04.240Z"
+    ],
+    "MODIFIED_DATE": [
+      "2026-03-01T06:56:52.017Z"
+    ]
+  },
+  "bridge_emp_lookup": {
+    "COUNTRY_CODE": {
+      "error": "Invalid object name 'bridge_emp_lookup'."
+    },
+    "EMP_ID": {
+      "error": "Invalid object name 'bridge_emp_lookup'."
+    },
+    "EMP_LDAP": {
+      "error": "Invalid object name 'bridge_emp_lookup'."
+    },
+    "EMP_ROLE_TYPE": {
+      "error": "Invalid object name 'bridge_emp_lookup'."
+    },
+    "SUB_MOPG1_CNTRY": {
+      "error": "Invalid object name 'bridge_emp_lookup'."
+    },
+    "SUB_STD_NAME_KEY": {
+      "error": "Invalid object name 'bridge_emp_lookup'."
+    },
+    "MAJOR_OPG1": {
+      "error": "Invalid object name 'bridge_emp_lookup'."
+    },
+    "BU_SOLUTION": {
+      "error": "Invalid object name 'bridge_emp_lookup'."
+    }
+  }
+}

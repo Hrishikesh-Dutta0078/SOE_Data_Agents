@@ -1,0 +1,36 @@
+{
+  "name": "auto-agents-server",
+  "version": "0.1.0",
+  "description": "Fully autonomous agentic Text-to-SQL system — Express + LangGraph backend",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "node --test",
+    "ssl:gen": "node scripts/generate-ssl-cert.js",
+    "harvest:schema": "node ../scripts/generateSchemaKnowledge.js",
+    "harvest:values": "node ../scripts/harvestDistinctValues.js",
+    "deploy:prepare": "node ../scripts/prepare-deploy.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@langchain/anthropic": "^0.3.0",
+    "@langchain/core": "^0.3.0",
+    "@langchain/langgraph": "^0.2.0",
+    "@langchain/openai": "^0.6.17",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.0",
+    "helmet": "^8.1.0",
+    "mssql": "^11.0.1",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "selfsigned": "^2.4.1"
+  }
+}

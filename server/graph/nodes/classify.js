@@ -1,0 +1,464 @@
+/**
+ * Classify Node — Intent classification with two-tier gold example matching.
+ *
+ * Step 1: Programmatic exact match against gold example variants (< 1ms).
+ *         If matched, skips the LLM call entirely and sets matchType = 'exact'.
+ * Step 2: LLM-based classification with partial template matching.
+ *         If LLM identifies a related template, sets matchType = 'partial'.
+ */
+
+const fs = require('fs');
+const path = require('path');
+const { z } = require('zod');
+const { getModel, getModelMeta } = require('../../config/llm');
+const { searchRules } = require('../../vectordb/rulesFetcher');
+const { classifyPrompt, buildClassifyInputs } = require('../../prompts/classify');
+const { getSession } = require('../../memory/sessionMemory');
+const logger = require('../../utils/logger');
+const { CLASSIFY_MAX_TOKENS, CLASSIFY_TEMPERATURE } = require('../../config/constants');
+
+const EXACT_MATCH_THRESHOLD = 0.8;
+
+const DASHBOARD_PATTERNS = [
+  /^\/dashboard\b/i,
+  /^\/create[-\s]?dashboard\b/i,
+];
+
+function hasDashboardableData(conversationHistory) {
+  if (!Array.isArray(conversationHistory) || conversationHistory.length === 0) return false;
+  return conversationHistory.some(
+    (msg) => msg.role === 'assistant' && (msg.sql || msg.resultSummary),
+  );
+}
+
+const STOP_WORDS = new Set([
+  'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+  'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could',
+  'should', 'may', 'might', 'shall', 'can', 'need', 'to', 'of', 'in',
+  'for', 'on', 'with', 'at', 'by', 'from', 'as', 'into', 'through',
+  'and', 'but', 'or', 'not', 'so', 'both', 'each', 'few', 'more',
+  'most', 'other', 'some', 'such', 'no', 'only', 'own', 'same',
+  'than', 'too', 'very', 'just', 'that', 'this', 'these', 'those',
+  'it', 'its', 'all', 'any', 'per', 'what', 'show', 'me', 'my',
+  'get', 'give', 'how', 'much', 'many',
+]);
+
+function tokenize(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, ' ')
+    .split(/\s+/)
+    .filter((w) => w.length > 1 && !STOP_WORDS.has(w));
+}
+
+let _goldIndex = null;
+
+function loadGoldIndex() {
+  if (_goldIndex) return _goldIndex;
+
+  const examplesMap = new Map();
+  const variantIndex = [];
+
+  try {
+    const filePath = path.join(__dirname, '..', '..', 'context', 'goldExamples.json');
+    const raw = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+    for (const ex of raw) {
+      examplesMap.set(ex.id, ex);
+
+      const allPhrases = [ex.question, ...(ex.variants || [])];
+      for (const phrase of allPhrases) {
+        variantIndex.push({
+          id: ex.id,
+          phrase,
+          tokens: new Set(tokenize(phrase)),
+        });
+      }
+    }
+  } catch {
+    /* gold examples not available */
+  }
+
+  _goldIndex = { examplesMap, variantIndex };
+  return _goldIndex;
+}
+
+function findExactMatch(question) {
+  const { variantIndex, examplesMap } = loadGoldIndex();
+  if (variantIndex.length === 0) return null;
+
+  const userTokens = new Set(tokenize(question));
+  if (userTokens.size === 0) return null;
+
+  let bestScore = 0;
+  let bestId = null;
+
+  for (const entry of variantIndex) {
+    const intersection = [...userTokens].filter((t) => entry.tokens.has(t)).length;
+    const denominator = Math.max(userTokens.size, entry.tokens.size);
+    const score = denominator > 0 ? intersection / denominator : 0;
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestId = entry.id;
+    }
+  }
+
+  if (bestScore >= EXACT_MATCH_THRESHOLD && bestId) {
+    const example = examplesMap.get(bestId);
+    return example
+      ? { id: bestId, sql: example.sql, score: bestScore, questionCategory: example.questionCategory, questionSubCategory: example.questionSubCategory }
+      : null;
+  }
+
+  return null;
+}
+
+const ClarificationQuestion = z.object({
+  id: z.string(),
+  question: z.string(),
+  options: z.array(z.string()),
+});
+
+const DetectedEntities = z.object({
+  metrics: z.array(z.string()).default([]),
+  dimensions: z.array(z.string()).default([]),
+  filters: z.array(z.string()).default([]),
+  operations: z.array(z.string()).default([]),
+});
+
+const ClassifySchema = z.object({
+  intent: z.enum(['SQL_QUERY', 'CLARIFICATION', 'GENERAL_CHAT', 'DASHBOARD']),
+  complexity: z.enum(['SIMPLE', 'MODERATE', 'COMPLEX']).default('MODERATE'),
+  detected_entities: DetectedEntities.default({ metrics: [], dimensions: [], filters: [], operations: [] }),
+  question_category: z.enum(['WHAT_HAPPENED', 'WHY', 'WHAT_TO_DO']).default('WHAT_HAPPENED'),
+  question_sub_category: z.string().default(''),
+  matched_example_id: z.string().nullable().default(null),
+  is_followup: z.boolean().default(false),
+  needs_decomposition: z.boolean().default(false),
+  dashboard_has_data_request: z.boolean().default(false),
+  clarification_questions: z.array(ClarificationQuestion).default([]),
+  reply: z.string().default(''),
+  reasoning: z.string().default(''),
+});
+
+function formatContext(rules, goldExamples) {
+  const sections = [];
+
+  if (goldExamples.length > 0) {
+    const exLines = goldExamples.map((ex) => {
+      const variants = ex.variants?.length > 0 ? `\n  Variants: ${ex.variants.join('; ')}` : '';
+      return `[id: ${ex.id}] Q: "${ex.question}"${variants}\n  Tables: ${(ex.tables_used || []).join(', ')}\n  SQL: ${ex.sql}`;
+    });
+    sections.push(`GOLD SQL TEMPLATES (verified, production-tested queries):\n${exLines.join('\n\n')}`);
+  }
+
+  if (rules.length > 0) {
+    sections.push(`BUSINESS RULES:\n${rules.map((r) => `- [${r.category}] ${r.text}`).join('\n')}`);
+  }
+
+  if (sections.length === 0) return '';
+  return `=== RETRIEVED CONTEXT ===\n\n${sections.join('\n\n')}`;
+}
+
+async function classifyNode(state) {
+  const start = Date.now();
+  logger.stage('1', 'Classify', 'intent + entities');
+
+  const stateReset = {
+    queryPlan: [],
+    currentQueryIndex: 0,
+    subQueryMatchFound: false,
+    queries: null,
+    attempts: { agent: 0, correction: 0, reflection: 0, resultCheck: 0 },
+  };
+
+  // Step 0a: Dashboard refinement fast path (< 5ms, no LLM)
+  if (state.previousDashboardSpec) {
+    const duration = Date.now() - start;
+    logger.info(`Classify: dashboard refinement request, skipping to dashboardAgent (${duration}ms)`);
+    return {
+      ...stateReset,
+      intent: 'DASHBOARD',
+      complexity: 'SIMPLE',
+      entities: { metrics: [], dimensions: [], filters: [], operations: [] },
+      questionCategory: 'WHAT_HAPPENED',
+      questionSubCategory: '',
+      templateSql: '',
+      matchType: 'dashboard_refine',
+      needsDecomposition: false,
+      dashboardHasDataRequest: false,
+      clarificationQuestions: [],
+      generalChatReply: '',
+      orchestrationReasoning: 'Dashboard refinement — reusing existing data, routing to dashboardAgent.',
+      trace: [{ node: 'classify', timestamp: start, duration, intent: 'DASHBOARD', matchType: 'dashboard_refine' }],
+    };
+  }
+
+  // Step 0b: Dashboard slash-command detection (< 1ms)
+  const isDashboardCommand = DASHBOARD_PATTERNS.some((p) => p.test(state.question.trim()));
+  if (isDashboardCommand) {
+    const trimmed = state.question.trim();
+    const hasTrailingText = trimmed.replace(/^\/\S+\s*/, '').trim().length > 0;
+
+    if (!hasTrailingText) {
+      if (!hasDashboardableData(state.conversationHistory)) {
+        const duration = Date.now() - start;
+        logger.info(`Classify: /dashboard with no conversation data (${duration}ms)`);
+        return {
+          ...stateReset,
+          intent: 'GENERAL_CHAT',
+          complexity: 'SIMPLE',
+          entities: { metrics: [], dimensions: [], filters: [], operations: [] },
+          questionCategory: 'WHAT_HAPPENED',
+          questionSubCategory: '',
+          templateSql: '',
+          matchType: '',
+          needsDecomposition: false,
+          dashboardHasDataRequest: false,
+          clarificationQuestions: [],
+          generalChatReply: "There's nothing to build a dashboard from yet. "
+            + 'Try asking a few data questions first — like pipeline by region, '
+            + 'deal progression, or coverage trends — and then ask me to create a dashboard.\n\n'
+            + 'Or you can ask me directly: "Build me a dashboard showing pipeline progression '
+            + 'and deals to focus" and I\'ll run the queries for you.',
+          orchestrationReasoning: 'Dashboard requested but no conversation data available.',
+          trace: [{ node: 'classify', timestamp: start, duration, intent: 'GENERAL_CHAT', matchType: 'none', dashboardNoData: true }],
+        };
+      }
+
+      const duration = Date.now() - start;
+      logger.info(`Classify: /dashboard from conversation data (${duration}ms)`);
+      return {
+        ...stateReset,
+        intent: 'DASHBOARD',
+        complexity: 'SIMPLE',
+        entities: { metrics: [], dimensions: [], filters: [], operations: [] },
+        questionCategory: 'WHAT_HAPPENED',
+        questionSubCategory: '',
+        templateSql: '',
+        matchType: '',
+        needsDecomposition: false,
+        dashboardHasDataRequest: false,
+        clarificationQuestions: [],
+        generalChatReply: '',
+        orchestrationReasoning: 'Slash command /dashboard — assembling from conversation data.',
+        trace: [{ node: 'classify', timestamp: start, duration, intent: 'DASHBOARD', matchType: 'none', dashboardHasDataRequest: false }],
+      };
+    }
+  }
+
+  // Step 1: Programmatic exact match (< 1ms)
+  const exactMatch = findExactMatch(state.question);
+  if (exactMatch) {
+    const duration = Date.now() - start;
+    const category = exactMatch.questionCategory || 'WHAT_HAPPENED';
+    const subCategory = exactMatch.questionSubCategory || '';
+    logger.info(`Classify (${duration}ms)`, { intent: 'SQL_QUERY', matchType: 'exact', matchId: exactMatch.id, score: exactMatch.score.toFixed(2) });
+    return {
+      ...stateReset,
+      intent: 'SQL_QUERY',
+      complexity: 'COMPLEX',
+      entities: { metrics: [], dimensions: [], filters: [], operations: [] },
+      questionCategory: category,
+      questionSubCategory: subCategory,
+      templateSql: exactMatch.sql,
+      matchType: 'exact',
+      sql: exactMatch.sql,
+      clarificationQuestions: [],
+      generalChatReply: '',
+      orchestrationReasoning: `Exact match to gold template ${exactMatch.id} (score: ${exactMatch.score.toFixed(2)})`,
+      trace: [{ node: 'classify', timestamp: start, duration, intent: 'SQL_QUERY', matchType: 'exact', matchId: exactMatch.id, questionCategory: category }],
+    };
+  }
+
+  // Step 1b: Explicit follow-up from UI — skip LLM call entirely
+  if (state.isFollowUp) {
+    const history = state.conversationHistory || [];
+    let priorSql = null;
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i].role === 'assistant' && history[i].sql) {
+        priorSql = history[i].sql;
+        break;
+      }
+    }
+
+    if (priorSql) {
+      const session = state.sessionId ? getSession(state.sessionId) : null;
+      const lastQuery = session?.queryHistory?.slice(-1)[0];
+      const priorResearchBrief = lastQuery?.researchBrief || null;
+      const priorEntities = lastQuery?.entities || null;
+      const category = lastQuery?.questionCategory || 'WHAT_HAPPENED';
+
+      const duration = Date.now() - start;
+      logger.info(`Classify: explicit follow-up from UI, using prior SQL as template (${duration}ms)`);
+
+      const output = {
+        ...stateReset,
+        intent: 'SQL_QUERY',
+        complexity: 'MODERATE',
+        entities: priorEntities || { metrics: [], dimensions: [], filters: [], operations: [] },
+        questionCategory: category,
+        questionSubCategory: lastQuery?.questionSubCategory || '',
+        templateSql: priorSql,
+        matchType: 'followup',
+        needsDecomposition: false,
+        clarificationQuestions: [],
+        dashboardHasDataRequest: false,
+        generalChatReply: '',
+        orchestrationReasoning: 'Explicit follow-up from UI — reusing prior SQL as template.',
+        trace: [{ node: 'classify', timestamp: start, duration, intent: 'SQL_QUERY', matchType: 'followup', isExplicitFollowUp: true, questionCategory: category }],
+      };
+
+      if (priorResearchBrief) {
+        output.researchBrief = priorResearchBrief;
+      }
+
+      return output;
+    }
+
+    logger.info('Classify: explicit follow-up requested but no prior SQL found, falling through to normal classification');
+  }
+
+  // Step 2: LLM classification with partial template matching
+  const rules = searchRules(state.question, 8);
+  const { examplesMap } = loadGoldIndex();
+  const goldExamples = [...examplesMap.values()];
+  const retrievedContext = formatContext(rules, goldExamples);
+
+  const messages = await classifyPrompt.formatMessages(
+    buildClassifyInputs(state, retrievedContext),
+  );
+
+  const baseModel = getModel({
+    temperature: CLASSIFY_TEMPERATURE,
+    maxTokens: CLASSIFY_MAX_TOKENS,
+    cache: true,
+    nodeKey: 'classify',
+  });
+  const llmMeta = getModelMeta(baseModel);
+  const model = baseModel.withStructuredOutput(ClassifySchema);
+
+  let result;
+  try {
+    result = await model.invoke(messages);
+  } catch (err) {
+    logger.warn('Classify structured output failed, using fallback', { error: err.message });
+    result = {
+      intent: 'GENERAL_CHAT',
+      complexity: 'SIMPLE',
+      detected_entities: { metrics: [], dimensions: [], filters: [], operations: [] },
+      matched_example_id: null,
+      clarification_questions: [],
+      reply: "I'm not sure I understood that. Could you rephrase your question?",
+      reasoning: 'Failed to parse classifier response.',
+    };
+  }
+
+  let templateSql = '';
+  let matchType = '';
+  let priorResearchBrief = null;
+  let priorEntities = null;
+
+  if (result.matched_example_id && result.intent === 'SQL_QUERY') {
+    const matched = examplesMap.get(result.matched_example_id);
+    if (matched?.sql) {
+      templateSql = matched.sql;
+      matchType = 'partial';
+      logger.info('  Classify: partial template match', { id: result.matched_example_id });
+    } else {
+      logger.warn('  Classify: matched_example_id not found in gold examples', { id: result.matched_example_id });
+    }
+  }
+
+  if (!matchType && state.isFollowUp && result.intent === 'SQL_QUERY') {
+    const history = state.conversationHistory || [];
+    let priorSql = null;
+    for (let i = history.length - 1; i >= 0; i--) {
+      if (history[i].role === 'assistant' && history[i].sql) {
+        priorSql = history[i].sql;
+        break;
+      }
+    }
+
+    const session = state.sessionId ? getSession(state.sessionId) : null;
+    const lastQuery = session?.queryHistory?.slice(-1)[0];
+    const priorCategory = lastQuery?.questionCategory || null;
+    const currentCategory = result.question_category || 'WHAT_HAPPENED';
+    const categoryChanged = priorCategory && priorCategory !== currentCategory;
+    const isComplex = result.complexity === 'COMPLEX';
+
+    if (categoryChanged || isComplex) {
+      logger.info('  Classify: follow-up flagged but overridden — category changed or complex question, using full research path', {
+        priorCategory,
+        currentCategory,
+        complexity: result.complexity,
+      });
+    } else if (priorSql) {
+      templateSql = priorSql;
+      matchType = 'followup';
+
+      if (lastQuery) {
+        priorResearchBrief = lastQuery.researchBrief || null;
+        priorEntities = lastQuery.entities || null;
+      }
+
+      logger.info('  Classify: follow-up detected, using prior SQL as template', {
+        hasBrief: !!priorResearchBrief,
+        hasPriorEntities: !!priorEntities,
+      });
+    } else {
+      logger.info('  Classify: follow-up detected but no prior SQL found in history, using normal path');
+    }
+  }
+
+  const duration = Date.now() - start;
+  const questionCategory = result.question_category || 'WHAT_HAPPENED';
+  const questionSubCategory = result.question_sub_category || '';
+
+  const isDashboard = result.intent === 'DASHBOARD';
+  const needsDecomposition = !!(
+    result.needs_decomposition
+    && (result.intent === 'SQL_QUERY' || isDashboard)
+    && !matchType
+  );
+
+  const decompLabel = needsDecomposition ? ' | MULTI-QUERY' : '';
+  logger.info(`[Classify] ${result.intent} | ${result.complexity} | ${questionCategory}${matchType ? ` | match:${matchType}` : ''}${decompLabel} (${duration}ms)`);
+
+  const output = {
+    ...stateReset,
+    intent: result.intent,
+    complexity: result.complexity,
+    entities: result.detected_entities,
+    questionCategory,
+    questionSubCategory,
+    templateSql,
+    matchType,
+    needsDecomposition,
+    clarificationQuestions: result.clarification_questions,
+    dashboardHasDataRequest: !!(isDashboard && result.dashboard_has_data_request),
+    generalChatReply: result.intent === 'GENERAL_CHAT' ? (result.reply || 'How can I help you today?') : '',
+    orchestrationReasoning: result.reasoning,
+    trace: [{
+      node: 'classify',
+      timestamp: start,
+      duration,
+      intent: result.intent,
+      complexity: result.complexity,
+      matchType: matchType || 'none',
+      needsDecomposition,
+      questionCategory,
+      questionSubCategory,
+      llm: llmMeta,
+    }],
+  };
+
+  if (matchType === 'followup' && priorResearchBrief) {
+    output.researchBrief = priorResearchBrief;
+  }
+
+  return output;
+}
+
+module.exports = { classifyNode, findExactMatch, loadGoldIndex };
