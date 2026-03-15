@@ -11,12 +11,15 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
     "lucide-react": "^0.577.0",
+    "microsoft-cognitiveservices-speech-sdk": "^1.48.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-grid-layout": "^2.2.2",
     "react-markdown": "^10.1.0",
+    "react-speech-recognition": "^4.0.1",
     "recharts": "^3.7.0",
-    "tailwindcss": "^4.2.1"
+    "tailwindcss": "^4.2.1",
+    "web-speech-cognitive-services": "^8.1.4"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
