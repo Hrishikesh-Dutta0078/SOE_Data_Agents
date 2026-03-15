@@ -5,6 +5,7 @@ import ResultsPanel from './ResultsPanel';
 import AgentTracePanel from './AgentTracePanel';
 import ThinkingPanel from './ThinkingPanel';
 import DashboardOverlay from './DashboardOverlay';
+import VoiceInput from './VoiceInput';
 import { Menu, ArrowUp, X, MessageSquare, Copy, Check } from 'lucide-react';
 
 function Badge({ className = '', children }) {
@@ -1055,6 +1056,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
 
       {/* Input */}
       <div className="px-5 py-3.5 border-t border-stone-100 bg-white/80 backdrop-blur-xl">
+        {/* Screen reader announcement for voice transcription */}
+        <div aria-live="polite" aria-atomic="false" className="sr-only" id="voice-transcript-status" />
         <div className="flex items-center gap-3">
           <input
             ref={inputRef}
@@ -1066,6 +1069,22 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
+            disabled={loading}
+          />
+          <VoiceInput
+            onInterimTranscript={(text) => {
+              setInput(text);
+              const el = document.getElementById('voice-transcript-status');
+              if (el) el.textContent = text;
+            }}
+            onFinalTranscript={(text) => {
+              setInput(text);
+              const el = document.getElementById('voice-transcript-status');
+              if (el) el.textContent = 'Final: ' + text;
+            }}
+            onError={(msg) => {
+              setMessages((prev) => [...prev, { role: 'system', type: 'error', content: msg }]);
+            }}
             disabled={loading}
           />
           <button
