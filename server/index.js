@@ -67,6 +67,7 @@ const { loadJoinKnowledgeAsync } = require('./vectordb/joinRuleFetcher');
 const { loadKpiGlossaryAsync } = require('./vectordb/kpiFetcher');
 const { requireAuthorization } = require('./auth/requireAuth');
 const { analysisLimiter, impersonateLimiter } = require('./middleware/rateLimiter');
+const { voiceRateLimiter } = require('./middleware/voiceRateLimit');
 
 const OKTA_CALLBACK_PATH = process.env.OKTA_CALLBACK_PATH || '/implicit/callback';
 const PUBLIC_PATHS = ['/api/health', '/login', OKTA_CALLBACK_PATH, '/logout', '/api/auth/me'];
@@ -80,8 +81,9 @@ app.use(helmet({
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "blob:"],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", "wss://*.stt.speech.microsoft.com", "wss://*.tts.speech.microsoft.com"],
       fontSrc: ["'self'"],
+      workerSrc: ["'self'", "blob:"],
       objectSrc: ["'none'"],
       frameAncestors: ["'none'"],
     },
@@ -124,6 +126,7 @@ app.use(require('./routes/auth'));
 app.use('/api/health', require('./routes/health'));
 app.use('/api/impersonate', impersonateLimiter, require('./routes/impersonate'));
 app.use('/api/text-to-sql', analysisLimiter, require('./routes/textToSql'));
+app.use('/api/voice', voiceRateLimiter, require('./routes/voice'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (_req, res) => {
