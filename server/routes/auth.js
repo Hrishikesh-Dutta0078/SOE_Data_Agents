@@ -8,6 +8,7 @@ const { URLSearchParams } = require('url');
 const router = express.Router();
 const { generatePkcePair } = require('../auth/pkce');
 const { logUserLogin } = require('../auth/logUserLogin');
+const { loginLimiter } = require('../middleware/rateLimiter');
 
 const OKTA_ISSUER_URL = process.env.OKTA_ISSUER_URL || '';
 const OKTA_CLIENT_ID = process.env.OKTA_CLIENT_ID || '';
@@ -15,7 +16,7 @@ const OKTA_REDIRECT_URI = process.env.OKTA_REDIRECT_URI || '';
 const OKTA_CALLBACK_PATH = process.env.OKTA_CALLBACK_PATH || '/implicit/callback';
 
 /** GET /login — start Okta OAuth flow (PKCE + state, redirect to authorize) */
-router.get('/login', (req, res) => {
+router.get('/login', loginLimiter, (req, res) => {
   const { code_verifier, code_challenge } = generatePkcePair();
   const state = crypto.randomBytes(16).toString('base64url');
 

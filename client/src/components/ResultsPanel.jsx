@@ -10,23 +10,24 @@ import {
 } from 'recharts';
 
 const COLORS = [
-  '#0077B6', '#F4A261', '#2A9D8F', '#E76F51', '#6A4C93',
-  '#17BEBB', '#E9C46A', '#264653', '#EF476F', '#06D6A0',
+  '#6366F1', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444',
+  '#06B6D4', '#F97316', '#EC4899', '#14B8A6', '#84CC16',
 ];
 
 const VALID_TYPES = new Set(['bar', 'stacked_bar', 'line', 'pie', 'area', 'scatter']);
 
 const tooltipStyle = {
   contentStyle: {
-    background: '#1e293b',
-    border: 'none',
-    borderRadius: 8,
-    fontSize: 12,
-    color: '#e2e8f0',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    background: '#ffffff',
+    border: '1px solid #E7E5E4',
+    borderRadius: 10,
+    fontSize: 13,
+    color: '#1C1917',
+    boxShadow: '0 12px 32px rgba(0,0,0,0.08)',
+    padding: '8px 12px',
   },
-  itemStyle: { color: '#e2e8f0' },
-  labelStyle: { color: '#94a3b8', fontWeight: 600 },
+  itemStyle: { color: '#44403C' },
+  labelStyle: { color: '#78716C', fontWeight: 600 },
 };
 
 function formatCellValue(val) {
@@ -155,9 +156,9 @@ function SingleChart({ config, rows, colorIndex }) {
       case 'stacked_bar':
         return (
           <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey={xKey} tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} />
+            <CartesianGrid stroke="#F5F5F4" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 12, fill: '#A8A29E' }} />
+            <YAxis tick={{ fontSize: 12, fill: '#A8A29E' }} />
             <Tooltip {...tooltipStyle} />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             {dataKeys.map((dk, i) => (
@@ -167,7 +168,7 @@ function SingleChart({ config, rows, colorIndex }) {
                 fill={COLORS[(colorIndex + i) % COLORS.length]}
                 name={seriesKeys.length > 0 ? dk : (config.yAxis[i]?.label || dk)}
                 stackId={chartType === 'stacked_bar' ? 'stack' : undefined}
-                radius={[4, 4, 0, 0]}
+                radius={[6, 6, 0, 0]}
               />
             ))}
           </BarChart>
@@ -176,9 +177,9 @@ function SingleChart({ config, rows, colorIndex }) {
       case 'line':
         return (
           <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey={xKey} tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} />
+            <CartesianGrid stroke="#F5F5F4" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 12, fill: '#A8A29E' }} />
+            <YAxis tick={{ fontSize: 12, fill: '#A8A29E' }} />
             <Tooltip {...tooltipStyle} />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             {dataKeys.map((dk, i) => (
@@ -188,9 +189,9 @@ function SingleChart({ config, rows, colorIndex }) {
                 dataKey={dk}
                 stroke={COLORS[(colorIndex + i) % COLORS.length]}
                 name={seriesKeys.length > 0 ? dk : (config.yAxis[i]?.label || dk)}
-                strokeWidth={2}
-                dot={{ r: 3 }}
-                activeDot={{ r: 5, strokeWidth: 2 }}
+                strokeWidth={2.5}
+                dot={false}
+                activeDot={{ r: 5, strokeWidth: 0 }}
               />
             ))}
           </LineChart>
@@ -199,9 +200,9 @@ function SingleChart({ config, rows, colorIndex }) {
       case 'area':
         return (
           <AreaChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey={xKey} tick={{ fontSize: 11 }} />
-            <YAxis tick={{ fontSize: 11 }} />
+            <CartesianGrid stroke="#F5F5F4" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 12, fill: '#A8A29E' }} />
+            <YAxis tick={{ fontSize: 12, fill: '#A8A29E' }} />
             <Tooltip {...tooltipStyle} />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             {dataKeys.map((dk, i) => (
@@ -243,16 +244,16 @@ function SingleChart({ config, rows, colorIndex }) {
       case 'scatter':
         return (
           <ScatterChart>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey={xKey} name={config.xAxis?.label || xKey} tick={{ fontSize: 11 }} />
-            <YAxis dataKey={yKeys[0]} name={config.yAxis[0]?.label || yKeys[0]} tick={{ fontSize: 11 }} />
+            <CartesianGrid stroke="#F5F5F4" />
+            <XAxis dataKey={xKey} name={config.xAxis?.label || xKey} tick={{ fontSize: 12, fill: '#A8A29E' }} />
+            <YAxis dataKey={yKeys[0]} name={config.yAxis[0]?.label || yKeys[0]} tick={{ fontSize: 12, fill: '#A8A29E' }} />
             <Tooltip {...tooltipStyle} cursor={{ strokeDasharray: '3 3' }} />
             <Scatter data={chartData} fill={COLORS[colorIndex % COLORS.length]} name={config.yAxis[0]?.label || yKeys[0]} />
           </ScatterChart>
         );
 
       default:
-        return <div className="p-6 text-center text-slate-400 text-[13px]">Unsupported chart type: {chartType}</div>;
+        return <div className="p-6 text-center text-stone-400 text-[13px]">Unsupported chart type: {chartType}</div>;
     }
   };
 
@@ -273,7 +274,7 @@ function ChartsView({ chart, rows }) {
 
   if (chartsToRender.length === 0) {
     return (
-      <div className="p-6 text-center text-slate-400 text-[13px]">
+      <div className="p-6 text-center text-stone-400 text-[13px]">
         {chart?.reasoning || 'No chart available for this data.'}
       </div>
     );
@@ -290,7 +291,7 @@ function ChartsView({ chart, rows }) {
 
 function TableView({ columns, rows }) {
   if (!columns || columns.length === 0) {
-    return <div className="p-6 text-center text-slate-400 text-[13px]">No data to display.</div>;
+    return <div className="p-6 text-center text-stone-400 text-[13px]">No data to display.</div>;
   }
 
   return (
@@ -302,7 +303,7 @@ function TableView({ columns, rows }) {
               {columns.map((col) => (
                 <th
                   key={col}
-                  className="sticky top-0 px-3 py-2 text-left font-semibold text-[11px] uppercase tracking-wide text-slate-600 bg-slate-100 border-b-2 border-slate-200 whitespace-nowrap"
+                  className="sticky top-0 px-3 py-2 text-left font-semibold text-[11px] uppercase tracking-wide text-stone-500 bg-stone-50 border-b border-stone-200 whitespace-nowrap"
                 >
                   {col}
                 </th>
@@ -313,12 +314,12 @@ function TableView({ columns, rows }) {
             {rows.map((row, i) => (
               <tr
                 key={i}
-                className={`transition-colors hover:bg-indigo-50/50 ${i % 2 !== 0 ? 'bg-slate-50/60' : ''}`}
+                className={`transition-colors hover:bg-stone-50/60 ${i % 2 !== 0 ? 'bg-stone-50/30' : ''}`}
               >
                 {columns.map((col) => (
                   <td
                     key={col}
-                    className="px-3 py-1.5 border-b border-slate-100 text-slate-700 whitespace-nowrap max-w-[300px] overflow-hidden text-ellipsis"
+                    className="px-3 py-1.5 border-b border-stone-100 text-stone-700 whitespace-nowrap max-w-[300px] overflow-hidden text-ellipsis"
                   >
                     {formatCellValue(row[col])}
                   </td>
@@ -328,7 +329,7 @@ function TableView({ columns, rows }) {
           </tbody>
         </table>
       </div>
-      <div className="mt-2 text-[11px] text-slate-400 text-right">
+      <div className="mt-2 text-[11px] text-stone-400 text-right">
         {rows.length} row{rows.length !== 1 ? 's' : ''}
       </div>
     </>
@@ -342,16 +343,16 @@ function SubQuerySection({ query, index }) {
   const hasSql = !!query.sql?.trim();
 
   return (
-    <div className="border border-slate-200 rounded-lg overflow-hidden mb-2">
+    <div className="border border-stone-200 rounded-[12px] overflow-hidden mb-2">
       <button
-        className="w-full flex items-center justify-between px-3 py-2 bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer border-none text-left"
+        className="w-full flex items-center justify-between px-3 py-2 bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer border-none text-left"
         onClick={() => setOpen(!open)}
       >
         <div className="flex items-center gap-2">
-          <span className="text-[10px] font-mono text-slate-400 bg-slate-200 rounded px-1.5 py-0.5">
+          <span className="text-[10px] font-mono text-stone-400 bg-stone-100 rounded-[6px] px-1.5 py-0.5">
             Q{index + 1}
           </span>
-          <span className="text-[12px] font-medium text-slate-700">{query.subQuestion}</span>
+          <span className="text-[12px] font-medium text-stone-700">{query.subQuestion}</span>
         </div>
         <div className="flex items-center gap-2">
           {exec?.success && (
@@ -359,18 +360,18 @@ function SubQuerySection({ query, index }) {
               {exec.rowCount} rows
             </span>
           )}
-          <span className="text-[10px] text-slate-400">{open ? 'collapse' : 'expand'}</span>
+          <span className="text-[10px] text-stone-400">{open ? 'collapse' : 'expand'}</span>
         </div>
       </button>
       {open && (hasSql || hasRows) && (
-        <div className="p-3 border-t border-slate-200 space-y-3">
+        <div className="p-3 border-t border-stone-200 space-y-3">
           {query.purpose && (
-            <div className="text-[11px] text-slate-500 italic">{query.purpose}</div>
+            <div className="text-[11px] text-stone-500 italic">{query.purpose}</div>
           )}
           {hasSql && (
             <div>
-              <div className="text-[11px] font-semibold text-slate-600 uppercase tracking-wide mb-1">SQL</div>
-              <pre className="p-3 bg-slate-900 text-slate-100 text-[11px] font-mono rounded-lg overflow-x-auto whitespace-pre-wrap break-words max-h-[300px] overflow-y-auto">
+              <div className="text-[11px] font-semibold text-stone-500 mb-1">SQL</div>
+              <pre className="p-3 bg-gray-900 text-gray-200 text-[11px] font-mono rounded-lg overflow-x-auto whitespace-pre-wrap break-words max-h-[300px] overflow-y-auto">
                 {query.sql}
               </pre>
             </div>
@@ -407,16 +408,16 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
   const currentTab = tabs.find((t) => t.id === activeTab) ? activeTab : tabs[0]?.id;
 
   return (
-    <div className="mt-3 border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm">
-      <div className="flex border-b border-slate-200 bg-slate-50">
+    <div className="mt-3 border border-stone-200 rounded-[16px] overflow-hidden bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
+      <div className="flex gap-1 p-1 m-3 mb-0 bg-stone-100 rounded-[10px]">
         {tabs.map((t) => (
           <button
             key={t.id}
             className={`
-              px-4 py-2 text-xs font-semibold cursor-pointer border-none border-b-2 transition-all
+              flex-1 text-center px-3 py-1.5 text-xs font-medium cursor-pointer transition-all
               ${currentTab === t.id
-                ? 'text-slate-800 border-b-indigo-500 bg-white'
-                : 'text-slate-500 border-b-transparent bg-transparent hover:text-slate-700 hover:bg-slate-100'
+                ? 'text-stone-900 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.06)] rounded-[8px] font-semibold'
+                : 'text-stone-500 bg-transparent hover:text-stone-700 rounded-[8px]'
               }
             `}
             onClick={() => setActiveTab(t.id)}
@@ -428,7 +429,7 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
 
       <div className="p-4">
         {currentTab === 'insights' && insights && (
-          <div className="text-[13px] leading-relaxed text-slate-700">
+          <div className="text-[13px] leading-relaxed text-stone-700">
             <ReactMarkdown>{insights}</ReactMarkdown>
           </div>
         )}

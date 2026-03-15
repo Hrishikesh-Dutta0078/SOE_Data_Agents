@@ -5,10 +5,11 @@ import ResultsPanel from './ResultsPanel';
 import AgentTracePanel from './AgentTracePanel';
 import ThinkingPanel from './ThinkingPanel';
 import DashboardOverlay from './DashboardOverlay';
+import { Menu, ArrowUp, X, MessageSquare, Copy, Check } from 'lucide-react';
 
 function Badge({ className = '', children }) {
   return (
-    <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded uppercase tracking-wide ${className}`}>
+    <span className={`inline-block text-[11px] font-medium px-2.5 py-0.5 rounded-full ${className}`}>
       {children}
     </span>
   );
@@ -68,7 +69,7 @@ function loadMessages(sessionId) {
   } catch { return []; }
 }
 
-export default function ChatPanel({ onMenuClick, impersonateContext = null, validationEnabled = true, sessionId, onNewChat, enabledTools: enabledToolsProp = null, useFastModel = false }) {
+export default function ChatPanel({ onMenuClick, impersonateContext = null, validationEnabled = true, sessionId, onNewChat, enabledTools: enabledToolsProp = null, useFastModel = false, userName = '' }) {
   const [messages, setMessages] = useState(() => loadMessages(sessionId));
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -545,16 +546,16 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         const entries = Object.entries(msg.entities).filter(([, v]) => Array.isArray(v) && v.length > 0);
         if (entries.length === 0) return null;
         return (
-          <div className="mb-3 p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs leading-relaxed text-emerald-800">
-            <div className="font-semibold text-[11px] uppercase tracking-wide text-emerald-700 mb-1">
+          <div className="mb-3 p-2.5 bg-stone-50 border border-stone-200 rounded-[12px] text-xs leading-relaxed text-stone-700">
+            <div className="font-semibold text-[11px] text-stone-500 mb-1">
               Detected Entities
             </div>
             {entries.map(([key, values]) => (
               <div key={key} className="flex gap-1.5 mb-0.5 flex-wrap items-baseline">
-                <span className="font-semibold text-emerald-800 min-w-[80px]">{key}:</span>
+                <span className="font-semibold text-stone-600 min-w-[80px]">{key}:</span>
                 <span>
                   {values.map((v, i) => (
-                    <span key={i} className="inline-block px-2 py-px bg-emerald-100 rounded-full text-[11px] text-emerald-800 mr-1">
+                    <span key={i} className="inline-block px-2 py-px bg-stone-100 rounded-full text-[11px] text-stone-600 mr-1">
                       {v}
                     </span>
                   ))}
@@ -570,8 +571,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       )}
 
       {msg.execution && !msg.execution.success && (
-        <div className="mt-2.5 p-2.5 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-800 leading-relaxed">
-          <div className="font-semibold text-[11px] uppercase tracking-wide text-rose-700 mb-1">
+        <div className="mt-2.5 p-2.5 bg-red-50/50 border border-red-100 rounded-[12px] text-xs text-red-700 leading-relaxed">
+          <div className="font-semibold text-[11px] text-red-600 mb-1">
             Query execution failed
           </div>
           {msg.execution.error}
@@ -581,7 +582,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       {msg.content && (
         <div className="mt-2">
           <button
-            className="text-xs text-indigo-500 hover:text-indigo-700 cursor-pointer bg-transparent border-none p-0 underline transition-colors"
+            className="text-[13px] font-medium text-indigo-500 hover:text-indigo-600 cursor-pointer bg-transparent border-none p-0 transition-colors"
             onClick={() => toggle(`${idx}-sql`)}
           >
             {expanded[`${idx}-sql`] ? 'Hide SQL' : 'Show generated SQL'}
@@ -589,13 +590,13 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           {expanded[`${idx}-sql`] && (
             <>
               {msg.sqlReasoning && (
-                <div className="mt-2 p-2.5 bg-indigo-50 border border-indigo-200 rounded-lg text-[12px] text-indigo-800 leading-relaxed whitespace-pre-wrap">
+                <div className="mt-2 p-2.5 bg-indigo-50/50 border border-indigo-100 rounded-[12px] text-[12px] text-indigo-700 leading-relaxed whitespace-pre-wrap">
                   {msg.sqlReasoning}
                 </div>
               )}
-              <div className="mt-2 relative bg-slate-900 text-slate-200 rounded-md p-3 text-[13px] font-mono overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">
+              <div className="mt-2 relative bg-gray-900 text-gray-200 rounded-[12px] p-3 text-[13px] font-mono overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">
                 <button
-                  className="absolute top-1.5 right-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 border-none rounded px-2 py-0.5 text-[11px] cursor-pointer transition-colors"
+                  className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-gray-300 border-none rounded-[6px] px-2 py-0.5 text-[11px] cursor-pointer transition-colors"
                   onClick={() => copyToClipboard(msg.content, idx)}
                 >
                   {copiedIdx === idx ? 'Copied!' : 'Copy'}
@@ -610,7 +611,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       <AgentTracePanel trace={msg.trace} />
 
       {(msg.usage || msg.usageByNodeAndModel) && (
-        <div className="mt-2 text-[10px] text-slate-400">
+        <div className="mt-2 text-[10px] text-stone-400">
           {msg.usageByNodeAndModel ? (
             <div className="space-y-1">
               {[
@@ -630,7 +631,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                 if (!opus && !haiku) return null;
                 return (
                   <div key={key} className="flex flex-wrap gap-x-3 gap-y-0.5">
-                    <span className="font-medium text-slate-500 min-w-[100px]">{label}:</span>
+                    <span className="font-medium text-stone-500 min-w-[100px]">{label}:</span>
                     {opus && <span>Opus {opus}</span>}
                     {opus && haiku && <span>·</span>}
                     {haiku && <span>Haiku {haiku}</span>}
@@ -643,13 +644,13 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                     (msg.usageByNodeAndModel[k]?.opus?.totalTokens ?? 0) +
                     (msg.usageByNodeAndModel[k]?.haiku?.totalTokens ?? 0) > 0
                 ) && (
-                  <div className="pt-0.5 border-t border-slate-200 mt-1">
-                    <span className="text-slate-500">Total: </span>
+                  <div className="pt-0.5 border-t border-stone-200 mt-1">
+                    <span className="text-stone-500">Total: </span>
                     <span>{formatTokensInMillions(msg.usage.totalTokens)} tokens</span>
                     {formatDurationMs(msg.usage?.duration) && (
-                      <span className="text-slate-500"> · {formatDurationMs(msg.usage.duration)}</span>
+                      <span className="text-stone-500"> · {formatDurationMs(msg.usage.duration)}</span>
                     )}
-                    <span className="text-slate-500"> (classify, present, etc.)</span>
+                    <span className="text-stone-500"> (classify, present, etc.)</span>
                   </div>
                 )}
               {formatDurationMs(msg.usage?.duration) &&
@@ -658,8 +659,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                     (msg.usageByNodeAndModel[k]?.opus?.totalTokens ?? 0) +
                     (msg.usageByNodeAndModel[k]?.haiku?.totalTokens ?? 0) > 0
                 ) && (
-                  <div className="pt-0.5 border-t border-slate-200 mt-1">
-                    <span className="text-slate-500">Query time: </span>
+                  <div className="pt-0.5 border-t border-stone-200 mt-1">
+                    <span className="text-stone-500">Query time: </span>
                     <span>{formatDurationMs(msg.usage.duration)}</span>
                   </div>
                 )}
@@ -683,7 +684,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       )}
 
       {msg.warnings && msg.warnings.length > 0 && (
-        <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-[11px] text-amber-800 space-y-0.5">
+        <div className="mt-2 p-2.5 bg-amber-50/50 border border-amber-100 rounded-[12px] text-[11px] text-amber-700 space-y-0.5">
           {msg.warnings.map((w, i) => (
             <div key={i} className="flex gap-1.5 items-start">
               <span className="shrink-0">&#9888;</span>
@@ -694,16 +695,16 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       )}
 
       {msg.suggestedFollowUps && msg.suggestedFollowUps.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-slate-200">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-1.5">
+        <div className="mt-3 pt-3 border-t border-stone-100">
+          <div className="text-[12px] font-medium text-stone-400 mb-2">
             Suggested Follow-Ups
           </div>
           <div className="flex flex-col gap-1.5">
             {msg.suggestedFollowUps.map((q, i) => (
               <button
                 key={i}
-                className="text-left px-3 py-2 text-[12px] text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg
-                           hover:bg-indigo-100 hover:border-indigo-300 cursor-pointer transition-colors leading-relaxed"
+                className="text-left px-3 py-2.5 text-[13px] text-stone-700 bg-stone-50 border border-stone-200 rounded-[12px]
+                           hover:bg-stone-100 hover:shadow-[0_1px_2px_rgba(0,0,0,0.03)] cursor-pointer transition-all leading-relaxed"
                 onClick={() => handleSend(q, { isFollowUp: true })}
                 disabled={loading}
               >
@@ -717,8 +718,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       {msg.type === 'sql' && msg.execution?.success && !loading && (
         <div className="mt-2 pt-2 border-t border-slate-100">
           <button
-            className="px-3 py-1.5 text-[11px] font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200
-                       rounded-md hover:bg-indigo-100 hover:border-indigo-300 cursor-pointer transition-colors"
+            className="px-3.5 py-1.5 text-[12px] font-medium text-indigo-500 bg-indigo-50 border border-indigo-100
+                       rounded-[8px] hover:bg-indigo-100 cursor-pointer transition-all"
             onClick={() => setFollowUpMode(true)}
           >
             Follow Up
@@ -747,7 +748,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     return (
       <div className="text-xs leading-relaxed">
         <div className="mb-2">
-          <Badge className="bg-amber-100 text-amber-800">Clarification Needed</Badge>
+          <Badge className="bg-amber-50 text-amber-600">Clarification Needed</Badge>
         </div>
         <div className="text-[13px] text-slate-700 whitespace-pre-wrap mb-2">{msg.content}</div>
 
@@ -767,10 +768,10 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                         className={`
                           px-2.5 py-1 text-[11px] rounded-full border select-none transition-all cursor-pointer
                           ${selected === opt
-                            ? 'bg-slate-800 text-white border-slate-800'
-                            : 'bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100 hover:border-slate-400'
+                            ? 'bg-stone-900 text-white border-stone-900'
+                            : 'bg-white text-stone-700 border-stone-200 hover:bg-stone-50 hover:border-stone-300'
                           }
-                          ${!isInteractive ? 'cursor-default opacity-70' : ''}
+                          ${!isInteractive ? 'cursor-default opacity-60' : ''}
                         `}
                         onClick={() => {
                           if (!isInteractive) return;
@@ -784,10 +785,10 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                       className={`
                         px-2.5 py-1 text-[11px] rounded-full border border-dashed select-none italic cursor-pointer transition-all
                         ${isOther
-                          ? 'bg-amber-50 text-amber-800 border-amber-400 border-solid'
-                          : 'bg-white text-slate-500 border-slate-400 hover:bg-slate-50'
+                          ? 'bg-amber-50 text-amber-700 border-amber-300 border-solid'
+                          : 'bg-white text-stone-500 border-stone-300 hover:bg-stone-50'
                         }
-                        ${!isInteractive ? 'cursor-default opacity-70' : ''}
+                        ${!isInteractive ? 'cursor-default opacity-60' : ''}
                       `}
                       onClick={() => {
                         if (!isInteractive) return;
@@ -800,7 +801,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                   {isOther && isInteractive && (
                     <input
                       type="text"
-                      className="mt-1 w-full px-2 py-1 text-[11px] border border-amber-400 rounded bg-amber-50 outline-none font-sans focus:ring-1 focus:ring-amber-400"
+                      className="mt-1.5 w-full px-2.5 py-1 text-[11px] border border-amber-200 rounded-[8px] bg-amber-50/50 outline-none font-sans focus:ring-2 focus:ring-amber-300/30"
                       placeholder="Type your answer..."
                       value={otherText[q.id] || ''}
                       onChange={(e) =>
@@ -809,7 +810,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                     />
                   )}
                   {!isInteractive && selected && (
-                    <div className="mt-0.5 text-[10px] text-slate-500 italic">
+                    <div className="mt-0.5 text-[10px] text-stone-400 italic">
                       Selected: {isOther ? otherText[q.id] || 'Other' : selected}
                     </div>
                   )}
@@ -819,12 +820,12 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
 
             {isInteractive && (
               <>
-                <div className="mt-2.5 pt-2 border-t border-slate-200">
-                  <div className="text-[11px] font-semibold text-slate-500 mb-1">
+                <div className="mt-2.5 pt-2 border-t border-stone-200">
+                  <div className="text-[11px] font-medium text-stone-400 mb-1">
                     Anything else to clarify? (optional)
                   </div>
                   <textarea
-                    className="w-full px-2 py-1 text-[11px] border border-slate-300 rounded outline-none font-sans resize-y min-h-[28px] text-slate-700 focus:ring-1 focus:ring-indigo-400 focus:border-indigo-400"
+                    className="w-full px-2.5 py-1.5 text-[11px] border border-stone-200 rounded-[8px] outline-none font-sans resize-y min-h-[28px] text-stone-700 focus:ring-2 focus:ring-indigo-500/15 focus:border-indigo-400 transition-all"
                     rows={2}
                     placeholder="Add any extra context, filters, or preferences..."
                     value={additionalNotes}
@@ -833,8 +834,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                 </div>
                 <button
                   className={`
-                    mt-2 px-3.5 py-1.5 text-[11px] font-semibold bg-slate-800 text-white border-none rounded-md cursor-pointer
-                    hover:bg-slate-700 transition-colors
+                    mt-2.5 px-3.5 py-1.5 text-[11px] font-semibold bg-stone-900 text-white border-none rounded-[8px] cursor-pointer
+                    hover:bg-stone-800 transition-all
                     ${!allAnswered ? 'opacity-40 cursor-not-allowed' : ''}
                   `}
                   disabled={!allAnswered}
@@ -853,13 +854,13 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const renderDashboardMessage = (msg) => (
     <div className="text-xs leading-relaxed">
       <div className="mb-2 flex flex-wrap gap-1">
-        <Badge className="bg-violet-100 text-violet-800">DASHBOARD</Badge>
-        <Badge className="bg-slate-100 text-slate-600">{msg.tileCount} tiles</Badge>
+        <Badge className="bg-violet-50 text-violet-600">DASHBOARD</Badge>
+        <Badge className="bg-stone-100 text-stone-500">{msg.tileCount} tiles</Badge>
       </div>
       <div className="text-[13px] font-semibold text-slate-800 mb-2">{msg.content}</div>
       <button
-        className="px-3.5 py-1.5 text-[12px] font-semibold text-white bg-indigo-600 hover:bg-indigo-700
-                   rounded-lg transition-colors cursor-pointer border-none"
+        className="px-3.5 py-1.5 text-[12px] font-semibold text-white bg-indigo-500 hover:bg-indigo-600
+                   rounded-[8px] transition-all cursor-pointer border-none"
         onClick={() => {
           if (msg.dashboardSpec) {
             const sources = [];
@@ -872,7 +873,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         View Dashboard
       </button>
       {(msg.usage || msg.usageByNodeAndModel) && (
-        <div className="mt-2 text-[10px] text-slate-400">
+        <div className="mt-2 text-[10px] text-stone-400">
           {msg.usageByNodeAndModel ? (
             <div className="space-y-1">
               {[
@@ -892,7 +893,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                 if (!opus && !haiku) return null;
                 return (
                   <div key={key} className="flex flex-wrap gap-x-3 gap-y-0.5">
-                    <span className="font-medium text-slate-500 min-w-[100px]">{label}:</span>
+                    <span className="font-medium text-stone-500 min-w-[100px]">{label}:</span>
                     {opus && <span>Opus {opus}</span>}
                     {opus && haiku && <span>·</span>}
                     {haiku && <span>Haiku {haiku}</span>}
@@ -926,10 +927,10 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   };
 
   const getBubbleClasses = (msg) => {
-    const base = 'px-4 py-3 rounded-2xl text-sm leading-relaxed break-words shadow-sm';
+    const base = 'px-4 py-3 rounded-[20px] text-sm leading-relaxed break-words';
     if (msg.role === 'user')
-      return `${base} self-end max-w-[70%] bg-slate-700 text-white rounded-br-sm whitespace-pre-wrap`;
-    const assistantBase = `${base} self-start bg-white text-slate-800 border border-slate-200 rounded-bl-sm`;
+      return `${base} self-end max-w-[70%] bg-indigo-500 text-white rounded-br-[8px] shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] whitespace-pre-wrap`;
+    const assistantBase = `${base} self-start bg-white text-stone-800 border border-stone-100 rounded-bl-[8px] shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]`;
     if (msg.type === 'sql' && msg.execution?.success) return `${assistantBase} w-[90%]`;
     if (msg.type === 'dashboard') return `${assistantBase} max-w-[70%]`;
     return `${assistantBase} max-w-[70%]`;
@@ -938,21 +939,19 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 md:px-6 py-3 border-b border-slate-200 bg-white">
+      <div className="flex items-center gap-3 px-5 py-3.5 border-b border-stone-100 bg-white/80 backdrop-blur-xl">
         <button
-          className="md:hidden p-1.5 rounded-md text-slate-600 hover:bg-slate-100 transition-colors"
+          className="md:hidden p-1.5 rounded-[8px] text-stone-500 hover:bg-stone-100 transition-colors"
           onClick={onMenuClick}
           aria-label="Toggle sidebar"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
+          <Menu size={20} strokeWidth={1.5} />
         </button>
-        <span className="font-semibold text-base text-slate-800">Auto Agents</span>
+        <span className="font-semibold text-base text-stone-900 tracking-tight">{userName ? `Welcome, ${userName}` : 'Auto Agents'}</span>
         <div className="ml-auto">
           <button
-            className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 border border-slate-200 rounded-md
-                       hover:bg-slate-200 hover:text-slate-800 transition-colors cursor-pointer"
+            className="px-3.5 py-1.5 text-sm font-medium text-indigo-500 bg-transparent border-none rounded-[8px]
+                       hover:bg-indigo-50 transition-all cursor-pointer"
             onClick={() => { if (onNewChat) onNewChat(); }}
             disabled={loading}
           >
@@ -962,10 +961,16 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 flex flex-col gap-4">
+      <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
         {messages.length === 0 && !loading && (
-          <div className="m-auto text-center text-slate-400 text-sm">
-            Ask a question to get started.
+          <div className="m-auto flex flex-col items-center gap-4 max-w-md text-center animate-fade-in-up">
+            <div className="w-14 h-14 rounded-[16px] bg-stone-100 flex items-center justify-center">
+              <MessageSquare size={24} strokeWidth={1.5} className="text-stone-400" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-stone-900 mb-1.5 tracking-tight">What would you like to know?</h2>
+              <p className="text-sm text-stone-500">Ask a question about your data in plain English.</p>
+            </div>
           </div>
         )}
 
@@ -985,19 +990,17 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                   startTime={progress.startTime}
                 />
                 {streamingInsights && (
-                  <div className="mt-3 pt-3 border-t border-slate-200 text-[13px] leading-relaxed text-slate-700">
+                  <div className="mt-3 pt-3 border-t border-stone-100 text-[13px] leading-relaxed text-stone-700">
                     <ReactMarkdown>{streamingInsights}</ReactMarkdown>
-                    <span className="inline-block w-1.5 h-4 bg-indigo-400 rounded-sm animate-pulse align-text-bottom ml-0.5" />
+                    <span className="inline-block w-0.5 h-[18px] bg-indigo-500 rounded-full animate-subtle-pulse align-text-bottom ml-0.5" />
                   </div>
                 )}
               </>
             ) : (
-              <div className="flex items-center gap-2 text-slate-400">
-                <svg className="animate-spin h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Thinking...
+              <div className="flex items-center gap-1.5 py-1">
+                <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '0ms'}} />
+                <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '200ms'}} />
+                <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '400ms'}} />
               </div>
             )}
           </div>
@@ -1008,14 +1011,14 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
 
       {/* Follow-up input */}
       {followUpMode && (
-        <div className="px-4 md:px-6 py-2 border-t border-indigo-200 bg-indigo-50/50">
+        <div className="px-5 py-2.5 border-t border-indigo-100 bg-indigo-50/40">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-indigo-600 uppercase tracking-wide shrink-0">Follow-up</span>
+            <span className="text-[11px] font-medium text-indigo-500 shrink-0">Follow-up</span>
             <input
               type="text"
-              className="flex-1 px-3 py-2 text-sm border border-indigo-300 rounded-lg outline-none font-sans
-                         bg-white focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-shadow
-                         disabled:bg-slate-50 disabled:text-slate-400"
+              className="flex-1 px-3 py-2 text-sm border border-stone-200 rounded-[12px] outline-none font-sans
+                         bg-white focus:ring-2 focus:ring-indigo-500/15 focus:border-indigo-400 transition-all
+                         disabled:bg-stone-50 disabled:text-stone-400"
               placeholder="Ask a follow-up question..."
               value={followUpInput}
               onChange={(e) => setFollowUpInput(e.target.value)}
@@ -1030,8 +1033,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
             />
             <button
               className={`
-                px-4 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-lg shrink-0
-                hover:bg-indigo-700 transition-colors
+                px-4 py-2 text-sm font-semibold bg-indigo-500 text-white rounded-[8px] shrink-0
+                hover:bg-indigo-600 transition-all
                 ${loading || !followUpInput.trim() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
               onClick={() => handleSend(followUpInput, { isFollowUp: true })}
@@ -1040,27 +1043,25 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
               Send
             </button>
             <button
-              className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+              className="p-1.5 text-stone-400 hover:text-stone-600 transition-colors cursor-pointer"
               onClick={() => { setFollowUpMode(false); setFollowUpInput(''); }}
               title="Cancel follow-up"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X size={16} strokeWidth={2} />
             </button>
           </div>
         </div>
       )}
 
       {/* Input */}
-      <div className="px-4 md:px-6 py-3 border-t border-slate-200 bg-white">
+      <div className="px-5 py-3.5 border-t border-stone-100 bg-white/80 backdrop-blur-xl">
         <div className="flex items-center gap-3">
           <input
             ref={inputRef}
             type="text"
-            className="flex-1 px-4 py-2.5 text-sm border border-slate-300 rounded-lg outline-none font-sans
-                       focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-shadow
-                       disabled:bg-slate-50 disabled:text-slate-400"
+            className="flex-1 px-4 py-2.5 text-sm bg-stone-50 border border-stone-200 rounded-[16px] outline-none font-sans
+                       focus:ring-2 focus:ring-indigo-500/15 focus:border-indigo-400 transition-all
+                       disabled:bg-stone-50 disabled:text-stone-400"
             placeholder="Ask a new question..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -1069,14 +1070,14 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           />
           <button
             className={`
-              px-5 py-2.5 text-sm font-semibold bg-slate-800 text-white rounded-lg shrink-0
-              hover:bg-slate-700 transition-colors
+              w-10 h-10 flex items-center justify-center bg-indigo-500 text-white rounded-[8px] shrink-0
+              hover:bg-indigo-600 transition-all
               ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
             onClick={() => handleSend()}
             disabled={loading}
           >
-            Send
+            <ArrowUp size={18} strokeWidth={2.5} />
           </button>
         </div>
       </div>

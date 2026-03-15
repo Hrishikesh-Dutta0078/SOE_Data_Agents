@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect, useCallback } from 'react';
+import { BarChart3, ArrowUpDown, Maximize2, X, GripVertical, AlertCircle } from 'lucide-react';
 import { ResponsiveGridLayout } from 'react-grid-layout';
 
 import KpiSparklineCard from './dashboard/KpiSparklineCard';
@@ -50,21 +51,19 @@ function TileToolbar({ tile, onChangeChartType, onSwapAxes, onRemove, onFullscre
         <div className="relative">
           <button
             onClick={() => setShowTypeMenu((v) => !v)}
-            className="p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-transparent border-none"
+            className="p-1 rounded-[6px] hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition-colors cursor-pointer bg-transparent border-none"
             title="Change chart type"
           >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3v18h18M7 16V9m4 7V5m4 11v-4m4 4V8" />
-            </svg>
+            <BarChart3 size={14} strokeWidth={1.5} />
           </button>
           {showTypeMenu && (
-            <div className="absolute right-0 top-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 py-1 min-w-[120px]">
+            <div className="absolute right-0 top-full mt-1 bg-white border border-stone-200 rounded-[10px] shadow-[0_12px_32px_rgba(0,0,0,0.08)] z-20 py-1 min-w-[120px]">
               {CHART_TYPES.map((ct) => (
                 <button
                   key={ct}
                   onClick={() => { onChangeChartType(ct); setShowTypeMenu(false); }}
-                  className={`w-full text-left px-3 py-1.5 text-[11px] hover:bg-indigo-50 transition-colors cursor-pointer border-none bg-transparent
-                    ${tile.config?.chartType === ct ? 'text-indigo-600 font-semibold' : 'text-slate-600'}`}
+                  className={`w-full text-left px-3 py-1.5 text-[11px] hover:bg-stone-50 transition-colors cursor-pointer border-none bg-transparent
+                    ${tile.config?.chartType === ct ? 'text-indigo-500 font-semibold' : 'text-stone-600'}`}
                 >
                   {ct.replace('_', ' ')}
                 </button>
@@ -76,31 +75,25 @@ function TileToolbar({ tile, onChangeChartType, onSwapAxes, onRemove, onFullscre
       {isChart && (
         <button
           onClick={onSwapAxes}
-          className="p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-transparent border-none"
+          className="p-1 rounded-[6px] hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition-colors cursor-pointer bg-transparent border-none"
           title="Swap axes"
         >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-          </svg>
+          <ArrowUpDown size={14} strokeWidth={1.5} />
         </button>
       )}
       <button
         onClick={onFullscreen}
-        className="p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-transparent border-none"
+        className="p-1 rounded-[6px] hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition-colors cursor-pointer bg-transparent border-none"
         title="Expand tile"
       >
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5" />
-        </svg>
+        <Maximize2 size={14} strokeWidth={1.5} />
       </button>
       <button
         onClick={onRemove}
-        className="p-1 rounded hover:bg-red-100 text-slate-400 hover:text-red-500 transition-colors cursor-pointer bg-transparent border-none"
+        className="p-1 rounded-[6px] hover:bg-red-50 text-stone-400 hover:text-red-500 transition-colors cursor-pointer bg-transparent border-none"
         title="Remove tile"
       >
-        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <X size={14} strokeWidth={1.5} />
       </button>
     </div>
   );
@@ -109,12 +102,10 @@ function TileToolbar({ tile, onChangeChartType, onSwapAxes, onRemove, onFullscre
 function TileErrorCard({ message, availableColumns }) {
   return (
     <div className="flex flex-col items-center justify-center h-full px-4 py-3 text-center">
-      <svg className="w-8 h-8 text-amber-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-      </svg>
-      <p className="text-xs text-slate-600 mb-1">{message}</p>
+      <AlertCircle size={32} strokeWidth={1.5} className="text-amber-400 mb-2" />
+      <p className="text-xs text-stone-600 mb-1">{message}</p>
       {availableColumns?.length > 0 && (
-        <p className="text-[10px] text-slate-400">Available: {availableColumns.join(', ')}</p>
+        <p className="text-[10px] text-stone-400">Available: {availableColumns.join(', ')}</p>
       )}
     </div>
   );
@@ -157,30 +148,28 @@ function TileRenderer({ tile, data, sql, activeFilters }) {
     case 'chart':
       return <DashboardChart config={tile.config} data={filteredData} sql={sql} />;
     case 'table':
-      return <div className="flex items-center justify-center h-full text-slate-400 text-sm italic">Data available in paginated view via filters</div>;
+      return <div className="flex items-center justify-center h-full text-stone-400 text-sm italic">Data available in paginated view via filters</div>;
     case 'insight':
       return <InsightCard config={tile.config} />;
     default:
-      return <div className="flex items-center justify-center h-full text-slate-400 text-sm">Unknown tile type</div>;
+      return <div className="flex items-center justify-center h-full text-stone-400 text-sm">Unknown tile type</div>;
   }
 }
 
 function FullscreenModal({ tile, data, sql, activeFilters, onClose }) {
   return (
-    <div className="fixed inset-0 z-[60] bg-black/40 flex items-center justify-center p-6" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm flex items-center justify-center p-6" onClick={onClose}>
       <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-5xl h-[80vh] flex flex-col overflow-hidden"
+        className="bg-white rounded-[20px] shadow-[0_12px_32px_rgba(0,0,0,0.08)] w-full max-w-5xl h-[80vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200">
-          <span className="text-sm font-bold text-slate-700">{tile.title}</span>
+        <div className="flex items-center justify-between px-5 py-3 border-b border-stone-100">
+          <span className="text-sm font-semibold text-stone-700">{tile.title}</span>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer bg-transparent border-none"
+            className="p-1.5 rounded-[8px] hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition-colors cursor-pointer bg-transparent border-none"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X size={20} strokeWidth={1.5} />
           </button>
         </div>
         <div className="flex-1 overflow-hidden p-4">
@@ -266,9 +255,9 @@ export default function DashboardGrid({ tiles: initialTiles, dataSources, active
             const sourceData = dataSources?.[tile.sourceIndex]?.execution?.rows || [];
             const sourceSql = dataSources?.[tile.sourceIndex]?.sql || null;
             return (
-              <div key={tile.id} className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden flex flex-col group">
-                <div className="tile-drag-handle flex items-center justify-between px-3 py-1.5 bg-slate-50 border-b border-slate-100 cursor-grab active:cursor-grabbing select-none">
-                  <span className="text-[11px] font-semibold text-slate-600 uppercase tracking-wide truncate">
+              <div key={tile.id} className="bg-white rounded-[16px] shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] border border-stone-200/60 overflow-hidden flex flex-col group hover:shadow-[0_8px_24px_rgba(0,0,0,0.06),0_2px_6px_rgba(0,0,0,0.03)] transition-shadow">
+                <div className="tile-drag-handle flex items-center justify-between px-3 py-2 bg-stone-50/50 border-b border-stone-100 cursor-grab active:cursor-grabbing select-none">
+                  <span className="text-[12px] font-medium text-stone-600 truncate">
                     {tile.title}
                   </span>
                   <div className="flex items-center gap-1">
@@ -281,11 +270,7 @@ export default function DashboardGrid({ tiles: initialTiles, dataSources, active
                         onFullscreen={() => setFullscreenTileId(tile.id)}
                       />
                     </div>
-                    <svg className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" viewBox="0 0 16 16" fill="currentColor">
-                      <circle cx="5" cy="3" r="1.2" /><circle cx="11" cy="3" r="1.2" />
-                      <circle cx="5" cy="8" r="1.2" /><circle cx="11" cy="8" r="1.2" />
-                      <circle cx="5" cy="13" r="1.2" /><circle cx="11" cy="13" r="1.2" />
-                    </svg>
+                    <GripVertical size={14} strokeWidth={1.5} className="text-stone-400 flex-shrink-0" />
                   </div>
                 </div>
                 <div className="flex-1 overflow-hidden">

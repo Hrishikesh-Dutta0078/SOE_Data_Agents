@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { ChevronLeft, Download, LayoutGrid } from 'lucide-react';
 import { fetchSlicerValues } from '../utils/api';
 import SlicerBar from './SlicerBar';
 import DashboardGrid from './DashboardGrid';
@@ -12,14 +13,9 @@ function EmptyState({ onSuggestionClick }) {
 
   return (
     <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
-      <svg className="w-16 h-16 text-slate-300 mb-4" fill="none" viewBox="0 0 64 64" stroke="currentColor" strokeWidth="1.5">
-        <rect x="6" y="22" width="20" height="14" rx="2" />
-        <rect x="6" y="40" width="20" height="14" rx="2" />
-        <rect x="30" y="22" width="28" height="32" rx="2" />
-        <rect x="6" y="6" width="52" height="12" rx="2" />
-      </svg>
-      <h3 className="text-lg font-semibold text-slate-600 mb-2">No dashboard data yet</h3>
-      <p className="text-sm text-slate-500 mb-5 max-w-md">
+      <LayoutGrid size={32} strokeWidth={1.5} className="text-stone-300" />
+      <h3 className="text-xl font-semibold text-stone-700 mb-2 tracking-tight">No dashboard data yet</h3>
+      <p className="text-sm text-stone-500 mb-5 max-w-md">
         Ask some data questions in the chat, then come back and create a dashboard to visualize your results.
       </p>
       <div className="flex flex-wrap justify-center gap-2">
@@ -27,8 +23,8 @@ function EmptyState({ onSuggestionClick }) {
           <button
             key={s}
             onClick={() => onSuggestionClick?.(s)}
-            className="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-full
-                       border border-indigo-200 transition-colors cursor-pointer"
+            className="text-xs bg-stone-50 hover:bg-stone-100 text-stone-700 px-3 py-1.5 rounded-full
+                       border border-stone-200 hover:border-stone-300 transition-all cursor-pointer"
           >
             {s}
           </button>
@@ -198,48 +194,44 @@ export default function DashboardOverlay({ dashboardData, onClose, onSuggestionC
   const hasTiles = spec.tiles?.length > 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-slate-100 animate-fade-in">
+    <div className="fixed inset-0 z-50 flex flex-col bg-stone-50 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3 bg-white border-b border-slate-200 shadow-sm">
+      <div className="flex items-center justify-between px-5 py-3 bg-white/80 backdrop-blur-xl border-b border-stone-100">
         <div className="flex items-center gap-3">
           <button
             onClick={onClose}
-            className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-slate-100
-                       text-slate-500 hover:text-slate-700 transition-colors cursor-pointer border-none bg-transparent"
+            className="flex items-center justify-center w-8 h-8 rounded-[8px] hover:bg-stone-100
+                       text-stone-500 hover:text-stone-700 transition-colors cursor-pointer border-none bg-transparent"
             title="Back to chat"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft size={20} strokeWidth={1.5} />
           </button>
           <div>
-            <h1 className="text-base font-bold text-slate-800">{spec.title || 'Dashboard'}</h1>
+            <h1 className="text-base font-semibold text-stone-900 tracking-tight">{spec.title || 'Dashboard'}</h1>
             {spec.description && (
-              <p className="text-[11px] text-slate-500 mt-0.5">{spec.description}</p>
+              <p className="text-[11px] text-stone-400 mt-0.5">{spec.description}</p>
             )}
           </div>
         </div>
         <div className="flex items-center gap-2">
           {slicersLoading && (
-            <span className="text-[10px] text-indigo-500 animate-pulse">Loading filters...</span>
+            <span className="text-[10px] text-indigo-500 animate-subtle-pulse">Loading filters...</span>
           )}
           {version > 1 && (
-            <span className="text-[10px] font-semibold text-indigo-600 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-semibold text-indigo-500 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded">
               v{version}
             </span>
           )}
-          <span className="text-[10px] text-slate-400 uppercase tracking-wide">
+          <span className="text-[10px] text-stone-400">
             {spec.tiles?.length || 0} tiles
           </span>
           <button
             onClick={handleExportJson}
-            className="flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-slate-500 hover:text-slate-700
-                       bg-transparent hover:bg-slate-100 border border-slate-200 rounded-md transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-2 py-1 text-[10px] font-medium text-stone-500 hover:text-stone-700
+                       bg-transparent hover:bg-stone-100 border border-stone-200 rounded-[8px] transition-all cursor-pointer"
             title="Export dashboard spec as JSON"
           >
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
+            <Download size={14} strokeWidth={1.5} />
             Export
           </button>
         </div>
@@ -256,7 +248,7 @@ export default function DashboardOverlay({ dashboardData, onClose, onSuggestionC
       )}
 
       {/* Dashboard body */}
-      <div className="flex-1 overflow-auto px-3 py-3 relative">
+      <div className="flex-1 overflow-auto px-4 py-4 relative">
         {hasTiles ? (
           <DashboardGrid
             tiles={spec.tiles}
@@ -269,10 +261,10 @@ export default function DashboardOverlay({ dashboardData, onClose, onSuggestionC
 
         {/* Shimmer overlay while refining */}
         {refining && (
-          <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex items-center justify-center">
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
               <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-              <span className="text-sm font-medium text-indigo-600">Refining dashboard...</span>
+              <span className="text-sm font-medium text-indigo-500">Refining dashboard...</span>
             </div>
           </div>
         )}
@@ -280,15 +272,15 @@ export default function DashboardOverlay({ dashboardData, onClose, onSuggestionC
 
       {/* Refinement input bar */}
       {onRefineDashboard && (
-        <div className="border-t border-slate-200 bg-white px-4 py-3 shadow-[0_-2px_8px_rgba(0,0,0,0.04)]">
+        <div className="border-t border-stone-100 bg-white/80 backdrop-blur-xl px-4 py-3">
           {refineSuggestions.length > 0 && !refining && (
             <div className="flex flex-wrap gap-1.5 mb-2">
               {refineSuggestions.map((s) => (
                 <button
                   key={s}
                   onClick={() => { setRefineInput(s); refineInputRef.current?.focus(); }}
-                  className="text-[11px] bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-2.5 py-1 rounded-full
-                             border border-indigo-200 transition-colors cursor-pointer"
+                  className="text-[11px] bg-stone-50 hover:bg-stone-100 text-stone-600 px-2.5 py-1 rounded-full
+                             border border-stone-200 transition-all cursor-pointer"
                 >
                   {s}
                 </button>
@@ -299,9 +291,9 @@ export default function DashboardOverlay({ dashboardData, onClose, onSuggestionC
             <input
               ref={refineInputRef}
               type="text"
-              className="flex-1 px-3 py-2 text-sm border border-slate-300 rounded-lg outline-none font-sans
-                         bg-white focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 transition-shadow
-                         disabled:bg-slate-50 disabled:text-slate-400"
+              className="flex-1 px-3 py-2 text-sm border border-stone-200 rounded-[12px] outline-none font-sans
+                         bg-white focus:ring-2 focus:ring-indigo-500/15 focus:border-indigo-400 transition-all
+                         disabled:bg-stone-50 disabled:text-stone-400"
               placeholder="Refine this dashboard..."
               value={refineInput}
               onChange={(e) => setRefineInput(e.target.value)}
@@ -315,8 +307,8 @@ export default function DashboardOverlay({ dashboardData, onClose, onSuggestionC
             />
             <button
               className={`
-                px-4 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-lg shrink-0
-                hover:bg-indigo-700 transition-colors
+                px-4 py-2 text-sm font-semibold bg-indigo-500 text-white rounded-[8px] shrink-0
+                hover:bg-indigo-600 transition-all
                 ${refining || !refineInput.trim() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
               onClick={handleRefineSubmit}

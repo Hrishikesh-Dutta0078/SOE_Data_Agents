@@ -1,21 +1,21 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react';
 
 const CATEGORY_STYLES = {
-  classify:       { border: 'border-violet-500/50', text: 'text-violet-400', label: 'CLASSIFY' },
-  decompose:     { border: 'border-purple-500/50', text: 'text-purple-400', label: 'DECOMPOSE' },
-  researchAgent: { border: 'border-cyan-500/50', text: 'text-cyan-400', label: 'RESEARCH' },
-  research:      { border: 'border-cyan-500/50', text: 'text-cyan-400', label: 'RESEARCH' },
-  sqlWriterAgent:{ border: 'border-blue-500/50', text: 'text-blue-400', label: 'SQL_WRITE' },
-  sql_generation:{ border: 'border-blue-500/50', text: 'text-blue-400', label: 'SQL_WRITE' },
-  injectRls:     { border: 'border-cyan-400/50', text: 'text-cyan-300', label: 'RLS' },
-  validate:      { border: 'border-teal-500/50', text: 'text-teal-400', label: 'VALIDATE' },
-  correct:       { border: 'border-amber-500/50', text: 'text-amber-400', label: 'CORRECT' },
-  execute:       { border: 'border-emerald-500/50', text: 'text-emerald-400', label: 'EXECUTE' },
-  checkResults:  { border: 'border-lime-500/50', text: 'text-lime-400', label: 'CHECK' },
-  accumulateResult: { border: 'border-amber-500/50', text: 'text-amber-400', label: 'LOOP' },
-  loop:          { border: 'border-amber-500/50', text: 'text-amber-400', label: 'LOOP' },
-  present:       { border: 'border-fuchsia-500/50', text: 'text-fuchsia-400', label: 'PRESENT' },
-  tool:          { border: 'border-slate-500/50', text: 'text-slate-400', label: 'TOOL' },
+  classify:       { bg: 'bg-violet-50',  text: 'text-violet-600', label: 'Classify' },
+  decompose:      { bg: 'bg-purple-50',  text: 'text-purple-600', label: 'Decompose' },
+  researchAgent:  { bg: 'bg-blue-50',    text: 'text-blue-600',   label: 'Research' },
+  research:       { bg: 'bg-blue-50',    text: 'text-blue-600',   label: 'Research' },
+  sqlWriterAgent: { bg: 'bg-sky-50',     text: 'text-sky-600',    label: 'SQL Write' },
+  sql_generation: { bg: 'bg-sky-50',     text: 'text-sky-600',    label: 'SQL Write' },
+  injectRls:      { bg: 'bg-cyan-50',    text: 'text-cyan-600',   label: 'RLS' },
+  validate:       { bg: 'bg-teal-50',    text: 'text-teal-600',   label: 'Validate' },
+  correct:        { bg: 'bg-amber-50',   text: 'text-amber-600',  label: 'Correct' },
+  execute:        { bg: 'bg-emerald-50', text: 'text-emerald-600',label: 'Execute' },
+  checkResults:   { bg: 'bg-lime-50',    text: 'text-lime-600',   label: 'Check' },
+  accumulateResult:{ bg: 'bg-amber-50',  text: 'text-amber-600',  label: 'Loop' },
+  loop:           { bg: 'bg-amber-50',   text: 'text-amber-600',  label: 'Loop' },
+  present:        { bg: 'bg-pink-50',    text: 'text-pink-600',   label: 'Present' },
+  tool:           { bg: 'bg-stone-50',   text: 'text-stone-500',  label: 'Tool' },
 };
 
 function formatElapsed(ms) {
@@ -54,12 +54,12 @@ function useParallelDiscoveryState(entries) {
 function ParallelDiscoveryViz({ total, completed }) {
   if (total <= 0) return null;
   return (
-    <div className="rounded border border-cyan-500/30 bg-slate-900/80 p-2.5 mb-2">
+    <div className="rounded-[12px] border border-indigo-100 bg-indigo-50/50 p-3 mb-2">
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-[9px] font-mono uppercase tracking-widest text-cyan-400/90">
+        <span className="text-[11px] font-medium text-indigo-500">
           Parallel discovery
         </span>
-        <span className="text-[9px] font-mono text-slate-500">
+        <span className="text-[11px] text-stone-400">
           {completed}/{total} context{total !== 1 ? 's' : ''} ready
         </span>
       </div>
@@ -71,15 +71,15 @@ function ParallelDiscoveryViz({ total, completed }) {
               {i > 0 && (
                 <div
                   className={`h-px flex-1 max-w-[12px] transition-colors duration-300 ${
-                    i <= completed ? 'bg-cyan-500/60' : 'bg-slate-600/40'
+                    i <= completed ? 'bg-indigo-400' : 'bg-stone-200'
                   }`}
                 />
               )}
               <div
-                className={`w-2.5 h-2.5 rounded-full border border-cyan-500/50 transition-all duration-300 ${
+                className={`w-2.5 h-2.5 rounded-full border border-indigo-200 transition-all duration-300 ${
                   ready
-                    ? 'bg-cyan-500 shadow-[0_0_8px_rgba(34,211,238,0.6)] thinking-node-ready'
-                    : 'bg-slate-700/80 thinking-node-pulse'
+                    ? 'bg-indigo-500'
+                    : 'bg-stone-200 animate-subtle-pulse'
                 }`}
                 title={ready ? `Sub-query ${i + 1} context ready` : `Sub-query ${i + 1} discovering...`}
               />
@@ -87,7 +87,7 @@ function ParallelDiscoveryViz({ total, completed }) {
           );
         })}
         {total > 6 && (
-          <span className="ml-1 text-[9px] font-mono text-slate-500">+{total - 6}</span>
+          <span className="ml-1 text-[11px] text-stone-400">+{total - 6}</span>
         )}
       </div>
     </div>
@@ -105,32 +105,32 @@ function ThinkingEntry({ entry, isLatest }) {
 
   return (
     <div
-      className={`flex gap-2 py-1.5 px-1 rounded border-l-2 ${style.border} bg-slate-800/30 ${
+      className={`flex gap-3 py-2 px-2 rounded-[8px] hover:bg-stone-50 transition-colors ${
         isLatest ? 'animate-fade-in' : ''
-      } ${isParallel ? 'bg-cyan-950/20' : ''}`}
+      }`}
     >
-      <span className="text-[10px] font-mono text-cyan-400/80 w-[40px] shrink-0 text-right pt-0.5 tabular-nums">
+      <span className="text-[12px] font-mono text-stone-400 w-[44px] shrink-0 text-right pt-0.5 tabular-nums">
         {formatElapsed(entry.elapsed)}
       </span>
       <span
-        className={`text-[8px] font-mono font-semibold px-1.5 py-0.5 rounded shrink-0 h-fit border ${style.border} ${style.text} bg-slate-900/60`}
+        className={`text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 h-fit ${style.bg} ${style.text}`}
       >
         {style.label}
       </span>
       <div className="flex-1 min-w-0">
         <span
-          className={`text-[11px] font-mono text-slate-300 leading-relaxed whitespace-pre-wrap ${
-            hasDetail ? 'cursor-pointer hover:text-slate-100' : ''
-          } ${isParallel ? 'text-cyan-200/90' : ''}`}
+          className={`text-[13px] text-stone-700 leading-relaxed whitespace-pre-wrap ${
+            hasDetail ? 'cursor-pointer hover:text-stone-900' : ''
+          }`}
           onClick={() => hasDetail && setExpanded(!expanded)}
         >
           {entry.message}
           {hasDetail && (
-            <span className="ml-1 text-[9px] text-cyan-500">{expanded ? '[-]' : '[+]'}</span>
+            <span className="ml-1 text-[10px] text-indigo-500">{expanded ? '[-]' : '[+]'}</span>
           )}
         </span>
         {expanded && entry.detail && (
-          <div className="mt-1.5 p-2 bg-slate-900/80 border border-slate-600/50 rounded text-[10px] font-mono text-slate-400 whitespace-pre-wrap max-h-[120px] overflow-y-auto">
+          <div className="mt-1.5 p-2.5 bg-stone-50 border border-stone-200 rounded-[8px] text-[11px] font-mono text-stone-500 whitespace-pre-wrap max-h-[120px] overflow-y-auto">
             {entry.detail}
           </div>
         )}
@@ -142,14 +142,14 @@ function ThinkingEntry({ entry, isLatest }) {
 function QueryPlanBanner({ queryPlan }) {
   if (!queryPlan || queryPlan.length <= 1) return null;
   return (
-    <div className="mb-2 p-2.5 rounded border border-purple-500/30 bg-slate-900/60">
-      <div className="text-[9px] font-mono font-semibold text-purple-400 uppercase tracking-widest mb-1.5">
+    <div className="mb-2 p-3 rounded-[12px] border border-purple-100 bg-purple-50/50">
+      <div className="text-[11px] font-medium text-purple-600 mb-2">
         Multi-query plan — {queryPlan.length} sub-queries
       </div>
       {queryPlan.map((q, i) => (
-        <div key={q.id} className="flex gap-2 text-[10px] font-mono text-slate-400 py-0.5">
-          <span className="text-purple-500 shrink-0">{i + 1}.</span>
-          <span className="text-slate-300">{q.subQuestion}</span>
+        <div key={q.id} className="flex gap-2 text-[13px] text-stone-600 py-0.5">
+          <span className="text-purple-400 shrink-0">{i + 1}.</span>
+          <span className="text-stone-700">{q.subQuestion}</span>
         </div>
       ))}
     </div>
@@ -170,10 +170,9 @@ export default function ThinkingPanel({ entries = [], queryPlan = null, startTim
 
   if (entries.length === 0 && !queryPlan) {
     return (
-      <div className="flex items-center gap-2 font-mono text-[11px] text-slate-500 bg-slate-900/50 rounded-lg border border-slate-600/30 px-3 py-2">
-        <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_6px_rgba(34,211,238,0.6)]" />
-        <span className="uppercase tracking-wider">Standby</span>
-        <span className="thinking-cursor">_</span>
+      <div className="flex items-center gap-2 text-[13px] text-stone-500 bg-stone-50 rounded-[12px] border border-stone-200 px-3 py-2.5">
+        <span className="w-2 h-2 rounded-full bg-indigo-500 animate-subtle-pulse" />
+        <span>Standby</span>
       </div>
     );
   }
@@ -181,50 +180,26 @@ export default function ThinkingPanel({ entries = [], queryPlan = null, startTim
   const latestEntry = entries[entries.length - 1];
 
   return (
-    <div className="rounded-xl overflow-hidden border border-cyan-500/20 bg-slate-900/95 shadow-lg shadow-slate-900/50 relative">
-      {/* Subtle grid background */}
+    <div className="rounded-[16px] overflow-hidden border border-stone-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] relative">
       <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(34,211,238,0.15) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(34,211,238,0.15) 1px, transparent 1px)
-          `,
-          backgroundSize: '12px 12px',
-        }}
-      />
-      {/* Scanline when active */}
-      {entries.length > 0 && (
-        <div
-          className="absolute inset-0 overflow-hidden pointer-events-none opacity-30"
-          style={{ mixBlendMode: 'screen' }}
-        >
-          <div
-            className="thinking-scanline absolute left-0 right-0 h-px bg-gradient-to-b from-transparent via-cyan-400/40 to-transparent"
-            style={{ width: '100%' }}
-          />
-        </div>
-      )}
-
-      <div
-        className="relative flex items-center justify-between px-3 py-2 border-b border-cyan-500/20 bg-slate-800/60 cursor-pointer select-none"
+        className="relative flex items-center justify-between px-3.5 py-2.5 border-b border-stone-100 bg-stone-50 cursor-pointer select-none"
         onClick={() => setCollapsed(!collapsed)}
       >
         <div className="flex items-center gap-2.5">
-          <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
-          <span className="text-[10px] font-mono font-semibold uppercase tracking-widest text-cyan-300/90">
-            Agent cortex
+          <span className="w-2 h-2 rounded-full bg-indigo-500 animate-subtle-pulse" />
+          <span className="text-[13px] font-medium text-stone-600">
+            Agent Activity
           </span>
-          <span className="text-[9px] font-mono text-slate-500">
+          <span className="text-[12px] text-stone-400">
             {entries.length} step{entries.length !== 1 ? 's' : ''}
           </span>
           {showParallelViz && (
-            <span className="text-[8px] font-mono text-cyan-500/80 border border-cyan-500/30 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-medium text-indigo-500 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full">
               parallel
             </span>
           )}
         </div>
-        <span className="text-[9px] font-mono text-slate-500 uppercase tracking-wide">
+        <span className="text-[12px] font-medium text-stone-400">
           {collapsed ? 'expand' : 'collapse'}
         </span>
       </div>
@@ -237,7 +212,7 @@ export default function ThinkingPanel({ entries = [], queryPlan = null, startTim
         <div
           ref={scrollRef}
           className="relative px-3 py-2 max-h-[320px] overflow-y-auto scrollbar-thin"
-          style={{ scrollbarColor: 'rgba(34,211,238,0.2) transparent' }}
+          style={{ scrollbarColor: 'rgba(168,162,158,0.3) transparent' }}
         >
           <QueryPlanBanner queryPlan={queryPlan} />
           {showParallelViz && (

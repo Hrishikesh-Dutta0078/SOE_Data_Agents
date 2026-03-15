@@ -10,14 +10,14 @@ router.get('/', async (_req, res) => {
     await getPool();
     checks.database = 'ok';
   } catch (err) {
-    checks.database = `error: ${err.message}`;
+    checks.database = 'error';
   }
 
   try {
     await pingLLM();
     checks.llm = 'ok';
   } catch (err) {
-    checks.llm = `error: ${err.message}`;
+    checks.llm = 'error';
   }
 
   const allOk = Object.values(checks).every((v) => v === 'ok');

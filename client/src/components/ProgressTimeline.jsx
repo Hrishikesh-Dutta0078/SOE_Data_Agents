@@ -39,7 +39,7 @@ function StepDot({ status, color }) {
   }
   if (status === 'active') {
     return (
-      <div className="w-4 h-4 rounded-full bg-blue-500 shrink-0 animate-pulse ring-2 ring-blue-200" />
+      <div className="w-4 h-4 rounded-full bg-indigo-500 shrink-0 animate-subtle-pulse" />
     );
   }
   return <div className="w-4 h-4 rounded-full bg-slate-200 shrink-0" />;
@@ -76,21 +76,21 @@ export default function ProgressTimeline({ steps, usage, startTime, activeTools 
               <div className="flex flex-col items-center">
                 <StepDot status={step.status} color={meta.color} />
                 {!isLast && (
-                  <div className={`w-px flex-1 min-h-[16px] ${step.status === 'completed' ? 'bg-slate-300' : 'bg-slate-100'}`} />
+                  <div className={`w-px flex-1 min-h-[16px] ${step.status === 'completed' ? 'bg-stone-300' : 'bg-stone-100'}`} />
                 )}
               </div>
               <div className={`pb-2 flex-1 min-w-0 ${step.status === 'pending' ? 'opacity-40' : ''}`}>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[11px] font-semibold text-slate-700">{meta.label}</span>
+                  <span className="text-[11px] font-semibold text-stone-700">{meta.label}</span>
                   {step.status === 'completed' && step.duration != null && (
-                    <span className="text-[10px] text-slate-400 font-mono">{formatDuration(step.duration)}</span>
+                    <span className="text-[10px] text-stone-400 font-mono">{formatDuration(step.duration)}</span>
                   )}
                   {step.status === 'active' && (
-                    <span className="text-[10px] text-blue-500 italic">running...</span>
+                    <span className="text-[10px] text-indigo-500 italic">running...</span>
                   )}
                 </div>
                 {step.summary && step.status === 'completed' && (
-                  <div className="text-[10px] text-slate-500 mt-0.5 truncate">{step.summary}</div>
+                  <div className="text-[10px] text-stone-500 mt-0.5 truncate">{step.summary}</div>
                 )}
                 {step.status === 'active' && activeTools.length > 0 && (
                   <div className="mt-0.5 flex flex-wrap gap-1">
@@ -99,12 +99,12 @@ export default function ProgressTimeline({ steps, usage, startTime, activeTools 
                         key={`${t.name}-${ti}`}
                         className={`inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full ${
                           t.status === 'running'
-                            ? 'bg-blue-50 text-blue-600 border border-blue-200'
-                            : 'bg-slate-50 text-slate-400 border border-slate-200'
+                            ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                            : 'bg-stone-50 text-stone-400 border border-stone-200'
                         }`}
                       >
                         {t.status === 'running' && (
-                          <span className="w-1 h-1 rounded-full bg-blue-500 animate-pulse" />
+                          <span className="w-1 h-1 rounded-full bg-indigo-500 animate-subtle-pulse" />
                         )}
                         {TOOL_LABELS[t.name] || t.name}
                       </span>
@@ -117,7 +117,7 @@ export default function ProgressTimeline({ steps, usage, startTime, activeTools 
         })}
       </div>
 
-      <div className="mt-2 pt-2 border-t border-slate-200 flex flex-wrap gap-3 text-[10px] text-slate-400 font-mono">
+      <div className="mt-2 pt-2 border-t border-stone-100 flex flex-wrap gap-3 text-[10px] text-stone-400 font-mono">
         {formatTokensInMillions(usage?.totalTokens) && (
           <span>{formatTokensInMillions(usage.totalTokens)} tokens</span>
         )}

@@ -24,9 +24,9 @@ function confidenceColor(score) {
 }
 
 function confidenceBg(score) {
-  if (score >= 0.8) return 'bg-emerald-100';
-  if (score >= 0.5) return 'bg-amber-100';
-  return 'bg-rose-100';
+  if (score >= 0.8) return 'bg-emerald-50';
+  if (score >= 0.5) return 'bg-amber-50';
+  return 'bg-rose-50';
 }
 
 function TraceEntry({ entry }) {
@@ -35,15 +35,15 @@ function TraceEntry({ entry }) {
   return (
     <div className="flex gap-3 relative">
       <div className="flex flex-col items-center">
-        <div className={`w-3 h-3 rounded-full ${style.color} shrink-0 mt-0.5 ring-2 ring-white`} />
-        <div className="w-px flex-1 bg-slate-200" />
+        <div className={`w-3 h-3 rounded-full ${style.color} shrink-0 mt-0.5 shadow-[0_1px_2px_rgba(0,0,0,0.1)]`} />
+        <div className="w-px flex-1 bg-stone-200" />
       </div>
 
       <div className="pb-4 min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-xs font-semibold text-slate-800">{style.label}</span>
+          <span className="text-xs font-semibold text-stone-800">{style.label}</span>
           {entry.duration != null && (
-            <span className="text-[10px] text-slate-400 font-mono">{entry.duration}ms</span>
+            <span className="text-[10px] text-stone-400 font-mono">{entry.duration}ms</span>
           )}
         </div>
 
@@ -51,12 +51,12 @@ function TraceEntry({ entry }) {
           {entry.node === 'classify' && (
             <>
               {entry.intent && (
-                <span className="px-1.5 py-0.5 bg-violet-100 text-violet-700 rounded">
+                <span className="px-1.5 py-0.5 bg-violet-50 text-violet-600 rounded">
                   {entry.intent}
                 </span>
               )}
               {entry.complexity && (
-                <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">
+                <span className="px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
                   {entry.complexity}
                 </span>
               )}
@@ -66,17 +66,17 @@ function TraceEntry({ entry }) {
           {entry.node === 'sqlAgent' && (
             <>
               {entry.toolCallCount != null && (
-                <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded">
+                <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded">
                   {entry.toolCallCount} tool call{entry.toolCallCount !== 1 ? 's' : ''}
                 </span>
               )}
               {entry.toolNames?.length > 0 && (
-                <span className="text-slate-500">
+                <span className="text-stone-500">
                   {entry.toolNames.join(', ')}
                 </span>
               )}
               {entry.decision && (
-                <span className="px-1.5 py-0.5 bg-slate-100 text-slate-600 rounded">
+                <span className="px-1.5 py-0.5 bg-stone-100 text-stone-500 rounded">
                   {entry.decision}
                 </span>
               )}
@@ -91,7 +91,7 @@ function TraceEntry({ entry }) {
                 </span>
               )}
               {entry.issues?.length > 0 && (
-                <span className="text-slate-500 truncate max-w-[200px]">
+                <span className="text-stone-500 truncate max-w-[200px]">
                   {entry.issues.length} issue{entry.issues.length !== 1 ? 's' : ''}
                 </span>
               )}
@@ -100,21 +100,21 @@ function TraceEntry({ entry }) {
 
           {entry.node === 'validate' && entry.valid != null && (
             <span className={`px-1.5 py-0.5 rounded ${
-              entry.valid ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+              entry.valid ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
             }`}>
               {entry.valid ? 'valid' : entry.errorType || 'invalid'}
             </span>
           )}
 
           {entry.node === 'correct' && (
-            <span className="px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded">
+            <span className="px-1.5 py-0.5 bg-orange-50 text-orange-600 rounded">
               {entry.errorType || 'correction'}
             </span>
           )}
 
           {entry.node === 'execute' && (
             <span className={`px-1.5 py-0.5 rounded ${
-              entry.success ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+              entry.success ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'
             }`}>
               {entry.success ? `${entry.rowCount ?? 0} rows` : 'failed'}
             </span>
@@ -122,7 +122,7 @@ function TraceEntry({ entry }) {
 
           {entry.node === 'injectRls' && (
             <span className={`px-1.5 py-0.5 rounded ${
-              entry.rlsApplied ? 'bg-cyan-100 text-cyan-700' : 'bg-slate-100 text-slate-600'
+              entry.rlsApplied ? 'bg-cyan-50 text-cyan-600' : 'bg-stone-100 text-stone-500'
             }`}>
               {entry.rlsApplied ? 'RLS applied' : 'skipped'}
             </span>
@@ -130,7 +130,7 @@ function TraceEntry({ entry }) {
 
           {entry.node === 'checkResults' && entry.warningCount != null && (
             <span className={`px-1.5 py-0.5 rounded ${
-              entry.warningCount === 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+              entry.warningCount === 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
             }`}>
               {entry.warningCount === 0 ? 'OK' : `${entry.warningCount} warning${entry.warningCount !== 1 ? 's' : ''}`}
             </span>
@@ -139,12 +139,12 @@ function TraceEntry({ entry }) {
           {entry.node === 'present' && (
             <>
               {entry.chartType && (
-                <span className="px-1.5 py-0.5 bg-fuchsia-100 text-fuchsia-700 rounded">
+                <span className="px-1.5 py-0.5 bg-fuchsia-50 text-fuchsia-600 rounded">
                   {entry.chartType}
                 </span>
               )}
               {entry.insightLength != null && (
-                <span className="text-slate-500">
+                <span className="text-stone-500">
                   {entry.insightLength} chars of insights
                 </span>
               )}
@@ -164,15 +164,15 @@ export default function AgentTracePanel({ trace }) {
   return (
     <div className="mt-3">
       <button
-        className="text-xs text-indigo-500 hover:text-indigo-700 cursor-pointer bg-transparent border-none p-0 underline transition-colors"
+        className="text-[13px] font-medium text-indigo-500 hover:text-indigo-600 cursor-pointer bg-transparent border-none p-0 transition-colors"
         onClick={() => setOpen((v) => !v)}
       >
         {open ? 'Hide Agent Trace' : 'Show Agent Trace'}
       </button>
 
       {open && (
-        <div className="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-lg">
-          <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 mb-3">
+        <div className="mt-2 p-3 bg-stone-50 border border-stone-200 rounded-[12px]">
+          <div className="text-[12px] font-medium text-stone-500 mb-3">
             Execution Trace
           </div>
           {trace.map((entry, i) => (

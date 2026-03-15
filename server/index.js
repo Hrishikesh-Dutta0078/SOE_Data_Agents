@@ -66,13 +66,27 @@ const { loadRulesAsync } = require('./vectordb/rulesFetcher');
 const { loadJoinKnowledgeAsync } = require('./vectordb/joinRuleFetcher');
 const { loadKpiGlossaryAsync } = require('./vectordb/kpiFetcher');
 const { requireAuthorization } = require('./auth/requireAuth');
+const { analysisLimiter, impersonateLimiter } = require('./middleware/rateLimiter');
 
 const OKTA_CALLBACK_PATH = process.env.OKTA_CALLBACK_PATH || '/implicit/callback';
 const PUBLIC_PATHS = ['/api/health', '/login', OKTA_CALLBACK_PATH, '/logout', '/api/auth/me'];
 
 const app = express();
 
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+    },
+  },
+}));
 app.use(cors({
   origin: (process.env.ALLOWED_ORIGINS || '')
     .split(',')
@@ -85,6 +99,9 @@ app.use(express.json({ limit: '5mb' }));
 const useHttps = process.env.USE_HTTPS === 'true' || (
   fs.existsSync(path.join(__dirname, 'cert.pem')) && fs.existsSync(path.join(__dirname, 'key.pem'))
 );
+if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+  throw new Error('SESSION_SECRET environment variable must be set in production');
+}
 app.use(session({
   secret: process.env.SESSION_SECRET || 'auto-agents-session-secret-change-in-production',
   resave: false,
@@ -105,8 +122,8 @@ app.use((req, res, next) => {
 
 app.use(require('./routes/auth'));
 app.use('/api/health', require('./routes/health'));
-app.use('/api/impersonate', require('./routes/impersonate'));
-app.use('/api/text-to-sql', require('./routes/textToSql'));
+app.use('/api/impersonate', impersonateLimiter, require('./routes/impersonate'));
+app.use('/api/text-to-sql', analysisLimiter, require('./routes/textToSql'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (_req, res) => {

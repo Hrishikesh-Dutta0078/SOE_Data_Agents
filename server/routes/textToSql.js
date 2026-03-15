@@ -469,7 +469,7 @@ router.post('/analyze', async (req, res) => {
     logger.error('Pipeline failed', { error: err.message });
     res.status(500).json({
       error: 'Failed to analyze the question. Please try again.',
-      details: err.message,
+      details: 'Internal processing error',
     });
   }
 });
@@ -800,7 +800,7 @@ router.post('/analyze-stream', async (req, res) => {
     if (onParallelCorrectionComplete) parallelPipelineEvents.removeListener('parallel_correction_complete', onParallelCorrectionComplete);
     if (onDashboardProgress) dashboardEvents.removeListener('dashboard_progress', onDashboardProgress);
     logger.error('Pipeline stream failed', { error: err.message });
-    const errorPayload = { error: err.message };
+    const errorPayload = { error: 'Stream processing failed' };
     res.write(`event: error\ndata: ${JSON.stringify(errorPayload)}\n\n`);
     res.end();
   }
@@ -906,7 +906,7 @@ router.post('/dashboard-data', async (req, res) => {
     }
   } catch (err) {
     logger.error('Dashboard data query failed', { mode, error: err.message });
-    res.status(500).json({ error: `Dashboard data query failed: ${err.message}` });
+    res.status(500).json({ error: 'Dashboard data query failed' });
   }
 });
 
@@ -940,7 +940,7 @@ router.get('/history/:threadId', async (req, res) => {
     res.json({ threadId, checkpoints: history });
   } catch (err) {
     logger.error('History retrieval failed', { error: err.message });
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'History retrieval failed' });
   }
 });
 

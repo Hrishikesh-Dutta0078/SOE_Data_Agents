@@ -6,22 +6,22 @@ export default function SlicerBar({ slicers, activeFilters, onFilterChange, onRe
   const hasActiveFilters = Object.values(activeFilters || {}).some((v) => v != null);
 
   return (
-    <div className="flex items-center gap-3 px-5 py-2.5 bg-white border-b border-slate-200 overflow-x-auto">
-      <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide whitespace-nowrap">
+    <div className="flex items-center gap-3 px-5 py-2.5 bg-white/80 backdrop-blur-xl border-b border-stone-100 overflow-x-auto">
+      <span className="text-[12px] font-medium text-stone-500 whitespace-nowrap">
         Filters
       </span>
       {slicers.map((slicer) => (
         <div key={slicer.id} className="flex items-center gap-1.5">
-          <label className="text-xs text-slate-600 whitespace-nowrap" htmlFor={slicer.id}>
+          <label className="text-xs text-stone-600 whitespace-nowrap" htmlFor={slicer.id}>
             {slicer.dimension}
           </label>
           <select
             id={slicer.id}
             value={activeFilters?.[slicer.dimension] ?? ''}
             onChange={(e) => onFilterChange(slicer.dimension, e.target.value || null)}
-            className="text-xs bg-slate-50 border border-slate-200 rounded px-2 py-1 text-slate-700
-                       focus:outline-none focus:ring-1 focus:ring-indigo-300 focus:border-indigo-300
-                       cursor-pointer min-w-[100px]"
+            className="text-xs bg-white border border-stone-200 rounded-[8px] px-2 py-1 text-stone-700
+                       focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400
+                       cursor-pointer min-w-[100px] transition-all"
           >
             <option value="">All</option>
             {slicer.values.map((val) => (
@@ -33,8 +33,8 @@ export default function SlicerBar({ slicers, activeFilters, onFilterChange, onRe
       {hasActiveFilters && (
         <button
           onClick={onResetAll}
-          className="text-[11px] text-indigo-600 hover:text-indigo-800 font-semibold
-                     bg-indigo-50 hover:bg-indigo-100 px-2.5 py-1 rounded transition-colors
+          className="text-[11px] text-indigo-500 hover:text-indigo-600 font-medium
+                     bg-transparent hover:bg-indigo-50 px-2.5 py-1 rounded-full transition-all
                      whitespace-nowrap cursor-pointer border-none"
         >
           Reset All

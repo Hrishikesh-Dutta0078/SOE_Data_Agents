@@ -41,7 +41,7 @@ export default function KpiSparklineCard({ config, data }) {
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-4 py-3">
-      <div className="text-2xl font-bold text-slate-800 tracking-tight">
+      <div className="text-3xl font-bold text-stone-900 tracking-tight">
         {displayValue}
       </div>
       {delta && (

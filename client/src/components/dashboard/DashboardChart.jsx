@@ -10,8 +10,8 @@ import {
 import { fetchDashboardPage } from '../../utils/api';
 
 const COLORS = [
-  '#0077B6', '#F4A261', '#2A9D8F', '#E76F51', '#6A4C93',
-  '#17BEBB', '#E9C46A', '#264653', '#EF476F', '#06D6A0',
+  '#6366F1', '#10B981', '#F59E0B', '#8B5CF6', '#EF4444',
+  '#06B6D4', '#F97316', '#EC4899', '#14B8A6', '#84CC16',
 ];
 
 function RichTooltip({ active, payload, label, tooltipFields }) {
@@ -21,8 +21,8 @@ function RichTooltip({ active, payload, label, tooltipFields }) {
   const fields = tooltipFields?.length > 0 ? tooltipFields : Object.keys(row);
 
   return (
-    <div className="bg-slate-800 text-slate-100 rounded-lg px-3 py-2 text-xs shadow-lg max-w-xs">
-      {label && <div className="font-semibold text-slate-300 mb-1 text-[11px]">{label}</div>}
+    <div className="bg-white text-stone-900 rounded-[10px] px-3 py-2.5 text-xs shadow-[0_12px_32px_rgba(0,0,0,0.08)] border border-stone-200 max-w-xs">
+      {label && <div className="font-semibold text-stone-500 mb-1 text-[11px]">{label}</div>}
       <table className="w-full">
         <tbody>
           {fields.map((field) => {
@@ -33,7 +33,7 @@ function RichTooltip({ active, payload, label, tooltipFields }) {
               : String(val);
             return (
               <tr key={field}>
-                <td className="pr-3 text-slate-400 whitespace-nowrap">{field}</td>
+                <td className="pr-3 text-stone-400 whitespace-nowrap">{field}</td>
                 <td className="font-semibold text-right">{formatted}</td>
               </tr>
             );
@@ -158,8 +158,8 @@ export default function DashboardChart({ config, data, sql }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full text-slate-400 text-sm">
-        <svg className="animate-spin h-4 w-4 mr-2 text-slate-400" viewBox="0 0 24 24" fill="none">
+      <div className="flex items-center justify-center h-full text-stone-400 text-sm">
+        <svg className="animate-spin h-4 w-4 mr-2 text-stone-400" viewBox="0 0 24 24" fill="none">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
@@ -169,7 +169,7 @@ export default function DashboardChart({ config, data, sql }) {
   }
 
   if (chartData.length === 0 || !xKey) {
-    return <div className="flex items-center justify-center h-full text-slate-400 text-sm">No data</div>;
+    return <div className="flex items-center justify-center h-full text-stone-400 text-sm">No data</div>;
   }
 
   const customTooltip = <RichTooltip tooltipFields={tooltipFields} />;
@@ -184,13 +184,13 @@ export default function DashboardChart({ config, data, sql }) {
       case 'line':
         return (
           <LineChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey={xKey} tick={{ fontSize: 11, fill: '#64748b' }} />
-            <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+            <CartesianGrid stroke="#F5F5F4" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 12, fill: '#A8A29E' }} />
+            <YAxis tick={{ fontSize: 12, fill: '#A8A29E' }} />
             <Tooltip content={customTooltip} />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             {yKeys.map((yk, i) => (
-              <Line key={yk} type="monotone" dataKey={yk} stroke={COLORS[i % COLORS.length]} strokeWidth={2} dot={{ r: 3 }} />
+              <Line key={yk} type="monotone" dataKey={yk} stroke={COLORS[i % COLORS.length]} strokeWidth={2.5} dot={false} />
             ))}
           </LineChart>
         );
@@ -211,9 +211,9 @@ export default function DashboardChart({ config, data, sql }) {
       case 'area':
         return (
           <AreaChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey={xKey} tick={{ fontSize: 11, fill: '#64748b' }} />
-            <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+            <CartesianGrid stroke="#F5F5F4" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 12, fill: '#A8A29E' }} />
+            <YAxis tick={{ fontSize: 12, fill: '#A8A29E' }} />
             <Tooltip content={customTooltip} />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             {yKeys.map((yk, i) => (
@@ -225,9 +225,9 @@ export default function DashboardChart({ config, data, sql }) {
       case 'scatter':
         return (
           <ScatterChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey={xKey} tick={{ fontSize: 11, fill: '#64748b' }} name={xKey} />
-            <YAxis dataKey={yKeys[0]} tick={{ fontSize: 11, fill: '#64748b' }} name={yKeys[0]} />
+            <CartesianGrid stroke="#F5F5F4" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 12, fill: '#A8A29E' }} name={xKey} />
+            <YAxis dataKey={yKeys[0]} tick={{ fontSize: 12, fill: '#A8A29E' }} name={yKeys[0]} />
             <Tooltip content={customTooltip} />
             <Scatter data={chartData} fill={COLORS[0]} />
           </ScatterChart>
@@ -236,13 +236,13 @@ export default function DashboardChart({ config, data, sql }) {
       case 'stacked_bar':
         return (
           <BarChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey={xKey} tick={{ fontSize: 11, fill: '#64748b' }} />
-            <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+            <CartesianGrid stroke="#F5F5F4" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 12, fill: '#A8A29E' }} />
+            <YAxis tick={{ fontSize: 12, fill: '#A8A29E' }} />
             <Tooltip content={customTooltip} />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             {yKeys.map((yk, i) => (
-              <Bar key={yk} dataKey={yk} stackId="stack" fill={COLORS[i % COLORS.length]} />
+              <Bar key={yk} dataKey={yk} stackId="stack" fill={COLORS[i % COLORS.length]} radius={[6, 6, 0, 0]} />
             ))}
           </BarChart>
         );
@@ -250,13 +250,13 @@ export default function DashboardChart({ config, data, sql }) {
       default:
         return (
           <BarChart {...commonProps}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-            <XAxis dataKey={xKey} tick={{ fontSize: 11, fill: '#64748b' }} />
-            <YAxis tick={{ fontSize: 11, fill: '#64748b' }} />
+            <CartesianGrid stroke="#F5F5F4" />
+            <XAxis dataKey={xKey} tick={{ fontSize: 12, fill: '#A8A29E' }} />
+            <YAxis tick={{ fontSize: 12, fill: '#A8A29E' }} />
             <Tooltip content={customTooltip} />
             <Legend wrapperStyle={{ fontSize: 11 }} />
             {yKeys.map((yk, i) => (
-              <Bar key={yk} dataKey={yk} fill={COLORS[i % COLORS.length]} radius={[3, 3, 0, 0]} />
+              <Bar key={yk} dataKey={yk} fill={COLORS[i % COLORS.length]} radius={[6, 6, 0, 0]} />
             ))}
           </BarChart>
         );

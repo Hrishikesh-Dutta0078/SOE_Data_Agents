@@ -69,8 +69,16 @@ export default function App() {
   });
   const toolToggles = useEnabledTools();
 
+  const [userName, setUserName] = useState('');
+
   useEffect(() => {
-    request('/api/auth/me').catch(() => {});
+    request('/api/auth/me')
+      .then((user) => {
+        if (user && (user.name || user.given_name)) {
+          setUserName(user.given_name || user.name);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -113,10 +121,10 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen font-sans text-slate-800 bg-slate-100">
+    <div className="flex h-screen font-sans text-stone-900 bg-stone-50">
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-20 bg-black/40 md:hidden"
+          className="fixed inset-0 z-20 bg-black/20 backdrop-blur-sm md:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -124,33 +132,36 @@ export default function App() {
       <aside
         className={`
           fixed inset-y-0 left-0 z-30 w-64 flex-shrink-0 flex flex-col
-          bg-slate-900 text-slate-300 p-6 transition-transform duration-200
+          bg-stone-100 text-stone-700 border-r border-stone-200/60 p-6 transition-transform duration-200
           md:static md:translate-x-0
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        <div className="flex items-center gap-2 text-lg font-bold text-white mb-1">
+        <div className="flex items-center gap-2 text-lg font-bold text-stone-900 mb-1 tracking-tight">
+          <svg width="22" height="20" viewBox="0 0 1551 1375" className="shrink-0">
+            <path d="m576.5 0.4h403.6l570.4 1374.6h-426.7l-360.5-912.8-238.4 598.9h283.4l112.9 313.9h-921.2z" fill="#EB1000"/>
+          </svg>
           Auto Agents
         </div>
-        <div className="text-[10px] text-slate-500 mb-1 whitespace-nowrap">
+        <div className="text-[11px] text-stone-400 mb-1 whitespace-nowrap">
           Autonomous Text-to-SQL System
         </div>
-        <div className="text-[10px] text-slate-500 mb-8">v0.0.5</div>
-        <div className="text-sm text-slate-500 leading-relaxed">
+        <div className="text-[11px] text-stone-300 mb-8">v0.0.5</div>
+        <div className="text-sm text-stone-500 leading-relaxed">
           Fully autonomous agent with 19 tools. Every query is researched, verified, and validated by the agent.
         </div>
 
-        <div className="mt-auto pt-6 border-t border-slate-700/50 space-y-4">
+        <div className="mt-auto pt-6 border-t border-stone-200 space-y-4">
           <div className="relative" ref={impersonateDropdownRef}>
-            <div className="text-xs font-semibold text-slate-300 mb-1">Impersonate</div>
-            <div className="text-[10px] text-slate-500 mt-0.5 mb-2">Search by name to filter data</div>
+            <div className="text-xs font-semibold text-stone-600 mb-1">Impersonate</div>
+            <div className="text-[11px] text-stone-400 mt-0.5 mb-2">Search by name to filter data</div>
             {impersonateContext ? (
-              <div className="flex items-center justify-between gap-2 rounded bg-slate-800 text-slate-200 px-2 py-1.5 text-xs">
+              <div className="flex items-center justify-between gap-2 rounded-[8px] bg-indigo-50 text-indigo-600 px-3 py-1.5 text-xs">
                 <span className="truncate">{impersonateContext.name} — {impersonateContext.role}</span>
                 <button
                   type="button"
                   onClick={clearImpersonate}
-                  className="text-slate-500 hover:text-white shrink-0"
+                  className="text-indigo-400 hover:text-indigo-700 shrink-0"
                   aria-label="Clear impersonation"
                 >
                   ×
@@ -164,21 +175,21 @@ export default function App() {
                   onChange={(e) => { setImpersonateSearch(e.target.value); setImpersonateDropdownOpen(true); }}
                   onFocus={() => impersonateDropdownOpen && setImpersonateDropdownOpen(true)}
                   placeholder="Search by name..."
-                  className="w-full rounded bg-slate-800 text-slate-200 px-2 py-1.5 text-xs placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                  className="w-full rounded-[8px] bg-white text-stone-800 border border-stone-200 px-3 py-1.5 text-xs placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all"
                 />
                 {impersonateDropdownOpen && (impersonateSearch.trim().length >= 2 || impersonateResults.length > 0) && (
-                  <div className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded bg-slate-800 border border-slate-600 shadow-lg z-50">
+                  <div className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-[12px] bg-white border border-stone-200 shadow-[0_12px_32px_rgba(0,0,0,0.08)] z-50">
                     {impersonateLoading ? (
-                      <div className="px-2 py-2 text-xs text-slate-500">Searching...</div>
+                      <div className="px-3 py-2 text-xs text-stone-400">Searching...</div>
                     ) : impersonateResults.length === 0 ? (
-                      <div className="px-2 py-2 text-xs text-slate-500">No results</div>
+                      <div className="px-3 py-2 text-xs text-stone-400">No results</div>
                     ) : (
                       impersonateResults.map((item, i) => (
                         <button
                           key={`${item.name}-${item.role}-${item.impersonateId}-${i}`}
                           type="button"
                           onClick={() => selectImpersonate(item)}
-                          className="w-full text-left px-2 py-1.5 text-xs text-slate-300 hover:bg-slate-700 hover:text-white"
+                          className="w-full text-left px-3 py-1.5 text-xs text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors"
                         >
                           {item.name} — {item.role}
                         </button>
@@ -192,8 +203,8 @@ export default function App() {
 
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs font-semibold text-slate-300">Fast Model (Haiku)</div>
-              <div className="text-[10px] text-slate-500 mt-0.5">Use faster LLM for agents</div>
+              <div className="text-xs font-semibold text-stone-600">Fast Model (Haiku)</div>
+              <div className="text-[11px] text-stone-400 mt-0.5">Use faster LLM for agents</div>
             </div>
             <button
               type="button"
@@ -203,8 +214,8 @@ export default function App() {
               className={`
                 relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full
                 border-2 border-transparent transition-colors duration-200 ease-in-out
-                focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-slate-900
-                ${useFastModel ? 'bg-cyan-500' : 'bg-slate-600'}
+                focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:ring-offset-2 focus:ring-offset-stone-100
+                ${useFastModel ? 'bg-indigo-500' : 'bg-stone-300'}
               `}
             >
               <span
@@ -220,7 +231,7 @@ export default function App() {
       </aside>
 
       <main className="flex-1 flex flex-col min-w-0">
-        <ChatPanel onMenuClick={() => setSidebarOpen((v) => !v)} impersonateContext={impersonateContext} validationEnabled={validationEnabled} sessionId={sessionId} onNewChat={() => setSessionId(generateSessionId())} enabledTools={toolToggles.enabledTools} useFastModel={useFastModel} />
+        <ChatPanel onMenuClick={() => setSidebarOpen((v) => !v)} impersonateContext={impersonateContext} validationEnabled={validationEnabled} sessionId={sessionId} onNewChat={() => setSessionId(generateSessionId())} enabledTools={toolToggles.enabledTools} useFastModel={useFastModel} userName={userName} />
       </main>
     </div>
   );
