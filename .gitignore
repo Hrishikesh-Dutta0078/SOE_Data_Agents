@@ -4,3 +4,11 @@ server/key.pem
 server/public/
 node_modules/
 client/node_modules/
+
+# Local-only docs and files
+CLAUDE.md
+deployment_checklist.md
+okta_implementation.md
+to_remove_from_DWH.md
+Breaking Down Questions.docx
+database_prev.js
