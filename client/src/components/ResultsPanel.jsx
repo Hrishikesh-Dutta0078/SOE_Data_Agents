@@ -585,6 +585,26 @@ export default function ResultsPanel({ execution, insights, chart, queries = [],
           </div>
         )}
       </div>
+
+      {!isPartial && (
+        <div className="flex items-center justify-end gap-1 px-4 pb-3 pt-1">
+          <span className="text-[11px] text-stone-400 mr-1">Was this helpful?</span>
+          <button onClick={() => {
+            setFeedback('up');
+            fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId, question, sql, rating: 'up' }) }).catch(() => {});
+          }}
+            className={`p-1 rounded-md cursor-pointer transition-colors bg-transparent border-none ${feedback === 'up' ? 'text-emerald-500 bg-emerald-50' : 'text-stone-300 hover:text-emerald-500'}`}>
+            <ThumbsUp size={13} />
+          </button>
+          <button onClick={() => {
+            setFeedback('down');
+            fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId, question, sql, rating: 'down' }) }).catch(() => {});
+          }}
+            className={`p-1 rounded-md cursor-pointer transition-colors bg-transparent border-none ${feedback === 'down' ? 'text-red-500 bg-red-50' : 'text-stone-300 hover:text-red-500'}`}>
+            <ThumbsDown size={13} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

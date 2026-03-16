@@ -127,6 +127,7 @@ app.use('/api/health', require('./routes/health'));
 app.use('/api/impersonate', impersonateLimiter, require('./routes/impersonate'));
 app.use('/api/text-to-sql', analysisLimiter, require('./routes/textToSql'));
 app.use('/api/voice', voiceRateLimiter, require('./routes/voice'));
+app.use('/api/feedback', require('./routes/feedback'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('*', (_req, res) => {

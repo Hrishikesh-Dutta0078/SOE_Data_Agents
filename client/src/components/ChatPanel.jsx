@@ -7,6 +7,7 @@ import ThinkingPanel from './ThinkingPanel';
 import DashboardOverlay from './DashboardOverlay';
 import VoiceInput from './VoiceInput';
 import BlueprintPicker from './BlueprintPicker';
+import SuggestedQuestions from './SuggestedQuestions';
 import { Menu, ArrowUp, X, MessageSquare, Copy, Check } from 'lucide-react';
 
 function Badge({ className = '', children }) {
@@ -647,6 +648,9 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           confidence={msg.confidence}
           retrySuggestions={msg.retrySuggestions}
           onRetrySuggestion={(text) => handleSend(text)}
+          sessionId={sessionId}
+          question={msg.content}
+          sql={msg.content}
         />
       )}
 
@@ -1051,15 +1055,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       <div className="chat-card">
       <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
         {messages.length === 0 && !loading && (
-          <div className="m-auto flex flex-col items-center gap-4 max-w-md text-center animate-fade-in-up">
-            <div className="w-14 h-14 rounded-[16px] flex items-center justify-center" style={{ background: 'var(--gradient-empty-icon)', boxShadow: 'var(--shadow-card)' }}>
-              <MessageSquare size={24} strokeWidth={1.5} className="text-stone-400" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-stone-900 mb-1.5 tracking-tight">What would you like to know?</h2>
-              <p className="text-sm text-stone-500">Ask a question about your data in plain English.</p>
-            </div>
-          </div>
+          <SuggestedQuestions onSelect={(text) => handleSend(text)} />
         )}
 
         {messages.map((msg, i) => (
