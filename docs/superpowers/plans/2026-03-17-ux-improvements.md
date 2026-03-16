@@ -336,6 +336,113 @@ git add server/routes/textToSql.js client/src/components/ResultsPanel.jsx
 git commit -m "feat(trust): add confidence badge to results panel"
 ```
 
+### Task 2.4: Make insights crisp by default with expandable detail
+
+**Problem:** Insights are too verbose (~500-800 words). Sales leaders want a quick takeaway, not a wall of text.
+
+**Solution:** Single LLM call produces a short Executive Summary (~200 words) + Detailed Analysis. Client shows summary by default with an "Expand" toggle.
+
+**Files:**
+- Modify: `server/prompts/present.js`
+- Modify: `client/src/components/ResultsPanel.jsx`
+
+- [ ] **Step 1: Update the insight prompt to produce two sections**
+
+In `server/prompts/present.js`, replace the `INSIGHT_SYSTEM` constant:
+
+```js
+const INSIGHT_SYSTEM = `You are a senior sales analytics advisor for a pipeline / revenue analytics system. Given query results, produce insights in TWO sections.
+
+SECTION 1 — EXECUTIVE SUMMARY (this is what the user sees first):
+- 3-4 bullet points, each 1-2 sentences max
+- Lead with the most important finding
+- Include specific numbers but skip detailed breakdowns
+- Total section: 150-200 words maximum
+- End with ONE key follow-up question inline
+
+SECTION 2 — DETAILED ANALYSIS (hidden by default, shown on demand):
+- Deep dive into patterns, anomalies, root causes
+- Compare against benchmarks where applicable
+- Full category-specific analysis per the guidance below
+- End with 2-3 suggested follow-up questions
+
+{categoryGuidance}
+
+FORMAT — You MUST use these exact headings:
+
+## Key Takeaways
+- [3-4 crisp bullets, 150-200 words total]
+
+## Detailed Analysis
+[Full analytical depth here]
+
+## Suggested Follow-Up Questions
+- [2-3 questions progressing What -> Why -> Fix]`;
+```
+
+- [ ] **Step 2: Split insight markdown in ResultsPanel**
+
+In `ResultsPanel.jsx`, parse the insights string into summary and detail sections:
+
+```jsx
+const [showDetail, setShowDetail] = useState(false);
+
+const insightSections = useMemo(() => {
+  if (!insights) return { summary: '', detail: '' };
+  const detailMarker = /^## Detailed Analysis/m;
+  const match = insights.match(detailMarker);
+  if (!match) return { summary: insights, detail: '' };
+  const splitIdx = insights.indexOf(match[0]);
+  return {
+    summary: insights.substring(0, splitIdx).trim(),
+    detail: insights.substring(splitIdx).trim(),
+  };
+}, [insights]);
+```
+
+- [ ] **Step 3: Render summary with expand toggle**
+
+Replace the current insights tab content:
+
+```jsx
+{currentTab === 'insights' && insights && (
+  <div className="relative">
+    {/* Copy button (from Task 4.1) */}
+    <div className="text-[13px] leading-relaxed text-stone-700 pr-8">
+      <ReactMarkdown>{insightSections.summary}</ReactMarkdown>
+    </div>
+    {insightSections.detail && (
+      <>
+        <button
+          onClick={() => setShowDetail(!showDetail)}
+          className="mt-2 text-[12px] font-medium text-indigo-500 hover:text-indigo-700 cursor-pointer transition-colors"
+        >
+          {showDetail ? 'Show less' : 'Show detailed analysis'}
+        </button>
+        {showDetail && (
+          <div className="mt-3 pt-3 border-t border-stone-100 text-[13px] leading-relaxed text-stone-600">
+            <ReactMarkdown>{insightSections.detail}</ReactMarkdown>
+          </div>
+        )}
+      </>
+    )}
+  </div>
+)}
+```
+
+- [ ] **Step 4: Test with different query types**
+
+- Single query: summary should be 3-4 bullets (~200 words). "Show detailed analysis" reveals full depth.
+- Blueprint multi-query: same structure, summary synthesizes across sub-queries.
+- Verify follow-ups are still parsed correctly from the `## Suggested Follow-Up Questions` section.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add server/prompts/present.js client/src/components/ResultsPanel.jsx
+git commit -m "feat(insights): two-tier insights — crisp summary by default, detail on expand"
+```
+
 ---
 
 ## Chunk 3: Smart Disambiguation & Guided Retry
