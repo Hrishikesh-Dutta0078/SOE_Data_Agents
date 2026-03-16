@@ -527,3 +527,14 @@ wave_p0() {
       bash -c 'trufflehog git "'"$git_uri"'" --json > "'"$REPORTS_DIR/trufflehog_output.json"'"'
   fi
 }
+
+# --- Wave P1: trivy (SCA) ---
+wave_p1() {
+  echo ""
+  echo "=== Wave P1: SCA ==="
+
+  if ensure_tool "trivy" install_trivy; then
+    run_tool "P1" "trivy" "$REPORTS_DIR/trivy_output.json" \
+      trivy fs --format json --output "$REPORTS_DIR/trivy_output.json" "$PROJECT_DIR"
+  fi
+}
