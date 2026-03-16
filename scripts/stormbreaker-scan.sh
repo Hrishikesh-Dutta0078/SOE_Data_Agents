@@ -490,3 +490,40 @@ print_summary() {
 
   log_info "Summary written to $REPORTS_DIR/stormbreaker_summary.txt"
 }
+
+# ============================================================
+# WAVE FUNCTIONS
+# ============================================================
+
+# --- Wave P0: semgrep (SAST) + trufflehog (Secrets) ---
+wave_p0() {
+  echo ""
+  echo "=== Wave P0: SAST + Secrets ==="
+
+  # --- semgrep ---
+  if ensure_tool "semgrep" install_semgrep; then
+    if [[ "$PLATFORM" == "windows" ]]; then
+      # Run via WSL — translate project path
+      local wsl_project
+      wsl_project=$(wsl wslpath -u "$(cygpath -w "$PROJECT_DIR")" 2>/dev/null || echo "$PROJECT_DIR")
+      run_tool "P0" "semgrep" "$REPORTS_DIR/semgrep_output.json" \
+        wsl semgrep scan --config auto --json \
+        -o "$REPORTS_DIR/semgrep_output.json" \
+        "$wsl_project/server/" "$wsl_project/client/src/"
+    else
+      run_tool "P0" "semgrep" "$REPORTS_DIR/semgrep_output.json" \
+        semgrep scan --config auto --json \
+        -o "$REPORTS_DIR/semgrep_output.json" \
+        "$PROJECT_DIR/server/" "$PROJECT_DIR/client/src/"
+    fi
+  fi
+
+  # --- trufflehog ---
+  if ensure_tool "trufflehog" install_trufflehog; then
+    # Use cygpath -m on MINGW for valid file:// URI; quote paths for spaces
+    local git_uri="file://$PROJECT_DIR"
+    [[ "$PLATFORM" == "windows" ]] && git_uri="file://$(cygpath -m "$PROJECT_DIR")"
+    run_tool "P0" "trufflehog" "$REPORTS_DIR/trufflehog_output.json" \
+      bash -c 'trufflehog git "'"$git_uri"'" --json > "'"$REPORTS_DIR/trufflehog_output.json"'"'
+  fi
+}
