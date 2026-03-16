@@ -81,6 +81,7 @@ async function runOneSubQuery(baseState, plan, index, emit) {
       templateSql: match.sql,
       subQueryMatchFound: true,
       researchBrief: null,
+      matchType: 'exact',
       reasoning: `Direct template match: ${match.id}`,
     };
     logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (using gold SQL directly)`);
@@ -90,6 +91,7 @@ async function runOneSubQuery(baseState, plan, index, emit) {
       ...state,
       templateSql: match.sql,
       subQueryMatchFound: true,
+      matchType: 'partial',
     };
     logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (routing through writer for user params)`);
 
@@ -155,10 +157,10 @@ async function runOneSubQuery(baseState, plan, index, emit) {
 }
 
 /**
- * One correction pass for a single sub-query: correct → injectRls → validate → execute.
- * Used when the first-pass execution failed (validation or runtime error).
+ * Correction loop for a single sub-query: (correct → injectRls → validate → execute) × up to maxRounds.
+ * Retries if the corrected SQL still fails, feeding the new error back each round.
  */
-async function runOneSubQueryCorrection(baseState, plan, index, previousResult, emit) {
+async function runOneSubQueryCorrection(baseState, plan, index, previousResult, emit, maxRounds = PARALLEL_CORRECTION_ROUNDS) {
   const total = plan.length;
   const item = plan[index] || {};
   const id = item.id || `q${index + 1}`;
@@ -174,27 +176,8 @@ async function runOneSubQueryCorrection(baseState, plan, index, previousResult, 
     });
   }
 
-  const execError = previousResult.execution?.error || '';
-  const errorType = previousResult.errorType || 'EXECUTION_ERROR';
-  logger.info(`[ParallelPipeline] [${index + 1}/${total}] Correction pass starting`, {
-    errorType,
-    errorPreview: (execError || 'validation failed').substring(0, 120),
-  });
-
-  let state = buildStateSlice(baseState, plan, index);
-  state = {
-    ...state,
-    sql: previousResult.sql || '',
-    reasoning: previousResult.reasoning || '',
-    validationReport: previousResult.validationReport || null,
-    errorType,
-    researchBrief: previousResult.researchBrief || null,
-    attempts: { ...baseState.attempts, correction: 0, reflection: 0, resultCheck: 0 },
-    trace: [
-      { node: 'execute', timestamp: Date.now(), success: false, error: execError || 'Unknown' },
-    ],
-  };
-
+  // Build column reference once from the research brief
+  let correctionColumnReference = '';
   const briefTables = previousResult.researchBrief?.tables || [];
   if (briefTables.length > 0) {
     const parts = briefTables
@@ -205,41 +188,89 @@ async function runOneSubQueryCorrection(baseState, plan, index, previousResult, 
       })
       .filter(Boolean);
     if (parts.length > 0) {
-      state.correctionColumnReference = parts.join('\n\n');
+      correctionColumnReference = parts.join('\n\n');
     }
   }
 
-  const correctUpdate = await correctNode(state);
-  state = { ...state, ...correctUpdate };
-  if (!state.sql) {
-    logger.warn(`[ParallelPipeline] [${index + 1}/${total}] Correction produced no SQL`);
-    return { ...previousResult };
-  }
+  let current = previousResult;
+  let lastState = null;
 
-  const rlsUpdate = await injectRlsNode(state);
-  state = { ...state, ...rlsUpdate };
-  if (state.validationEnabled !== false) {
-    const validateUpdate = await validateNode(state);
-    state = { ...state, ...validateUpdate };
-  }
-  const execUpdate = await executeNode(state);
-  state = { ...state, ...execUpdate };
-
-  const recovered = state.execution?.success;
-  if (!recovered) {
-    logger.warn(`[ParallelPipeline] [${index + 1}/${total}] Correction did not recover`, {
+  for (let round = 1; round <= maxRounds; round++) {
+    const execError = current.execution?.error || '';
+    const errorType = current.errorType || 'EXECUTION_ERROR';
+    logger.info(`[ParallelPipeline] [${index + 1}/${total}] Correction round ${round}/${maxRounds}`, {
       errorType,
-      errorPreview: (state.execution?.error || '').substring(0, 120),
+      errorPreview: (execError || 'validation failed').substring(0, 120),
     });
+
+    let state = buildStateSlice(baseState, plan, index);
+    state = {
+      ...state,
+      sql: current.sql || '',
+      reasoning: current.reasoning || '',
+      validationReport: current.validationReport || null,
+      errorType,
+      researchBrief: current.researchBrief || previousResult.researchBrief || null,
+      correctionColumnReference,
+      attempts: { ...baseState.attempts, correction: round - 1, reflection: 0, resultCheck: 0 },
+      trace: lastState?.trace || [
+        { node: 'execute', timestamp: Date.now(), success: false, error: execError || 'Unknown' },
+      ],
+    };
+
+    const correctUpdate = await correctNode(state);
+    state = { ...state, ...correctUpdate };
+    if (!state.sql) {
+      logger.warn(`[ParallelPipeline] [${index + 1}/${total}] Correction round ${round} produced no SQL`);
+      break;
+    }
+
+    const rlsUpdate = await injectRlsNode(state);
+    state = { ...state, ...rlsUpdate };
+    if (state.validationEnabled !== false) {
+      const validateUpdate = await validateNode(state);
+      state = { ...state, ...validateUpdate };
+    }
+    const execUpdate = await executeNode(state);
+    state = { ...state, ...execUpdate };
+    lastState = state;
+
+    if (state.execution?.success) {
+      logger.info(`[ParallelPipeline] [${index + 1}/${total}] Correction recovered on round ${round}`);
+      return {
+        id,
+        subQuestion,
+        purpose,
+        sql: state.sql || '',
+        reasoning: state.reasoning || '',
+        execution: state.execution,
+        validationReport: state.validationReport || null,
+        researchBrief: state.researchBrief || previousResult.researchBrief || null,
+      };
+    }
+
+    // Feed the new error back for the next round
+    current = {
+      ...current,
+      sql: state.sql || current.sql,
+      reasoning: state.reasoning || current.reasoning,
+      execution: state.execution,
+      validationReport: state.validationReport || null,
+      errorType: state.errorType || errorType,
+    };
   }
+
+  logger.warn(`[ParallelPipeline] [${index + 1}/${total}] Correction exhausted ${maxRounds} rounds`, {
+    errorPreview: (lastState?.execution?.error || current.execution?.error || '').substring(0, 120),
+  });
 
   return {
     id,
     subQuestion,
     purpose,
-    sql: state.sql || '',
-    reasoning: state.reasoning || '',
-    execution: state.execution || previousResult.execution,
+    sql: lastState?.sql || current.sql || '',
+    reasoning: lastState?.reasoning || current.reasoning || '',
+    execution: lastState?.execution || current.execution || previousResult.execution,
   };
 }
 
@@ -344,12 +375,15 @@ async function parallelSubQueryPipelineNode(state) {
     duration,
   });
 
+  // Surface the first successful sub-query execution so the client can render charts/tables
+  const primaryResult = results.find((r) => r.execution?.success && r.execution?.rowCount > 0);
+
   return {
     queries: results,
     currentQueryIndex: total,
-    sql: '',
-    reasoning: '',
-    execution: null,
+    sql: primaryResult?.sql || '',
+    reasoning: primaryResult?.reasoning || '',
+    execution: primaryResult?.execution || null,
     researchBrief: null,
     researchToolCalls: [],
     validationReport: null,

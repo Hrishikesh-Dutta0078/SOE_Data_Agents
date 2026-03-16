@@ -40,7 +40,7 @@ module.exports = {
   REFLECT_CONFIDENCE_THRESHOLD: 0.6,
   MAX_CORRECTION_ROUNDS: 3,
   /** Correction attempts per failed sub-query in the parallel pipeline (1–2 recommended for latency). */
-  PARALLEL_CORRECTION_ROUNDS: 1,
+  PARALLEL_CORRECTION_ROUNDS: 2,
   MAX_REFLECTION_ROUNDS: 3,
   MAX_RESULT_RETRIES: 2,
 

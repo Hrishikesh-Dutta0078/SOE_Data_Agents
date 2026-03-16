@@ -389,6 +389,11 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
   const [activeTab, setActiveTab] = useState('insights');
   const isMultiQuery = queries.length > 1;
 
+  // For multi-query results, fall back to the first successful sub-query's execution
+  const primaryExec = execution
+    || queries.find((q) => q.execution?.success && q.execution?.rows?.length > 0)?.execution;
+  const primaryRows = primaryExec?.rows || [];
+
   const hasCharts = chart?.charts?.some((c) => VALID_TYPES.has(c.chartType)) ?? false;
 
   const tabs = useMemo(() => {
@@ -397,11 +402,14 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
     if (hasCharts) t.push({ id: 'chart', label: 'Charts' });
     if (isMultiQuery) {
       t.push({ id: 'subqueries', label: `Sub-Queries (${queries.length})` });
-    } else if (execution?.rows?.length > 0) {
+      if (primaryRows.length > 0) {
+        t.push({ id: 'table', label: 'Table' });
+      }
+    } else if (primaryRows.length > 0) {
       t.push({ id: 'table', label: 'Table' });
     }
     return t;
-  }, [insights, hasCharts, execution, isMultiQuery, queries.length]);
+  }, [insights, hasCharts, execution, isMultiQuery, queries.length, primaryRows.length]);
 
   if (tabs.length === 0) return null;
 
@@ -435,13 +443,13 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
         )}
 
         {currentTab === 'chart' && (
-          <ChartsView chart={chart} rows={execution?.rows || []} />
+          <ChartsView chart={chart} rows={primaryRows} />
         )}
 
         {currentTab === 'table' && (
           <TableView
-            columns={execution?.columns || []}
-            rows={execution?.rows || []}
+            columns={primaryExec?.columns || []}
+            rows={primaryRows}
           />
         )}
 

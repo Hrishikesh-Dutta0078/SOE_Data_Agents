@@ -80,6 +80,21 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(() => resolve(PREFETCH_TIMEOUT), ms));
 }
 
+/**
+ * Extract messages from a streamMode:'updates' chunk.
+ * LangGraph 1.x nests state under node names: { agent: { messages: [...] } }
+ * while 0.x returned flat: { messages: [...] }. Handle both.
+ */
+function extractMessagesFromChunk(chunk) {
+  if (!chunk || typeof chunk !== 'object') return [];
+  if (Array.isArray(chunk.messages)) return chunk.messages;
+  for (const key of Object.keys(chunk)) {
+    const val = chunk[key];
+    if (val && Array.isArray(val.messages)) return val.messages;
+  }
+  return [];
+}
+
 function stableStringify(value) {
   if (value === null || value === undefined) return 'null';
   if (typeof value !== 'object') return JSON.stringify(value);
@@ -456,7 +471,10 @@ function parseResearchBrief(result) {
       const content = msg.content;
       if (typeof content === 'object') return content;
       if (typeof content === 'string') {
-        try { return JSON.parse(content); } catch { /* fall through */ }
+        // submit_research may append a "Note: ..." after the JSON when tables are omitted
+        const jsonEnd = content.lastIndexOf('}');
+        const jsonStr = jsonEnd >= 0 ? content.substring(0, jsonEnd + 1) : content;
+        try { return JSON.parse(jsonStr); } catch { /* fall through */ }
       }
     }
   }
@@ -581,10 +599,12 @@ async function researchAgentNode(state) {
       const seenToolCallKeys = new Set();
       const seenToolResultKeys = new Set();
       let toolCallCount = 0;
+      const accumulatedMessages = [];
 
       for await (const chunk of stream) {
         lastAgentState = chunk;
-        const msgs = chunk.messages || [];
+        const msgs = extractMessagesFromChunk(chunk);
+        accumulatedMessages.push(...msgs);
         for (const msg of msgs) {
           if (msg.tool_calls?.length > 0) {
             for (const tc of msg.tool_calls) {
@@ -609,7 +629,9 @@ async function researchAgentNode(state) {
         if (finishedDiscovery) break;
       }
 
-      result = lastAgentState;
+      result = accumulatedMessages.length > 0
+        ? { ...lastAgentState, messages: accumulatedMessages }
+        : lastAgentState;
 
       // --- Phase 2: Opus brief synthesis ---
       if (result?.messages?.length > 0 && (finishedDiscovery || discoverContextContent)) {
@@ -684,10 +706,12 @@ Use ONLY tables and columns that appear in the discovery results. Do not invent 
       let submittedResearch = false;
       const seenToolCallKeys = new Set();
       const seenToolResultKeys = new Set();
+      const accumulatedMessages = [];
 
       for await (const chunk of stream) {
         lastAgentState = chunk;
-        const msgs = chunk.messages || [];
+        const msgs = extractMessagesFromChunk(chunk);
+        accumulatedMessages.push(...msgs);
         for (const msg of msgs) {
           if (msg.tool_calls?.length > 0) {
             for (const tc of msg.tool_calls) {
@@ -712,7 +736,9 @@ Use ONLY tables and columns that appear in the discovery results. Do not invent 
         if (submittedResearch) break;
       }
 
-      result = lastAgentState;
+      result = accumulatedMessages.length > 0
+        ? { ...lastAgentState, messages: accumulatedMessages }
+        : lastAgentState;
       clearTimeout(timeout);
     } finally {
       // timeout cleared above

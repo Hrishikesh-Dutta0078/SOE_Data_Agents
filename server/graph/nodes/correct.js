@@ -319,6 +319,20 @@ async function correctNode(state) {
 Return ONLY valid, executable SQL with no explanation.`;
   }
 
+  const typeConversionMatch = issueText.match(/Conversion failed when converting (?:the )?(\w+) value '([^']+)' to data type (\w+)/i);
+  if (typeConversionMatch) {
+    const [, sourceType, sampleValue, targetType] = typeConversionMatch;
+    errorSpecificGuidance += `\n\nCRITICAL — TYPE CONVERSION ERROR: The column being converted contains non-${targetType} values like '${sampleValue}'.
+This means the column has MIXED data types (e.g., both numbers and text like 'INTL', 'N/A', 'WW', 'TBD').
+You MUST fix ALL ${sourceType}-to-${targetType} conversions in the query, not just the one that failed:
+- Replace CAST(col AS ${targetType}) with TRY_CAST(col AS ${targetType})
+- Replace CONVERT(${targetType}, col) with TRY_CONVERT(${targetType}, col)
+- For WHERE clauses filtering on numeric values, add ISNUMERIC(col) = 1 or use TRY_CAST(col AS ${targetType}) IS NOT NULL
+- For SUM/AVG aggregations, use SUM(TRY_CAST(col AS ${targetType})) instead of SUM(CAST(col AS ${targetType}))
+- Check ALL columns in the query that might have mixed types — the error showed '${sampleValue}' but the same column likely has other non-numeric values too.
+Do NOT just handle the specific value '${sampleValue}' — use TRY_CAST/TRY_CONVERT to handle ALL non-numeric values generically.`;
+  }
+
   const invalidObjMatch = issueText.match(/Invalid object name '([^']+)'/i);
   if (invalidObjMatch) {
     const badTable = invalidObjMatch[1];

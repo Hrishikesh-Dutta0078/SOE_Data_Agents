@@ -254,9 +254,31 @@ async function classifyNode(state) {
           nodeKey: 'classify',
         }).withStructuredOutput(DetectedEntities);
 
+        const subQueryContext = blueprint.subQueries
+          ? blueprint.subQueries.map((sq) => `- ${sq.subQuestion || sq.purpose}`).join('\n')
+          : '';
+
+        const entitySystemPrompt = `Extract structured entities from the user's filter parameters for a multi-query sales analytics blueprint.
+
+Blueprint: "${blueprint.name}" — ${blueprint.description}
+${subQueryContext ? `Sub-queries this blueprint will execute:\n${subQueryContext}\n` : ''}
+Recognizable filter values in this database (for reference only — do NOT include column names in your output):
+- Global regions: AMERICAS, EMEA, APAC, WW
+- Fiscal quarters: format "YYYY-QN" (e.g., 2026-Q1, 2026-Q2) — bare "Q2" means the current year's Q2
+- Segments: Enterprise, Growth, SMB
+- Sales stages: S1-Prospect, S2-Qualify, S3-Develop, S4-Prove
+
+Identify:
+- metrics: KPIs mentioned (pipeline, revenue, deal count, etc.)
+- dimensions: grouping axes the user wants (region, segment, quarter, etc.)
+- filters: the raw values the user wants to filter by (e.g., "EMEA", "Q2", "Enterprise"). Output ONLY the value itself — never prepend a column name like "REGION_ID = EMEA". The downstream agents will resolve the correct column.
+- operations: comparisons or rankings (compare, rank, top N, etc.)
+
+Return only what is explicitly stated in the user parameters.`;
+
         const extractionResult = await entityModel.invoke([
-          { role: 'system', content: 'Extract structured entities from the user\'s filter parameters for a sales analytics query. Identify any metrics, dimensions (grouping axes like region, segment), filters (specific values like EMEA, Q2, Enterprise), and operations (compare, rank, top N). Return only what is explicitly stated.' },
-          { role: 'user', content: `Blueprint: ${blueprint.name} — ${blueprint.description}\nUser parameters: ${params}` },
+          { role: 'system', content: entitySystemPrompt },
+          { role: 'user', content: `User parameters: ${params}` },
         ]);
 
         if (extractionResult) {

@@ -41,6 +41,21 @@ function filterToolsByEnabled(allTools, enabledNames) {
 const EventEmitter = require('events');
 const _writerToolEvents = new EventEmitter();
 
+/**
+ * Extract messages from a streamMode:'updates' chunk.
+ * LangGraph 1.x nests state under node names: { agent: { messages: [...] } }
+ * while 0.x returned flat: { messages: [...] }. Handle both.
+ */
+function extractMessagesFromChunk(chunk) {
+  if (!chunk || typeof chunk !== 'object') return [];
+  if (Array.isArray(chunk.messages)) return chunk.messages;
+  for (const key of Object.keys(chunk)) {
+    const val = chunk[key];
+    if (val && Array.isArray(val.messages)) return val.messages;
+  }
+  return [];
+}
+
 function stableStringify(value) {
   if (value === null || value === undefined) return 'null';
   if (typeof value !== 'object') return JSON.stringify(value);
@@ -270,7 +285,23 @@ Call submit_sql with the final SQL and reasoning explaining how you adapted the 
     prompt = `You are a precise T-SQL writer for Microsoft SQL Server. Your research team has gathered context for you. Write the SQL query using ONLY the information provided.
 
 ${briefText}
+`;
 
+    // When a gold template exists alongside the research brief,
+    // show it as an adaptation reference so the writer starts from
+    // known-good SQL rather than writing from scratch.
+    if (state.templateSql) {
+      prompt += `
+=== REFERENCE SQL TEMPLATE (adapt this) ===
+A verified SQL template exists for a closely related question. Use it as your starting point — preserve its table selections, join patterns, and column names. Adapt it to answer the user's specific question by applying the detected entities (filters, dimensions, etc.) listed below.
+
+${state.templateSql}
+
+IMPORTANT: Adapt this template rather than writing from scratch. Add WHERE clauses for any user-specified filters while keeping the template's structure intact.
+`;
+    }
+
+    prompt += `
 MANDATORY SQL RULES:
 - Do NOT use table or column names that appear only in EXAMPLE PATTERNS. Use only ALLOWED TABLES and EXACT COLUMN REFERENCE for this question.
 - Use ONLY the tables listed in ALLOWED TABLES and ONLY the columns listed in EXACT COLUMN REFERENCE for each table. Any other table or column name does not exist and will cause execution failure.
@@ -499,7 +530,7 @@ async function sqlWriterAgentNode(state) {
 
         for await (const chunk of stream) {
           lastAgentState = chunk;
-          const msgs = chunk.messages || [];
+          const msgs = extractMessagesFromChunk(chunk);
           accumulatedMessages.push(...msgs);
 
           for (const msg of msgs) {
