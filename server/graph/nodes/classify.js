@@ -42,10 +42,12 @@ function loadBlueprints() {
 }
 
 function findBlueprintBySlashCommand(question) {
-  const trimmed = question.trim().toLowerCase();
+  const trimmed = question.trim();
+  const lower = trimmed.toLowerCase();
   const blueprints = loadBlueprints();
   for (const bp of blueprints) {
-    if (trimmed.startsWith(bp.slashCommand)) {
+    if (lower.startsWith(bp.slashCommand)) {
+      // Preserve original case of user params (e.g., "EMEA", "Q2")
       const trailing = trimmed.slice(bp.slashCommand.length).trim();
       return { blueprint: bp, params: trailing };
     }

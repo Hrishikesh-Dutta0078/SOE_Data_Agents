@@ -23,6 +23,10 @@ async function alignSubQueriesToTemplatesNode(state) {
     };
   }
 
+  // When a blueprint has user params (e.g., "for EMEA"), append them to each
+  // sub-question after canonical rewriting so the writer can apply the filters.
+  const userParams = state.blueprintMeta?.userParams || '';
+
   const { examplesMap } = loadGoldIndex();
   const aligned = [];
   const sentToResearch = [];
@@ -33,12 +37,15 @@ async function alignSubQueriesToTemplatesNode(state) {
     if (item.templateId) {
       const example = examplesMap.get(item.templateId);
       if (example) {
+        const rewritten = userParams
+          ? `${example.question} ${userParams}`
+          : example.question;
         aligned.push({
           ...item,
-          subQuestion: example.question,
+          subQuestion: rewritten,
           templateId: item.templateId,
         });
-        logger.info(`[AlignSubQueries] "${sub.substring(0, 60)}" → direct templateId hit: ${item.templateId}`);
+        logger.info(`[AlignSubQueries] "${sub.substring(0, 60)}" → direct templateId hit: ${item.templateId}${userParams ? ` (+params: ${userParams})` : ''}`);
         continue;
       }
     }
@@ -49,15 +56,19 @@ async function alignSubQueriesToTemplatesNode(state) {
     if (match) {
       const example = examplesMap.get(match.id);
       const canonicalQuestion = example ? example.question : sub;
+      const rewritten = userParams
+        ? `${canonicalQuestion} ${userParams}`
+        : canonicalQuestion;
       aligned.push({
         ...item,
-        subQuestion: canonicalQuestion,
+        subQuestion: rewritten,
         templateId: match.id,
       });
       logger.info(
-        `[AlignSubQueries] "${sub.substring(0, 60)}" → aligned to ${match.id} ("${canonicalQuestion.substring(0, 50)}")`,
+        `[AlignSubQueries] "${sub.substring(0, 60)}" → aligned to ${match.id} ("${canonicalQuestion.substring(0, 50)}")${userParams ? ` (+params: ${userParams})` : ''}`,
       );
     } else {
+      // For non-template sub-queries, params are already in the sub-question from expandBlueprintPlan
       aligned.push({ ...item, subQuestion: sub, templateId: undefined });
       sentToResearch.push(item);
       logger.info(`[AlignSubQueries] "${sub.substring(0, 60)}" → no template match, keeping for research`);

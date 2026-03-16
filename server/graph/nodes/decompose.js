@@ -77,11 +77,13 @@ function expandBlueprintPlan(state) {
     let subQuestion = sq.subQuestion || '';
 
     if (sq.templateId) {
+      // Use canonical question from gold template; alignSubQueriesToTemplates
+      // will append userParams after canonical rewriting.
       const example = examplesMap.get(sq.templateId);
       if (example) subQuestion = example.question;
-    }
-
-    if (userParams) {
+    } else if (userParams) {
+      // Non-template sub-queries: append params here since alignSubQueries
+      // won't rewrite these.
       subQuestion = `${subQuestion} ${userParams}`;
     }
 
