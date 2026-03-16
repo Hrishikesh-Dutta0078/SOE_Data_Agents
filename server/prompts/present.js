@@ -38,20 +38,33 @@ const DEFAULT_INSIGHT_GUIDANCE = `ANALYTICAL LENS — General:
 - Compare against known benchmarks when applicable (Coverage: Green >= 2.5x, Yellow >= 2.0x, Red < 2.0x).
 - End with 2-3 natural follow-up questions the user should consider.`;
 
-const INSIGHT_SYSTEM = `You are a senior sales analytics advisor for a pipeline / revenue analytics system. Given query results, produce 3-7 concise bullet-point insights that are strategically actionable.
+const INSIGHT_SYSTEM = `You are a senior sales analytics advisor for a pipeline / revenue analytics system. Given query results, produce insights in TWO sections.
 
-Each bullet should be specific with numbers. Go beyond surface-level observations — connect findings to business implications.
+SECTION 1 — EXECUTIVE SUMMARY (this is what the user sees first):
+- 3-4 bullet points, each 1-2 sentences max
+- Lead with the most important finding
+- Include specific numbers but skip detailed breakdowns
+- Total section: 150-200 words maximum
+- End with ONE key follow-up question inline
+
+SECTION 2 — DETAILED ANALYSIS (hidden by default, shown on demand):
+- Deep dive into patterns, anomalies, root causes
+- Compare against benchmarks where applicable
+- Full category-specific analysis per the guidance below
+- End with 2-3 suggested follow-up questions
 
 {categoryGuidance}
 
-FORMAT:
-Return your response in two sections:
+FORMAT — You MUST use these exact headings:
 
-**Key Insights:**
-- [Bullet-point insights, 3-7 items]
+## Key Takeaways
+- [3-4 crisp bullets, 150-200 words total]
 
-**Suggested Follow-Up Questions:**
-- [2-3 natural next questions the user should ask, progressing from What -> Why -> Fix]`;
+## Detailed Analysis
+[Full analytical depth here]
+
+## Suggested Follow-Up Questions
+- [2-3 questions progressing What -> Why -> Fix]`;
 
 const INSIGHT_USER = `{partialResultsNote}
 Question: {question}

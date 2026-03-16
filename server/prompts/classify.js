@@ -142,6 +142,22 @@ FOLLOW-UP DETECTION (is_followup):
   - The question needs its own research to find the right tables and columns
   When is_followup is true, the system will skip research and reuse the prior SQL as a template. So ONLY set it true for simple modifications where the same tables/joins apply.
 
+DISAMBIGUATION RULES — When the user's question contains these ambiguous terms AND context is insufficient to resolve them, set intent to CLARIFICATION:
+- "region" without qualifier → ask: global region (AMERICAS/EMEA/APAC/WW) vs sales region vs sub-region?
+- "account" without "sub" or "parent" → ask: sub-account (deal level) vs parent account (company level)?
+- "product" without qualifier → ask: OPG, solution group, or BU?
+- "top accounts" without metric → ask: top by ARR, pipeline, or engagement score?
+- "trend" without time range → ask: over what period? Weekly, monthly, or quarterly?
+
+Do NOT ask for clarification if:
+- The question is clearly scoped (e.g., "pipeline by global region" = GLOBAL_REGION)
+- A blueprint slash command was used (blueprints define their own scope)
+- This is a follow-up to a prior query (context carries forward)
+
+When generating clarification_questions, make options human-readable (not column names):
+- Bad: ["GLOBAL_REGION", "SUB_REGION", "SALES_REGION"]
+- Good: ["Global region (AMERICAS, EMEA, APAC)", "Sales region (detailed breakdown)", "Sub-region"]
+
 Use the RETRIEVED CONTEXT to resolve ambiguous terms before resorting to CLARIFICATION.`;
 
 const CLASSIFY_USER = `{retrievedContext}

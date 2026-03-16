@@ -2,11 +2,12 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { analyzeQuestionStream, fetchBlueprints } from '../utils/api';
 import ResultsPanel from './ResultsPanel';
-import AgentTracePanel from './AgentTracePanel';
+
 import ThinkingPanel from './ThinkingPanel';
 import DashboardOverlay from './DashboardOverlay';
 import VoiceInput from './VoiceInput';
 import BlueprintPicker from './BlueprintPicker';
+import SuggestedQuestions from './SuggestedQuestions';
 import { Menu, ArrowUp, X, MessageSquare, Copy, Check } from 'lucide-react';
 
 function Badge({ className = '', children }) {
@@ -92,6 +93,9 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const [blueprints, setBlueprints] = useState([]);
   const [showBlueprintPicker, setShowBlueprintPicker] = useState(false);
   const [blueprintSelectedIdx, setBlueprintSelectedIdx] = useState(0);
+  const [partialQueries, setPartialQueries] = useState([]);
+  const [querySummary, setQuerySummary] = useState('');
+  const [confidence, setConfidence] = useState(null);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -260,13 +264,16 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           queries: data.queries || [],
           queryPlan: data.queryPlan || [],
           suggestedFollowUps: data.suggestedFollowUps || [],
+          retrySuggestions: data.retrySuggestions || [],
           trace: data.trace || null,
           usage: data.usage || null,
           usageByNodeAndModel: data.usageByNodeAndModel || null,
           warnings: data.warnings || null,
           entities: data.entities || null,
+          confidence: data.confidence || null,
         },
       ]);
+      if (data.confidence) setConfidence(data.confidence);
     } else if (intent === 'CLARIFICATION') {
       const questions = data.clarificationQuestions || [];
       let hint = 'I need a bit more information to generate a query.';
@@ -276,6 +283,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       setPendingAnswers({});
       setOtherText({});
       setAdditionalNotes('');
+      // Find the original user question for disambiguation re-submission
+      const lastUserQ = [...messages].reverse().find((m) => m.role === 'user' && m.type === 'user');
       setMessages((prev) => [
         ...prev,
         {
@@ -284,6 +293,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           content: hint,
           entities: data.entities || {},
           questions,
+          originalQuestion: lastUserQ?.content || '',
         },
       ]);
     } else if (intent === 'GENERAL_CHAT' || data.generalChatReply) {
@@ -374,6 +384,14 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           elapsed: eventData.elapsed,
         },
       ]);
+    } else if (eventType === 'subquery_result') {
+      setPartialQueries((prev) => {
+        const next = [...prev];
+        next[eventData.index] = eventData.result;
+        return next;
+      });
+    } else if (eventType === 'query_summary') {
+      setQuerySummary(eventData.summary || '');
     }
   }, []);
 
@@ -384,6 +402,9 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     setActiveTools([]);
     setThinkingEntries([]);
     setQueryPlan(null);
+    setPartialQueries([]);
+    setQuerySummary('');
+    setConfidence(null);
 
     const opts = { impersonateContext: impersonateContext ? { type: impersonateContext.type, id: impersonateContext.id } : null, validationEnabled, sessionId, isFollowUp, useFastModel, enabledTools: enabledToolsProp ?? null };
     const result = await analyzeQuestionStream(
@@ -619,7 +640,18 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       })()}
 
       {(msg.insights || msg.chart || (msg.execution?.success && msg.execution.rows?.length > 0) || (msg.queries?.length > 0)) && (
-        <ResultsPanel execution={msg.execution} insights={msg.insights} chart={msg.chart} queries={msg.queries || []} />
+        <ResultsPanel
+          execution={msg.execution}
+          insights={msg.insights}
+          chart={msg.chart}
+          queries={msg.queries || []}
+          confidence={msg.confidence}
+          retrySuggestions={msg.retrySuggestions}
+          onRetrySuggestion={(text) => handleSend(text)}
+          sessionId={sessionId}
+          question={msg.content}
+          sql={msg.content}
+        />
       )}
 
       {msg.execution && !msg.execution.success && (
@@ -660,7 +692,6 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         </div>
       )}
 
-      <AgentTracePanel trace={msg.trace} />
 
       {(msg.usage || msg.usageByNodeAndModel) && (
         <div className="mt-2 text-[10px] text-stone-400">
@@ -810,6 +841,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
               const selected = pendingAnswers[q.id];
               const isOther = selected === '__other__';
 
+              const isSingleQuestion = questions.length === 1;
               return (
                 <div key={q.id} className="my-1.5">
                   <div className="text-[11px] font-semibold text-slate-800 mb-1">{q.question}</div>
@@ -827,6 +859,12 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                         `}
                         onClick={() => {
                           if (!isInteractive) return;
+                          if (isSingleQuestion && msg.originalQuestion) {
+                            // Quick-pick: re-submit with the resolved clarification
+                            const clarifiedQuestion = `${msg.originalQuestion} (${opt})`;
+                            handleSend(clarifiedQuestion, { isFollowUp: false });
+                            return;
+                          }
                           setPendingAnswers((prev) => ({ ...prev, [q.id]: opt }));
                         }}
                       >
@@ -989,42 +1027,65 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   };
 
   return (
-    <div className="flex flex-col h-full gap-3">
-      {/* Header — separate floating card */}
-      <div className="flex items-center gap-3 px-5 py-3.5 surface-gradient-header shrink-0">
-        <button
-          className="md:hidden p-1.5 rounded-[8px] text-stone-500 hover:bg-stone-100 transition-colors"
-          onClick={onMenuClick}
-          aria-label="Toggle sidebar"
-        >
-          <Menu size={20} strokeWidth={1.5} />
-        </button>
-        <span className="font-semibold text-base text-stone-900 tracking-tight">{userName ? `Welcome, ${userName}` : 'Auto Agents'}</span>
-        <div className="ml-auto">
-          <button
-            className="px-3.5 py-1.5 text-sm font-medium text-indigo-500 bg-transparent border-none rounded-[8px]
-                       hover:bg-indigo-50 transition-all cursor-pointer"
-            onClick={() => { if (onNewChat) onNewChat(); }}
-            disabled={loading}
-          >
-            New Chat
-          </button>
-        </div>
-      </div>
-
-      {/* Chat area — separate floating card */}
+    <div className="flex flex-col h-full">
+      {/* Chat area */}
       <div className="chat-card">
-      <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
+      <div className={`flex-1 overflow-y-auto p-5 flex flex-col ${messages.length === 0 && !loading ? 'justify-center items-center' : 'gap-4'}`}>
         {messages.length === 0 && !loading && (
-          <div className="m-auto flex flex-col items-center gap-4 max-w-md text-center animate-fade-in-up">
-            <div className="w-14 h-14 rounded-[16px] flex items-center justify-center" style={{ background: 'var(--gradient-empty-icon)', boxShadow: 'var(--shadow-card)' }}>
-              <MessageSquare size={24} strokeWidth={1.5} className="text-stone-400" />
-            </div>
-            <div>
-              <h2 className="text-xl font-semibold text-stone-900 mb-1.5 tracking-tight">What would you like to know?</h2>
-              <p className="text-sm text-stone-500">Ask a question about your data in plain English.</p>
-            </div>
-          </div>
+          <SuggestedQuestions
+            onSelect={(text) => handleSend(text)}
+            renderInput={() => (
+              <div className="w-full flex justify-center mb-5" style={{ maxWidth: 560, animation: 'fade-in-up 0.6s 0.65s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
+                <div className="relative w-full">
+                  {showBlueprintPicker && (
+                    <BlueprintPicker
+                      blueprints={blueprints}
+                      selectedIndex={blueprintSelectedIdx}
+                      onSelect={handleBlueprintSelect}
+                      onClose={() => setShowBlueprintPicker(false)}
+                    />
+                  )}
+                  <div className="flex items-center gap-2.5 w-full rounded-[18px] px-1.5 py-1.5" style={{ background: 'var(--glass-bg)', border: '1px solid var(--color-border)' }}>
+                    <div className={`voice-input-wrapper flex-1 ${voiceListening ? 'voice-active' : ''}`}>
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        className="voice-input-field w-full bg-transparent border-none outline-none text-[14px] px-3 py-2.5"
+                        style={{ color: 'var(--color-text-primary)', fontFamily: 'inherit' }}
+                        placeholder={voiceListening ? 'Listening...' : 'Ask a question...'}
+                        value={input}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setInput(val);
+                          if (val === '/' && blueprints.length > 0) { setShowBlueprintPicker(true); setBlueprintSelectedIdx(0); }
+                          else if (showBlueprintPicker && !val.startsWith('/')) { setShowBlueprintPicker(false); }
+                        }}
+                        onKeyDown={handleKeyDown}
+                        onBlur={() => setTimeout(() => setShowBlueprintPicker(false), 150)}
+                        disabled={loading}
+                      />
+                    </div>
+                    <VoiceInput
+                      stopRef={voiceStopRef}
+                      onInterimTranscript={(text) => { setInput(text); inputRef.current?.focus(); }}
+                      onFinalTranscript={(text) => { setInput(text); inputRef.current?.focus(); }}
+                      onListeningChange={(listening) => { setVoiceListening(listening); if (listening) inputRef.current?.focus(); }}
+                      onError={(msg) => { setMessages((prev) => [...prev, { role: 'system', type: 'error', content: msg }]); }}
+                      disabled={loading}
+                    />
+                    <button
+                      className="w-9 h-9 flex items-center justify-center rounded-[12px] shrink-0 cursor-pointer border-none text-white transition-all"
+                      style={{ background: 'var(--gradient-send-btn)', boxShadow: '0 2px 8px rgba(99,102,241,0.25)' }}
+                      onClick={() => handleSend()}
+                      disabled={loading}
+                    >
+                      <ArrowUp size={16} strokeWidth={2.5} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          />
         )}
 
         {messages.map((msg, i) => (
@@ -1042,6 +1103,22 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                   queryPlan={queryPlan}
                   startTime={progress.startTime}
                 />
+                {querySummary && (
+                  <div className="mx-0 mb-2 mt-2 px-4 py-2.5 rounded-xl text-[13px] text-indigo-800"
+                       style={{ background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)', border: '1px solid rgba(99,102,241,0.15)' }}>
+                    <span className="font-semibold text-indigo-600 mr-1.5">Plan:</span>
+                    {querySummary}
+                  </div>
+                )}
+                {partialQueries.filter(Boolean).length > 0 && (
+                  <ResultsPanel
+                    execution={null}
+                    insights={null}
+                    chart={null}
+                    queries={partialQueries.filter(Boolean)}
+                    isPartial={true}
+                  />
+                )}
                 {streamingInsights && (
                   <div className="mt-3 pt-3 border-t border-stone-100 text-[13px] leading-relaxed text-stone-700">
                     <ReactMarkdown>{streamingInsights}</ReactMarkdown>
@@ -1108,8 +1185,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       )}
       </div>{/* end chat-card */}
 
-      {/* Input — separate floating card */}
-      <div className="relative px-5 py-3.5 surface-gradient-input shrink-0">
+      {/* Input — pinned bottom, hidden on empty state */}
+      <div className={`relative px-5 py-3.5 surface-gradient-input shrink-0 ${messages.length === 0 && !loading ? 'hidden' : ''}`}>
         {showBlueprintPicker && (
           <BlueprintPicker
             blueprints={blueprints}
@@ -1125,10 +1202,10 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
             <input
               ref={inputRef}
               type="text"
-              className="voice-input-field w-full px-4 py-2.5 text-sm bg-white border border-stone-200/70 rounded-[16px] outline-none font-sans
-                         focus:ring-2 focus:ring-indigo-500/15 focus:border-indigo-400
+              className="voice-input-field w-full px-4 py-2.5 text-sm border rounded-[16px] outline-none font-sans
+                         focus:border-indigo-400/30
                          disabled:bg-stone-50 disabled:text-stone-400"
-              style={{ boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(255,255,255,0.6)' }}
+              style={{ background: 'var(--glass-bg-light)', borderColor: 'var(--color-border)' }}
               placeholder={voiceListening ? 'Listening...' : 'Ask a new question...'}
               value={input}
               onChange={(e) => {

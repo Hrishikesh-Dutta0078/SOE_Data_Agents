@@ -74,7 +74,7 @@ async function runOneSubQuery(baseState, plan, index, emit) {
   if (!match) match = findSubQueryMatch(subQuestion);
   if (!match) match = await findSubQueryMatchLLMFallback(subQuestion);
   if (match && !hasUserParams) {
-    // Exact template match with no user params — use gold SQL directly, skip writer
+    // Exact template match with no user params — use gold SQL directly, skip writer + validation
     state = {
       ...state,
       sql: match.sql,
@@ -83,6 +83,7 @@ async function runOneSubQuery(baseState, plan, index, emit) {
       researchBrief: null,
       matchType: 'exact',
       reasoning: `Direct template match: ${match.id}`,
+      validationEnabled: false,
     };
     logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (using gold SQL directly)`);
   } else if (match && hasUserParams) {
@@ -143,7 +144,7 @@ async function runOneSubQuery(baseState, plan, index, emit) {
   const execUpdate = await executeNode(state);
   state = { ...state, ...execUpdate };
 
-  return {
+  const result = {
     id,
     subQuestion,
     purpose,
@@ -154,6 +155,23 @@ async function runOneSubQuery(baseState, plan, index, emit) {
     errorType: state.errorType || '',
     researchBrief: state.researchBrief || null,
   };
+
+  if (emit) {
+    _parallelPipelineEvents.emit('subquery_result', {
+      sessionId: baseState.sessionId || '',
+      index,
+      total,
+      result: {
+        id,
+        subQuestion,
+        purpose,
+        sql: state.sql || '',
+        execution: state.execution || null,
+      },
+    });
+  }
+
+  return result;
 }
 
 /**

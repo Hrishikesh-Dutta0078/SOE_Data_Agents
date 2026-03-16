@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Copy, Check, Download } from 'lucide-react';
 import {
   BarChart, Bar,
   LineChart, Line,
@@ -270,7 +271,18 @@ function SingleChart({ config, rows, colorIndex }) {
 }
 
 function ChartsView({ chart, rows }) {
+  const chartRef = useRef(null);
   const chartsToRender = chart?.charts?.filter((c) => VALID_TYPES.has(c.chartType)) ?? [];
+
+  const handleDownload = async () => {
+    if (!chartRef.current) return;
+    const html2canvas = (await import('html2canvas')).default;
+    const canvas = await html2canvas(chartRef.current, { backgroundColor: '#ffffff', scale: 2 });
+    const link = document.createElement('a');
+    link.download = `chart-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
 
   if (chartsToRender.length === 0) {
     return (
@@ -281,21 +293,58 @@ function ChartsView({ chart, rows }) {
   }
 
   return (
-    <div className="w-full max-h-[1200px] overflow-y-auto">
-      {chartsToRender.map((cfg, idx) => (
-        <SingleChart key={idx} config={cfg} rows={rows} colorIndex={idx} />
-      ))}
+    <div className="relative">
+      <button onClick={handleDownload} className="absolute top-0 right-0 p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer z-10" title="Download chart">
+        <Download size={14} />
+      </button>
+      <div ref={chartRef} className="w-full max-h-[1200px] overflow-y-auto">
+        {chartsToRender.map((cfg, idx) => (
+          <SingleChart key={idx} config={cfg} rows={rows} colorIndex={idx} />
+        ))}
+      </div>
     </div>
   );
 }
 
 function TableView({ columns, rows }) {
+  const handleExportExcel = async () => {
+    const { utils, writeFile } = await import('xlsx');
+    const ws = utils.json_to_sheet(rows, { header: columns });
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, 'Results');
+    writeFile(wb, `results-${Date.now()}.xlsx`);
+  };
+
+  const handleExportCsv = () => {
+    const header = columns.join(',');
+    const csvRows = rows.map(row => columns.map(col => {
+      const val = row[col];
+      if (val === null || val === undefined) return '';
+      const str = String(val);
+      return str.includes(',') || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str;
+    }).join(','));
+    const csv = [header, ...csvRows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.download = `results-${Date.now()}.csv`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+  };
+
   if (!columns || columns.length === 0) {
     return <div className="p-6 text-center text-stone-400 text-[13px]">No data to display.</div>;
   }
 
   return (
     <>
+      <div className="flex justify-end gap-1 mb-2">
+        <button onClick={handleExportExcel} className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-stone-500 hover:text-stone-700 rounded-md hover:bg-stone-100 cursor-pointer transition-colors bg-transparent border-none" title="Download as Excel">
+          <Download size={12} /> Excel
+        </button>
+        <button onClick={handleExportCsv} className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-stone-500 hover:text-stone-700 rounded-md hover:bg-stone-100 cursor-pointer transition-colors bg-transparent border-none" title="Download as CSV">
+          <Download size={12} /> CSV
+        </button>
+      </div>
       <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
         <table className="w-full border-collapse text-xs">
           <thead>
@@ -385,9 +434,24 @@ function SubQuerySection({ query, index }) {
   );
 }
 
-export default function ResultsPanel({ execution, insights, chart, queries = [] }) {
+export default function ResultsPanel({ execution, insights, chart, queries = [], isPartial = false, confidence, retrySuggestions, onRetrySuggestion, sessionId, question, sql }) {
   const [activeTab, setActiveTab] = useState('insights');
+  const [showDetail, setShowDetail] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [feedback, setFeedback] = useState(null);
   const isMultiQuery = queries.length > 1;
+
+  const insightSections = useMemo(() => {
+    if (!insights) return { summary: '', detail: '' };
+    const detailMarker = /^## Detailed Analysis/m;
+    const match = insights.match(detailMarker);
+    if (!match) return { summary: insights, detail: '' };
+    const splitIdx = insights.indexOf(match[0]);
+    return {
+      summary: insights.substring(0, splitIdx).trim(),
+      detail: insights.substring(splitIdx).trim(),
+    };
+  }, [insights]);
 
   // For multi-query results, fall back to the first successful sub-query's execution
   const primaryExec = execution
@@ -398,6 +462,11 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
 
   const tabs = useMemo(() => {
     const t = [];
+    if (isPartial && queries.length > 0) {
+      const completed = queries.filter((q) => q.execution?.success).length;
+      t.push({ id: 'subqueries', label: `Results (${completed}/${queries.length} complete)` });
+      return t;
+    }
     if (insights) t.push({ id: 'insights', label: 'Insights' });
     if (hasCharts) t.push({ id: 'chart', label: 'Charts' });
     if (isMultiQuery) {
@@ -409,7 +478,7 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
       t.push({ id: 'table', label: 'Table' });
     }
     return t;
-  }, [insights, hasCharts, execution, isMultiQuery, queries.length, primaryRows.length]);
+  }, [insights, hasCharts, execution, isMultiQuery, queries.length, primaryRows.length, isPartial]);
 
   if (tabs.length === 0) return null;
 
@@ -417,7 +486,7 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
 
   return (
     <div className="mt-3 rounded-[16px] overflow-hidden bg-white" style={{ border: '1px solid rgba(231,229,228,0.5)', boxShadow: 'var(--shadow-float)' }}>
-      <div className="flex gap-1 p-1 m-3 mb-0 rounded-[10px]" style={{ background: 'linear-gradient(135deg, #F5F5F4 0%, #EEF2FF 100%)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.04)' }}>
+      <div className="flex items-center gap-1 p-1 m-3 mb-0 rounded-[10px]" style={{ background: 'linear-gradient(135deg, #F5F5F4 0%, #EEF2FF 100%)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.04)' }}>
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -433,12 +502,47 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
             {t.label}
           </button>
         ))}
+        {confidence && !isPartial && (
+          <span className={`ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+            confidence.level === 'high' ? 'bg-emerald-50 text-emerald-700' :
+            confidence.level === 'medium' ? 'bg-amber-50 text-amber-700' :
+            'bg-red-50 text-red-700'
+          }`}>
+            {confidence.level === 'high' ? 'High confidence' :
+             confidence.level === 'medium' ? 'Moderate confidence' :
+             'Low confidence — verify results'}
+          </span>
+        )}
       </div>
 
       <div className="p-4">
         {currentTab === 'insights' && insights && (
-          <div className="text-[13px] leading-relaxed text-stone-700">
-            <ReactMarkdown>{insights}</ReactMarkdown>
+          <div className="relative">
+            <button
+              onClick={() => { navigator.clipboard.writeText(insights); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+              className="absolute top-0 right-0 p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer"
+              title="Copy insights"
+            >
+              {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+            </button>
+            <div className="text-[13px] leading-relaxed text-stone-700 pr-8">
+              <ReactMarkdown>{insightSections.summary}</ReactMarkdown>
+            </div>
+            {insightSections.detail && (
+              <>
+                <button
+                  onClick={() => setShowDetail(!showDetail)}
+                  className="mt-2 text-[12px] font-medium text-indigo-500 hover:text-indigo-700 cursor-pointer transition-colors bg-transparent border-none p-0"
+                >
+                  {showDetail ? 'Show less' : 'Show detailed analysis'}
+                </button>
+                {showDetail && (
+                  <div className="mt-3 pt-3 border-t border-stone-100 text-[13px] leading-relaxed text-stone-600">
+                    <ReactMarkdown>{insightSections.detail}</ReactMarkdown>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
 
@@ -455,12 +559,52 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
 
         {currentTab === 'subqueries' && (
           <div>
+            {isPartial && (
+              <div className="flex items-center gap-2 mb-3 px-2 py-1.5 text-[12px] text-indigo-600 bg-indigo-50/50 rounded-lg">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                Analyzing sub-queries...
+              </div>
+            )}
             {queries.map((q, i) => (
               <SubQuerySection key={q.id || i} query={q} index={i} />
             ))}
           </div>
         )}
+
+        {retrySuggestions?.length > 0 && (
+          <div className="mt-3 p-3 rounded-xl bg-amber-50/50 border border-amber-100">
+            <div className="text-[11px] font-semibold text-amber-700 mb-2">Try rephrasing:</div>
+            <div className="flex flex-col gap-1.5">
+              {retrySuggestions.map((s, i) => (
+                <button key={i} onClick={() => onRetrySuggestion?.(s)}
+                  className="text-left text-[12px] text-amber-800 hover:text-amber-950 px-2 py-1 rounded-lg hover:bg-amber-100/50 cursor-pointer transition-colors bg-transparent border-none">
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
+      {!isPartial && (
+        <div className="flex items-center justify-end gap-1 px-4 pb-3 pt-1">
+          <span className="text-[11px] text-stone-400 mr-1">Was this helpful?</span>
+          <button onClick={() => {
+            setFeedback('up');
+            fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId, question, sql, rating: 'up' }) }).catch(() => {});
+          }}
+            className={`p-1 rounded-md cursor-pointer transition-colors bg-transparent border-none ${feedback === 'up' ? 'text-emerald-500 bg-emerald-50' : 'text-stone-300 hover:text-emerald-500'}`}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+          </button>
+          <button onClick={() => {
+            setFeedback('down');
+            fetch('/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId, question, sql, rating: 'down' }) }).catch(() => {});
+          }}
+            className={`p-1 rounded-md cursor-pointer transition-colors bg-transparent border-none ${feedback === 'down' ? 'text-red-500 bg-red-50' : 'text-stone-300 hover:text-red-500'}`}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 }

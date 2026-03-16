@@ -349,6 +349,42 @@ function extractThinkingMessage(nodeName, update, fullState) {
   }
 }
 
+function buildQuerySummary(state) {
+  const parts = [];
+  if (state.matchType === 'blueprint') {
+    parts.push(`Running analysis: ${state.blueprintMeta?.name || state.blueprintId}`);
+    if (state.blueprintMeta?.userParams) parts.push(`Filtered by: ${state.blueprintMeta.userParams}`);
+    const planSize = state.queryPlan?.length || state.blueprintMeta?.subQueries?.length || 0;
+    if (planSize > 0) parts.push(`This will run ${planSize} sub-queries in parallel`);
+  } else if (state.matchType === 'exact') {
+    parts.push('Found an exact match in verified templates — executing directly');
+  } else if (state.matchType === 'followup') {
+    parts.push('Adapting previous query for your follow-up');
+  } else {
+    parts.push(`Researching: "${state.question}"`);
+    if (state.entities?.filters?.length > 0) parts.push(`Filters: ${state.entities.filters.join(', ')}`);
+    if (state.entities?.dimensions?.length > 0) parts.push(`Grouped by: ${state.entities.dimensions.join(', ')}`);
+    if (state.entities?.metrics?.length > 0) parts.push(`Metrics: ${state.entities.metrics.join(', ')}`);
+  }
+  return parts.join('. ') + '.';
+}
+
+function computeConfidence(state) {
+  let score = 0.5;
+  if (state.matchType === 'exact') score += 0.4;
+  else if (state.matchType === 'partial' || state.matchType === 'followup') score += 0.25;
+  else if (state.matchType === 'blueprint') score += 0.2;
+
+  if (state.validationReport?.overall_valid) score += 0.15;
+  if (state.execution?.success && state.execution?.rowCount > 0) score += 0.1;
+  if (state.execution?.rowCount === 0) score -= 0.2;
+  if (state.attempts?.correction > 0) score -= 0.1 * state.attempts.correction;
+
+  score = Math.max(0, Math.min(1, score));
+  const level = score >= 0.8 ? 'high' : score >= 0.5 ? 'medium' : 'low';
+  return { score: Number(score.toFixed(2)), level };
+}
+
 function extractNodeModel(update) {
   const trace = Array.isArray(update?.trace) ? update.trace : [];
   if (trace.length === 0) return null;
@@ -382,6 +418,7 @@ function buildFinalResponse(state, usage, runtimeMetrics = null, usageByNodeAndM
     insights: state.insights,
     chart: state.chart,
     suggestedFollowUps: state.suggestedFollowUps || [],
+    retrySuggestions: state.retrySuggestions || [],
     partialResultsSummary: state.partialResultsSummary || null,
     dashboardSpec: state.dashboardSpec || null,
     trace: state.trace,
@@ -543,6 +580,7 @@ router.post('/analyze-stream', async (req, res) => {
   let onParallelCorrectionStart = null;
   let onParallelCorrectionComplete = null;
   let onParallelPipelineComplete = null;
+  let onSubqueryResult = null;
 
   const emitThinking = (message, category) => {
     const event = { type: 'thinking', message, category, elapsed: Date.now() - requestStart };
@@ -680,11 +718,23 @@ router.post('/analyze-stream', async (req, res) => {
         'parallelSubQueryPipeline'
       );
     };
+    onSubqueryResult = (data) => {
+      if (data.sessionId && data.sessionId !== sessionId) return;
+      const event = {
+        type: 'subquery_result',
+        index: data.index,
+        total: data.total,
+        result: data.result,
+        elapsed: Date.now() - requestStart,
+      };
+      res.write(`event: subquery_result\ndata: ${JSON.stringify(event)}\n\n`);
+    };
     parallelPipelineEvents.on('parallel_pipeline_start', onParallelPipelineStart);
     parallelPipelineEvents.on('parallel_subquery_progress', onParallelSubqueryProgress);
     parallelPipelineEvents.on('parallel_pipeline_complete', onParallelPipelineComplete);
     parallelPipelineEvents.on('parallel_correction_start', onParallelCorrectionStart);
     parallelPipelineEvents.on('parallel_correction_complete', onParallelCorrectionComplete);
+    parallelPipelineEvents.on('subquery_result', onSubqueryResult);
 
     onQueryProgress = (data) => {
       if (data.sessionId && data.sessionId !== sessionId) return;
@@ -729,6 +779,12 @@ router.post('/analyze-stream', async (req, res) => {
       const thinkingMsg = extractThinkingMessage(nodeName, update, lastState);
       if (thinkingMsg) emitThinking(thinkingMsg, nodeName);
 
+      if (nodeName === 'classify') {
+        const summary = buildQuerySummary(lastState);
+        const summaryEvent = { type: 'query_summary', summary, matchType: lastState.matchType || '', elapsed: Date.now() - requestStart };
+        res.write(`event: query_summary\ndata: ${JSON.stringify(summaryEvent)}\n\n`);
+      }
+
       const event = {
         node: nodeName,
         duration,
@@ -772,10 +828,12 @@ router.post('/analyze-stream', async (req, res) => {
     if (onParallelPipelineComplete) parallelPipelineEvents.removeListener('parallel_pipeline_complete', onParallelPipelineComplete);
     if (onParallelCorrectionStart) parallelPipelineEvents.removeListener('parallel_correction_start', onParallelCorrectionStart);
     if (onParallelCorrectionComplete) parallelPipelineEvents.removeListener('parallel_correction_complete', onParallelCorrectionComplete);
+    if (onSubqueryResult) parallelPipelineEvents.removeListener('subquery_result', onSubqueryResult);
     if (onDashboardProgress) dashboardEvents.removeListener('dashboard_progress', onDashboardProgress);
 
     const usageByNodeAndModel = buildUsageBreakdown(getUsageByNodeAndModel());
     const finalPayload = buildFinalResponse(lastState, usageWithTiming, runtimeMetrics, usageByNodeAndModel);
+    finalPayload.confidence = computeConfidence(lastState);
     res.write(`event: done\ndata: ${JSON.stringify(finalPayload)}\n\n`);
     res.end();
   } catch (err) {
@@ -799,6 +857,7 @@ router.post('/analyze-stream', async (req, res) => {
     if (onParallelPipelineComplete) parallelPipelineEvents.removeListener('parallel_pipeline_complete', onParallelPipelineComplete);
     if (onParallelCorrectionStart) parallelPipelineEvents.removeListener('parallel_correction_start', onParallelCorrectionStart);
     if (onParallelCorrectionComplete) parallelPipelineEvents.removeListener('parallel_correction_complete', onParallelCorrectionComplete);
+    if (onSubqueryResult) parallelPipelineEvents.removeListener('subquery_result', onSubqueryResult);
     if (onDashboardProgress) dashboardEvents.removeListener('dashboard_progress', onDashboardProgress);
     logger.error('Pipeline stream failed', { error: err.message });
     const errorPayload = { error: 'Stream processing failed' };

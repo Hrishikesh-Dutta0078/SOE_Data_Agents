@@ -94,7 +94,7 @@ function ParallelDiscoveryViz({ total, completed }) {
   );
 }
 
-function ThinkingEntry({ entry, isLatest }) {
+function ThinkingEntry({ entry, isLatest, index = 0 }) {
   const style = CATEGORY_STYLES[entry.category] || CATEGORY_STYLES.tool;
   const [expanded, setExpanded] = useState(false);
   const hasDetail = entry.detail && entry.detail.length > 0;
@@ -108,6 +108,7 @@ function ThinkingEntry({ entry, isLatest }) {
       className={`flex gap-3 py-2 px-2 rounded-[8px] hover:bg-stone-50 transition-colors ${
         isLatest ? 'animate-fade-in' : ''
       }`}
+      style={{ animation: 'thinking-entry-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both', animationDelay: `${0.3 + index * 0.9}s` }}
     >
       <span className="text-[12px] font-mono text-stone-400 w-[44px] shrink-0 text-right pt-0.5 tabular-nums">
         {formatElapsed(entry.elapsed)}
@@ -123,6 +124,7 @@ function ThinkingEntry({ entry, isLatest }) {
             hasDetail ? 'cursor-pointer hover:text-stone-900' : ''
           }`}
           onClick={() => hasDetail && setExpanded(!expanded)}
+          {...(isLatest ? { style: { animation: 'thinking-breathe 2s ease-in-out infinite' } } : {})}
         >
           {entry.message}
           {hasDetail && (
@@ -181,13 +183,17 @@ export default function ThinkingPanel({ entries = [], queryPlan = null, startTim
 
   return (
     <div className="rounded-[16px] overflow-hidden bg-white relative" style={{ border: '1px solid rgba(231,229,228,0.5)', boxShadow: 'var(--shadow-float)' }}>
+      <div className="absolute top-0 left-0 h-0.5 w-[40%]" style={{ background: 'linear-gradient(90deg, transparent, rgba(99,102,241,0.4), transparent)', animation: 'thinking-shimmer-bar 2s ease-in-out infinite' }} />
       <div
         className="relative flex items-center justify-between px-3.5 py-2.5 cursor-pointer select-none"
         style={{ background: 'linear-gradient(90deg, #F5F5F4 0%, #F0EEFF 100%)', borderBottom: '1px solid rgba(231,229,228,0.4)' }}
         onClick={() => setCollapsed(!collapsed)}
       >
         <div className="flex items-center gap-2.5">
-          <span className="w-2 h-2 rounded-full bg-indigo-500 animate-subtle-pulse" />
+          <span className="relative w-2 h-2 rounded-full bg-indigo-500 inline-block" style={{ animation: 'subtle-pulse 1.5s ease-in-out infinite' }}>
+            <span className="absolute inset-0 rounded-full border-[1.5px] border-indigo-500" style={{ animation: 'ripple-ring 2s ease-out infinite' }} />
+            <span className="absolute inset-0 rounded-full border-[1.5px] border-indigo-500" style={{ animation: 'ripple-ring 2s 0.8s ease-out infinite' }} />
+          </span>
           <span className="text-[13px] font-medium text-stone-600">
             Agent Activity
           </span>
@@ -225,9 +231,17 @@ export default function ThinkingPanel({ entries = [], queryPlan = null, startTim
                 key={`${entry.elapsed}-${i}`}
                 entry={entry}
                 isLatest={i === entries.length - 1}
+                index={i}
               />
             ))}
           </div>
+        </div>
+      )}
+      {!collapsed && entries.length > 0 && (
+        <div className="flex gap-1 px-4 pb-2.5" style={{ paddingLeft: 76 }}>
+          {[0, 1, 2].map(i => (
+            <span key={i} className="w-[5px] h-[5px] rounded-full bg-indigo-500" style={{ animation: `bounce-dot 1.4s ${i * 0.2}s ease-in-out infinite` }} />
+          ))}
         </div>
       )}
     </div>
