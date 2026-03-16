@@ -236,17 +236,50 @@ async function classifyNode(state) {
     };
   }
 
-  // Step 0c: Blueprint slash-command detection (< 1ms, no LLM)
+  // Step 0c: Blueprint slash-command detection
   const blueprintSlash = findBlueprintBySlashCommand(state.question);
   if (blueprintSlash) {
     const { blueprint, params } = blueprintSlash;
+
+    let entities = { metrics: [], dimensions: [], filters: [], operations: [] };
+
+    // When user params exist (e.g., "for EMEA Q2"), run a lightweight LLM call
+    // to extract structured entities so the research agent can use them.
+    if (params) {
+      try {
+        const entityModel = getModel({
+          temperature: 0,
+          maxTokens: 300,
+          cache: true,
+          nodeKey: 'classify',
+        }).withStructuredOutput(DetectedEntities);
+
+        const extractionResult = await entityModel.invoke([
+          { role: 'system', content: 'Extract structured entities from the user\'s filter parameters for a sales analytics query. Identify any metrics, dimensions (grouping axes like region, segment), filters (specific values like EMEA, Q2, Enterprise), and operations (compare, rank, top N). Return only what is explicitly stated.' },
+          { role: 'user', content: `Blueprint: ${blueprint.name} — ${blueprint.description}\nUser parameters: ${params}` },
+        ]);
+
+        if (extractionResult) {
+          entities = {
+            metrics: extractionResult.metrics || [],
+            dimensions: extractionResult.dimensions || [],
+            filters: extractionResult.filters || [],
+            operations: extractionResult.operations || [],
+          };
+          logger.info('Classify: extracted entities from blueprint params', { params, entities });
+        }
+      } catch (err) {
+        logger.warn('Classify: entity extraction from blueprint params failed, continuing with empty entities', { error: err.message });
+      }
+    }
+
     const duration = Date.now() - start;
-    logger.info(`Classify: blueprint slash-command "${blueprint.slashCommand}" matched → ${blueprint.id} (${duration}ms)`);
+    logger.info(`Classify: blueprint slash-command "${blueprint.slashCommand}" matched → ${blueprint.id} (${duration}ms)${params ? ` params: "${params}"` : ''}`);
     return {
       ...stateReset,
       intent: 'SQL_QUERY',
       complexity: 'COMPLEX',
-      entities: { metrics: [], dimensions: [], filters: [], operations: [] },
+      entities,
       questionCategory: blueprint.category || 'WHAT_TO_DO',
       questionSubCategory: blueprint.subCategory || '',
       templateSql: '',
@@ -257,7 +290,7 @@ async function classifyNode(state) {
       clarificationQuestions: [],
       generalChatReply: '',
       orchestrationReasoning: `Blueprint slash-command "${blueprint.slashCommand}" → ${blueprint.name}${params ? ` (params: ${params})` : ''}.`,
-      trace: [{ node: 'classify', timestamp: start, duration, intent: 'SQL_QUERY', matchType: 'blueprint', blueprintId: blueprint.id }],
+      trace: [{ node: 'classify', timestamp: start, duration, intent: 'SQL_QUERY', matchType: 'blueprint', blueprintId: blueprint.id, entities }],
     };
   }
 
