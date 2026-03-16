@@ -268,8 +268,10 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           usageByNodeAndModel: data.usageByNodeAndModel || null,
           warnings: data.warnings || null,
           entities: data.entities || null,
+          confidence: data.confidence || null,
         },
       ]);
+      if (data.confidence) setConfidence(data.confidence);
     } else if (intent === 'CLARIFICATION') {
       const questions = data.clarificationQuestions || [];
       let hint = 'I need a bit more information to generate a query.';
@@ -633,7 +635,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       })()}
 
       {(msg.insights || msg.chart || (msg.execution?.success && msg.execution.rows?.length > 0) || (msg.queries?.length > 0)) && (
-        <ResultsPanel execution={msg.execution} insights={msg.insights} chart={msg.chart} queries={msg.queries || []} />
+        <ResultsPanel execution={msg.execution} insights={msg.insights} chart={msg.chart} queries={msg.queries || []} confidence={msg.confidence} />
       )}
 
       {msg.execution && !msg.execution.success && (

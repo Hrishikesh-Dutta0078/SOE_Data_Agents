@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Copy, Check, Download, ThumbsUp, ThumbsDown } from 'lucide-react';
 import {
   BarChart, Bar,
   LineChart, Line,
@@ -387,7 +388,22 @@ function SubQuerySection({ query, index }) {
 
 export default function ResultsPanel({ execution, insights, chart, queries = [], isPartial = false, confidence, retrySuggestions, onRetrySuggestion, sessionId, question, sql }) {
   const [activeTab, setActiveTab] = useState('insights');
+  const [showDetail, setShowDetail] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [feedback, setFeedback] = useState(null);
   const isMultiQuery = queries.length > 1;
+
+  const insightSections = useMemo(() => {
+    if (!insights) return { summary: '', detail: '' };
+    const detailMarker = /^## Detailed Analysis/m;
+    const match = insights.match(detailMarker);
+    if (!match) return { summary: insights, detail: '' };
+    const splitIdx = insights.indexOf(match[0]);
+    return {
+      summary: insights.substring(0, splitIdx).trim(),
+      detail: insights.substring(splitIdx).trim(),
+    };
+  }, [insights]);
 
   // For multi-query results, fall back to the first successful sub-query's execution
   const primaryExec = execution
@@ -422,7 +438,7 @@ export default function ResultsPanel({ execution, insights, chart, queries = [],
 
   return (
     <div className="mt-3 rounded-[16px] overflow-hidden bg-white" style={{ border: '1px solid rgba(231,229,228,0.5)', boxShadow: 'var(--shadow-float)' }}>
-      <div className="flex gap-1 p-1 m-3 mb-0 rounded-[10px]" style={{ background: 'linear-gradient(135deg, #F5F5F4 0%, #EEF2FF 100%)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.04)' }}>
+      <div className="flex items-center gap-1 p-1 m-3 mb-0 rounded-[10px]" style={{ background: 'linear-gradient(135deg, #F5F5F4 0%, #EEF2FF 100%)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.04)' }}>
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -438,12 +454,47 @@ export default function ResultsPanel({ execution, insights, chart, queries = [],
             {t.label}
           </button>
         ))}
+        {confidence && !isPartial && (
+          <span className={`ml-auto text-[10px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${
+            confidence.level === 'high' ? 'bg-emerald-50 text-emerald-700' :
+            confidence.level === 'medium' ? 'bg-amber-50 text-amber-700' :
+            'bg-red-50 text-red-700'
+          }`}>
+            {confidence.level === 'high' ? 'High confidence' :
+             confidence.level === 'medium' ? 'Moderate confidence' :
+             'Low confidence — verify results'}
+          </span>
+        )}
       </div>
 
       <div className="p-4">
         {currentTab === 'insights' && insights && (
-          <div className="text-[13px] leading-relaxed text-stone-700">
-            <ReactMarkdown>{insights}</ReactMarkdown>
+          <div className="relative">
+            <button
+              onClick={() => { navigator.clipboard.writeText(insights); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
+              className="absolute top-0 right-0 p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer"
+              title="Copy insights"
+            >
+              {copied ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+            </button>
+            <div className="text-[13px] leading-relaxed text-stone-700 pr-8">
+              <ReactMarkdown>{insightSections.summary}</ReactMarkdown>
+            </div>
+            {insightSections.detail && (
+              <>
+                <button
+                  onClick={() => setShowDetail(!showDetail)}
+                  className="mt-2 text-[12px] font-medium text-indigo-500 hover:text-indigo-700 cursor-pointer transition-colors bg-transparent border-none p-0"
+                >
+                  {showDetail ? 'Show less' : 'Show detailed analysis'}
+                </button>
+                {showDetail && (
+                  <div className="mt-3 pt-3 border-t border-stone-100 text-[13px] leading-relaxed text-stone-600">
+                    <ReactMarkdown>{insightSections.detail}</ReactMarkdown>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
 
