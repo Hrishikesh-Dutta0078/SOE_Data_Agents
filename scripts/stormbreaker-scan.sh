@@ -594,3 +594,38 @@ wave_p4() {
       depscan --src "$PROJECT_DIR" --reports_dir "$REPORTS_DIR" --report_file depscan_output.json
   fi
 }
+
+# ============================================================
+# MAIN ORCHESTRATOR
+# ============================================================
+
+should_run_wave() {
+  local wave=$1
+  [[ "$SELECTED_WAVES" == "all" ]] && return 0
+  # Check if wave is in comma-separated list
+  IFS=',' read -ra waves <<< "$SELECTED_WAVES"
+  for w in "${waves[@]}"; do
+    [[ "$w" == "$wave" ]] && return 0
+  done
+  return 1
+}
+
+main() {
+  should_run_wave "p0" && wave_p0
+  should_run_wave "p1" && wave_p1
+  should_run_wave "p2" && wave_p2
+  should_run_wave "p4" && wave_p4
+
+  print_summary
+
+  echo ""
+  echo "=== StormBreaker Scan Complete ==="
+  echo "Reports:  $REPORTS_DIR/"
+  echo "Debug:    $DEBUG_LOG"
+  echo "Summary:  $REPORTS_DIR/stormbreaker_summary.txt"
+
+  # Always exit 0 (advisory mode)
+  exit 0
+}
+
+main
