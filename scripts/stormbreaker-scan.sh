@@ -247,9 +247,9 @@ ensure_tool() {
   local tool=$1
   local install_fn=$2
 
-  # Special case: semgrep on Windows checks WSL Ubuntu
-  if [[ "$tool" == "semgrep" && "$PLATFORM" == "windows" ]]; then
-    if command -v wsl &>/dev/null && $WSL_EXEC "which semgrep" &>/dev/null 2>&1; then
+  # Special case: semgrep + bearer on Windows check WSL Ubuntu
+  if [[ ("$tool" == "semgrep" || "$tool" == "bearer") && "$PLATFORM" == "windows" ]]; then
+    if command -v wsl &>/dev/null && $WSL_EXEC "which $tool" &>/dev/null 2>&1; then
       return 0
     fi
   elif command -v "$tool" &>/dev/null; then
@@ -324,13 +324,17 @@ install_trivy() {
 
 install_bearer() {
   if [[ "$PLATFORM" == "windows" ]]; then
-    log_warn "Bearer does not provide Windows binaries. Skipping."
-    log_warn "Run bearer via WSL or Docker: https://docs.bearer.com/reference/installation/"
-    return 1
+    if ! command -v wsl &>/dev/null; then
+      log_warn "Bearer requires WSL on Windows. Install WSL + Ubuntu to enable."
+      return 1
+    fi
+    log_info "Installing bearer in WSL Ubuntu..."
+    $WSL_EXEC "curl -sfL https://raw.githubusercontent.com/Bearer/bearer/v1.46.0/contrib/install.sh | sh -s -- -b \$HOME/.local/bin 2>&1" >>"$DEBUG_LOG" 2>&1
+  else
+    log_info "Installing bearer via install script..."
+    curl -sfL https://raw.githubusercontent.com/Bearer/bearer/v1.46.0/contrib/install.sh \
+      | sh -s -- -b "$INSTALL_DIR" 2>>"$DEBUG_LOG"
   fi
-  log_info "Installing bearer via install script..."
-  curl -sfL https://raw.githubusercontent.com/Bearer/bearer/v1.46.0/contrib/install.sh \
-    | sh -s -- -b "$INSTALL_DIR" 2>>"$DEBUG_LOG"
 }
 
 install_osv_scanner() {
@@ -571,8 +575,35 @@ wave_p2() {
 
   # --- bearer ---
   if ensure_tool "bearer" install_bearer; then
-    run_tool "P2" "bearer" "$REPORTS_DIR/bearer_output.json" \
-      bearer scan "$PROJECT_DIR" --format json --output "$REPORTS_DIR/bearer_output.json"
+    if [[ "$PLATFORM" == "windows" ]]; then
+      # Run via WSL Ubuntu — translate paths and ensure git safe.directory
+      local win_project_b
+      win_project_b=$(cygpath -w "$PROJECT_DIR")
+      local wsl_project_b
+      wsl_project_b=$($WSL_EXEC "wslpath -u '$win_project_b'" 2>/dev/null)
+      local wsl_reports_b
+      wsl_reports_b=$($WSL_EXEC "wslpath -u '$(cygpath -w "$REPORTS_DIR")'" 2>/dev/null)
+      # Bearer needs git safe.directory for cross-filesystem repos
+      $WSL_EXEC "git config --global --add safe.directory '$wsl_project_b' 2>/dev/null" &>/dev/null
+      # Run bearer directly (not via run_tool) — WSL processes don't work with run_with_timeout on MINGW64
+      echo ""
+      echo "[P2] Running bearer..."
+      log_debug "run_tool: bearer -> $REPORTS_DIR/bearer_output.json"
+      local bearer_rc=0
+      $WSL_EXEC "bearer scan '$wsl_project_b' --format json --output '$wsl_reports_b/bearer_output.json'" 2>>"$DEBUG_LOG" || bearer_rc=$?
+      local bearer_count
+      bearer_count=$(extract_count "bearer" "$REPORTS_DIR/bearer_output.json")
+      if [[ $bearer_rc -eq 0 && "$bearer_count" == "0" ]]; then
+        RESULTS+=("P2|bearer|PASS|$bearer_count")
+      else
+        RESULTS+=("P2|bearer|WARN|$bearer_count")
+      fi
+      log_info "bearer complete — $bearer_count findings (exit $bearer_rc)"
+      log_info "Report: $REPORTS_DIR/bearer_output.json"
+    else
+      run_tool "P2" "bearer" "$REPORTS_DIR/bearer_output.json" \
+        bearer scan "$PROJECT_DIR" --format json --output "$REPORTS_DIR/bearer_output.json"
+    fi
   fi
 
   # --- osv-scanner ---
