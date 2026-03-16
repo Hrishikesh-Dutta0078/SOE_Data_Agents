@@ -271,7 +271,18 @@ function SingleChart({ config, rows, colorIndex }) {
 }
 
 function ChartsView({ chart, rows }) {
+  const chartRef = useRef(null);
   const chartsToRender = chart?.charts?.filter((c) => VALID_TYPES.has(c.chartType)) ?? [];
+
+  const handleDownload = async () => {
+    if (!chartRef.current) return;
+    const html2canvas = (await import('html2canvas')).default;
+    const canvas = await html2canvas(chartRef.current, { backgroundColor: '#ffffff', scale: 2 });
+    const link = document.createElement('a');
+    link.download = `chart-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
 
   if (chartsToRender.length === 0) {
     return (
@@ -282,21 +293,58 @@ function ChartsView({ chart, rows }) {
   }
 
   return (
-    <div className="w-full max-h-[1200px] overflow-y-auto">
-      {chartsToRender.map((cfg, idx) => (
-        <SingleChart key={idx} config={cfg} rows={rows} colorIndex={idx} />
-      ))}
+    <div className="relative">
+      <button onClick={handleDownload} className="absolute top-0 right-0 p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer z-10" title="Download chart">
+        <Download size={14} />
+      </button>
+      <div ref={chartRef} className="w-full max-h-[1200px] overflow-y-auto">
+        {chartsToRender.map((cfg, idx) => (
+          <SingleChart key={idx} config={cfg} rows={rows} colorIndex={idx} />
+        ))}
+      </div>
     </div>
   );
 }
 
 function TableView({ columns, rows }) {
+  const handleExportExcel = async () => {
+    const XLSX = (await import('xlsx')).default;
+    const ws = XLSX.utils.json_to_sheet(rows, { header: columns });
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Results');
+    XLSX.writeFile(wb, `results-${Date.now()}.xlsx`);
+  };
+
+  const handleExportCsv = () => {
+    const header = columns.join(',');
+    const csvRows = rows.map(row => columns.map(col => {
+      const val = row[col];
+      if (val === null || val === undefined) return '';
+      const str = String(val);
+      return str.includes(',') || str.includes('"') ? `"${str.replace(/"/g, '""')}"` : str;
+    }).join(','));
+    const csv = [header, ...csvRows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.download = `results-${Date.now()}.csv`;
+    link.href = URL.createObjectURL(blob);
+    link.click();
+  };
+
   if (!columns || columns.length === 0) {
     return <div className="p-6 text-center text-stone-400 text-[13px]">No data to display.</div>;
   }
 
   return (
     <>
+      <div className="flex justify-end gap-1 mb-2">
+        <button onClick={handleExportExcel} className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-stone-500 hover:text-stone-700 rounded-md hover:bg-stone-100 cursor-pointer transition-colors bg-transparent border-none" title="Download as Excel">
+          <Download size={12} /> Excel
+        </button>
+        <button onClick={handleExportCsv} className="flex items-center gap-1 px-2 py-1 text-[11px] font-medium text-stone-500 hover:text-stone-700 rounded-md hover:bg-stone-100 cursor-pointer transition-colors bg-transparent border-none" title="Download as CSV">
+          <Download size={12} /> CSV
+        </button>
+      </div>
       <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
         <table className="w-full border-collapse text-xs">
           <thead>
