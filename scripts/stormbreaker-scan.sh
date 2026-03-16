@@ -350,3 +350,143 @@ install_depscan() {
     $PIPX_CMD owasp-depscan 2>>"$DEBUG_LOG"
   fi
 }
+
+# --- Finding count extraction ---
+# Uses fs.readFileSync (not require) for MINGW64 path compatibility.
+read_json_node() {
+  local file=$1
+  local expr=$2
+  node -e "const fs=require('fs');try{const d=JSON.parse(fs.readFileSync('$file','utf8'));console.log($expr)}catch(e){console.log('?')}" 2>/dev/null || echo "?"
+}
+
+extract_count() {
+  local tool=$1
+  local file=$2
+
+  if [[ ! -f "$file" ]]; then
+    echo "?"
+    return
+  fi
+
+  case "$tool" in
+    semgrep)
+      read_json_node "$file" "d.results?.length ?? 0"
+      ;;
+    trufflehog)
+      # JSONL format: one JSON object per line
+      wc -l < "$file" 2>/dev/null | tr -d ' ' || echo "?"
+      ;;
+    trivy)
+      read_json_node "$file" "(d.Results||[]).reduce((s,r)=>s+(r.Vulnerabilities?.length||0),0)"
+      ;;
+    bearer)
+      read_json_node "$file" "d.findings?.length ?? 0"
+      ;;
+    osv-scanner)
+      read_json_node "$file" "(d.results||[]).reduce((s,r)=>s+r.packages.reduce((ps,p)=>ps+p.vulnerabilities.length,0),0)"
+      ;;
+    syft)
+      read_json_node "$file" "(d.artifacts?.length??0)+' artifacts'"
+      ;;
+    bomber)
+      read_json_node "$file" "(d.packages||[]).filter(p=>p.vulnerabilities?.length>0).length"
+      ;;
+    depscan)
+      read_json_node "$file" "Array.isArray(d)?d.length:0"
+      ;;
+    *)
+      echo "?"
+      ;;
+  esac
+}
+
+# --- Run a scan tool ---
+# Usage: run_tool <wave> <tool_name> <output_file> <command...>
+run_tool() {
+  local wave=$1
+  local tool=$2
+  local output_file=$3
+  shift 3
+
+  echo ""
+  echo "[$wave] Running $tool..."
+  log_debug "run_tool: $tool -> $output_file"
+  log_debug "  command: $*"
+
+  local rc=0
+  run_with_timeout "$TIMEOUT_SECS" "$@" 2>>"$DEBUG_LOG" || rc=$?
+
+  if [[ $rc -eq 137 || $rc -eq 143 ]]; then
+    log_warn "$tool timed out after ${TIMEOUT_SECS}s"
+    RESULTS+=("$wave|$tool|TIMEOUT|—")
+    return
+  fi
+
+  local count
+  count=$(extract_count "$tool" "$output_file")
+
+  if [[ $rc -eq 0 && ( "$count" == "0" || "$count" == "0 artifacts" ) ]]; then
+    RESULTS+=("$wave|$tool|PASS|$count")
+  elif [[ $rc -eq 0 ]]; then
+    RESULTS+=("$wave|$tool|WARN|$count")
+  else
+    RESULTS+=("$wave|$tool|WARN|$count")
+  fi
+
+  log_info "$tool complete — $count findings (exit $rc)"
+  log_info "Report: $output_file"
+}
+
+# --- Summary ---
+print_summary() {
+  local total=0 pass=0 warn=0 timeout=0 skipped_count=${#SKIPPED[@]}
+
+  echo ""
+  echo "+------------------------------------------------+"
+  echo "|          StormBreaker Scan Summary              |"
+  echo "+------+--------------+---------+----------------+"
+  printf "| %-4s | %-12s | %-7s | %-14s |\n" "Wave" "Tool" "Status" "Findings"
+  echo "+------+--------------+---------+----------------+"
+
+  for entry in "${RESULTS[@]}"; do
+    IFS='|' read -r wave tool status findings <<< "$entry"
+    printf "| %-4s | %-12s | %-7s | %-14s |\n" "$wave" "$tool" "$status" "$findings"
+    total=$((total + 1))
+    case "$status" in
+      PASS)    pass=$((pass + 1))    ;;
+      WARN)    warn=$((warn + 1))    ;;
+      TIMEOUT) timeout=$((timeout + 1)) ;;
+    esac
+  done
+
+  for tool in "${SKIPPED[@]}"; do
+    printf "| %-4s | %-12s | %-7s | %-14s |\n" "—" "$tool" "SKIPPED" "not installed"
+  done
+
+  echo "+------+--------------+---------+----------------+"
+  printf "| Total: %d run | %d pass | %d warn | %d skipped    |\n" \
+    "$total" "$pass" "$warn" "$skipped_count"
+  if [[ $timeout -gt 0 ]]; then
+    printf "| Timeouts: %d                                    |\n" "$timeout"
+  fi
+  echo "+------------------------------------------------+"
+
+  # Write summary to file
+  {
+    echo "StormBreaker Scan Summary — $(date -Iseconds 2>/dev/null || date)"
+    echo ""
+    printf "%-6s %-14s %-9s %s\n" "Wave" "Tool" "Status" "Findings"
+    echo "-----  ------------- -------  --------"
+    for entry in "${RESULTS[@]}"; do
+      IFS='|' read -r wave tool status findings <<< "$entry"
+      printf "%-6s %-14s %-9s %s\n" "$wave" "$tool" "$status" "$findings"
+    done
+    for tool in "${SKIPPED[@]}"; do
+      printf "%-6s %-14s %-9s %s\n" "—" "$tool" "SKIPPED" "not installed"
+    done
+    echo ""
+    echo "Total: $total run | $pass pass | $warn warn | $skipped_count skipped"
+  } > "$REPORTS_DIR/stormbreaker_summary.txt"
+
+  log_info "Summary written to $REPORTS_DIR/stormbreaker_summary.txt"
+}
