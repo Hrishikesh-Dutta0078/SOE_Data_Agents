@@ -308,7 +308,7 @@ function ChartsView({ chart, rows }) {
 
 function TableView({ columns, rows }) {
   const handleExportExcel = async () => {
-    const XLSX = (await import('xlsx')).default;
+    const XLSX = await import('xlsx');
     const ws = XLSX.utils.json_to_sheet(rows, { header: columns });
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Results');
