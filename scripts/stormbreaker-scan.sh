@@ -355,7 +355,12 @@ install_depscan() {
 read_json_node() {
   local file=$1
   local expr=$2
-  node -e "const fs=require('fs');try{const d=JSON.parse(fs.readFileSync('$file','utf8'));console.log($expr)}catch(e){console.log('?')}" 2>/dev/null || echo "?"
+  # Convert MINGW64 paths (/c/Users/...) to Windows paths (C:\Users\...) for Node.js
+  local node_path="$file"
+  if [[ "$PLATFORM" == "windows" ]] && command -v cygpath &>/dev/null; then
+    node_path=$(cygpath -w "$file")
+  fi
+  node -e "const fs=require('fs');try{const d=JSON.parse(fs.readFileSync(String.raw\`$node_path\`,'utf8'));console.log($expr)}catch(e){console.log('?')}" 2>/dev/null || echo "?"
 }
 
 extract_count() {
