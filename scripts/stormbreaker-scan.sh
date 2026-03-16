@@ -114,3 +114,239 @@ echo "Platform: $PLATFORM ($ARCH_NAME)"
 echo "Reports:  $REPORTS_DIR"
 echo "Waves:    $SELECTED_WAVES"
 echo ""
+
+# --- Logging ---
+log_info()  { echo "  $*"; }
+log_warn()  { echo "  [WARN] $*"; }
+log_debug() { echo "$*" >> "$DEBUG_LOG"; }
+
+# --- Timeout ---
+# Bash-native timeout (no GNU timeout on MINGW64)
+# Uses setsid (if available) to create a process group so child processes are also killed.
+run_with_timeout() {
+  local secs=$1; shift
+  if command -v setsid &>/dev/null; then
+    setsid "$@" &
+  else
+    "$@" &
+  fi
+  local pid=$!
+  ( sleep "$secs" && kill -- -"$pid" 2>/dev/null || kill "$pid" 2>/dev/null ) &
+  local watchdog=$!
+  wait "$pid" 2>/dev/null
+  local rc=$?
+  kill "$watchdog" 2>/dev/null
+  wait "$watchdog" 2>/dev/null
+  return $rc
+}
+
+# --- Python tool installer ---
+PIPX_CMD=""
+ensure_pipx() {
+  if command -v pipx &>/dev/null; then
+    PIPX_CMD="pipx"
+    return 0
+  elif command -v pip3 &>/dev/null; then
+    PIPX_CMD="pip3 install --user"
+    log_warn "pipx not found, falling back to pip3 install --user"
+    return 0
+  elif command -v pip &>/dev/null; then
+    PIPX_CMD="pip install --user"
+    log_warn "pipx not found, falling back to pip install --user"
+    return 0
+  else
+    log_warn "Neither pipx nor pip found. Python-based tools will be skipped."
+    log_warn "Install pipx: https://pipx.pypa.io/stable/installation/"
+    return 1
+  fi
+}
+
+# --- GitHub release binary installer ---
+# Usage: install_github_release <org/repo> <binary_name> <asset_pattern>
+# asset_pattern uses {TAG}, {OS}, {ARCH} as placeholders
+install_github_release() {
+  local repo=$1
+  local binary=$2
+  local asset_pattern=$3
+  local dest="$INSTALL_DIR"
+
+  log_info "Installing $binary from github.com/$repo ..."
+  log_debug "install_github_release: repo=$repo binary=$binary pattern=$asset_pattern"
+
+  # Fetch latest release tag
+  local tag
+  tag=$(curl -sL "https://api.github.com/repos/${repo}/releases/latest" \
+    | node -e "let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{try{console.log(JSON.parse(d).tag_name)}catch(e){console.error(e);process.exit(1)}})" 2>>"$DEBUG_LOG")
+
+  if [[ -z "$tag" ]]; then
+    log_warn "Failed to fetch latest release for $repo"
+    return 1
+  fi
+
+  log_debug "  Latest tag: $tag"
+
+  # Build asset URL from pattern
+  local tag_no_v="${tag#v}"
+  local asset_name="${asset_pattern}"
+  asset_name="${asset_name//\{TAG\}/$tag_no_v}"
+  asset_name="${asset_name//\{OS\}/$OS_NAME}"
+  asset_name="${asset_name//\{ARCH\}/$ARCH_NAME}"
+
+  local url="https://github.com/${repo}/releases/download/${tag}/${asset_name}"
+  log_debug "  Download URL: $url"
+
+  # Download and extract
+  local tmp_dir
+  tmp_dir=$(mktemp -d)
+  if curl -sL "$url" -o "$tmp_dir/$asset_name" 2>>"$DEBUG_LOG"; then
+    case "$asset_name" in
+      *.tar.gz|*.tgz)
+        tar xzf "$tmp_dir/$asset_name" -C "$tmp_dir" 2>>"$DEBUG_LOG"
+        ;;
+      *.zip)
+        unzip -o "$tmp_dir/$asset_name" -d "$tmp_dir" 2>>"$DEBUG_LOG"
+        ;;
+      *)
+        # Plain binary (e.g., osv-scanner)
+        mv "$tmp_dir/$asset_name" "$tmp_dir/$binary"
+        ;;
+    esac
+
+    # Find the binary in extracted files — use bash glob (not find, avoids Windows find.exe)
+    local found=""
+    for f in "$tmp_dir/$binary" "$tmp_dir/${binary}.exe" "$tmp_dir"/*/"$binary" "$tmp_dir"/*/"${binary}.exe"; do
+      [[ -f "$f" ]] && found="$f" && break
+    done
+
+    if [[ -n "$found" ]]; then
+      cp "$found" "$dest/$binary"
+      chmod +x "$dest/$binary"
+      log_info "Installed $binary ($tag) to $dest/"
+    else
+      log_warn "Could not find $binary in downloaded release"
+      rm -rf "$tmp_dir"
+      return 1
+    fi
+  else
+    log_warn "Failed to download $url"
+    rm -rf "$tmp_dir"
+    return 1
+  fi
+
+  rm -rf "$tmp_dir"
+  return 0
+}
+
+# --- Tool availability check + auto-install ---
+# Usage: ensure_tool <tool_name> <install_function>
+# Returns 0 if tool is available, 1 if skipped
+ensure_tool() {
+  local tool=$1
+  local install_fn=$2
+
+  # Special case: semgrep on Windows checks WSL
+  if [[ "$tool" == "semgrep" && "$PLATFORM" == "windows" ]]; then
+    if command -v wsl &>/dev/null && wsl which semgrep &>/dev/null 2>&1; then
+      return 0
+    fi
+  elif command -v "$tool" &>/dev/null; then
+    return 0
+  fi
+
+  # Tool not found — try install
+  if [[ "$NO_INSTALL" -eq 1 ]]; then
+    log_warn "$tool not found (--no-install set, skipping)"
+    SKIPPED+=("$tool")
+    return 1
+  fi
+
+  log_info "$tool not found. Attempting auto-install..."
+  if $install_fn; then
+    # Verify it's now available
+    if [[ "$tool" == "semgrep" && "$PLATFORM" == "windows" ]]; then
+      if command -v wsl &>/dev/null && wsl which semgrep &>/dev/null 2>&1; then
+        return 0
+      fi
+    elif command -v "$tool" &>/dev/null; then
+      return 0
+    fi
+  fi
+
+  log_warn "Failed to install $tool. Skipping."
+  SKIPPED+=("$tool")
+  return 1
+}
+
+# --- Per-tool install functions ---
+
+install_semgrep() {
+  if [[ "$PLATFORM" == "windows" ]]; then
+    if ! command -v wsl &>/dev/null; then
+      log_warn "semgrep requires WSL on Windows. Install WSL to enable."
+      return 1
+    fi
+    log_info "Installing semgrep in WSL..."
+    wsl pip install semgrep 2>>"$DEBUG_LOG" || wsl pip3 install semgrep 2>>"$DEBUG_LOG"
+  else
+    ensure_pipx || return 1
+    if [[ "$PIPX_CMD" == "pipx" ]]; then
+      pipx install semgrep 2>>"$DEBUG_LOG"
+    else
+      $PIPX_CMD semgrep 2>>"$DEBUG_LOG"
+    fi
+  fi
+}
+
+install_trufflehog() {
+  install_github_release "trufflesecurity/trufflehog" "trufflehog" \
+    "trufflehog_{TAG}_{OS}_{ARCH}.tar.gz"
+}
+
+install_trivy() {
+  # Trivy uses slightly different naming: trivy_0.58.0_Linux-64bit.tar.gz
+  local os_trivy
+  case "$PLATFORM" in
+    windows) os_trivy="Windows" ;;
+    macos)   os_trivy="macOS"   ;;
+    linux)   os_trivy="Linux"   ;;
+  esac
+  local arch_trivy
+  case "$ARCH_NAME" in
+    amd64) arch_trivy="64bit"  ;;
+    arm64) arch_trivy="ARM64"  ;;
+    *)     arch_trivy="64bit"  ;;
+  esac
+  install_github_release "aquasecurity/trivy" "trivy" \
+    "trivy_{TAG}_${os_trivy}-${arch_trivy}.tar.gz"
+}
+
+install_bearer() {
+  log_info "Installing bearer via install script..."
+  curl -sfL https://raw.githubusercontent.com/Bearer/bearer/v1.46.0/contrib/install.sh \
+    | sh -s -- -b "$INSTALL_DIR" 2>>"$DEBUG_LOG"
+}
+
+install_osv_scanner() {
+  install_github_release "google/osv-scanner" "osv-scanner" \
+    "osv-scanner_{TAG}_{OS}_{ARCH}"
+}
+
+install_syft() {
+  log_info "Installing syft via install script..."
+  curl -sSfL https://raw.githubusercontent.com/anchore/syft/v1.20.0/install.sh \
+    | sh -s -- -b "$INSTALL_DIR" 2>>"$DEBUG_LOG"
+}
+
+install_bomber() {
+  install_github_release "devops-kung-fu/bomber" "bomber" \
+    "bomber_{TAG}_{OS}_{ARCH}.tar.gz"
+}
+
+install_depscan() {
+  ensure_pipx || return 1
+  if [[ "$PIPX_CMD" == "pipx" ]]; then
+    pipx install owasp-depscan 2>>"$DEBUG_LOG"
+  else
+    $PIPX_CMD owasp-depscan 2>>"$DEBUG_LOG"
+  fi
+}
