@@ -48,4 +48,13 @@ cd "$PROJECT_DIR/server"
 node --test "tests/security/*.test.js" 2>&1 | tail -10
 echo ""
 
+# --- Phase 5 (optional): StormBreaker External Tools ---
+if [ "${RUN_STORMBREAKER:-0}" = "1" ]; then
+  echo "[5/5] Running StormBreaker external tools..."
+  bash "$(dirname "$0")/stormbreaker-scan.sh" --wave all || true
+else
+  echo "[5/5] StormBreaker external scan skipped (set RUN_STORMBREAKER=1 to enable)"
+fi
+echo ""
+
 echo "=== Scan Complete ==="
