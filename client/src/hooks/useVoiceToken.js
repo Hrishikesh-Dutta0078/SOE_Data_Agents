@@ -21,11 +21,16 @@ export default function useVoiceToken() {
     setError(null);
 
     try {
+      console.log('[useVoiceToken] Fetching token from /api/voice/token...');
       const res = await fetch('/api/voice/token', { credentials: 'include' });
+      console.log('[useVoiceToken] Response status:', res.status);
       if (!res.ok) {
+        const text = await res.text();
+        console.error('[useVoiceToken] Error response body:', text);
         throw new Error(`Token request failed: ${res.status}`);
       }
       const data = await res.json();
+      console.log('[useVoiceToken] Token received, region:', data.region);
       tokenRef.current = {
         token: data.token,
         region: data.region,

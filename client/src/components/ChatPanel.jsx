@@ -981,17 +981,17 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const getBubbleClasses = (msg) => {
     const base = 'px-4 py-3 rounded-[20px] text-sm leading-relaxed break-words';
     if (msg.role === 'user')
-      return `${base} self-end max-w-[70%] bg-indigo-500 text-white rounded-br-[8px] shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] whitespace-pre-wrap`;
-    const assistantBase = `${base} self-start bg-white text-stone-800 border border-stone-100 rounded-bl-[8px] shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]`;
+      return `${base} self-end max-w-[70%] bubble-user text-white rounded-br-[8px] whitespace-pre-wrap`;
+    const assistantBase = `${base} self-start bubble-assistant text-stone-800 rounded-bl-[8px]`;
     if (msg.type === 'sql' && msg.execution?.success) return `${assistantBase} w-[90%]`;
     if (msg.type === 'dashboard') return `${assistantBase} max-w-[70%]`;
     return `${assistantBase} max-w-[70%]`;
   };
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-3.5 border-b border-stone-100 bg-white/80 backdrop-blur-xl">
+    <div className="flex flex-col h-full gap-3">
+      {/* Header — separate floating card */}
+      <div className="flex items-center gap-3 px-5 py-3.5 surface-gradient-header shrink-0">
         <button
           className="md:hidden p-1.5 rounded-[8px] text-stone-500 hover:bg-stone-100 transition-colors"
           onClick={onMenuClick}
@@ -1012,11 +1012,12 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Chat area — separate floating card */}
+      <div className="chat-card">
       <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
         {messages.length === 0 && !loading && (
           <div className="m-auto flex flex-col items-center gap-4 max-w-md text-center animate-fade-in-up">
-            <div className="w-14 h-14 rounded-[16px] bg-stone-100 flex items-center justify-center">
+            <div className="w-14 h-14 rounded-[16px] flex items-center justify-center" style={{ background: 'var(--gradient-empty-icon)', boxShadow: 'var(--shadow-card)' }}>
               <MessageSquare size={24} strokeWidth={1.5} className="text-stone-400" />
             </div>
             <div>
@@ -1033,7 +1034,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         ))}
 
         {loading && (
-          <div className="self-start w-[90%] px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm text-sm">
+          <div className="self-start w-[90%] px-4 py-3 rounded-2xl rounded-bl-sm text-sm bubble-assistant">
             {progress ? (
               <>
                 <ThinkingPanel
@@ -1063,7 +1064,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
 
       {/* Follow-up input */}
       {followUpMode && (
-        <div className="px-5 py-2.5 border-t border-indigo-100 bg-indigo-50/40">
+        <div className="px-5 py-2.5 bg-indigo-50/40" style={{ borderTop: '1px solid rgba(199,210,254,0.4)' }}>
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-medium text-indigo-500 shrink-0">Follow-up</span>
             <input
@@ -1085,10 +1086,11 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
             />
             <button
               className={`
-                px-4 py-2 text-sm font-semibold bg-indigo-500 text-white rounded-[8px] shrink-0
-                hover:bg-indigo-600 transition-all
+                px-4 py-2 text-sm font-semibold text-white rounded-[10px] shrink-0
+                transition-all hover:brightness-110
                 ${loading || !followUpInput.trim() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               `}
+              style={{ background: 'var(--gradient-send-btn)', boxShadow: '0 2px 6px rgba(99,102,241,0.25)' }}
               onClick={() => handleSend(followUpInput, { isFollowUp: true })}
               disabled={loading || !followUpInput.trim()}
             >
@@ -1104,9 +1106,10 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           </div>
         </div>
       )}
+      </div>{/* end chat-card */}
 
-      {/* Input */}
-      <div className="relative px-5 py-3.5 border-t border-stone-100 bg-white/80 backdrop-blur-xl">
+      {/* Input — separate floating card */}
+      <div className="relative px-5 py-3.5 surface-gradient-input shrink-0">
         {showBlueprintPicker && (
           <BlueprintPicker
             blueprints={blueprints}
@@ -1122,9 +1125,10 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
             <input
               ref={inputRef}
               type="text"
-              className="voice-input-field w-full px-4 py-2.5 text-sm bg-stone-50 border border-stone-200 rounded-[16px] outline-none font-sans
+              className="voice-input-field w-full px-4 py-2.5 text-sm bg-white border border-stone-200/70 rounded-[16px] outline-none font-sans
                          focus:ring-2 focus:ring-indigo-500/15 focus:border-indigo-400
                          disabled:bg-stone-50 disabled:text-stone-400"
+              style={{ boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(255,255,255,0.6)' }}
               placeholder={voiceListening ? 'Listening...' : 'Ask a new question...'}
               value={input}
               onChange={(e) => {
@@ -1167,10 +1171,11 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           />
           <button
             className={`
-              w-10 h-10 flex items-center justify-center bg-indigo-500 text-white rounded-[8px] shrink-0
-              hover:bg-indigo-600 transition-all
+              w-10 h-10 flex items-center justify-center text-white rounded-[12px] shrink-0
+              transition-all hover:brightness-110
               ${loading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
             `}
+            style={{ background: 'var(--gradient-send-btn)', boxShadow: '0 2px 6px rgba(99,102,241,0.3), 0 4px 12px rgba(99,102,241,0.15)' }}
             onClick={() => handleSend()}
             disabled={loading}
           >

@@ -121,7 +121,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen font-sans text-stone-900 bg-stone-50">
+    <div className="flex h-screen font-sans text-stone-900 p-3 gap-3" style={{ background: 'var(--gradient-page)' }}>
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-20 bg-black/20 backdrop-blur-sm md:hidden"
@@ -132,10 +132,16 @@ export default function App() {
       <aside
         className={`
           fixed inset-y-0 left-0 z-30 w-64 flex-shrink-0 flex flex-col
-          bg-stone-100 text-stone-700 border-r border-stone-200/60 p-6 transition-transform duration-200
+          text-stone-700 p-6 transition-transform duration-200
           md:static md:translate-x-0
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
+        style={{
+          background: 'var(--gradient-sidebar)',
+          border: '1px solid rgba(231,229,228,0.45)',
+          borderRadius: '20px',
+          boxShadow: 'var(--shadow-float)',
+        }}
       >
         <div className="flex items-center gap-2 text-lg font-bold text-stone-900 mb-1 tracking-tight">
           <svg width="22" height="20" viewBox="0 0 1551 1375" className="shrink-0">
@@ -151,7 +157,7 @@ export default function App() {
           Fully autonomous agent with 19 tools. Every query is researched, verified, and validated by the agent.
         </div>
 
-        <div className="mt-auto pt-6 border-t border-stone-200 space-y-4">
+        <div className="mt-auto pt-6 border-t border-stone-300/30 space-y-4">
           <div className="relative" ref={impersonateDropdownRef}>
             <div className="text-xs font-semibold text-stone-600 mb-1">Impersonate</div>
             <div className="text-[11px] text-stone-400 mt-0.5 mb-2">Search by name to filter data</div>
@@ -178,7 +184,7 @@ export default function App() {
                   className="w-full rounded-[8px] bg-white text-stone-800 border border-stone-200 px-3 py-1.5 text-xs placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all"
                 />
                 {impersonateDropdownOpen && (impersonateSearch.trim().length >= 2 || impersonateResults.length > 0) && (
-                  <div className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-[12px] bg-white border border-stone-200 shadow-[0_12px_32px_rgba(0,0,0,0.08)] z-50">
+                  <div className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-[12px] bg-white border border-stone-200/60 z-50" style={{ boxShadow: 'var(--shadow-elevated)' }}>
                     {impersonateLoading ? (
                       <div className="px-3 py-2 text-xs text-stone-400">Searching...</div>
                     ) : impersonateResults.length === 0 ? (
@@ -230,7 +236,7 @@ export default function App() {
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 gap-3">
         <ChatPanel onMenuClick={() => setSidebarOpen((v) => !v)} impersonateContext={impersonateContext} validationEnabled={validationEnabled} sessionId={sessionId} onNewChat={() => setSessionId(generateSessionId())} enabledTools={toolToggles.enabledTools} useFastModel={useFastModel} userName={userName} />
       </main>
     </div>

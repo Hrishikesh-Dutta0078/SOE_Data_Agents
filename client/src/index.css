@@ -32,11 +32,23 @@
   --color-warning: #F59E0B;
   --color-error: #EF4444;
 
-  /* Shadows */
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.03);
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
-  --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.03);
-  --shadow-elevated: 0 12px 32px rgba(0,0,0,0.08);
+  /* Shadows — multi-layer for 3D depth */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05), 0 0 1px rgba(0,0,0,0.04);
+  --shadow-card: 0 2px 4px rgba(0,0,0,0.04), 0 6px 16px rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.03);
+  --shadow-card-hover: 0 4px 8px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.10), 0 0 1px rgba(0,0,0,0.04);
+  --shadow-elevated: 0 8px 16px rgba(0,0,0,0.08), 0 20px 48px rgba(0,0,0,0.12), 0 0 1px rgba(0,0,0,0.05);
+  --shadow-float: 0 4px 12px rgba(0,0,0,0.05), 0 16px 40px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.02);
+  --shadow-bubble: 0 2px 8px rgba(99,102,241,0.12), 0 4px 16px rgba(99,102,241,0.08);
+  --shadow-bubble-assistant: 0 2px 6px rgba(0,0,0,0.05), 0 8px 24px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.02);
+
+  /* Gradients */
+  --gradient-page: linear-gradient(145deg, #FAFAF9 0%, #F0EEFF 40%, #F5F5F4 70%, #EEF2FF 100%);
+  --gradient-sidebar: linear-gradient(180deg, #F5F5F4 0%, #EDECFE 50%, #F5F3FF 100%);
+  --gradient-header: linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(238,242,255,0.75) 100%);
+  --gradient-input-area: linear-gradient(0deg, rgba(255,255,255,0.95) 0%, rgba(249,248,255,0.85) 100%);
+  --gradient-user-bubble: linear-gradient(135deg, #6366F1 0%, #4F46E5 50%, #5B52F0 100%);
+  --gradient-send-btn: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+  --gradient-empty-icon: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
 
   /* Radius */
   --radius-sm: 8px;
@@ -58,7 +70,8 @@ html {
 }
 
 body {
-  background: var(--color-bg);
+  background: var(--gradient-page);
+  min-height: 100vh;
   color: var(--color-text-primary);
 }
 
@@ -117,6 +130,138 @@ body {
 }
 .animate-progress-dot {
   animation: progress-dot 1.4s ease-in-out infinite;
+}
+
+/* ===== Modular Panel Utilities ===== */
+.bubble-user {
+  background: var(--gradient-user-bubble);
+  box-shadow: var(--shadow-bubble);
+}
+.bubble-assistant {
+  background: #FFFFFF;
+  box-shadow: var(--shadow-bubble-assistant);
+  border: 1px solid rgba(231,229,228,0.5);
+}
+.surface-gradient-header {
+  background: var(--gradient-header);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(231,229,228,0.4);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+.surface-gradient-input {
+  background: var(--gradient-input-area);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(231,229,228,0.4);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+.chat-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255,255,255,0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(231,229,228,0.4);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ===== Voice Mode ===== */
+@property --voice-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes voice-border-spin {
+  to { --voice-angle: 360deg; }
+}
+
+@keyframes voice-glow-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.008); }
+}
+
+@keyframes voice-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.voice-input-wrapper {
+  position: relative;
+  border-radius: 20px;
+  transition: all 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.voice-input-wrapper.voice-active {
+  animation: voice-glow-pulse 2s ease-in-out infinite;
+}
+
+.voice-input-wrapper.voice-active::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 22px;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--voice-angle),
+    #E81123 0deg,
+    #EB1D36 45deg,
+    #FF0099 90deg,
+    #D946EF 135deg,
+    #7C3AED 180deg,
+    #5B21B6 225deg,
+    #0066FF 270deg,
+    #1A8CFF 315deg,
+    #E81123 360deg
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: voice-border-spin 3s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.voice-input-wrapper.voice-active::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 28px;
+  background: conic-gradient(
+    from var(--voice-angle),
+    rgba(232, 17, 35, 0.2) 0deg,
+    rgba(255, 0, 153, 0.2) 90deg,
+    rgba(124, 58, 237, 0.2) 180deg,
+    rgba(0, 102, 255, 0.2) 270deg,
+    rgba(232, 17, 35, 0.2) 360deg
+  );
+  animation: voice-border-spin 3s linear infinite;
+  filter: blur(12px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.voice-input-wrapper .voice-input-field {
+  transition: all 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  z-index: 2;
+}
+
+.voice-input-wrapper.voice-active .voice-input-field {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  font-size: 16px;
+  background: white;
+  border-color: transparent;
+  box-shadow: 0 0 0 1px rgba(124, 58, 237, 0.08);
 }
 
 /* ===== react-grid-layout ===== */

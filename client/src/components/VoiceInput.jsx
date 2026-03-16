@@ -14,7 +14,7 @@ function loadSpeechModules() {
     ]).then(([speechRecModule, azureModule]) => ({
       SpeechRecognition: speechRecModule.default,
       useSpeechRecognition: speechRecModule.useSpeechRecognition,
-      createSpeechServicesPonyfill: azureModule.default,
+      createSpeechServicesPonyfill: azureModule.createSpeechServicesPonyfill || azureModule.default?.createSpeechServicesPonyfill || azureModule.default,
     }));
   }
   return speechModulesPromise;
@@ -42,7 +42,7 @@ function VoiceTranscriptBridge({ speechModules, onInterimTranscript, onFinalTran
   return null;
 }
 
-export default function VoiceInput({ onInterimTranscript, onFinalTranscript, onError, disabled = false }) {
+export default function VoiceInput({ onInterimTranscript, onFinalTranscript, onError, onListeningChange, stopRef, disabled = false }) {
   const [voiceState, setVoiceState] = useState(VOICE_STATES.IDLE);
   const [micHidden, setMicHidden] = useState(false);
   const [speechModules, setSpeechModules] = useState(null);
@@ -51,15 +51,28 @@ export default function VoiceInput({ onInterimTranscript, onFinalTranscript, onE
   const polyfillApplied = useRef(false);
 
   const startListening = useCallback(async () => {
+    console.log('[VoiceInput] startListening called, state:', voiceState, 'disabled:', disabled);
     if (voiceState !== VOICE_STATES.IDLE || disabled) return;
 
     setVoiceState(VOICE_STATES.AWAITING_TOKEN);
 
     try {
-      const [modules, tokenData] = await Promise.all([
-        loadSpeechModules(),
-        getToken(),
-      ]);
+      console.log('[VoiceInput] Loading speech modules + fetching token...');
+      let modules, tokenData;
+      try {
+        modules = await loadSpeechModules();
+        console.log('[VoiceInput] Speech modules loaded OK');
+      } catch (modErr) {
+        console.error('[VoiceInput] Speech module load FAILED:', modErr);
+        throw modErr;
+      }
+      try {
+        tokenData = await getToken();
+        console.log('[VoiceInput] Token received OK, region:', tokenData.region);
+      } catch (tokErr) {
+        console.error('[VoiceInput] Token fetch FAILED:', tokErr);
+        throw tokErr;
+      }
 
       if (!speechModules) setSpeechModules(modules);
 
@@ -82,11 +95,13 @@ export default function VoiceInput({ onInterimTranscript, onFinalTranscript, onE
       });
 
       setVoiceState(VOICE_STATES.LISTENING);
+      onListeningChange?.(true);
 
       maxDurationTimer.current = setTimeout(() => {
         stopListening(modules);
       }, MAX_RECORDING_MS);
     } catch (err) {
+      console.error('[VoiceInput] startListening error:', err);
       setVoiceState(VOICE_STATES.IDLE);
       if (err.name === 'NotAllowedError' || err.message?.includes('Permission') || err.message?.includes('microphone')) {
         setMicHidden(true);
@@ -107,7 +122,13 @@ export default function VoiceInput({ onInterimTranscript, onFinalTranscript, onE
       mods.SpeechRecognition.abortListening();
     }
     setVoiceState(VOICE_STATES.IDLE);
-  }, [speechModules]);
+    onListeningChange?.(false);
+  }, [speechModules, onListeningChange]);
+
+  // Expose stop function to parent via ref
+  useEffect(() => {
+    if (stopRef) stopRef.current = stopListening;
+  }, [stopRef, stopListening]);
 
   const toggleListening = useCallback(() => {
     if (voiceState === VOICE_STATES.LISTENING) {

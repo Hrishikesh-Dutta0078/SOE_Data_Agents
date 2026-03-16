@@ -1,8 +1,8 @@
 /**
- * SQL Server connection pool using SQL Authentication (tedious driver).
+ * SQL Server connection pool using Windows Authentication (msnodesqlv8 driver).
  */
 
-const sql = require('mssql');
+const sql = require('mssql/msnodesqlv8');
 const logger = require('../utils/logger');
 const {
   DB_REQUEST_TIMEOUT,
@@ -14,15 +14,12 @@ const {
 
 let pool = null;
 
+const server = process.env.DB_SERVER;
+const port = parseInt(process.env.DB_PORT, 10) || 1433;
+const database = process.env.DB_DATABASE;
+
 const config = {
-  server: process.env.DB_SERVER,
-  port: parseInt(process.env.DB_PORT, 10) || 1433,
-  database: process.env.DB_DATABASE,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  options: {
-    trustServerCertificate: !!process.env.DB_TRUST_SERVER_CERT,
-  },
+  connectionString: `Driver={ODBC Driver 17 for SQL Server};Server=${server},${port};Database=${database};Trusted_Connection=Yes;`,
   pool: {
     min: DB_POOL_MIN,
     max: DB_POOL_MAX,
@@ -37,7 +34,6 @@ function getEnv() {
     server: process.env.DB_SERVER,
     port: parseInt(process.env.DB_PORT, 10) || 1433,
     database: process.env.DB_DATABASE,
-    user: process.env.DB_USER,
     trustServerCert: process.env.DB_TRUST_SERVER_CERT === 'true',
   };
 }
@@ -51,7 +47,7 @@ async function getPool() {
       logger.error('SQL Server pool error', { error: err.message });
       pool = null;
     });
-    logger.info('DB connected', { server: config.server });
+    logger.info('DB connected', { server });
     return pool;
   } catch (err) {
     logger.error('SQL Server connection failed', { error: err.message });
@@ -82,9 +78,9 @@ module.exports = {
         server: e.server,
         port: e.port,
         database: e.database,
-        user: e.user,
         options: {
           trustServerCertificate: e.trustServerCert,
+          trustedConnection: true,
         },
       },
     };
@@ -94,7 +90,7 @@ module.exports = {
     return [
       `Server=${e.server},${e.port}`,
       `Database=${e.database}`,
-      `User=${e.user || '(not set)'}`,
+      `Trusted_Connection=Yes`,
       `TrustServerCertificate=${e.trustServerCert}`,
     ].join(';');
   },

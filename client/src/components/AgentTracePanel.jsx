@@ -35,7 +35,7 @@ function TraceEntry({ entry }) {
   return (
     <div className="flex gap-3 relative">
       <div className="flex flex-col items-center">
-        <div className={`w-3 h-3 rounded-full ${style.color} shrink-0 mt-0.5 shadow-[0_1px_2px_rgba(0,0,0,0.1)]`} />
+        <div className={`w-3 h-3 rounded-full ${style.color} shrink-0 mt-0.5 shadow-[0_1px_3px_rgba(0,0,0,0.15),0_2px_6px_rgba(0,0,0,0.08)]`} />
         <div className="w-px flex-1 bg-stone-200" />
       </div>
 
@@ -171,7 +171,7 @@ export default function AgentTracePanel({ trace }) {
       </button>
 
       {open && (
-        <div className="mt-2 p-3 bg-stone-50 border border-stone-200 rounded-[12px]">
+        <div className="mt-2 p-3 rounded-[12px]" style={{ background: 'linear-gradient(135deg, #FAFAF9 0%, #F5F3FF 100%)', border: '1px solid rgba(231,229,228,0.5)', boxShadow: 'var(--shadow-card)' }}>
           <div className="text-[12px] font-medium text-stone-500 mb-3">
             Execution Trace
           </div>

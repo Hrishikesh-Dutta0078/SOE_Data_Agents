@@ -343,7 +343,7 @@ function SubQuerySection({ query, index }) {
   const hasSql = !!query.sql?.trim();
 
   return (
-    <div className="border border-stone-200 rounded-[12px] overflow-hidden mb-2">
+    <div className="rounded-[12px] overflow-hidden mb-2" style={{ border: '1px solid rgba(231,229,228,0.5)', boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 2px 8px rgba(0,0,0,0.03)' }}>
       <button
         className="w-full flex items-center justify-between px-3 py-2 bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer border-none text-left"
         onClick={() => setOpen(!open)}
@@ -416,15 +416,15 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
   const currentTab = tabs.find((t) => t.id === activeTab) ? activeTab : tabs[0]?.id;
 
   return (
-    <div className="mt-3 border border-stone-200 rounded-[16px] overflow-hidden bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)]">
-      <div className="flex gap-1 p-1 m-3 mb-0 bg-stone-100 rounded-[10px]">
+    <div className="mt-3 rounded-[16px] overflow-hidden bg-white" style={{ border: '1px solid rgba(231,229,228,0.5)', boxShadow: 'var(--shadow-float)' }}>
+      <div className="flex gap-1 p-1 m-3 mb-0 rounded-[10px]" style={{ background: 'linear-gradient(135deg, #F5F5F4 0%, #EEF2FF 100%)', boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.04)' }}>
         {tabs.map((t) => (
           <button
             key={t.id}
             className={`
               flex-1 text-center px-3 py-1.5 text-xs font-medium cursor-pointer transition-all
               ${currentTab === t.id
-                ? 'text-stone-900 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.06)] rounded-[8px] font-semibold'
+                ? 'text-stone-900 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_2px_8px_rgba(0,0,0,0.04)] rounded-[8px] font-semibold'
                 : 'text-stone-500 bg-transparent hover:text-stone-700 rounded-[8px]'
               }
             `}

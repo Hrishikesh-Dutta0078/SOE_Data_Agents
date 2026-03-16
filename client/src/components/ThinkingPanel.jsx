@@ -54,7 +54,7 @@ function useParallelDiscoveryState(entries) {
 function ParallelDiscoveryViz({ total, completed }) {
   if (total <= 0) return null;
   return (
-    <div className="rounded-[12px] border border-indigo-100 bg-indigo-50/50 p-3 mb-2">
+    <div className="rounded-[12px] p-3 mb-2" style={{ background: 'linear-gradient(135deg, rgba(238,242,255,0.5) 0%, rgba(224,231,254,0.4) 100%)', border: '1px solid rgba(199,210,254,0.4)', boxShadow: '0 1px 4px rgba(99,102,241,0.06)' }}>
       <div className="flex items-center gap-2 mb-2">
         <span className="text-[11px] font-medium text-indigo-500">
           Parallel discovery
@@ -142,7 +142,7 @@ function ThinkingEntry({ entry, isLatest }) {
 function QueryPlanBanner({ queryPlan }) {
   if (!queryPlan || queryPlan.length <= 1) return null;
   return (
-    <div className="mb-2 p-3 rounded-[12px] border border-purple-100 bg-purple-50/50">
+    <div className="mb-2 p-3 rounded-[12px]" style={{ background: 'linear-gradient(135deg, rgba(250,245,255,0.5) 0%, rgba(243,232,255,0.4) 100%)', border: '1px solid rgba(233,213,255,0.4)', boxShadow: '0 1px 4px rgba(168,85,247,0.06)' }}>
       <div className="text-[11px] font-medium text-purple-600 mb-2">
         Multi-query plan — {queryPlan.length} sub-queries
       </div>
@@ -170,7 +170,7 @@ export default function ThinkingPanel({ entries = [], queryPlan = null, startTim
 
   if (entries.length === 0 && !queryPlan) {
     return (
-      <div className="flex items-center gap-2 text-[13px] text-stone-500 bg-stone-50 rounded-[12px] border border-stone-200 px-3 py-2.5">
+      <div className="flex items-center gap-2 text-[13px] text-stone-500 rounded-[12px] px-3 py-2.5" style={{ background: 'linear-gradient(135deg, #FAFAF9 0%, #F0EEFF 100%)', border: '1px solid rgba(231,229,228,0.5)', boxShadow: 'var(--shadow-card)' }}>
         <span className="w-2 h-2 rounded-full bg-indigo-500 animate-subtle-pulse" />
         <span>Standby</span>
       </div>
@@ -180,9 +180,10 @@ export default function ThinkingPanel({ entries = [], queryPlan = null, startTim
   const latestEntry = entries[entries.length - 1];
 
   return (
-    <div className="rounded-[16px] overflow-hidden border border-stone-200 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.04),0_1px_2px_rgba(0,0,0,0.02)] relative">
+    <div className="rounded-[16px] overflow-hidden bg-white relative" style={{ border: '1px solid rgba(231,229,228,0.5)', boxShadow: 'var(--shadow-float)' }}>
       <div
-        className="relative flex items-center justify-between px-3.5 py-2.5 border-b border-stone-100 bg-stone-50 cursor-pointer select-none"
+        className="relative flex items-center justify-between px-3.5 py-2.5 cursor-pointer select-none"
+        style={{ background: 'linear-gradient(90deg, #F5F5F4 0%, #F0EEFF 100%)', borderBottom: '1px solid rgba(231,229,228,0.4)' }}
         onClick={() => setCollapsed(!collapsed)}
       >
         <div className="flex items-center gap-2.5">
