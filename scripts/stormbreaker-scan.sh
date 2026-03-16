@@ -303,21 +303,20 @@ install_trufflehog() {
 }
 
 install_trivy() {
-  # Trivy uses slightly different naming: trivy_0.58.0_Linux-64bit.tar.gz
-  local os_trivy
+  # Trivy asset naming: trivy_0.69.3_Linux-64bit.tar.gz / trivy_0.69.3_windows-64bit.zip
+  local os_trivy arch_trivy ext_trivy
   case "$PLATFORM" in
-    windows) os_trivy="Windows" ;;
-    macos)   os_trivy="macOS"   ;;
-    linux)   os_trivy="Linux"   ;;
+    windows) os_trivy="windows"; ext_trivy="zip" ;;
+    macos)   os_trivy="macOS";   ext_trivy="tar.gz" ;;
+    linux)   os_trivy="Linux";   ext_trivy="tar.gz" ;;
   esac
-  local arch_trivy
   case "$ARCH_NAME" in
     amd64) arch_trivy="64bit"  ;;
     arm64) arch_trivy="ARM64"  ;;
     *)     arch_trivy="64bit"  ;;
   esac
   install_github_release "aquasecurity/trivy" "trivy" \
-    "trivy_{TAG}_${os_trivy}-${arch_trivy}.tar.gz"
+    "trivy_{TAG}_${os_trivy}-${arch_trivy}.${ext_trivy}"
 }
 
 install_bearer() {
