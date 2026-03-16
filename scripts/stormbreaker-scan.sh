@@ -31,6 +31,9 @@ case "$PLATFORM" in
   linux)   OS_NAME="linux"   ;;
 esac
 
+# WSL command prefix — use Ubuntu distro with devuser (not docker-desktop default)
+WSL_EXEC="wsl -d Ubuntu -u devuser -- bash -lc"
+
 # State tracking
 NO_INSTALL=0
 SELECTED_WAVES="all"
@@ -244,9 +247,9 @@ ensure_tool() {
   local tool=$1
   local install_fn=$2
 
-  # Special case: semgrep on Windows checks WSL
+  # Special case: semgrep on Windows checks WSL Ubuntu
   if [[ "$tool" == "semgrep" && "$PLATFORM" == "windows" ]]; then
-    if command -v wsl &>/dev/null && wsl which semgrep &>/dev/null 2>&1; then
+    if command -v wsl &>/dev/null && $WSL_EXEC "which semgrep" &>/dev/null 2>&1; then
       return 0
     fi
   elif command -v "$tool" &>/dev/null; then
@@ -264,7 +267,7 @@ ensure_tool() {
   if $install_fn; then
     # Verify it's now available
     if [[ "$tool" == "semgrep" && "$PLATFORM" == "windows" ]]; then
-      if command -v wsl &>/dev/null && wsl which semgrep &>/dev/null 2>&1; then
+      if command -v wsl &>/dev/null && $WSL_EXEC "which semgrep" &>/dev/null 2>&1; then
         return 0
       fi
     elif command -v "$tool" &>/dev/null; then
@@ -282,11 +285,11 @@ ensure_tool() {
 install_semgrep() {
   if [[ "$PLATFORM" == "windows" ]]; then
     if ! command -v wsl &>/dev/null; then
-      log_warn "semgrep requires WSL on Windows. Install WSL to enable."
+      log_warn "semgrep requires WSL on Windows. Install WSL + Ubuntu to enable."
       return 1
     fi
-    log_info "Installing semgrep in WSL..."
-    wsl pip install semgrep 2>>"$DEBUG_LOG" || wsl pip3 install semgrep 2>>"$DEBUG_LOG"
+    log_info "Installing semgrep in WSL Ubuntu..."
+    $WSL_EXEC "pipx install semgrep 2>&1 || pip3 install --user semgrep 2>&1" >>"$DEBUG_LOG" 2>&1
   else
     ensure_pipx || return 1
     if [[ "$PIPX_CMD" == "pipx" ]]; then
@@ -519,13 +522,17 @@ wave_p0() {
   # --- semgrep ---
   if ensure_tool "semgrep" install_semgrep; then
     if [[ "$PLATFORM" == "windows" ]]; then
-      # Run via WSL — translate project path
+      # Run via WSL Ubuntu — translate project path to Linux mount
+      local win_project
+      win_project=$(cygpath -w "$PROJECT_DIR")
       local wsl_project
-      wsl_project=$(wsl wslpath -u "$(cygpath -w "$PROJECT_DIR")" 2>/dev/null || echo "$PROJECT_DIR")
+      wsl_project=$($WSL_EXEC "wslpath -u '$win_project'" 2>/dev/null)
+      local wsl_reports
+      wsl_reports=$($WSL_EXEC "wslpath -u '$(cygpath -w "$REPORTS_DIR")'" 2>/dev/null)
       run_tool "P0" "semgrep" "$REPORTS_DIR/semgrep_output.json" \
-        wsl semgrep scan --config auto --json \
-        -o "$REPORTS_DIR/semgrep_output.json" \
-        "$wsl_project/server/" "$wsl_project/client/src/"
+        $WSL_EXEC "semgrep scan --config auto --json \
+        -o '$wsl_reports/semgrep_output.json' \
+        '$wsl_project/server/' '$wsl_project/client/src/'"
     else
       run_tool "P0" "semgrep" "$REPORTS_DIR/semgrep_output.json" \
         semgrep scan --config auto --json \
