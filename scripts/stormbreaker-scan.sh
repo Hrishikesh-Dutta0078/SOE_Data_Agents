@@ -320,14 +320,26 @@ install_trivy() {
 }
 
 install_bearer() {
+  if [[ "$PLATFORM" == "windows" ]]; then
+    log_warn "Bearer does not provide Windows binaries. Skipping."
+    log_warn "Run bearer via WSL or Docker: https://docs.bearer.com/reference/installation/"
+    return 1
+  fi
   log_info "Installing bearer via install script..."
   curl -sfL https://raw.githubusercontent.com/Bearer/bearer/v1.46.0/contrib/install.sh \
     | sh -s -- -b "$INSTALL_DIR" 2>>"$DEBUG_LOG"
 }
 
 install_osv_scanner() {
-  install_github_release "google/osv-scanner" "osv-scanner" \
-    "osv-scanner_{TAG}_{OS}_{ARCH}"
+  # osv-scanner Windows assets: osv-scanner_windows_amd64.exe (no version tag)
+  # Linux/macOS assets: osv-scanner_linux_amd64 (no version tag, no extension)
+  if [[ "$PLATFORM" == "windows" ]]; then
+    install_github_release "google/osv-scanner" "osv-scanner" \
+      "osv-scanner_{OS}_{ARCH}.exe"
+  else
+    install_github_release "google/osv-scanner" "osv-scanner" \
+      "osv-scanner_{OS}_{ARCH}"
+  fi
 }
 
 install_syft() {
