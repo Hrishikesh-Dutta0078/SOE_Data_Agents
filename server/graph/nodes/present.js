@@ -169,7 +169,8 @@ function buildPartialResultsNote(allQueries) {
 
 function buildMultiQueryInsightInputs(state, allQueries) {
   const category = state.questionCategory || '';
-  const guidance = CATEGORY_INSIGHT_GUIDANCE[category] || DEFAULT_INSIGHT_GUIDANCE;
+  const blueprintHint = state.blueprintMeta?.presentationHint || '';
+  const guidance = blueprintHint || CATEGORY_INSIGHT_GUIDANCE[category] || DEFAULT_INSIGHT_GUIDANCE;
 
   const { note: partialResultsNote, summary: _partialSummary } = buildPartialResultsNote(allQueries);
 
@@ -307,17 +308,21 @@ async function presentNode(state) {
   const { cleanedInsights, followUps } = parseFollowUps(insightsRaw);
   const resolvedChartType = chart?.charts?.[0]?.chartType || null;
 
+  const blueprintFollowUps = state.blueprintMeta?.suggestedFollowUps || [];
+  const finalFollowUps = followUps.length > 0 ? followUps : blueprintFollowUps;
+
   const partialResults = isMultiQuery ? buildPartialResultsNote(allQueries) : { summary: null };
   const partialResultsSummary = partialResults.summary || null;
 
+  const blueprintLabel = state.blueprintId ? ` [blueprint: ${state.blueprintId}]` : '';
   const multiLabel = isMultiQuery ? ` (synthesizing ${allQueries.length} queries)` : '';
-  logger.info(`[Present]${multiLabel} ${cleanedInsights.length} chars insights, chart: ${resolvedChartType || 'none'}, ${followUps.length} follow-ups (${Date.now() - presentStart}ms)`);
+  logger.info(`[Present]${blueprintLabel}${multiLabel} ${cleanedInsights.length} chars insights, chart: ${resolvedChartType || 'none'}, ${finalFollowUps.length} follow-ups (${Date.now() - presentStart}ms)`);
 
   return {
     queries: isMultiQuery ? allQueries : [],
     insights: cleanedInsights,
     chart,
-    suggestedFollowUps: followUps,
+    suggestedFollowUps: finalFollowUps,
     partialResultsSummary,
     trace: [{
       node: 'present',

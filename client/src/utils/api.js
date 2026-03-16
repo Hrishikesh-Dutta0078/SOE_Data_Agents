@@ -128,6 +128,10 @@ export async function analyzeQuestionStream(
   return finalResult;
 }
 
+export function fetchBlueprints() {
+  return request('/api/text-to-sql/blueprints');
+}
+
 export function fetchDashboardPage(sql, page = 1, pageSize = 50) {
   return request('/api/text-to-sql/dashboard-data', {
     method: 'POST',

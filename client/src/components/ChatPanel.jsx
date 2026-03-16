@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { analyzeQuestionStream } from '../utils/api';
+import { analyzeQuestionStream, fetchBlueprints } from '../utils/api';
 import ResultsPanel from './ResultsPanel';
 import AgentTracePanel from './AgentTracePanel';
 import ThinkingPanel from './ThinkingPanel';
 import DashboardOverlay from './DashboardOverlay';
 import VoiceInput from './VoiceInput';
+import BlueprintPicker from './BlueprintPicker';
 import { Menu, ArrowUp, X, MessageSquare, Copy, Check } from 'lucide-react';
 
 function Badge({ className = '', children }) {
@@ -81,20 +82,29 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const [copiedIdx, setCopiedIdx] = useState(null);
   const [progress, setProgress] = useState(null);
   const [streamingInsights, setStreamingInsights] = useState('');
+  const [voiceListening, setVoiceListening] = useState(false);
   const [activeTools, setActiveTools] = useState([]);
   const [thinkingEntries, setThinkingEntries] = useState([]);
   const [queryPlan, setQueryPlan] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
   const [followUpMode, setFollowUpMode] = useState(false);
   const [followUpInput, setFollowUpInput] = useState('');
+  const [blueprints, setBlueprints] = useState([]);
+  const [showBlueprintPicker, setShowBlueprintPicker] = useState(false);
+  const [blueprintSelectedIdx, setBlueprintSelectedIdx] = useState(0);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const saveTimerRef = useRef(null);
+  const voiceStopRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, progress]);
+
+  useEffect(() => {
+    fetchBlueprints().then(setBlueprints).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
@@ -381,11 +391,13 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   }, [streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, useFastModel]);
 
   const handleSend = async (text, { isFollowUp = false } = {}) => {
+    voiceStopRef.current?.();
     const question = (text || input).trim();
     if (!question || loading) return;
 
     setMessages((prev) => [...prev, { role: 'user', type: 'user', content: question }]);
     setInput('');
+    setShowBlueprintPicker(false);
     setFollowUpMode(false);
     setFollowUpInput('');
     setLoading(true);
@@ -516,7 +528,35 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     }
   };
 
+  const handleBlueprintSelect = (bp) => {
+    setInput(bp.slashCommand + ' ');
+    setShowBlueprintPicker(false);
+    inputRef.current?.focus();
+  };
+
   const handleKeyDown = (e) => {
+    if (showBlueprintPicker && blueprints.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setBlueprintSelectedIdx((prev) => Math.min(prev + 1, blueprints.length - 1));
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setBlueprintSelectedIdx((prev) => Math.max(prev - 1, 0));
+        return;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleBlueprintSelect(blueprints[blueprintSelectedIdx]);
+        return;
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setShowBlueprintPicker(false);
+        return;
+      }
+    }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -1055,32 +1095,59 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       )}
 
       {/* Input */}
-      <div className="px-5 py-3.5 border-t border-stone-100 bg-white/80 backdrop-blur-xl">
+      <div className="relative px-5 py-3.5 border-t border-stone-100 bg-white/80 backdrop-blur-xl">
+        {showBlueprintPicker && (
+          <BlueprintPicker
+            blueprints={blueprints}
+            selectedIndex={blueprintSelectedIdx}
+            onSelect={handleBlueprintSelect}
+            onClose={() => setShowBlueprintPicker(false)}
+          />
+        )}
         {/* Screen reader announcement for voice transcription */}
         <div aria-live="polite" aria-atomic="false" className="sr-only" id="voice-transcript-status" />
         <div className="flex items-center gap-3">
-          <input
-            ref={inputRef}
-            type="text"
-            className="flex-1 px-4 py-2.5 text-sm bg-stone-50 border border-stone-200 rounded-[16px] outline-none font-sans
-                       focus:ring-2 focus:ring-indigo-500/15 focus:border-indigo-400 transition-all
-                       disabled:bg-stone-50 disabled:text-stone-400"
-            placeholder="Ask a new question..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={loading}
-          />
+          <div className={`voice-input-wrapper flex-1 ${voiceListening ? 'voice-active' : ''}`}>
+            <input
+              ref={inputRef}
+              type="text"
+              className="voice-input-field w-full px-4 py-2.5 text-sm bg-stone-50 border border-stone-200 rounded-[16px] outline-none font-sans
+                         focus:ring-2 focus:ring-indigo-500/15 focus:border-indigo-400
+                         disabled:bg-stone-50 disabled:text-stone-400"
+              placeholder={voiceListening ? 'Listening...' : 'Ask a new question...'}
+              value={input}
+              onChange={(e) => {
+                const val = e.target.value;
+                setInput(val);
+                if (val === '/' && blueprints.length > 0) {
+                  setShowBlueprintPicker(true);
+                  setBlueprintSelectedIdx(0);
+                } else if (showBlueprintPicker && !val.startsWith('/')) {
+                  setShowBlueprintPicker(false);
+                }
+              }}
+              onKeyDown={handleKeyDown}
+              onBlur={() => setTimeout(() => setShowBlueprintPicker(false), 150)}
+              disabled={loading}
+            />
+          </div>
           <VoiceInput
+            stopRef={voiceStopRef}
             onInterimTranscript={(text) => {
               setInput(text);
+              inputRef.current?.focus();
               const el = document.getElementById('voice-transcript-status');
               if (el) el.textContent = text;
             }}
             onFinalTranscript={(text) => {
               setInput(text);
+              inputRef.current?.focus();
               const el = document.getElementById('voice-transcript-status');
               if (el) el.textContent = 'Final: ' + text;
+            }}
+            onListeningChange={(listening) => {
+              setVoiceListening(listening);
+              if (listening) inputRef.current?.focus();
             }}
             onError={(msg) => {
               setMessages((prev) => [...prev, { role: 'system', type: 'error', content: msg }]);

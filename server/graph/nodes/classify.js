@@ -1,10 +1,12 @@
 /**
  * Classify Node — Intent classification with two-tier gold example matching.
  *
+ * Step 0c: Blueprint slash-command detection (< 1ms, no LLM).
  * Step 1: Programmatic exact match against gold example variants (< 1ms).
  *         If matched, skips the LLM call entirely and sets matchType = 'exact'.
  * Step 2: LLM-based classification with partial template matching.
  *         If LLM identifies a related template, sets matchType = 'partial'.
+ *         Also detects analysis blueprint matches semantically.
  */
 
 const fs = require('fs');
@@ -23,6 +25,42 @@ const DASHBOARD_PATTERNS = [
   /^\/dashboard\b/i,
   /^\/create[-\s]?dashboard\b/i,
 ];
+
+// --- Analysis Blueprints ---
+let _blueprintsCache = null;
+
+function loadBlueprints() {
+  if (_blueprintsCache) return _blueprintsCache;
+  try {
+    const filePath = path.join(__dirname, '..', '..', 'context', 'knowledge', 'analysis-blueprints.json');
+    const raw = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    _blueprintsCache = raw.blueprints || [];
+  } catch {
+    _blueprintsCache = [];
+  }
+  return _blueprintsCache;
+}
+
+function findBlueprintBySlashCommand(question) {
+  const trimmed = question.trim().toLowerCase();
+  const blueprints = loadBlueprints();
+  for (const bp of blueprints) {
+    if (trimmed.startsWith(bp.slashCommand)) {
+      const trailing = trimmed.slice(bp.slashCommand.length).trim();
+      return { blueprint: bp, params: trailing };
+    }
+  }
+  return null;
+}
+
+function getBlueprintContext() {
+  const blueprints = loadBlueprints();
+  if (blueprints.length === 0) return '';
+  const lines = blueprints.map((bp) =>
+    `[blueprint_id: ${bp.id}] "${bp.name}" — ${bp.description}\n  Trigger phrases: ${bp.triggers.join('; ')}`
+  );
+  return `\nANALYSIS BLUEPRINTS (if the user's question matches one of these, set matched_blueprint_id):\n${lines.join('\n')}\n`;
+}
 
 function hasDashboardableData(conversationHistory) {
   if (!Array.isArray(conversationHistory) || conversationHistory.length === 0) return false;
@@ -134,6 +172,7 @@ const ClassifySchema = z.object({
   question_category: z.enum(['WHAT_HAPPENED', 'WHY', 'WHAT_TO_DO']).default('WHAT_HAPPENED'),
   question_sub_category: z.string().default(''),
   matched_example_id: z.string().nullable().default(null),
+  matched_blueprint_id: z.string().nullable().default(null),
   is_followup: z.boolean().default(false),
   needs_decomposition: z.boolean().default(false),
   dashboard_has_data_request: z.boolean().default(false),
@@ -192,6 +231,31 @@ async function classifyNode(state) {
       generalChatReply: '',
       orchestrationReasoning: 'Dashboard refinement — reusing existing data, routing to dashboardAgent.',
       trace: [{ node: 'classify', timestamp: start, duration, intent: 'DASHBOARD', matchType: 'dashboard_refine' }],
+    };
+  }
+
+  // Step 0c: Blueprint slash-command detection (< 1ms, no LLM)
+  const blueprintSlash = findBlueprintBySlashCommand(state.question);
+  if (blueprintSlash) {
+    const { blueprint, params } = blueprintSlash;
+    const duration = Date.now() - start;
+    logger.info(`Classify: blueprint slash-command "${blueprint.slashCommand}" matched → ${blueprint.id} (${duration}ms)`);
+    return {
+      ...stateReset,
+      intent: 'SQL_QUERY',
+      complexity: 'COMPLEX',
+      entities: { metrics: [], dimensions: [], filters: [], operations: [] },
+      questionCategory: blueprint.category || 'WHAT_TO_DO',
+      questionSubCategory: blueprint.subCategory || '',
+      templateSql: '',
+      matchType: 'blueprint',
+      needsDecomposition: true,
+      blueprintId: blueprint.id,
+      blueprintMeta: { ...blueprint, userParams: params },
+      clarificationQuestions: [],
+      generalChatReply: '',
+      orchestrationReasoning: `Blueprint slash-command "${blueprint.slashCommand}" → ${blueprint.name}${params ? ` (params: ${params})` : ''}.`,
+      trace: [{ node: 'classify', timestamp: start, duration, intent: 'SQL_QUERY', matchType: 'blueprint', blueprintId: blueprint.id }],
     };
   }
 
@@ -324,7 +388,8 @@ async function classifyNode(state) {
   const rules = searchRules(state.question, 8);
   const { examplesMap } = loadGoldIndex();
   const goldExamples = [...examplesMap.values()];
-  const retrievedContext = formatContext(rules, goldExamples);
+  const blueprintContext = getBlueprintContext();
+  const retrievedContext = formatContext(rules, goldExamples) + blueprintContext;
 
   const messages = await classifyPrompt.formatMessages(
     buildClassifyInputs(state, retrievedContext),
@@ -416,11 +481,25 @@ async function classifyNode(state) {
   const questionCategory = result.question_category || 'WHAT_HAPPENED';
   const questionSubCategory = result.question_sub_category || '';
 
+  // Check for LLM-detected blueprint match
+  let blueprintId = '';
+  let blueprintMeta = null;
+  if (result.matched_blueprint_id) {
+    const blueprints = loadBlueprints();
+    const bp = blueprints.find((b) => b.id === result.matched_blueprint_id);
+    if (bp) {
+      blueprintId = bp.id;
+      blueprintMeta = { ...bp, userParams: '' };
+      matchType = 'blueprint';
+      logger.info('  Classify: LLM detected blueprint match', { id: bp.id, name: bp.name });
+    }
+  }
+
   const isDashboard = result.intent === 'DASHBOARD';
   const needsDecomposition = !!(
-    result.needs_decomposition
+    (result.needs_decomposition || blueprintId)
     && (result.intent === 'SQL_QUERY' || isDashboard)
-    && !matchType
+    && !matchType.match(/^(exact|partial|followup)$/)
   );
 
   const decompLabel = needsDecomposition ? ' | MULTI-QUERY' : '';
@@ -428,28 +507,33 @@ async function classifyNode(state) {
 
   const output = {
     ...stateReset,
-    intent: result.intent,
-    complexity: result.complexity,
+    intent: blueprintId ? 'SQL_QUERY' : result.intent,
+    complexity: blueprintId ? 'COMPLEX' : result.complexity,
     entities: result.detected_entities,
-    questionCategory,
-    questionSubCategory,
+    questionCategory: blueprintMeta?.category || questionCategory,
+    questionSubCategory: blueprintMeta?.subCategory || questionSubCategory,
     templateSql,
     matchType,
     needsDecomposition,
-    clarificationQuestions: result.clarification_questions,
+    blueprintId,
+    blueprintMeta,
+    clarificationQuestions: blueprintId ? [] : result.clarification_questions,
     dashboardHasDataRequest: !!(isDashboard && result.dashboard_has_data_request),
-    generalChatReply: result.intent === 'GENERAL_CHAT' ? (result.reply || 'How can I help you today?') : '',
-    orchestrationReasoning: result.reasoning,
+    generalChatReply: (!blueprintId && result.intent === 'GENERAL_CHAT') ? (result.reply || 'How can I help you today?') : '',
+    orchestrationReasoning: blueprintId
+      ? `LLM detected analysis blueprint "${blueprintMeta?.name}" — ${result.reasoning}`
+      : result.reasoning,
     trace: [{
       node: 'classify',
       timestamp: start,
       duration,
-      intent: result.intent,
-      complexity: result.complexity,
+      intent: blueprintId ? 'SQL_QUERY' : result.intent,
+      complexity: blueprintId ? 'COMPLEX' : result.complexity,
       matchType: matchType || 'none',
       needsDecomposition,
-      questionCategory,
-      questionSubCategory,
+      blueprintId: blueprintId || undefined,
+      questionCategory: blueprintMeta?.category || questionCategory,
+      questionSubCategory: blueprintMeta?.subCategory || questionSubCategory,
       llm: llmMeta,
     }],
   };
@@ -461,4 +545,4 @@ async function classifyNode(state) {
   return output;
 }
 
-module.exports = { classifyNode, findExactMatch, loadGoldIndex };
+module.exports = { classifyNode, findExactMatch, loadGoldIndex, loadBlueprints };

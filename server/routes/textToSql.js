@@ -218,7 +218,7 @@ function mergeStateUpdate(target, update) {
 function extractNodeSummary(nodeName, update) {
   switch (nodeName) {
     case 'classify':
-      return [update.intent, update.complexity, update.questionCategory, update.needsDecomposition ? 'multi-query' : ''].filter(Boolean).join(' | ');
+      return [update.intent, update.complexity, update.questionCategory, update.blueprintId ? `blueprint:${update.blueprintId}` : '', update.needsDecomposition ? 'multi-query' : ''].filter(Boolean).join(' | ');
     case 'decompose': {
       const plan = update.queryPlan || [];
       return `${plan.length} sub-queries planned`;
@@ -295,6 +295,7 @@ function extractThinkingMessage(nodeName, update, fullState) {
 
   switch (nodeName) {
     case 'classify':
+      if (update.blueprintId) return `Analysis blueprint detected: "${update.blueprintMeta?.name || update.blueprintId}" — expanding into sub-queries`;
       if (update.needsDecomposition) return 'Complex question detected — will decompose into multiple sub-queries';
       return `Classified as ${update.intent || 'unknown'} (${update.complexity || ''})`;
     case 'decompose': {
@@ -942,6 +943,20 @@ router.get('/history/:threadId', async (req, res) => {
     logger.error('History retrieval failed', { error: err.message });
     res.status(500).json({ error: 'History retrieval failed' });
   }
+});
+
+router.get('/blueprints', (req, res) => {
+  const { loadBlueprints } = require('../graph/nodes/classify');
+  const blueprints = loadBlueprints();
+  res.json(
+    blueprints.map((bp) => ({
+      id: bp.id,
+      name: bp.name,
+      slashCommand: bp.slashCommand,
+      description: bp.description,
+      icon: bp.icon || null,
+    }))
+  );
 });
 
 module.exports = router;

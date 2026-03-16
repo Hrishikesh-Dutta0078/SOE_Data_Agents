@@ -66,10 +66,72 @@ const DecomposeSchema = z.object({
   queries: z.array(SubQuerySchema),
 });
 
+function expandBlueprintPlan(state) {
+  const meta = state.blueprintMeta;
+  if (!meta?.subQueries) return null;
+
+  const userParams = meta.userParams || '';
+  const { examplesMap } = loadGoldIndex();
+
+  return meta.subQueries.map((sq, i) => {
+    let subQuestion = sq.subQuestion || '';
+
+    if (sq.templateId) {
+      const example = examplesMap.get(sq.templateId);
+      if (example) subQuestion = example.question;
+    }
+
+    if (userParams) {
+      subQuestion = `${subQuestion} ${userParams}`;
+    }
+
+    return {
+      id: sq.id || `q${i + 1}`,
+      subQuestion,
+      purpose: sq.purpose || '',
+      templateId: sq.templateId || undefined,
+    };
+  });
+}
+
 async function decomposeNode(state) {
   const start = Date.now();
   logger.stage('1b', 'Decompose', 'breaking question into sub-queries');
 
+  // Blueprint fast path — deterministic plan, no LLM call
+  if (state.blueprintId && state.blueprintMeta) {
+    const queryPlan = expandBlueprintPlan(state);
+    if (queryPlan && queryPlan.length > 0) {
+      const duration = Date.now() - start;
+      logger.info(`Decompose [blueprint: ${state.blueprintId}] (${duration}ms)`, {
+        subQueries: queryPlan.length,
+        ids: queryPlan.map((q) => q.id),
+      });
+      for (const q of queryPlan) {
+        logger.info(`  [${q.id}] ${q.subQuestion} — ${q.purpose}${q.templateId ? ` (template: ${q.templateId})` : ''}`);
+      }
+
+      _decomposeEvents.emit('query_plan', {
+        queryPlan,
+        sessionId: state.sessionId || '',
+      });
+
+      return {
+        queryPlan,
+        currentQueryIndex: 0,
+        trace: [{
+          node: 'decompose',
+          timestamp: start,
+          duration,
+          subQueryCount: queryPlan.length,
+          plan: queryPlan.map((q) => ({ id: q.id, subQuestion: q.subQuestion })),
+          blueprint: state.blueprintId,
+        }],
+      };
+    }
+  }
+
+  // Standard LLM decomposition
   const preferredPhrasings = buildPreferredPhrasings(state);
   const messages = await decomposePrompt.formatMessages(buildDecomposeInputs(state, preferredPhrasings));
 

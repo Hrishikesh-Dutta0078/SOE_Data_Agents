@@ -16,6 +16,7 @@ When intent is SQL_QUERY:
   "question_category": "<WHAT_HAPPENED | WHY | WHAT_TO_DO>",
   "question_sub_category": "<sub-category>",
   "matched_example_id": "<gold template id if closely matched, or null>",
+  "matched_blueprint_id": "<analysis blueprint id if semantically matched, or null>",
   "is_followup": true/false,
   "needs_decomposition": true/false,
   "reasoning": "<1-2 sentence explanation>"
@@ -107,6 +108,13 @@ TEMPLATE MATCHING:
   If the user's question closely matches a gold template (same intent, same core metrics/dimensions — even if worded differently), set matched_example_id to that template's id and classify as SQL_QUERY.
   Match generously: "show my pipeline coverage", "pipe coverage", "how am I performing" all match the same template.
   Do NOT match if the user asks for something structurally different (e.g. different dimensions, different time scope, additional filters not in the template).
+
+ANALYSIS BLUEPRINT MATCHING:
+  The RETRIEVED CONTEXT may also include ANALYSIS BLUEPRINTS — curated multi-query analysis patterns.
+  If the user's question semantically matches a blueprint's description or trigger phrases, set matched_blueprint_id to that blueprint's id.
+  Match generously: "pipeline hygiene", "how clean is my pipeline", "any deals falling through the cracks", "pipeline health check" all match the pipeline_hygiene blueprint.
+  When matched_blueprint_id is set, also set intent to SQL_QUERY, needs_decomposition to true, and do NOT set matched_example_id.
+  Blueprint matching takes priority over individual template matching when the question is asking for a broad analysis topic.
 
 MULTI-QUERY DECOMPOSITION (needs_decomposition):
   Set needs_decomposition to true when a SINGLE SQL query cannot fully answer the question because it requires MULTIPLE independent analytical angles. Examples:

@@ -33,6 +33,10 @@ const WorkflowState = Annotation.Root({
   generalChatReply: Annotation({ reducer: (_, b) => b, default: () => '' }),
   orchestrationReasoning: Annotation({ reducer: (_, b) => b, default: () => '' }),
 
+  // --- Blueprint ---
+  blueprintId: Annotation({ reducer: (_, b) => b, default: () => '' }),
+  blueprintMeta: Annotation({ reducer: (_, b) => b, default: () => null }),
+
   // --- Multi-query decomposition ---
   queryPlan: Annotation({ reducer: (_, b) => b, default: () => [] }),
   queries: Annotation({

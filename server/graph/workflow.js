@@ -61,7 +61,11 @@ function routeAfterClassify(state) {
   }
   if (state.intent === 'SQL_QUERY') {
     if (state.needsDecomposition) {
-      logger.info('Multi-query path: routing to decompose');
+      if (state.blueprintId) {
+        logger.info(`Blueprint path: "${state.blueprintId}" → routing to decompose (deterministic plan)`);
+      } else {
+        logger.info('Multi-query path: routing to decompose');
+      }
       return 'decompose';
     }
     return 'researchAgent';

@@ -1,0 +1,47 @@
+{
+  "blueprints": [
+    {
+      "id": "pipeline_hygiene",
+      "name": "Pipeline Hygiene",
+      "slashCommand": "/pipeline-hygiene",
+      "description": "S3/S4 deals, unreviewed high-value deals, and stalled pipeline",
+      "icon": "stethoscope",
+      "category": "WHAT_TO_DO",
+      "subCategory": "pipeline_hygiene",
+      "triggers": [
+        "pipeline hygiene",
+        "pipe hygiene",
+        "pipeline health check",
+        "pipeline health",
+        "how clean is my pipeline",
+        "pipeline quality check",
+        "pipeline cleanup",
+        "deals needing attention"
+      ],
+      "subQueries": [
+        {
+          "id": "q1",
+          "templateId": "exact__s3_s4_pipeline",
+          "purpose": "S3 and S4 deals in current quarter — baseline of active early-stage pipeline"
+        },
+        {
+          "id": "q2",
+          "templateId": null,
+          "subQuestion": "Show deals over 1M with no activity or review in the last 2 months",
+          "purpose": "High-value deals with no recent engagement — risk identification for large opportunities"
+        },
+        {
+          "id": "q3",
+          "templateId": "exact__stalled_deals",
+          "purpose": "Stalled deals (DSNSM > 30 days or SD > 90 and DSNSM > 15) — pipeline that needs cleanup or action"
+        }
+      ],
+      "presentationHint": "Synthesize as an action-oriented pipeline hygiene report. Structure: (1) Pipeline snapshot — summarize the S3/S4 landscape, (2) High-value risk — call out the 1M+ deals needing review, (3) Stalled pipeline — quantify and highlight deals requiring cleanup. End with 3-5 prioritized action items the manager should take this week.",
+      "suggestedFollowUps": [
+        "Which stalled deals should I deprioritize?",
+        "Show me deal progression trends this quarter",
+        "What is the pipeline coverage for next quarter?"
+      ]
+    }
+  ]
+}
