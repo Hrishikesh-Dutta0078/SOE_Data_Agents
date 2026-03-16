@@ -58,6 +58,10 @@ async function runOneSubQuery(baseState, plan, index, emit) {
 
   let state = buildStateSlice(baseState, plan, index);
 
+  // Check if blueprint has user-supplied parameters (e.g., "for EMEA", "Q2")
+  // that require the SQL writer to adapt template SQL with additional filters.
+  const hasUserParams = !!(baseState.blueprintMeta?.userParams);
+
   let match = null;
   if (item.templateId) {
     const { examplesMap } = loadGoldIndex();
@@ -69,8 +73,8 @@ async function runOneSubQuery(baseState, plan, index, emit) {
   }
   if (!match) match = findSubQueryMatch(subQuestion);
   if (!match) match = await findSubQueryMatchLLMFallback(subQuestion);
-  if (match) {
-    // Exact template match — use gold SQL directly, skip writer (same as exact match fast path)
+  if (match && !hasUserParams) {
+    // Exact template match with no user params — use gold SQL directly, skip writer
     state = {
       ...state,
       sql: match.sql,
@@ -80,7 +84,24 @@ async function runOneSubQuery(baseState, plan, index, emit) {
       reasoning: `Direct template match: ${match.id}`,
     };
     logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (using gold SQL directly)`);
+  } else if (match && hasUserParams) {
+    // Template match WITH user params — need research + writer to adapt the SQL with filters
+    state = {
+      ...state,
+      templateSql: match.sql,
+      subQueryMatchFound: true,
+    };
+    logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (routing through writer for user params)`);
+
+    emitProgress('research');
+    const researchUpdate = await researchAgentNode(state);
+    state = { ...state, ...researchUpdate };
+
+    emitProgress('sql');
+    const writerUpdate = await sqlWriterAgentNode(state);
+    state = { ...state, ...writerUpdate };
   } else {
+    // No template match — full research + writer path
     emitProgress('research');
     const researchUpdate = await researchAgentNode(state);
     state = { ...state, ...researchUpdate };
