@@ -263,6 +263,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           queries: data.queries || [],
           queryPlan: data.queryPlan || [],
           suggestedFollowUps: data.suggestedFollowUps || [],
+          retrySuggestions: data.retrySuggestions || [],
           trace: data.trace || null,
           usage: data.usage || null,
           usageByNodeAndModel: data.usageByNodeAndModel || null,
@@ -281,6 +282,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       setPendingAnswers({});
       setOtherText({});
       setAdditionalNotes('');
+      // Find the original user question for disambiguation re-submission
+      const lastUserQ = [...messages].reverse().find((m) => m.role === 'user' && m.type === 'user');
       setMessages((prev) => [
         ...prev,
         {
@@ -289,6 +292,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           content: hint,
           entities: data.entities || {},
           questions,
+          originalQuestion: lastUserQ?.content || '',
         },
       ]);
     } else if (intent === 'GENERAL_CHAT' || data.generalChatReply) {
@@ -635,7 +639,15 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       })()}
 
       {(msg.insights || msg.chart || (msg.execution?.success && msg.execution.rows?.length > 0) || (msg.queries?.length > 0)) && (
-        <ResultsPanel execution={msg.execution} insights={msg.insights} chart={msg.chart} queries={msg.queries || []} confidence={msg.confidence} />
+        <ResultsPanel
+          execution={msg.execution}
+          insights={msg.insights}
+          chart={msg.chart}
+          queries={msg.queries || []}
+          confidence={msg.confidence}
+          retrySuggestions={msg.retrySuggestions}
+          onRetrySuggestion={(text) => handleSend(text)}
+        />
       )}
 
       {msg.execution && !msg.execution.success && (
@@ -826,6 +838,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
               const selected = pendingAnswers[q.id];
               const isOther = selected === '__other__';
 
+              const isSingleQuestion = questions.length === 1;
               return (
                 <div key={q.id} className="my-1.5">
                   <div className="text-[11px] font-semibold text-slate-800 mb-1">{q.question}</div>
@@ -843,6 +856,12 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                         `}
                         onClick={() => {
                           if (!isInteractive) return;
+                          if (isSingleQuestion && msg.originalQuestion) {
+                            // Quick-pick: re-submit with the resolved clarification
+                            const clarifiedQuestion = `${msg.originalQuestion} (${opt})`;
+                            handleSend(clarifiedQuestion, { isFollowUp: false });
+                            return;
+                          }
                           setPendingAnswers((prev) => ({ ...prev, [q.id]: opt }));
                         }}
                       >

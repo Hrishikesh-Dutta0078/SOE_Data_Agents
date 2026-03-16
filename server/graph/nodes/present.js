@@ -314,6 +314,23 @@ async function presentNode(state) {
   const partialResults = isMultiQuery ? buildPartialResultsNote(allQueries) : { summary: null };
   const partialResultsSummary = partialResults.summary || null;
 
+  // Generate retry suggestions for empty or suspicious results
+  let retrySuggestions = [];
+  const resultsSuspicious = state.resultsSuspicious;
+  const primaryRowCount = primaryExec?.rowCount ?? primaryExec?.rows?.length ?? 0;
+  if (primaryRowCount === 0 || resultsSuspicious) {
+    const suggestions = [
+      state.entities?.filters?.length > 0
+        ? `Try without filters: "${state.question.replace(/\b(for|in|with)\s+\S+(\s+\S+)?$/i, '').trim()}"`
+        : null,
+      `Try being more specific: "${state.question} for current quarter"`,
+      state.questionCategory === 'WHAT_HAPPENED'
+        ? 'Try a broader time range: "last 4 quarters" or "year to date"'
+        : null,
+    ].filter(Boolean);
+    retrySuggestions = suggestions.slice(0, 3);
+  }
+
   const blueprintLabel = state.blueprintId ? ` [blueprint: ${state.blueprintId}]` : '';
   const multiLabel = isMultiQuery ? ` (synthesizing ${allQueries.length} queries)` : '';
   logger.info(`[Present]${blueprintLabel}${multiLabel} ${cleanedInsights.length} chars insights, chart: ${resolvedChartType || 'none'}, ${finalFollowUps.length} follow-ups (${Date.now() - presentStart}ms)`);
@@ -323,6 +340,7 @@ async function presentNode(state) {
     insights: cleanedInsights,
     chart,
     suggestedFollowUps: finalFollowUps,
+    retrySuggestions,
     partialResultsSummary,
     trace: [{
       node: 'present',

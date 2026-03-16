@@ -522,6 +522,20 @@ export default function ResultsPanel({ execution, insights, chart, queries = [],
             ))}
           </div>
         )}
+
+        {retrySuggestions?.length > 0 && (
+          <div className="mt-3 p-3 rounded-xl bg-amber-50/50 border border-amber-100">
+            <div className="text-[11px] font-semibold text-amber-700 mb-2">Try rephrasing:</div>
+            <div className="flex flex-col gap-1.5">
+              {retrySuggestions.map((s, i) => (
+                <button key={i} onClick={() => onRetrySuggestion?.(s)}
+                  className="text-left text-[12px] text-amber-800 hover:text-amber-950 px-2 py-1 rounded-lg hover:bg-amber-100/50 cursor-pointer transition-colors bg-transparent border-none">
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -418,6 +418,7 @@ function buildFinalResponse(state, usage, runtimeMetrics = null, usageByNodeAndM
     insights: state.insights,
     chart: state.chart,
     suggestedFollowUps: state.suggestedFollowUps || [],
+    retrySuggestions: state.retrySuggestions || [],
     partialResultsSummary: state.partialResultsSummary || null,
     dashboardSpec: state.dashboardSpec || null,
     trace: state.trace,
