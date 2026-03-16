@@ -538,3 +538,27 @@ wave_p1() {
       trivy fs --format json --output "$REPORTS_DIR/trivy_output.json" "$PROJECT_DIR"
   fi
 }
+
+# --- Wave P2: bearer (SAST/Data) + osv-scanner (SCA) ---
+wave_p2() {
+  echo ""
+  echo "=== Wave P2: SAST/Data + SCA ==="
+
+  # --- bearer ---
+  if ensure_tool "bearer" install_bearer; then
+    run_tool "P2" "bearer" "$REPORTS_DIR/bearer_output.json" \
+      bearer scan "$PROJECT_DIR" --format json --output "$REPORTS_DIR/bearer_output.json"
+  fi
+
+  # --- osv-scanner ---
+  if ensure_tool "osv-scanner" install_osv_scanner; then
+    # Build command string explicitly to avoid array-in-bash-c issues with spaces
+    local osv_cmd="osv-scanner --json"
+    [[ -f "$PROJECT_DIR/server/package-lock.json" ]] && osv_cmd+=" --lockfile=\"$PROJECT_DIR/server/package-lock.json\""
+    [[ -f "$PROJECT_DIR/client/package-lock.json" ]] && osv_cmd+=" --lockfile=\"$PROJECT_DIR/client/package-lock.json\""
+    osv_cmd+=" > \"$REPORTS_DIR/osv_output.json\""
+
+    run_tool "P2" "osv-scanner" "$REPORTS_DIR/osv_output.json" \
+      bash -c "$osv_cmd"
+  fi
+}
