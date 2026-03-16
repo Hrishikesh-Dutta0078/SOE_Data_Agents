@@ -536,11 +536,13 @@ wave_p0() {
 
   # --- trufflehog ---
   if ensure_tool "trufflehog" install_trufflehog; then
-    # Use cygpath -m on MINGW for valid file:// URI; quote paths for spaces
+    # Use cygpath -m on MINGW for valid file:// URI; resolve full binary path for bash -c
     local git_uri="file://$PROJECT_DIR"
     [[ "$PLATFORM" == "windows" ]] && git_uri="file://$(cygpath -m "$PROJECT_DIR")"
+    local th_bin
+    th_bin=$(command -v trufflehog)
     run_tool "P0" "trufflehog" "$REPORTS_DIR/trufflehog_output.json" \
-      bash -c 'trufflehog git "'"$git_uri"'" --json > "'"$REPORTS_DIR/trufflehog_output.json"'"'
+      bash -c '"'"$th_bin"'" git "'"$git_uri"'" --json > "'"$REPORTS_DIR/trufflehog_output.json"'"'
   fi
 }
 
@@ -568,8 +570,10 @@ wave_p2() {
 
   # --- osv-scanner ---
   if ensure_tool "osv-scanner" install_osv_scanner; then
-    # Build command string explicitly to avoid array-in-bash-c issues with spaces
-    local osv_cmd="osv-scanner --json"
+    # Resolve full path to binary — bash -c subshell may not inherit PATH on MINGW64
+    local osv_bin
+    osv_bin=$(command -v osv-scanner)
+    local osv_cmd="\"$osv_bin\" --json"
     [[ -f "$PROJECT_DIR/server/package-lock.json" ]] && osv_cmd+=" --lockfile=\"$PROJECT_DIR/server/package-lock.json\""
     [[ -f "$PROJECT_DIR/client/package-lock.json" ]] && osv_cmd+=" --lockfile=\"$PROJECT_DIR/client/package-lock.json\""
     osv_cmd+=" > \"$REPORTS_DIR/osv_output.json\""
@@ -586,18 +590,21 @@ wave_p4() {
 
   # --- syft ---
   local syft_available=0
+  local syft_bin="" bomber_bin=""
   if ensure_tool "syft" install_syft; then
     syft_available=1
+    syft_bin=$(command -v syft)
     run_tool "P4" "syft" "$REPORTS_DIR/syft_sbom.json" \
-      bash -c 'syft "dir:'"$PROJECT_DIR"'" -o json > "'"$REPORTS_DIR/syft_sbom.json"'"'
+      bash -c '"'"$syft_bin"'" "dir:'"$PROJECT_DIR"'" -o json > "'"$REPORTS_DIR/syft_sbom.json"'"'
   fi
 
   # --- bomber (depends on syft for CycloneDX SBOM) ---
   if ensure_tool "bomber" install_bomber; then
     if [[ $syft_available -eq 1 ]]; then
+      bomber_bin=$(command -v bomber)
       # Generate CycloneDX SBOM first, then run bomber
       run_tool "P4" "bomber" "$REPORTS_DIR/bomber_output.json" \
-        bash -c 'syft "dir:'"$PROJECT_DIR"'" -o cyclonedx-json > "'"$REPORTS_DIR/sbom.cdx.json"'" && bomber scan --output json "'"$REPORTS_DIR/sbom.cdx.json"'" > "'"$REPORTS_DIR/bomber_output.json"'"'
+        bash -c '"'"$syft_bin"'" "dir:'"$PROJECT_DIR"'" -o cyclonedx-json > "'"$REPORTS_DIR/sbom.cdx.json"'" && "'"$bomber_bin"'" scan --output json "'"$REPORTS_DIR/sbom.cdx.json"'" > "'"$REPORTS_DIR/bomber_output.json"'"'
     else
       log_warn "bomber requires syft for SBOM input. Skipping."
       SKIPPED+=("bomber")
