@@ -3,6 +3,7 @@ reports/
 server/cert.pem
 server/key.pem
 server/public/
+server/deploy.zip
 node_modules/
 client/node_modules/
 
