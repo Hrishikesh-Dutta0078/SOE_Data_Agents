@@ -308,12 +308,11 @@ function ChartsView({ chart, rows }) {
 
 function TableView({ columns, rows }) {
   const handleExportExcel = async () => {
-    const mod = await import('xlsx');
-    const XLSX = mod.default || mod;
-    const ws = XLSX.utils.json_to_sheet(rows, { header: columns });
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Results');
-    XLSX.writeFile(wb, `results-${Date.now()}.xlsx`);
+    const { utils, writeFile } = await import('xlsx');
+    const ws = utils.json_to_sheet(rows, { header: columns });
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, 'Results');
+    writeFile(wb, `results-${Date.now()}.xlsx`);
   };
 
   const handleExportCsv = () => {
