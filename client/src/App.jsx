@@ -120,8 +120,16 @@ export default function App() {
     setImpersonateDropdownOpen(false);
   };
 
+  const handleNewChat = () => setSessionId(generateSessionId());
+
   return (
-    <div className="flex h-screen font-sans text-stone-900 p-3 gap-3" style={{ background: 'var(--gradient-page)' }}>
+    <div className="h-screen w-screen overflow-hidden" style={{ background: 'var(--gradient-page)' }}>
+      {/* Background blobs */}
+      <div className="bg-blob bg-blob-1" />
+      <div className="bg-blob bg-blob-2" />
+      <div className="bg-blob bg-blob-3" />
+
+      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-20 bg-black/20 backdrop-blur-sm md:hidden"
@@ -129,116 +137,127 @@ export default function App() {
         />
       )}
 
-      <aside
-        className={`
-          fixed inset-y-0 left-0 z-30 w-64 flex-shrink-0 flex flex-col
-          text-stone-700 p-6 transition-transform duration-200
-          md:static md:translate-x-0
-          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        `}
-        style={{
-          background: 'var(--gradient-sidebar)',
-          border: '1px solid rgba(231,229,228,0.45)',
-          borderRadius: '20px',
-          boxShadow: 'var(--shadow-float)',
-        }}
-      >
-        <div className="flex items-center gap-2 text-lg font-bold text-stone-900 mb-1 tracking-tight">
-          <svg width="22" height="20" viewBox="0 0 1551 1375" className="shrink-0">
-            <path d="m576.5 0.4h403.6l570.4 1374.6h-426.7l-360.5-912.8-238.4 598.9h283.4l112.9 313.9h-921.2z" fill="#EB1000"/>
-          </svg>
-          Auto Agents
-        </div>
-        <div className="text-[11px] text-stone-400 mb-1 whitespace-nowrap">
-          Autonomous Text-to-SQL System
-        </div>
-        <div className="text-[11px] text-stone-300 mb-8">v0.0.5</div>
-        <div className="text-sm text-stone-500 leading-relaxed">
-          Fully autonomous agent with 19 tools. Every query is researched, verified, and validated by the agent.
-        </div>
+      {/* Single glass pane */}
+      <div className="glass-shell">
+        <div className="glass-pane">
 
-        <div className="mt-auto pt-6 border-t border-stone-300/30 space-y-4">
-          <div className="relative" ref={impersonateDropdownRef}>
-            <div className="text-xs font-semibold text-stone-600 mb-1">Impersonate</div>
-            <div className="text-[11px] text-stone-400 mt-0.5 mb-2">Search by name to filter data</div>
-            {impersonateContext ? (
-              <div className="flex items-center justify-between gap-2 rounded-[8px] bg-indigo-50 text-indigo-600 px-3 py-1.5 text-xs">
-                <span className="truncate">{impersonateContext.name} — {impersonateContext.role}</span>
-                <button
-                  type="button"
-                  onClick={clearImpersonate}
-                  className="text-indigo-400 hover:text-indigo-700 shrink-0"
-                  aria-label="Clear impersonation"
-                >
-                  ×
-                </button>
-              </div>
-            ) : (
-              <>
-                <input
-                  type="text"
-                  value={impersonateSearch}
-                  onChange={(e) => { setImpersonateSearch(e.target.value); setImpersonateDropdownOpen(true); }}
-                  onFocus={() => impersonateDropdownOpen && setImpersonateDropdownOpen(true)}
-                  placeholder="Search by name..."
-                  className="w-full rounded-[8px] bg-white text-stone-800 border border-stone-200 px-3 py-1.5 text-xs placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 transition-all"
-                />
-                {impersonateDropdownOpen && (impersonateSearch.trim().length >= 2 || impersonateResults.length > 0) && (
-                  <div className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-[12px] bg-white border border-stone-200/60 z-50" style={{ boxShadow: 'var(--shadow-elevated)' }}>
-                    {impersonateLoading ? (
-                      <div className="px-3 py-2 text-xs text-stone-400">Searching...</div>
-                    ) : impersonateResults.length === 0 ? (
-                      <div className="px-3 py-2 text-xs text-stone-400">No results</div>
-                    ) : (
-                      impersonateResults.map((item, i) => (
-                        <button
-                          key={`${item.name}-${item.role}-${item.impersonateId}-${i}`}
-                          type="button"
-                          onClick={() => selectImpersonate(item)}
-                          className="w-full text-left px-3 py-1.5 text-xs text-stone-600 hover:bg-stone-50 hover:text-stone-900 transition-colors"
-                        >
-                          {item.name} — {item.role}
-                        </button>
-                      ))
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-xs font-semibold text-stone-600">Fast Model (Haiku)</div>
-              <div className="text-[11px] text-stone-400 mt-0.5">Use faster LLM for agents</div>
+          {/* Sidebar */}
+          <aside
+            className={`
+              fixed inset-y-0 left-0 z-30 w-64 shrink-0 flex flex-col p-6
+              transition-transform duration-200
+              md:static md:translate-x-0
+              ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            `}
+            style={{ borderRight: '1px solid var(--color-border)' }}
+          >
+            <div className="text-lg font-bold mb-4 tracking-tight" style={{ color: 'var(--color-text-primary)', animation: 'slide-in-left 0.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
+              Welcome{userName ? `, ${userName}` : ''}
             </div>
+
+            {/* New Chat button */}
             <button
               type="button"
-              role="switch"
-              aria-checked={useFastModel}
-              onClick={() => setUseFastModel((v) => { const next = !v; localStorage.setItem('autoagents_useFastModel', String(next)); return next; })}
-              className={`
-                relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full
-                border-2 border-transparent transition-colors duration-200 ease-in-out
-                focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:ring-offset-2 focus:ring-offset-stone-100
-                ${useFastModel ? 'bg-indigo-500' : 'bg-stone-300'}
-              `}
+              onClick={handleNewChat}
+              className="flex items-center gap-2 w-full px-3.5 py-2.5 rounded-[12px] text-[13px] font-semibold cursor-pointer transition-all duration-200 mb-5 border"
+              style={{ color: 'var(--color-accent)', background: 'var(--color-accent-light)', borderColor: 'rgba(99,102,241,0.15)', animation: 'slide-in-left 0.5s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both' }}
             >
-              <span
-                className={`
-                  pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow
-                  transform transition duration-200 ease-in-out
-                  ${useFastModel ? 'translate-x-4' : 'translate-x-0'}
-                `}
-              />
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New Chat
             </button>
-          </div>
-        </div>
-      </aside>
 
-      <main className="flex-1 flex flex-col min-w-0 gap-3">
-        <ChatPanel onMenuClick={() => setSidebarOpen((v) => !v)} impersonateContext={impersonateContext} validationEnabled={validationEnabled} sessionId={sessionId} onNewChat={() => setSessionId(generateSessionId())} enabledTools={toolToggles.enabledTools} useFastModel={useFastModel} userName={userName} />
-      </main>
+            {/* Chat History */}
+            <div className="flex-1 min-h-0 flex flex-col" style={{ animation: 'slide-in-left 0.5s 0.4s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
+              <div className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-muted)' }}>Chat History</div>
+              <div className="flex-1 overflow-y-auto flex flex-col gap-0.5">
+                {['Pipeline by region analysis', 'Top deals closing this quarter', 'Revenue trend YoY', 'Rep performance breakdown', 'EMEA pipeline hygiene', 'Stalled deals last 90 days'].map((title, i) => (
+                  <div
+                    key={title}
+                    className={`flex items-center gap-2 px-2.5 py-2 rounded-[10px] text-[13px] cursor-pointer transition-all duration-150 ${i === 0 ? 'font-medium' : ''}`}
+                    style={{
+                      color: i === 0 ? 'var(--color-accent-hover)' : 'var(--color-text-secondary)',
+                      background: i === 0 ? 'var(--color-accent-light)' : 'transparent',
+                    }}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" style={{ color: i === 0 ? 'var(--color-accent)' : 'var(--color-text-faint)' }}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span className="truncate">{title}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom: Impersonate + Fast Model */}
+            <div className="pt-5 space-y-4" style={{ borderTop: '1px solid rgba(160,150,200,0.2)', animation: 'slide-in-left 0.5s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
+              <div className="relative" ref={impersonateDropdownRef}>
+                <div className="text-xs font-semibold mb-1" style={{ color: 'var(--color-text-secondary)' }}>Impersonate</div>
+                <div className="text-[11px] mt-0.5 mb-2" style={{ color: 'var(--color-text-muted)' }}>Search by name to filter data</div>
+                {impersonateContext ? (
+                  <div className="flex items-center justify-between gap-2 rounded-[10px] px-3 py-1.5 text-xs" style={{ background: 'var(--color-accent-light)', color: 'var(--color-accent)' }}>
+                    <span className="truncate">{impersonateContext.name} — {impersonateContext.role}</span>
+                    <button type="button" onClick={clearImpersonate} className="shrink-0 opacity-60 hover:opacity-100" aria-label="Clear impersonation">×</button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      type="text"
+                      value={impersonateSearch}
+                      onChange={(e) => { setImpersonateSearch(e.target.value); setImpersonateDropdownOpen(true); }}
+                      onFocus={() => impersonateDropdownOpen && setImpersonateDropdownOpen(true)}
+                      placeholder="Search by name..."
+                      className="w-full rounded-[10px] px-3 py-1.5 text-xs outline-none transition-all"
+                      style={{ background: 'var(--glass-bg-light)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}
+                    />
+                    {impersonateDropdownOpen && (impersonateSearch.trim().length >= 2 || impersonateResults.length > 0) && (
+                      <div className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-[12px] z-50" style={{ background: 'var(--glass-bg-heavy)', backdropFilter: 'var(--glass-blur)', border: '1px solid var(--color-border-white)', boxShadow: 'var(--shadow-elevated)' }}>
+                        {impersonateLoading ? (
+                          <div className="px-3 py-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>Searching...</div>
+                        ) : impersonateResults.length === 0 ? (
+                          <div className="px-3 py-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>No results</div>
+                        ) : (
+                          impersonateResults.map((item, i) => (
+                            <button
+                              key={`${item.name}-${item.role}-${item.impersonateId}-${i}`}
+                              type="button"
+                              onClick={() => selectImpersonate(item)}
+                              className="w-full text-left px-3 py-1.5 text-xs transition-colors hover:bg-white/30"
+                              style={{ color: 'var(--color-text-secondary)' }}
+                            >
+                              {item.name} — {item.role}
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-semibold" style={{ color: 'var(--color-text-secondary)' }}>Fast Model (Haiku)</div>
+                  <div className="text-[11px] mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Use faster LLM for agents</div>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={useFastModel}
+                  onClick={() => setUseFastModel((v) => { const next = !v; localStorage.setItem('autoagents_useFastModel', String(next)); return next; })}
+                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${useFastModel ? 'bg-indigo-500' : 'bg-stone-300'}`}
+                  style={{ boxShadow: useFastModel ? '0 2px 6px rgba(99,102,241,0.3)' : 'none' }}
+                >
+                  <span className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition duration-200 ease-in-out ${useFastModel ? 'translate-x-4' : 'translate-x-0'}`} />
+                </button>
+              </div>
+            </div>
+          </aside>
+
+          {/* Main content */}
+          <main className="flex-1 flex flex-col min-w-0">
+            <ChatPanel onMenuClick={() => setSidebarOpen((v) => !v)} impersonateContext={impersonateContext} validationEnabled={validationEnabled} sessionId={sessionId} onNewChat={handleNewChat} enabledTools={toolToggles.enabledTools} useFastModel={useFastModel} userName={userName} />
+          </main>
+
+        </div>
+      </div>
     </div>
   );
 }

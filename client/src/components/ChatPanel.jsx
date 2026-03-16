@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { analyzeQuestionStream, fetchBlueprints } from '../utils/api';
 import ResultsPanel from './ResultsPanel';
-import AgentTracePanel from './AgentTracePanel';
+
 import ThinkingPanel from './ThinkingPanel';
 import DashboardOverlay from './DashboardOverlay';
 import VoiceInput from './VoiceInput';
@@ -692,7 +692,6 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         </div>
       )}
 
-      <AgentTracePanel trace={msg.trace} />
 
       {(msg.usage || msg.usageByNodeAndModel) && (
         <div className="mt-2 text-[10px] text-stone-400">
@@ -1028,34 +1027,65 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   };
 
   return (
-    <div className="flex flex-col h-full gap-3">
-      {/* Header — separate floating card */}
-      <div className="flex items-center gap-3 px-5 py-3.5 surface-gradient-header shrink-0">
-        <button
-          className="md:hidden p-1.5 rounded-[8px] text-stone-500 hover:bg-stone-100 transition-colors"
-          onClick={onMenuClick}
-          aria-label="Toggle sidebar"
-        >
-          <Menu size={20} strokeWidth={1.5} />
-        </button>
-        <span className="font-semibold text-base text-stone-900 tracking-tight">{userName ? `Welcome, ${userName}` : 'Auto Agents'}</span>
-        <div className="ml-auto">
-          <button
-            className="px-3.5 py-1.5 text-sm font-medium text-indigo-500 bg-transparent border-none rounded-[8px]
-                       hover:bg-indigo-50 transition-all cursor-pointer"
-            onClick={() => { if (onNewChat) onNewChat(); }}
-            disabled={loading}
-          >
-            New Chat
-          </button>
-        </div>
-      </div>
-
-      {/* Chat area — separate floating card */}
+    <div className="flex flex-col h-full">
+      {/* Chat area */}
       <div className="chat-card">
-      <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4">
+      <div className={`flex-1 overflow-y-auto p-5 flex flex-col ${messages.length === 0 && !loading ? 'justify-center items-center' : 'gap-4'}`}>
         {messages.length === 0 && !loading && (
-          <SuggestedQuestions onSelect={(text) => handleSend(text)} />
+          <SuggestedQuestions
+            onSelect={(text) => handleSend(text)}
+            renderInput={() => (
+              <div className="w-full flex justify-center mb-5" style={{ maxWidth: 560, animation: 'fade-in-up 0.6s 0.65s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
+                <div className="relative w-full">
+                  {showBlueprintPicker && (
+                    <BlueprintPicker
+                      blueprints={blueprints}
+                      selectedIndex={blueprintSelectedIdx}
+                      onSelect={handleBlueprintSelect}
+                      onClose={() => setShowBlueprintPicker(false)}
+                    />
+                  )}
+                  <div className="flex items-center gap-2.5 w-full rounded-[18px] px-1.5 py-1.5" style={{ background: 'var(--glass-bg)', border: '1px solid var(--color-border)' }}>
+                    <div className={`voice-input-wrapper flex-1 ${voiceListening ? 'voice-active' : ''}`}>
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        className="voice-input-field w-full bg-transparent border-none outline-none text-[14px] px-3 py-2.5"
+                        style={{ color: 'var(--color-text-primary)', fontFamily: 'inherit' }}
+                        placeholder={voiceListening ? 'Listening...' : 'Ask a question...'}
+                        value={input}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setInput(val);
+                          if (val === '/' && blueprints.length > 0) { setShowBlueprintPicker(true); setBlueprintSelectedIdx(0); }
+                          else if (showBlueprintPicker && !val.startsWith('/')) { setShowBlueprintPicker(false); }
+                        }}
+                        onKeyDown={handleKeyDown}
+                        onBlur={() => setTimeout(() => setShowBlueprintPicker(false), 150)}
+                        disabled={loading}
+                      />
+                    </div>
+                    <VoiceInput
+                      stopRef={voiceStopRef}
+                      onInterimTranscript={(text) => { setInput(text); inputRef.current?.focus(); }}
+                      onFinalTranscript={(text) => { setInput(text); inputRef.current?.focus(); }}
+                      onListeningChange={(listening) => { setVoiceListening(listening); if (listening) inputRef.current?.focus(); }}
+                      onError={(msg) => { setMessages((prev) => [...prev, { role: 'system', type: 'error', content: msg }]); }}
+                      disabled={loading}
+                    />
+                    <button
+                      className="w-9 h-9 flex items-center justify-center rounded-[12px] shrink-0 cursor-pointer border-none text-white transition-all"
+                      style={{ background: 'var(--gradient-send-btn)', boxShadow: '0 2px 8px rgba(99,102,241,0.25)' }}
+                      onClick={() => handleSend()}
+                      disabled={loading}
+                    >
+                      <ArrowUp size={16} strokeWidth={2.5} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          />
         )}
 
         {messages.map((msg, i) => (
@@ -1155,8 +1185,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       )}
       </div>{/* end chat-card */}
 
-      {/* Input — separate floating card */}
-      <div className="relative px-5 py-3.5 surface-gradient-input shrink-0">
+      {/* Input — pinned bottom, hidden on empty state */}
+      <div className={`relative px-5 py-3.5 surface-gradient-input shrink-0 ${messages.length === 0 && !loading ? 'hidden' : ''}`}>
         {showBlueprintPicker && (
           <BlueprintPicker
             blueprints={blueprints}
@@ -1172,10 +1202,10 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
             <input
               ref={inputRef}
               type="text"
-              className="voice-input-field w-full px-4 py-2.5 text-sm bg-white border border-stone-200/70 rounded-[16px] outline-none font-sans
-                         focus:ring-2 focus:ring-indigo-500/15 focus:border-indigo-400
+              className="voice-input-field w-full px-4 py-2.5 text-sm border rounded-[16px] outline-none font-sans
+                         focus:border-indigo-400/30
                          disabled:bg-stone-50 disabled:text-stone-400"
-              style={{ boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(255,255,255,0.6)' }}
+              style={{ background: 'var(--glass-bg-light)', borderColor: 'var(--color-border)' }}
               placeholder={voiceListening ? 'Listening...' : 'Ask a new question...'}
               value={input}
               onChange={(e) => {
