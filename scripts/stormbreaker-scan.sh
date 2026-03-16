@@ -570,13 +570,12 @@ wave_p2() {
 
   # --- osv-scanner ---
   if ensure_tool "osv-scanner" install_osv_scanner; then
-    # Resolve full path to binary — bash -c subshell may not inherit PATH on MINGW64
+    # osv-scanner v2 CLI: osv-scanner scan source --format json --lockfile=... --output=...
     local osv_bin
     osv_bin=$(command -v osv-scanner)
-    local osv_cmd="\"$osv_bin\" --json"
-    [[ -f "$PROJECT_DIR/server/package-lock.json" ]] && osv_cmd+=" --lockfile=\"$PROJECT_DIR/server/package-lock.json\""
-    [[ -f "$PROJECT_DIR/client/package-lock.json" ]] && osv_cmd+=" --lockfile=\"$PROJECT_DIR/client/package-lock.json\""
-    osv_cmd+=" > \"$REPORTS_DIR/osv_output.json\""
+    local osv_cmd="\"$osv_bin\" scan source --format json --output \"$REPORTS_DIR/osv_output.json\""
+    [[ -f "$PROJECT_DIR/server/package-lock.json" ]] && osv_cmd+=" --lockfile \"$PROJECT_DIR/server/package-lock.json\""
+    [[ -f "$PROJECT_DIR/client/package-lock.json" ]] && osv_cmd+=" --lockfile \"$PROJECT_DIR/client/package-lock.json\""
 
     run_tool "P2" "osv-scanner" "$REPORTS_DIR/osv_output.json" \
       bash -c "$osv_cmd"
