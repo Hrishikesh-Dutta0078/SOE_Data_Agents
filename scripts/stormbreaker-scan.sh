@@ -587,6 +587,14 @@ wave_p4() {
   echo ""
   echo "=== Wave P4: SBOM + SCA ==="
 
+  # Convert project dir to Windows path for tools that can't handle MINGW paths
+  local project_native="$PROJECT_DIR"
+  local reports_native="$REPORTS_DIR"
+  if [[ "$PLATFORM" == "windows" ]] && command -v cygpath &>/dev/null; then
+    project_native=$(cygpath -w "$PROJECT_DIR")
+    reports_native=$(cygpath -w "$REPORTS_DIR")
+  fi
+
   # --- syft ---
   local syft_available=0
   local syft_bin="" bomber_bin=""
@@ -594,7 +602,7 @@ wave_p4() {
     syft_available=1
     syft_bin=$(command -v syft)
     run_tool "P4" "syft" "$REPORTS_DIR/syft_sbom.json" \
-      bash -c '"'"$syft_bin"'" "dir:'"$PROJECT_DIR"'" -o json > "'"$REPORTS_DIR/syft_sbom.json"'"'
+      bash -c '"'"$syft_bin"'" "dir:'"$project_native"'" -o json > "'"$REPORTS_DIR/syft_sbom.json"'"'
   fi
 
   # --- bomber (depends on syft for CycloneDX SBOM) ---
@@ -603,7 +611,7 @@ wave_p4() {
       bomber_bin=$(command -v bomber)
       # Generate CycloneDX SBOM first, then run bomber
       run_tool "P4" "bomber" "$REPORTS_DIR/bomber_output.json" \
-        bash -c '"'"$syft_bin"'" "dir:'"$PROJECT_DIR"'" -o cyclonedx-json > "'"$REPORTS_DIR/sbom.cdx.json"'" && "'"$bomber_bin"'" scan --output json "'"$REPORTS_DIR/sbom.cdx.json"'" > "'"$REPORTS_DIR/bomber_output.json"'"'
+        bash -c '"'"$syft_bin"'" "dir:'"$project_native"'" -o cyclonedx-json > "'"$REPORTS_DIR/sbom.cdx.json"'" && "'"$bomber_bin"'" scan --output json "'"$REPORTS_DIR/sbom.cdx.json"'" > "'"$REPORTS_DIR/bomber_output.json"'"'
     else
       log_warn "bomber requires syft for SBOM input. Skipping."
       SKIPPED+=("bomber")
@@ -612,8 +620,9 @@ wave_p4() {
 
   # --- depscan ---
   if ensure_tool "depscan" install_depscan; then
+    # depscan v6 CLI: -i for source, -o for reports dir
     run_tool "P4" "depscan" "$REPORTS_DIR/depscan_output.json" \
-      depscan --src "$PROJECT_DIR" --reports_dir "$REPORTS_DIR" --report_file depscan_output.json
+      depscan -i "$PROJECT_DIR" -o "$REPORTS_DIR"
   fi
 }
 
