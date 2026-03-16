@@ -562,3 +562,35 @@ wave_p2() {
       bash -c "$osv_cmd"
   fi
 }
+
+# --- Wave P4: syft (SBOM) + bomber (SBOM vuln) + depscan (SCA) ---
+wave_p4() {
+  echo ""
+  echo "=== Wave P4: SBOM + SCA ==="
+
+  # --- syft ---
+  local syft_available=0
+  if ensure_tool "syft" install_syft; then
+    syft_available=1
+    run_tool "P4" "syft" "$REPORTS_DIR/syft_sbom.json" \
+      bash -c 'syft "dir:'"$PROJECT_DIR"'" -o json > "'"$REPORTS_DIR/syft_sbom.json"'"'
+  fi
+
+  # --- bomber (depends on syft for CycloneDX SBOM) ---
+  if ensure_tool "bomber" install_bomber; then
+    if [[ $syft_available -eq 1 ]]; then
+      # Generate CycloneDX SBOM first, then run bomber
+      run_tool "P4" "bomber" "$REPORTS_DIR/bomber_output.json" \
+        bash -c 'syft "dir:'"$PROJECT_DIR"'" -o cyclonedx-json > "'"$REPORTS_DIR/sbom.cdx.json"'" && bomber scan --output json "'"$REPORTS_DIR/sbom.cdx.json"'" > "'"$REPORTS_DIR/bomber_output.json"'"'
+    else
+      log_warn "bomber requires syft for SBOM input. Skipping."
+      SKIPPED+=("bomber")
+    fi
+  fi
+
+  # --- depscan ---
+  if ensure_tool "depscan" install_depscan; then
+    run_tool "P4" "depscan" "$REPORTS_DIR/depscan_output.json" \
+      depscan --src "$PROJECT_DIR" --reports_dir "$REPORTS_DIR" --report_file depscan_output.json
+  fi
+}
