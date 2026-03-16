@@ -70,13 +70,16 @@ async function runOneSubQuery(baseState, plan, index, emit) {
   if (!match) match = findSubQueryMatch(subQuestion);
   if (!match) match = await findSubQueryMatchLLMFallback(subQuestion);
   if (match) {
+    // Exact template match — use gold SQL directly, skip writer (same as exact match fast path)
     state = {
       ...state,
+      sql: match.sql,
       templateSql: match.sql,
       subQueryMatchFound: true,
       researchBrief: null,
+      reasoning: `Direct template match: ${match.id}`,
     };
-    logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id}`);
+    logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (using gold SQL directly)`);
   } else {
     emitProgress('research');
     const researchUpdate = await researchAgentNode(state);
@@ -84,11 +87,12 @@ async function runOneSubQuery(baseState, plan, index, emit) {
     if (!state.researchBrief) {
       logger.warn(`[ParallelPipeline] [${index + 1}/${total}] Research produced no brief, continuing anyway`);
     }
+
+    emitProgress('sql');
+    const writerUpdate = await sqlWriterAgentNode(state);
+    state = { ...state, ...writerUpdate };
   }
 
-  emitProgress('sql');
-  const writerUpdate = await sqlWriterAgentNode(state);
-  state = { ...state, ...writerUpdate };
   if (!state.sql) {
     logger.warn(`[ParallelPipeline] [${index + 1}/${total}] No SQL produced`);
     return {
