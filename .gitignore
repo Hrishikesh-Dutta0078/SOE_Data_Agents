@@ -1,4 +1,5 @@
 server/.env
+reports/
 server/cert.pem
 server/key.pem
 server/public/
