@@ -70,7 +70,7 @@ const { analysisLimiter, impersonateLimiter } = require('./middleware/rateLimite
 const { voiceRateLimiter } = require('./middleware/voiceRateLimit');
 
 const OKTA_CALLBACK_PATH = process.env.OKTA_CALLBACK_PATH || '/implicit/callback';
-const PUBLIC_PATHS = ['/api/health', '/login', OKTA_CALLBACK_PATH, '/logout', '/api/auth/me'];
+const PUBLIC_PATHS = ['/api/health', '/login', OKTA_CALLBACK_PATH, '/logout', '/api/auth/me', '/api/text-to-sql/blueprints'];
 
 const app = express();
 
@@ -78,11 +78,11 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "blob:"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       imgSrc: ["'self'", "data:", "blob:"],
-      connectSrc: ["'self'", "wss://*.stt.speech.microsoft.com", "wss://*.tts.speech.microsoft.com"],
-      fontSrc: ["'self'"],
+      connectSrc: ["'self'", "wss://*.stt.speech.microsoft.com", "wss://*.tts.speech.microsoft.com", "https://*.stt.speech.microsoft.com", "https://*.tts.speech.microsoft.com", "https://*.api.cognitive.microsoft.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
       workerSrc: ["'self'", "blob:"],
       objectSrc: ["'none'"],
       frameAncestors: ["'none'"],

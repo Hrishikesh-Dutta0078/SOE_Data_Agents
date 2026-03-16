@@ -103,7 +103,18 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   }, [messages, progress]);
 
   useEffect(() => {
-    fetchBlueprints().then(setBlueprints).catch(() => {});
+    fetchBlueprints()
+      .then((data) => {
+        if (Array.isArray(data)) setBlueprints(data);
+      })
+      .catch(() => {
+        // Retry once after a short delay (session may not be established yet)
+        setTimeout(() => {
+          fetchBlueprints()
+            .then((data) => { if (Array.isArray(data)) setBlueprints(data); })
+            .catch(() => {});
+        }, 2000);
+      });
   }, []);
 
   useEffect(() => {
