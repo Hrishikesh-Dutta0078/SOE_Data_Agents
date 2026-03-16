@@ -92,6 +92,9 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const [blueprints, setBlueprints] = useState([]);
   const [showBlueprintPicker, setShowBlueprintPicker] = useState(false);
   const [blueprintSelectedIdx, setBlueprintSelectedIdx] = useState(0);
+  const [partialQueries, setPartialQueries] = useState([]);
+  const [querySummary, setQuerySummary] = useState('');
+  const [confidence, setConfidence] = useState(null);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -374,6 +377,14 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           elapsed: eventData.elapsed,
         },
       ]);
+    } else if (eventType === 'subquery_result') {
+      setPartialQueries((prev) => {
+        const next = [...prev];
+        next[eventData.index] = eventData.result;
+        return next;
+      });
+    } else if (eventType === 'query_summary') {
+      setQuerySummary(eventData.summary || '');
     }
   }, []);
 
@@ -384,6 +395,9 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     setActiveTools([]);
     setThinkingEntries([]);
     setQueryPlan(null);
+    setPartialQueries([]);
+    setQuerySummary('');
+    setConfidence(null);
 
     const opts = { impersonateContext: impersonateContext ? { type: impersonateContext.type, id: impersonateContext.id } : null, validationEnabled, sessionId, isFollowUp, useFastModel, enabledTools: enabledToolsProp ?? null };
     const result = await analyzeQuestionStream(
@@ -1042,6 +1056,22 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                   queryPlan={queryPlan}
                   startTime={progress.startTime}
                 />
+                {querySummary && (
+                  <div className="mx-0 mb-2 mt-2 px-4 py-2.5 rounded-xl text-[13px] text-indigo-800"
+                       style={{ background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)', border: '1px solid rgba(99,102,241,0.15)' }}>
+                    <span className="font-semibold text-indigo-600 mr-1.5">Plan:</span>
+                    {querySummary}
+                  </div>
+                )}
+                {partialQueries.filter(Boolean).length > 0 && (
+                  <ResultsPanel
+                    execution={null}
+                    insights={null}
+                    chart={null}
+                    queries={partialQueries.filter(Boolean)}
+                    isPartial={true}
+                  />
+                )}
                 {streamingInsights && (
                   <div className="mt-3 pt-3 border-t border-stone-100 text-[13px] leading-relaxed text-stone-700">
                     <ReactMarkdown>{streamingInsights}</ReactMarkdown>

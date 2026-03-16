@@ -385,7 +385,7 @@ function SubQuerySection({ query, index }) {
   );
 }
 
-export default function ResultsPanel({ execution, insights, chart, queries = [] }) {
+export default function ResultsPanel({ execution, insights, chart, queries = [], isPartial = false, confidence, retrySuggestions, onRetrySuggestion, sessionId, question, sql }) {
   const [activeTab, setActiveTab] = useState('insights');
   const isMultiQuery = queries.length > 1;
 
@@ -398,6 +398,11 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
 
   const tabs = useMemo(() => {
     const t = [];
+    if (isPartial && queries.length > 0) {
+      const completed = queries.filter((q) => q.execution?.success).length;
+      t.push({ id: 'subqueries', label: `Results (${completed}/${queries.length} complete)` });
+      return t;
+    }
     if (insights) t.push({ id: 'insights', label: 'Insights' });
     if (hasCharts) t.push({ id: 'chart', label: 'Charts' });
     if (isMultiQuery) {
@@ -409,7 +414,7 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
       t.push({ id: 'table', label: 'Table' });
     }
     return t;
-  }, [insights, hasCharts, execution, isMultiQuery, queries.length, primaryRows.length]);
+  }, [insights, hasCharts, execution, isMultiQuery, queries.length, primaryRows.length, isPartial]);
 
   if (tabs.length === 0) return null;
 
@@ -455,6 +460,12 @@ export default function ResultsPanel({ execution, insights, chart, queries = [] 
 
         {currentTab === 'subqueries' && (
           <div>
+            {isPartial && (
+              <div className="flex items-center gap-2 mb-3 px-2 py-1.5 text-[12px] text-indigo-600 bg-indigo-50/50 rounded-lg">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                Analyzing sub-queries...
+              </div>
+            )}
             {queries.map((q, i) => (
               <SubQuerySection key={q.id || i} query={q} index={i} />
             ))}

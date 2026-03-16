@@ -543,6 +543,7 @@ router.post('/analyze-stream', async (req, res) => {
   let onParallelCorrectionStart = null;
   let onParallelCorrectionComplete = null;
   let onParallelPipelineComplete = null;
+  let onSubqueryResult = null;
 
   const emitThinking = (message, category) => {
     const event = { type: 'thinking', message, category, elapsed: Date.now() - requestStart };
@@ -680,11 +681,23 @@ router.post('/analyze-stream', async (req, res) => {
         'parallelSubQueryPipeline'
       );
     };
+    onSubqueryResult = (data) => {
+      if (data.sessionId && data.sessionId !== sessionId) return;
+      const event = {
+        type: 'subquery_result',
+        index: data.index,
+        total: data.total,
+        result: data.result,
+        elapsed: Date.now() - requestStart,
+      };
+      res.write(`event: subquery_result\ndata: ${JSON.stringify(event)}\n\n`);
+    };
     parallelPipelineEvents.on('parallel_pipeline_start', onParallelPipelineStart);
     parallelPipelineEvents.on('parallel_subquery_progress', onParallelSubqueryProgress);
     parallelPipelineEvents.on('parallel_pipeline_complete', onParallelPipelineComplete);
     parallelPipelineEvents.on('parallel_correction_start', onParallelCorrectionStart);
     parallelPipelineEvents.on('parallel_correction_complete', onParallelCorrectionComplete);
+    parallelPipelineEvents.on('subquery_result', onSubqueryResult);
 
     onQueryProgress = (data) => {
       if (data.sessionId && data.sessionId !== sessionId) return;
@@ -772,6 +785,7 @@ router.post('/analyze-stream', async (req, res) => {
     if (onParallelPipelineComplete) parallelPipelineEvents.removeListener('parallel_pipeline_complete', onParallelPipelineComplete);
     if (onParallelCorrectionStart) parallelPipelineEvents.removeListener('parallel_correction_start', onParallelCorrectionStart);
     if (onParallelCorrectionComplete) parallelPipelineEvents.removeListener('parallel_correction_complete', onParallelCorrectionComplete);
+    if (onSubqueryResult) parallelPipelineEvents.removeListener('subquery_result', onSubqueryResult);
     if (onDashboardProgress) dashboardEvents.removeListener('dashboard_progress', onDashboardProgress);
 
     const usageByNodeAndModel = buildUsageBreakdown(getUsageByNodeAndModel());
@@ -799,6 +813,7 @@ router.post('/analyze-stream', async (req, res) => {
     if (onParallelPipelineComplete) parallelPipelineEvents.removeListener('parallel_pipeline_complete', onParallelPipelineComplete);
     if (onParallelCorrectionStart) parallelPipelineEvents.removeListener('parallel_correction_start', onParallelCorrectionStart);
     if (onParallelCorrectionComplete) parallelPipelineEvents.removeListener('parallel_correction_complete', onParallelCorrectionComplete);
+    if (onSubqueryResult) parallelPipelineEvents.removeListener('subquery_result', onSubqueryResult);
     if (onDashboardProgress) dashboardEvents.removeListener('dashboard_progress', onDashboardProgress);
     logger.error('Pipeline stream failed', { error: err.message });
     const errorPayload = { error: 'Stream processing failed' };
