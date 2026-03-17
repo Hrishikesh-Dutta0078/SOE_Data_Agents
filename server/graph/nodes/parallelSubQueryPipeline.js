@@ -34,7 +34,7 @@ function buildStateSlice(baseState, plan, index) {
     attempts: { ...baseState.attempts, correction: 0, reflection: 0, resultCheck: 0 },
     // Preserve request-level toggles so tool filtering is applied in researchAgent/sqlWriterAgent
     enabledTools: baseState.enabledTools,
-    useFastModel: baseState.useFastModel,
+    nodeModelOverrides: baseState.nodeModelOverrides,
   };
 }
 
@@ -323,7 +323,7 @@ async function parallelSubQueryPipelineNode(state) {
     ...state,
     queries: [],
     enabledTools: state.enabledTools,
-    useFastModel: state.useFastModel,
+    nodeModelOverrides: state.nodeModelOverrides,
   };
   const emit = true;
   const promises = plan.map((_, index) =>
