@@ -435,7 +435,7 @@ Provide the corrected SQL only.`,
     maxTokens: CORRECT_MAX_TOKENS,
     temperature: CORRECT_TEMPERATURE,
     nodeKey: 'correct',
-    profile: state.useFastModel === true ? 'opus' : undefined,
+    profile: state.nodeModelOverrides?.correct,
   });
   const resolvedModelMeta = getModelMeta(model);
 

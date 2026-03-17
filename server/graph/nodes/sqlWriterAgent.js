@@ -483,7 +483,7 @@ async function sqlWriterAgentNode(state) {
     temperature: 0,
     maxTokens: 4096,
     nodeKey: 'sqlWriterAgent',
-    profile: 'haiku',
+    profile: state.nodeModelOverrides?.sqlWriterAgent,
   });
   const llmMeta = getModelMeta(model);
   const systemPrompt = buildWriterSystemPrompt(state);
