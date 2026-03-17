@@ -72,7 +72,7 @@ function loadMessages(sessionId) {
   } catch { return []; }
 }
 
-export default function ChatPanel({ onMenuClick, impersonateContext = null, validationEnabled = true, sessionId, onNewChat, enabledTools: enabledToolsProp = null, useFastModel = false, userName = '' }) {
+export default function ChatPanel({ onMenuClick, impersonateContext = null, validationEnabled = true, sessionId, onNewChat, enabledTools: enabledToolsProp = null, nodeModelOverrides = {}, userName = '', onMetricsUpdate }) {
   const [messages, setMessages] = useState(() => loadMessages(sessionId));
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -392,8 +392,12 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       });
     } else if (eventType === 'query_summary') {
       setQuerySummary(eventData.summary || '');
+    } else if (eventType === 'done') {
+      if (onMetricsUpdate && eventData.usageByNodeAndModel) {
+        onMetricsUpdate(eventData.usageByNodeAndModel);
+      }
     }
-  }, []);
+  }, [onMetricsUpdate]);
 
   const runStream = useCallback(async (question, history, entities, resolved, { isFollowUp = false } = {}) => {
     const startTime = Date.now();
@@ -406,7 +410,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     setQuerySummary('');
     setConfidence(null);
 
-    const opts = { impersonateContext: impersonateContext ? { type: impersonateContext.type, id: impersonateContext.id } : null, validationEnabled, sessionId, isFollowUp, useFastModel, enabledTools: enabledToolsProp ?? null };
+    const opts = { impersonateContext: impersonateContext ? { type: impersonateContext.type, id: impersonateContext.id } : null, validationEnabled, sessionId, isFollowUp, nodeModelOverrides, enabledTools: enabledToolsProp ?? null };
     const result = await analyzeQuestionStream(
       question,
       history,
@@ -420,7 +424,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     setStreamingInsights('');
     setActiveTools([]);
     return result;
-  }, [streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, useFastModel]);
+  }, [streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, nodeModelOverrides]);
 
   const handleSend = async (text, { isFollowUp = false } = {}) => {
     voiceStopRef.current?.();
@@ -474,7 +478,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       sessionId,
       previousDashboardSpec: dashboardData.spec,
       dashboardDataSources: serializedSources,
-      useFastModel,
+      nodeModelOverrides,
       enabledTools: enabledToolsProp ?? null,
     };
     const result = await analyzeQuestionStream(
@@ -504,7 +508,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     }
 
     return result;
-  }, [dashboardData, buildHistory, streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, useFastModel]);
+  }, [dashboardData, buildHistory, streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, nodeModelOverrides]);
 
   const handleClarificationSubmit = async (questions) => {
     if (loading) return;
