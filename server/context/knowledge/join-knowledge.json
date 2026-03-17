@@ -650,6 +650,27 @@
       "columns": [
         "vw_TF_EBI_P2S.CREATOR_TYPE_ID = vw_EBI_CREATOR_TYPE.ID"
       ]
+    },
+    {
+      "left_table": "vw_TF_EBI_P2S",
+      "right_table": "TD_EBI_COUNTRY",
+      "columns": [
+        "vw_TF_EBI_P2S.ACCOUNT_COUNTRY_ID = TD_EBI_COUNTRY.COUNTRY_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_MARKETING_TREND",
+      "right_table": "TD_EBI_COUNTRY",
+      "columns": [
+        "TF_EBI_MARKETING_TREND.ACCOUNT_COUNTRY_ID = TD_EBI_COUNTRY.COUNTRY_ID"
+      ]
+    },
+    {
+      "left_table": "TF_EBI_TPT_INFO",
+      "right_table": "TD_EBI_COUNTRY",
+      "columns": [
+        "TF_EBI_TPT_INFO.COUNTRY_ID = TD_EBI_COUNTRY.COUNTRY_ID"
+      ]
     }
   ],
   "multihopJoins": [
@@ -948,6 +969,33 @@
       "steps": [
         "TD_EBI_UCP_COMPETITORS.sub_std_name_key = vw_TD_EBI_ACCOUNT.SUB_ID",
         "vw_TD_EBI_ACCOUNT.ACCOUNT_ID = vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT.ACCOUNT_ID"
+      ]
+    },
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "TD_EBI_COUNTRY",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_td_ebi_region_rpt.REGION_ID = vw_TF_EBI_P2S.REGION_ID",
+        "vw_TF_EBI_P2S.ACCOUNT_COUNTRY_ID = TD_EBI_COUNTRY.COUNTRY_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_ACCOUNT",
+      "right_table": "TD_EBI_COUNTRY",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_TD_EBI_ACCOUNT.ACCOUNT_ID = vw_TF_EBI_P2S.ACCOUNT_ID",
+        "vw_TF_EBI_P2S.ACCOUNT_COUNTRY_ID = TD_EBI_COUNTRY.COUNTRY_ID"
+      ]
+    },
+    {
+      "left_table": "vw_TD_EBI_OPP",
+      "right_table": "TD_EBI_COUNTRY",
+      "bridge_table": "vw_TF_EBI_P2S",
+      "steps": [
+        "vw_TD_EBI_OPP.OPP_ID = vw_TF_EBI_P2S.OPP_ID",
+        "vw_TF_EBI_P2S.ACCOUNT_COUNTRY_ID = TD_EBI_COUNTRY.COUNTRY_ID"
       ]
     }
   ]
