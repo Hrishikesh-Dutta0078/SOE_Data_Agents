@@ -81,7 +81,10 @@ function getEnvValue(name, fallback = '') {
   return fallback;
 }
 
-const FAST_NODE_KEYS = new Set(['researchAgent', 'sqlAgent']);
+const FAST_NODE_KEYS = new Set([
+  'researchAgent', 'researchAgent_phase1',
+  'sqlAgent', 'sqlWriterAgent',
+]);
 
 function resolveProfileName(opts) {
   if (opts.profile && MODEL_PROFILES[opts.profile]) return opts.profile;

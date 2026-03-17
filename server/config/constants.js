@@ -6,9 +6,16 @@ const MODEL_PROFILES = Object.freeze({
   opus: Object.freeze({
     provider: 'anthropic',
     modelNameEnv: 'AZURE_ANTHROPIC_MODEL_NAME',
-    defaultModelName: 'claude-opus-4-6',
+    defaultModelName: 'claude-opus-4-6-2',
     endpointEnv: 'AZURE_ANTHROPIC_ENDPOINT',
     apiKeyEnv: 'AZURE_ANTHROPIC_API_KEY',
+  }),
+  sonnet: Object.freeze({
+    provider: 'anthropic',
+    modelNameEnv: 'AZURE_ANTHROPIC_SONNET_MODEL_NAME',
+    defaultModelName: 'claude-sonnet-4-6',
+    endpointEnv: 'AZURE_ANTHROPIC_SONNET_ENDPOINT',
+    apiKeyEnv: 'AZURE_ANTHROPIC_SONNET_API_KEY',
   }),
   haiku: Object.freeze({
     provider: 'anthropic',
@@ -36,12 +43,9 @@ module.exports = {
   // --- Agent Limits ---
   SQL_AGENT_TIMEOUT_MS: 180000,
   SQL_AGENT_TIMEOUT_COMPLEX_MS: 300000,
-  SQL_AGENT_MAX_ITERATIONS: 15,
-  REFLECT_CONFIDENCE_THRESHOLD: 0.6,
   MAX_CORRECTION_ROUNDS: 3,
   /** Correction attempts per failed sub-query in the parallel pipeline (1–2 recommended for latency). */
   PARALLEL_CORRECTION_ROUNDS: 2,
-  MAX_REFLECTION_ROUNDS: 3,
   MAX_RESULT_RETRIES: 2,
 
   // --- Query Execution ---
@@ -52,8 +56,6 @@ module.exports = {
   // --- LLM Tuning Per Node ---
   CLASSIFY_MAX_TOKENS: 1500,
   CLASSIFY_TEMPERATURE: 0,
-  REFLECT_MAX_TOKENS: 2048,
-  REFLECT_TEMPERATURE: 0,
   CORRECT_MAX_TOKENS: 4096,
   CORRECT_TEMPERATURE: 0,
   SEMANTIC_VALIDATOR_MAX_TOKENS: 1500,
@@ -79,4 +81,10 @@ module.exports = {
   COST_PER_1M_INPUT_TOKENS: 15,
   COST_PER_1M_CACHED_INPUT_TOKENS: 1.875,
   COST_PER_1M_OUTPUT_TOKENS: 75,
+
+  COST_RATES: Object.freeze({
+    opus:   Object.freeze({ input: 15,   cachedInput: 1.875, output: 75 }),
+    sonnet: Object.freeze({ input: 3,    cachedInput: 0.375, output: 15 }),
+    haiku:  Object.freeze({ input: 0.80, cachedInput: 0.10,  output: 4 }),
+  }),
 };
