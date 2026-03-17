@@ -544,7 +544,6 @@ async function researchAgentNode(state) {
     });
   }
 
-  const useFastModel = state.useFastModel === true;
   const cacheStats = { hits: 0, misses: 0 };
   const toolTimings = [];
   const enabledNames = state.enabledTools?.research;
@@ -557,94 +556,93 @@ async function researchAgentNode(state) {
   let llmMeta;
 
   try {
-  if (useFastModel) {
-    // --- Phase 1: Haiku discovery only ---
-    const phase1Model = getModel({
-      temperature: 0,
-      maxTokens: 4096,
-      nodeKey: 'researchAgent',
-      profile: 'haiku',
-    });
-    llmMeta = getModelMeta(phase1Model);
-    const phase1Tools = createMemoizedTools(cacheStats, toolTimings, enabledNames, state.sessionId ?? null, qIdx, {
-      toolsOverride: DISCOVERY_TOOLS,
-      phase1Mode: true,
-    });
-    const phase1Prompt = buildResearchSystemPromptPhase1(state);
-    logger.info('Research agent (Fast mode) Phase 1: Haiku discovery', { tools: phase1Tools.map((t) => t.name) });
+  // --- Phase 1: discovery only ---
+  const phase1Model = getModel({
+    temperature: 0,
+    maxTokens: 4096,
+    nodeKey: 'researchAgent_phase1',
+    profile: state.nodeModelOverrides?.researchAgent_phase1,
+  });
+  llmMeta = getModelMeta(phase1Model);
+  const phase1Tools = createMemoizedTools(cacheStats, toolTimings, enabledNames, state.sessionId ?? null, qIdx, {
+    toolsOverride: DISCOVERY_TOOLS,
+    phase1Mode: true,
+  });
+  const phase1Prompt = buildResearchSystemPromptPhase1(state);
+  logger.info('Research agent Phase 1: discovery', { tools: phase1Tools.map((t) => t.name) });
 
-    const phase1Agent = createReactAgent({
-      llm: phase1Model,
-      tools: phase1Tools,
-      stateModifier: new SystemMessage(phase1Prompt),
-    });
+  const phase1Agent = createReactAgent({
+    llm: phase1Model,
+    tools: phase1Tools,
+    stateModifier: new SystemMessage(phase1Prompt),
+  });
 
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), timeoutMs);
-      const plan = state.queryPlan || [];
-      const activeQuestion = plan.length > 1 ? plan[qIdx]?.subQuestion || state.question : state.question;
-      const hasHistory = state.conversationHistory?.length > 0;
-      const humanMsg = hasHistory
-        ? `Given the conversation context in the system prompt, research what is needed for this follow-up question:\n\n${activeQuestion}`
-        : activeQuestion;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    const plan = state.queryPlan || [];
+    const activeQuestion = plan.length > 1 ? plan[qIdx]?.subQuestion || state.question : state.question;
+    const hasHistory = state.conversationHistory?.length > 0;
+    const humanMsg = hasHistory
+      ? `Given the conversation context in the system prompt, research what is needed for this follow-up question:\n\n${activeQuestion}`
+      : activeQuestion;
 
-      const stream = await phase1Agent.stream(
-        { messages: [new HumanMessage(humanMsg)] },
-        { recursionLimit: 16, signal: controller.signal, streamMode: 'updates' }
-      );
+    const stream = await phase1Agent.stream(
+      { messages: [new HumanMessage(humanMsg)] },
+      { recursionLimit: 16, signal: controller.signal, streamMode: 'updates' }
+    );
 
-      let lastAgentState = null;
-      let finishedDiscovery = false;
-      const seenToolCallKeys = new Set();
-      const seenToolResultKeys = new Set();
-      let toolCallCount = 0;
-      const accumulatedMessages = [];
+    let lastAgentState = null;
+    let finishedDiscovery = false;
+    const seenToolCallKeys = new Set();
+    const seenToolResultKeys = new Set();
+    let toolCallCount = 0;
+    const accumulatedMessages = [];
 
-      for await (const chunk of stream) {
-        lastAgentState = chunk;
-        const msgs = extractMessagesFromChunk(chunk);
-        accumulatedMessages.push(...msgs);
-        for (const msg of msgs) {
-          if (msg.tool_calls?.length > 0) {
-            for (const tc of msg.tool_calls) {
-              const dedupKey = tc.id ? `id:${tc.id}` : `${tc.name}|${stableStringify(tc.args || {})}`;
-              if (seenToolCallKeys.has(dedupKey)) continue;
-              seenToolCallKeys.add(dedupKey);
-              toolCallCount++;
-              _researchToolEvents.emit('tool_call', { name: tc.name, index: toolCallCount, attempt: attempts.agent, phase: 'research', sessionId: state.sessionId || '' });
-              if (tc.name === 'finish_discovery') finishedDiscovery = true;
-            }
-          }
-          if (msg.name && msg.content) {
-            if (msg.name === 'discover_context' && typeof msg.content === 'string' && msg.content.length > 500) {
-              discoverContextContent = msg.content;
-            }
-            const resultKey = msg.tool_call_id ? `${msg.name}|${msg.tool_call_id}` : `${msg.name}|${typeof msg.content === 'string' ? msg.content.substring(0, 240) : ''}`;
-            if (seenToolResultKeys.has(resultKey)) continue;
-            seenToolResultKeys.add(resultKey);
-            _researchToolEvents.emit('tool_result', { name: msg.name, index: toolCallCount, attempt: attempts.agent, phase: 'research', sessionId: state.sessionId || '' });
+    for await (const chunk of stream) {
+      lastAgentState = chunk;
+      const msgs = extractMessagesFromChunk(chunk);
+      accumulatedMessages.push(...msgs);
+      for (const msg of msgs) {
+        if (msg.tool_calls?.length > 0) {
+          for (const tc of msg.tool_calls) {
+            const dedupKey = tc.id ? `id:${tc.id}` : `${tc.name}|${stableStringify(tc.args || {})}`;
+            if (seenToolCallKeys.has(dedupKey)) continue;
+            seenToolCallKeys.add(dedupKey);
+            toolCallCount++;
+            _researchToolEvents.emit('tool_call', { name: tc.name, index: toolCallCount, attempt: attempts.agent, phase: 'research', sessionId: state.sessionId || '' });
+            if (tc.name === 'finish_discovery') finishedDiscovery = true;
           }
         }
-        if (finishedDiscovery) break;
+        if (msg.name && msg.content) {
+          if (msg.name === 'discover_context' && typeof msg.content === 'string' && msg.content.length > 500) {
+            discoverContextContent = msg.content;
+          }
+          const resultKey = msg.tool_call_id ? `${msg.name}|${msg.tool_call_id}` : `${msg.name}|${typeof msg.content === 'string' ? msg.content.substring(0, 240) : ''}`;
+          if (seenToolResultKeys.has(resultKey)) continue;
+          seenToolResultKeys.add(resultKey);
+          _researchToolEvents.emit('tool_result', { name: msg.name, index: toolCallCount, attempt: attempts.agent, phase: 'research', sessionId: state.sessionId || '' });
+        }
       }
+      if (finishedDiscovery) break;
+    }
 
-      result = accumulatedMessages.length > 0
-        ? { ...lastAgentState, messages: accumulatedMessages }
-        : lastAgentState;
+    result = accumulatedMessages.length > 0
+      ? { ...lastAgentState, messages: accumulatedMessages }
+      : lastAgentState;
 
-      // --- Phase 2: Opus brief synthesis ---
-      if (result?.messages?.length > 0 && (finishedDiscovery || discoverContextContent)) {
-        try {
-          const opusModel = getModel({
-            temperature: 0,
-            maxTokens: 4096,
-            nodeKey: 'researchAgent',
-            profile: 'opus',
-          });
-          const structuredModel = opusModel.withStructuredOutput(ResearchBriefSchema);
-          const convText = formatPhase1MessagesForPrompt(result.messages);
-          const phase2Prompt = `You are synthesizing a research brief from a discovery conversation. The assistant (Haiku) ran discovery tools. Extract and structure the findings into the required JSON format.
+    // --- Phase 2: brief synthesis ---
+    if (result?.messages?.length > 0 && (finishedDiscovery || discoverContextContent)) {
+      try {
+        const opusModel = getModel({
+          temperature: 0,
+          maxTokens: 4096,
+          nodeKey: 'researchAgent_phase2',
+          profile: state.nodeModelOverrides?.researchAgent_phase2,
+        });
+        const structuredModel = opusModel.withStructuredOutput(ResearchBriefSchema);
+        const convText = formatPhase1MessagesForPrompt(result.messages);
+        const phase2Prompt = `You are synthesizing a research brief from a discovery conversation. The assistant (Haiku) ran discovery tools. Extract and structure the findings into the required JSON format.
 
 === DISCOVERY CONVERSATION ===
 ${convText}
@@ -653,96 +651,19 @@ ${convText}
 Generate the research brief as JSON with: tables (name, relevantColumns, description), joins (from, to, type), businessRules, examplePatterns, filterValues (column, values), fiscalPeriod, reasoning.
 Use ONLY tables and columns that appear in the discovery results. Do not invent column names.`;
 
-          const briefRaw = await structuredModel.invoke([new HumanMessage(phase2Prompt)]);
-          const brief = briefRaw ? enrichBriefWithSchema(briefRaw) : null;
-          if (brief) {
-            result = { ...result, _phase2Brief: brief };
-          }
-        } catch (phase2Err) {
-          logger.warn('Phase 2 Opus brief synthesis failed', { error: phase2Err?.message });
+        const briefRaw = await structuredModel.invoke([new HumanMessage(phase2Prompt)]);
+        const brief = briefRaw ? enrichBriefWithSchema(briefRaw) : null;
+        if (brief) {
+          result = { ...result, _phase2Brief: brief };
         }
+      } catch (phase2Err) {
+        logger.warn('Phase 2 brief synthesis failed', { error: phase2Err?.message });
       }
-      clearTimeout(timeout);
-    } catch (err) {
-      if (typeof timeout !== 'undefined') clearTimeout(timeout);
-      throw err;
     }
-  } else {
-    // --- Single-model flow (Opus or default) ---
-    const model = getModel({
-      temperature: 0,
-      maxTokens: 4096,
-      nodeKey: 'researchAgent',
-      profile: state.useFastModel === false ? 'opus' : undefined,
-    });
-    llmMeta = getModelMeta(model);
-    const systemPrompt = buildResearchSystemPrompt(state);
-    const memoizedTools = createMemoizedTools(cacheStats, toolTimings, enabledNames, state.sessionId ?? null, qIdx);
-    logger.info('Research agent tools', { enabledFilter: enabledNames ?? 'all', using: memoizedTools.map((t) => t.name) });
-
-    const agent = createReactAgent({
-      llm: model,
-      tools: memoizedTools,
-      stateModifier: new SystemMessage(systemPrompt),
-    });
-
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), timeoutMs);
-      const plan = state.queryPlan || [];
-      const activeQuestion = plan.length > 1 ? plan[qIdx]?.subQuestion || state.question : state.question;
-      const hasHistory = state.conversationHistory?.length > 0;
-      const humanMsg = hasHistory
-        ? `Given the conversation context in the system prompt, research what is needed for this follow-up question:\n\n${activeQuestion}`
-        : activeQuestion;
-
-      const stream = await agent.stream(
-        { messages: [new HumanMessage(humanMsg)] },
-        { recursionLimit: 16, signal: controller.signal, streamMode: 'updates' }
-      );
-
-      let toolCallCount = 0;
-      let lastAgentState = null;
-      let submittedResearch = false;
-      const seenToolCallKeys = new Set();
-      const seenToolResultKeys = new Set();
-      const accumulatedMessages = [];
-
-      for await (const chunk of stream) {
-        lastAgentState = chunk;
-        const msgs = extractMessagesFromChunk(chunk);
-        accumulatedMessages.push(...msgs);
-        for (const msg of msgs) {
-          if (msg.tool_calls?.length > 0) {
-            for (const tc of msg.tool_calls) {
-              const dedupKey = tc.id ? `id:${tc.id}` : `${tc.name}|${stableStringify(tc.args || {})}`;
-              if (seenToolCallKeys.has(dedupKey)) continue;
-              seenToolCallKeys.add(dedupKey);
-              toolCallCount++;
-              _researchToolEvents.emit('tool_call', { name: tc.name, index: toolCallCount, attempt: attempts.agent, phase: 'research', sessionId: state.sessionId || '' });
-            }
-          }
-          if (msg.name && msg.content) {
-            if (msg.name === 'discover_context' && typeof msg.content === 'string' && msg.content.length > 500) {
-              discoverContextContent = msg.content;
-            }
-            const resultKey = msg.tool_call_id ? `${msg.name}|${msg.tool_call_id}` : `${msg.name}|${typeof msg.content === 'string' ? msg.content.substring(0, 240) : ''}`;
-            if (seenToolResultKeys.has(resultKey)) continue;
-            seenToolResultKeys.add(resultKey);
-            _researchToolEvents.emit('tool_result', { name: msg.name, index: toolCallCount, attempt: attempts.agent, phase: 'research', sessionId: state.sessionId || '' });
-            if (msg.name === 'submit_research') submittedResearch = true;
-          }
-        }
-        if (submittedResearch) break;
-      }
-
-      result = accumulatedMessages.length > 0
-        ? { ...lastAgentState, messages: accumulatedMessages }
-        : lastAgentState;
-      clearTimeout(timeout);
-    } finally {
-      // timeout cleared above
-    }
+    clearTimeout(timeout);
+  } catch (err) {
+    if (typeof timeout !== 'undefined') clearTimeout(timeout);
+    throw err;
   }
 
   } catch (err) {
