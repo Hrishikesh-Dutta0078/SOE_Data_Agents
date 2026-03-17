@@ -25,7 +25,7 @@ const KNOWLEDGE_DIR = path.join(__dirname, '..', 'server', 'context', 'knowledge
 const SCHEMA_FILE = path.join(KNOWLEDGE_DIR, 'schema-knowledge.json');
 const OUTPUT_FILE = path.join(KNOWLEDGE_DIR, 'distinct-values.json');
 
-const DISTINCT_LIMIT = 50;
+const DISTINCT_LIMIT = 10;
 const QUERY_TIMEOUT = 30000;
 
 async function harvestTable(pool, tableName, columns) {
@@ -35,7 +35,7 @@ async function harvestTable(pool, tableName, columns) {
   for (const colName of colNames) {
     const quotedTable = `[${tableName}]`;
     const quotedCol = `[${colName}]`;
-    const query = `SET NOCOUNT ON; SELECT DISTINCT TOP ${DISTINCT_LIMIT} ${quotedCol} FROM ${quotedTable} ORDER BY ${quotedCol}`;
+    const query = `SET NOCOUNT ON; SELECT TOP ${DISTINCT_LIMIT} ${quotedCol} FROM (SELECT DISTINCT ${quotedCol} FROM ${quotedTable}) AS sub ORDER BY NEWID()`;
 
     try {
       const request = pool.request();
