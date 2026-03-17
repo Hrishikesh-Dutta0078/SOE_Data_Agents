@@ -36,11 +36,11 @@ export function analyzeQuestion(
   conversationHistory = [],
   previousEntities = null,
   resolvedQuestions = [],
-  { impersonateContext = null, validationEnabled = true, sessionId, isFollowUp = false, enabledTools = null, useFastModel } = {},
+  { impersonateContext = null, validationEnabled = true, sessionId, isFollowUp = false, enabledTools = null, nodeModelOverrides } = {},
 ) {
   const payload = { question, conversationHistory, previousEntities, resolvedQuestions, impersonateContext, validationEnabled, isFollowUp };
   payload.enabledTools = enabledTools ?? null;
-  if (useFastModel !== undefined) payload.useFastModel = useFastModel;
+  if (nodeModelOverrides && Object.keys(nodeModelOverrides).length > 0) payload.nodeModelOverrides = nodeModelOverrides;
   const headers = {};
   if (sessionId) headers['x-session-id'] = sessionId;
   return request('/api/text-to-sql/analyze', {
@@ -56,7 +56,7 @@ export async function analyzeQuestionStream(
   previousEntities = null,
   resolvedQuestions = [],
   onEvent,
-  { impersonateContext = null, validationEnabled = true, sessionId, isFollowUp = false, previousDashboardSpec = null, dashboardDataSources = null, enabledTools = null, useFastModel } = {},
+  { impersonateContext = null, validationEnabled = true, sessionId, isFollowUp = false, previousDashboardSpec = null, dashboardDataSources = null, enabledTools = null, nodeModelOverrides } = {},
 ) {
   const payload = { question, conversationHistory, previousEntities, resolvedQuestions, impersonateContext, validationEnabled, isFollowUp };
   payload.enabledTools = enabledTools ?? null;
@@ -64,7 +64,7 @@ export async function analyzeQuestionStream(
     payload.previousDashboardSpec = previousDashboardSpec;
     payload.dashboardDataSources = dashboardDataSources || [];
   }
-  if (useFastModel !== undefined) payload.useFastModel = useFastModel;
+  if (nodeModelOverrides && Object.keys(nodeModelOverrides).length > 0) payload.nodeModelOverrides = nodeModelOverrides;
   const headers = { 'Content-Type': 'application/json' };
   if (sessionId) headers['x-session-id'] = sessionId;
 
