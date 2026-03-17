@@ -109,6 +109,7 @@ async function dashboardAgentNode(state) {
     temperature: DASHBOARD_TEMPERATURE,
     maxTokens: DASHBOARD_MAX_TOKENS,
     nodeKey: 'dashboardAgent',
+    profile: state.nodeModelOverrides?.dashboardAgent,
   });
   const llmMeta = getModelMeta(baseModel);
   const model = baseModel.withStructuredOutput(DashboardSpecSchema);

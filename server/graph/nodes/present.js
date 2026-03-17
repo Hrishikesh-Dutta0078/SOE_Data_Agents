@@ -259,6 +259,7 @@ async function presentNode(state) {
           maxTokens: isMultiQuery ? INSIGHT_MAX_TOKENS * 2 : INSIGHT_MAX_TOKENS,
           temperature: INSIGHT_TEMPERATURE,
           nodeKey: 'presentInsights',
+          profile: state.nodeModelOverrides?.presentInsights,
         });
         insightModelMeta = getModelMeta(model);
         const stream = await model.stream(messages);
@@ -285,6 +286,7 @@ async function presentNode(state) {
           maxTokens: CHART_MAX_TOKENS,
           temperature: CHART_TEMPERATURE,
           nodeKey: 'presentChart',
+          profile: state.nodeModelOverrides?.presentChart,
         });
         chartModelMeta = getModelMeta(baseModel);
         const model = baseModel.withStructuredOutput(ChartResponseSchema);

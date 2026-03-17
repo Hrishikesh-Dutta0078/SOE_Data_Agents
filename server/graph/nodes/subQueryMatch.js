@@ -81,7 +81,7 @@ function findSubQueryMatch(question) {
 /**
  * LLM fallback when programmatic match returns null. Returns { id, sql } or null.
  */
-async function findSubQueryMatchLLMFallback(subQuestion) {
+async function findSubQueryMatchLLMFallback(subQuestion, state) {
   const { examplesMap } = loadGoldIndex();
   const goldExamples = [...examplesMap.values()];
   if (goldExamples.length === 0) return null;
@@ -95,6 +95,7 @@ async function findSubQueryMatchLLMFallback(subQuestion) {
       maxTokens: SUB_QUERY_LLM_MATCH_MAX_TOKENS,
       cache: true,
       nodeKey: 'subQueryMatch',
+      profile: state.nodeModelOverrides?.subQueryMatch,
     }).withStructuredOutput(SubQueryMatchSchema);
     const llmResult = await model.invoke(messages);
     const matchedId = llmResult?.matched_example_id || null;
@@ -131,7 +132,7 @@ async function subQueryMatchNode(state) {
     matchSource = 'programmatic';
   }
   if (!match) {
-    match = await findSubQueryMatchLLMFallback(subQuestion);
+    match = await findSubQueryMatchLLMFallback(subQuestion, state);
     matchSource = 'llm_fallback';
   }
 

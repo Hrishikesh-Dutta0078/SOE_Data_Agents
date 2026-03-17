@@ -252,6 +252,7 @@ async function classifyNode(state) {
           maxTokens: 300,
           cache: true,
           nodeKey: 'classify',
+          profile: state.nodeModelOverrides?.classify,
         }).withStructuredOutput(DetectedEntities);
 
         const subQueryContext = blueprint.subQueries
@@ -457,6 +458,7 @@ Return only what is explicitly stated in the user parameters.`;
     maxTokens: CLASSIFY_MAX_TOKENS,
     cache: true,
     nodeKey: 'classify',
+    profile: state.nodeModelOverrides?.classify,
   });
   const llmMeta = getModelMeta(baseModel);
   const model = baseModel.withStructuredOutput(ClassifySchema);

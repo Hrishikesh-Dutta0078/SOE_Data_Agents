@@ -142,6 +142,7 @@ async function decomposeNode(state) {
     maxTokens: DECOMPOSE_MAX_TOKENS,
     cache: true,
     nodeKey: 'decompose',
+    profile: state.nodeModelOverrides?.decompose,
   });
   const llmMeta = getModelMeta(baseModel);
   const model = baseModel.withStructuredOutput(DecomposeSchema);
