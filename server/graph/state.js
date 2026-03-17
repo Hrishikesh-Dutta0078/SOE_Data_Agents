@@ -89,8 +89,8 @@ const WorkflowState = Annotation.Root({
   // --- Tool toggles (testing): { research: string[], sqlWriter: string[] } — if set, only these tools are enabled
   enabledTools: Annotation({ reducer: (_, b) => b, default: () => null }),
 
-  // --- Model toggle (testing): true = use fast model (Haiku) for tool-calling nodes, false = use Opus, null = nodeKey-based default
-  useFastModel: Annotation({ reducer: (_, b) => b, default: () => null }),
+  // --- Per-node model override: { [nodeKey]: 'haiku'|'sonnet'|'opus' } or null for defaults
+  nodeModelOverrides: Annotation({ reducer: (_, b) => b, default: () => null }),
 
   // --- Agentic control ---
   attempts: Annotation({
