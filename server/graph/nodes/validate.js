@@ -103,6 +103,7 @@ async function validateNode(state) {
     multiQueryContext: isMultiQuery
       ? `This SQL addresses sub-question ${qIdx + 1} of ${plan.length}: "${activeQuestion}" (purpose: ${plan[qIdx]?.purpose || 'N/A'}). It does NOT need to answer the full original question — only this specific sub-question.`
       : null,
+    nodeModelOverrides: state.nodeModelOverrides,
   });
   const semanticMeta = report?.passes?.semantic?.meta || null;
 

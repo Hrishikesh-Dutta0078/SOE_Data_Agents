@@ -74,12 +74,13 @@ function checksToIssues(checks) {
   return issues;
 }
 
-async function runSemanticPass({ userPrompt, nodeKey }) {
+async function runSemanticPass({ userPrompt, nodeKey, profile }) {
   const baseModel = getModel({
     temperature: SEMANTIC_VALIDATOR_TEMPERATURE,
     maxTokens: SEMANTIC_VALIDATOR_MAX_TOKENS,
     cache: true,
     nodeKey,
+    profile,
   });
   const llm = baseModel.withStructuredOutput(SemanticResultSchema);
   const parsed = await llm.invoke([
@@ -104,6 +105,7 @@ async function validateSemantics({
   question,
   detectedEntities,
   multiQueryContext,
+  nodeModelOverrides,
 }) {
   const issues = [];
 
@@ -134,6 +136,7 @@ async function validateSemantics({
     fastPass = await runSemanticPass({
       userPrompt,
       nodeKey: 'semanticValidatorFast',
+      profile: nodeModelOverrides?.semanticValidatorFast,
     });
   } catch (err) {
     fallbackReason = 'fast_error';
@@ -149,6 +152,7 @@ async function validateSemantics({
       opusPass = await runSemanticPass({
         userPrompt,
         nodeKey: 'semanticValidatorOpus',
+        profile: nodeModelOverrides?.semanticValidatorOpus,
       });
     } catch (err) {
       logger.error('Semantic validation fallback failed', { error: err.message });

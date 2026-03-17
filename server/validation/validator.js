@@ -36,6 +36,7 @@ async function validate({
   skipSyntax,
   multiQueryContext,
   onProgress,
+  nodeModelOverrides,
 }) {
   const passes = {
     rls: { passed: false, issues: [] },
@@ -114,6 +115,7 @@ async function validate({
       question,
       detectedEntities,
       multiQueryContext,
+      nodeModelOverrides,
     });
     passes.semantic = {
       passed: semanticResult.valid,
