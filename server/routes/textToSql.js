@@ -41,6 +41,25 @@ function normalizeEnabledTools(value) {
   return { research, sqlWriter };
 }
 
+const VALID_NODE_KEYS = new Set([
+  'classify', 'decompose', 'researchAgent_phase1', 'researchAgent_phase2',
+  'sqlWriterAgent', 'subQueryMatch', 'correct',
+  'semanticValidatorFast', 'semanticValidatorOpus',
+  'presentInsights', 'presentChart', 'dashboardAgent',
+]);
+const VALID_PROFILES = new Set(Object.keys(require('../config/constants').MODEL_PROFILES));
+
+function normalizeNodeModelOverrides(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const result = {};
+  for (const [key, profile] of Object.entries(value)) {
+    if (VALID_NODE_KEYS.has(key) && VALID_PROFILES.has(profile)) {
+      result[key] = profile;
+    }
+  }
+  return Object.keys(result).length > 0 ? result : null;
+}
+
 function isModelMeta(value) {
   return !!(
     value
@@ -458,7 +477,7 @@ router.post('/analyze', async (req, res) => {
     validationEnabled,
     isFollowUp,
     enabledTools,
-    useFastModel,
+    nodeModelOverrides,
   } = req.body;
 
   if (!question || typeof question !== 'string' || question.trim().length === 0) {
@@ -488,7 +507,7 @@ router.post('/analyze', async (req, res) => {
       validationEnabled: validationEnabled !== false,
       isFollowUp: !!isFollowUp,
       enabledTools: normalizeEnabledTools(enabledTools),
-      useFastModel: useFastModel ?? null,
+      nodeModelOverrides: normalizeNodeModelOverrides(nodeModelOverrides),
     }, { ...threadConfig, recursionLimit: 100 });
 
     const totalDuration = Date.now() - requestStart;
@@ -525,7 +544,7 @@ router.post('/analyze-stream', async (req, res) => {
     previousDashboardSpec,
     dashboardDataSources,
     enabledTools,
-    useFastModel,
+    nodeModelOverrides,
   } = req.body;
 
   if (!question || typeof question !== 'string' || question.trim().length === 0) {
@@ -562,7 +581,7 @@ router.post('/analyze-stream', async (req, res) => {
     dashboardRefinement: previousDashboardSpec ? question.trim() : '',
     dashboardDataSources: dashboardDataSources || [],
     enabledTools: normalizeEnabledTools(enabledTools),
-    useFastModel: useFastModel ?? null,
+    nodeModelOverrides: normalizeNodeModelOverrides(nodeModelOverrides),
   };
 
   let onToolCall = null;
