@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ChatPanel from './components/ChatPanel';
+import DevPanel from './components/DevPanel';
 import { request, searchImpersonate } from './utils/api';
 
 const RESEARCH_TOOLS = [
@@ -63,10 +64,19 @@ export default function App() {
     const stored = localStorage.getItem('autoagents_sessionId');
     return stored || generateSessionId();
   });
-  const [useFastModel, setUseFastModel] = useState(() => {
-    const stored = localStorage.getItem('autoagents_useFastModel');
-    return stored !== 'false';
+  const [nodeModelOverrides, setNodeModelOverrides] = useState(() => {
+    try {
+      const stored = localStorage.getItem('autoagents_nodeModelOverrides');
+      return stored ? JSON.parse(stored) : {};
+    } catch { return {}; }
   });
+  const [savedPresets, setSavedPresets] = useState(() => {
+    try {
+      const stored = localStorage.getItem('autoagents_devPresets');
+      return stored ? JSON.parse(stored) : {};
+    } catch { return {}; }
+  });
+  const [lastRunMetrics, setLastRunMetrics] = useState(null);
   const toolToggles = useEnabledTools();
 
   const [userName, setUserName] = useState('');
@@ -186,7 +196,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* Bottom: Impersonate + Fast Model */}
+            {/* Bottom: Impersonate */}
             <div className="pt-5 space-y-4" style={{ borderTop: '1px solid rgba(160,150,200,0.2)', animation: 'slide-in-left 0.5s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
               <div className="relative" ref={impersonateDropdownRef}>
                 <div className="text-xs font-semibold mb-1" style={{ color: 'var(--color-text-secondary)' }}>Impersonate</div>
@@ -232,32 +242,30 @@ export default function App() {
                 )}
               </div>
 
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-semibold" style={{ color: 'var(--color-text-secondary)' }}>Fast Model (Haiku)</div>
-                  <div className="text-[11px] mt-0.5" style={{ color: 'var(--color-text-muted)' }}>Use faster LLM for agents</div>
-                </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={useFastModel}
-                  onClick={() => setUseFastModel((v) => { const next = !v; localStorage.setItem('autoagents_useFastModel', String(next)); return next; })}
-                  className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${useFastModel ? 'bg-indigo-500' : 'bg-stone-300'}`}
-                  style={{ boxShadow: useFastModel ? '0 2px 6px rgba(99,102,241,0.3)' : 'none' }}
-                >
-                  <span className={`pointer-events-none inline-block h-4 w-4 rounded-full bg-white shadow transform transition duration-200 ease-in-out ${useFastModel ? 'translate-x-4' : 'translate-x-0'}`} />
-                </button>
-              </div>
             </div>
           </aside>
 
           {/* Main content */}
           <main className="flex-1 flex flex-col min-w-0">
-            <ChatPanel onMenuClick={() => setSidebarOpen((v) => !v)} impersonateContext={impersonateContext} validationEnabled={validationEnabled} sessionId={sessionId} onNewChat={handleNewChat} enabledTools={toolToggles.enabledTools} useFastModel={useFastModel} userName={userName} />
+            <ChatPanel onMenuClick={() => setSidebarOpen((v) => !v)} impersonateContext={impersonateContext} validationEnabled={validationEnabled} sessionId={sessionId} onNewChat={handleNewChat} enabledTools={toolToggles.enabledTools} nodeModelOverrides={nodeModelOverrides} userName={userName} onMetricsUpdate={setLastRunMetrics} />
           </main>
 
         </div>
       </div>
+
+      <DevPanel
+        nodeModelOverrides={nodeModelOverrides}
+        setNodeModelOverrides={(v) => {
+          setNodeModelOverrides(v);
+          localStorage.setItem('autoagents_nodeModelOverrides', JSON.stringify(v));
+        }}
+        savedPresets={savedPresets}
+        setSavedPresets={(v) => {
+          setSavedPresets(v);
+          localStorage.setItem('autoagents_devPresets', JSON.stringify(v));
+        }}
+        lastRunMetrics={lastRunMetrics}
+      />
     </div>
   );
 }
