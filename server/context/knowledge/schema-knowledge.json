@@ -3566,9 +3566,9 @@
       },
       "COUNTRY_ID": {
         "type": "INT",
-        "description": "country identifier",
+        "description": "country identifier, joins to TD_EBI_COUNTRY.COUNTRY_ID",
         "pk": false,
-        "fk": false
+        "fk": true
       },
       "SEGMENT_ID": {
         "type": "INT",
@@ -4370,5 +4370,102 @@
         "fk": false
       }
     }
+  },
+  "TD_EBI_COUNTRY": {
+    "description": "Geographic hierarchy dimension table mapping countries to sales organization structure. Provides country-to-region rollup: Country > Sub Market Area > Market Area > Sales Region > GEO. Use this table to resolve country names and geographic hierarchies from COUNTRY_ID or ACCOUNT_COUNTRY_ID foreign keys in fact tables.",
+    "columns": {
+      "COUNTRY_ID": {
+        "type": "INT",
+        "nullable": false,
+        "description": "unique country identifier, joins to vw_TF_EBI_P2S.ACCOUNT_COUNTRY_ID, TF_EBI_MARKETING_TREND.ACCOUNT_COUNTRY_ID, TF_EBI_TPT_INFO.COUNTRY_ID",
+        "pk": true,
+        "fk": false
+      },
+      "COUNTRY_CODE": {
+        "type": "VARCHAR",
+        "nullable": true,
+        "description": "ISO-style two-letter country code (e.g., US, AD, AE)",
+        "pk": false,
+        "fk": false
+      },
+      "COUNTRY_NAME": {
+        "type": "NVARCHAR",
+        "nullable": true,
+        "description": "full country name (e.g., United Arab Emirates, Andorra)",
+        "pk": false,
+        "fk": false
+      },
+      "GEO_CODE": {
+        "type": "INT",
+        "nullable": true,
+        "description": "geographic region code (1=AMERICAS, 2=EMEA, etc.)",
+        "pk": false,
+        "fk": false
+      },
+      "GEO": {
+        "type": "VARCHAR",
+        "nullable": true,
+        "description": "top-level geography name (AMERICAS, EMEA, APAC)",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_REGION_CODE": {
+        "type": "VARCHAR",
+        "nullable": true,
+        "description": "sales region code (e.g., WEU, UKI, RLAN)",
+        "pk": false,
+        "fk": false
+      },
+      "SALES_REGION": {
+        "type": "VARCHAR",
+        "nullable": true,
+        "description": "sales region name (e.g., Western Europe, UKI, Latin America)",
+        "pk": false,
+        "fk": false
+      },
+      "MARKET_AREA_CODE": {
+        "type": "VARCHAR",
+        "nullable": true,
+        "description": "market area code",
+        "pk": false,
+        "fk": false
+      },
+      "MARKET_AREA": {
+        "type": "VARCHAR",
+        "nullable": true,
+        "description": "market area name (e.g., Middle East, Iberica, Mediterranean)",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_MARKET_AREA_CODE": {
+        "type": "VARCHAR",
+        "nullable": true,
+        "description": "sub-market area code",
+        "pk": false,
+        "fk": false
+      },
+      "SUB_MARKET_AREA": {
+        "type": "VARCHAR",
+        "nullable": true,
+        "description": "sub-market area name (most granular geographic grouping)",
+        "pk": false,
+        "fk": false
+      },
+      "DIMENSION_TYPE": {
+        "type": "VARCHAR",
+        "nullable": true,
+        "description": "always 'COUNTRY'",
+        "pk": false,
+        "fk": false
+      },
+      "IS_ACTIVE": {
+        "type": "BIT",
+        "nullable": true,
+        "description": "soft-delete flag; always filter IS_ACTIVE = 1",
+        "pk": false,
+        "fk": false
+      }
+    },
+    "keywords": ["country", "country_code", "country_name", "geo", "geo_code", "geographic", "hierarchy", "market_area", "market_area_code", "sales_region", "sales_region_code", "sub_market_area", "sub_market_area_code", "td_ebi_country"]
   }
 }
