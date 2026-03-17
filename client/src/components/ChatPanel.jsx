@@ -317,9 +317,14 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     }
   };
 
+  const nodeDurationsRef = useRef({});
+
   const streamOnEvent = useCallback((eventType, eventData) => {
     if (eventType === 'node_complete') {
       setActiveTools([]);
+      if (eventData.node && eventData.duration != null) {
+        nodeDurationsRef.current[eventData.node] = eventData.duration;
+      }
       setProgress((prev) => {
         if (!prev) return prev;
         const steps = prev.steps
@@ -393,9 +398,13 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     } else if (eventType === 'query_summary') {
       setQuerySummary(eventData.summary || '');
     } else if (eventType === 'done') {
-      if (onMetricsUpdate && eventData.usageByNodeAndModel) {
-        onMetricsUpdate(eventData.usageByNodeAndModel);
+      if (onMetricsUpdate) {
+        onMetricsUpdate({
+          usageByNodeAndModel: eventData.usageByNodeAndModel || null,
+          nodeDurations: { ...nodeDurationsRef.current },
+        });
       }
+      nodeDurationsRef.current = {};
     }
   }, [onMetricsUpdate]);
 

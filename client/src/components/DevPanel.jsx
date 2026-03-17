@@ -63,25 +63,50 @@ function formatTokens(n) {
   return String(n);
 }
 
-function getNodeTotalTokens(nodeKey, lastRunMetrics) {
-  if (!lastRunMetrics || !lastRunMetrics[nodeKey]) return null;
-  const profiles = lastRunMetrics[nodeKey];
-  let total = 0;
-  for (const prof of Object.values(profiles)) {
-    total += prof.totalTokens || 0;
+function getNodeMetrics(nodeKey, lastRunMetrics) {
+  if (!lastRunMetrics) return null;
+  const usage = lastRunMetrics.usageByNodeAndModel;
+  const durations = lastRunMetrics.nodeDurations;
+  let tokens = null;
+  let latencyMs = null;
+
+  if (usage && usage[nodeKey]) {
+    tokens = 0;
+    for (const prof of Object.values(usage[nodeKey])) {
+      tokens += prof.totalTokens || 0;
+    }
   }
-  return total;
+
+  if (durations && durations[nodeKey] != null) {
+    latencyMs = durations[nodeKey];
+  }
+
+  if (tokens == null && latencyMs == null) return null;
+  return { tokens, latencyMs };
 }
 
 function getTotalMetrics(lastRunMetrics) {
   if (!lastRunMetrics) return null;
+  const usage = lastRunMetrics.usageByNodeAndModel;
+  const durations = lastRunMetrics.nodeDurations;
   let totalTokens = 0;
-  for (const nodeData of Object.values(lastRunMetrics)) {
-    for (const prof of Object.values(nodeData)) {
-      totalTokens += prof.totalTokens || 0;
+  let totalMs = 0;
+
+  if (usage) {
+    for (const nodeData of Object.values(usage)) {
+      for (const prof of Object.values(nodeData)) {
+        totalTokens += prof.totalTokens || 0;
+      }
     }
   }
-  return { totalTokens };
+
+  if (durations) {
+    for (const ms of Object.values(durations)) {
+      totalMs += ms || 0;
+    }
+  }
+
+  return { totalTokens, totalMs };
 }
 
 /* ------------------------------------------------------------------ */
@@ -104,6 +129,12 @@ const CodeIcon = () => (
 const TokenIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="currentColor" style={{ width: 10, height: 10 }}>
     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+  </svg>
+);
+
+const ClockIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" stroke="currentColor" style={{ width: 10, height: 10 }}>
+    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
   </svg>
 );
 
@@ -340,13 +371,13 @@ export default function DevPanel({ nodeModelOverrides, setNodeModelOverrides, sa
               </div>
               {/* Node rows */}
               {group.nodes.map(node => {
-                const tokens = getNodeTotalTokens(node.key, lastRunMetrics);
+                const metrics = getNodeMetrics(node.key, lastRunMetrics);
                 const selected = getSelectedModel(node.key);
                 return (
                   <NodeRow
                     key={node.key}
                     node={node}
-                    tokens={tokens}
+                    metrics={metrics}
                     selected={selected}
                     onSelect={(profile) => selectModel(node.key, profile)}
                   />
@@ -368,7 +399,7 @@ export default function DevPanel({ nodeModelOverrides, setNodeModelOverrides, sa
           <div style={{ fontSize: 10, color: 'var(--color-text-muted)' }}>
             {totals ? (
               <>
-                Last query: <strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>{formatTokens(totals.totalTokens)}</strong> tok
+                Last query: {totals.totalMs > 0 && <><strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>{(totals.totalMs / 1000).toFixed(1)}s</strong> &middot; </>}<strong style={{ color: 'var(--color-text-secondary)', fontWeight: 600 }}>{formatTokens(totals.totalTokens)}</strong> tok
               </>
             ) : (
               <span style={{ color: 'var(--color-text-faint)' }}>No run data yet</span>
@@ -442,7 +473,11 @@ function PresetButton({ name, active, onClick, onDelete, deletable }) {
 /* ------------------------------------------------------------------ */
 /*  NodeRow sub-component                                              */
 /* ------------------------------------------------------------------ */
-function NodeRow({ node, tokens, selected, onSelect }) {
+function NodeRow({ node, metrics, selected, onSelect }) {
+  const hasData = metrics != null;
+  const dimStyle = { display: 'flex', alignItems: 'center', gap: 3, color: 'var(--color-text-faint)', opacity: 0.5 };
+  const litStyle = { display: 'flex', alignItems: 'center', gap: 3 };
+
   return (
     <div
       className="flex items-center justify-between"
@@ -474,14 +509,26 @@ function NodeRow({ node, tokens, selected, onSelect }) {
           gap: 10,
           alignItems: 'center',
         }}>
-          {/* Token metric */}
-          {tokens != null ? (
-            <span style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-              <TokenIcon />
-              {formatTokens(tokens)} tok
+          {/* Latency metric */}
+          {hasData && metrics.latencyMs != null ? (
+            <span style={litStyle}>
+              <ClockIcon />
+              {(metrics.latencyMs / 1000).toFixed(1)}s
             </span>
           ) : (
-            <span style={{ display: 'flex', alignItems: 'center', gap: 3, color: 'var(--color-text-faint)', opacity: 0.5 }}>
+            <span style={dimStyle}>
+              <ClockIcon />
+              --
+            </span>
+          )}
+          {/* Token metric */}
+          {hasData && metrics.tokens != null ? (
+            <span style={litStyle}>
+              <TokenIcon />
+              {formatTokens(metrics.tokens)} tok
+            </span>
+          ) : (
+            <span style={dimStyle}>
               <TokenIcon />
               --
             </span>
@@ -493,17 +540,17 @@ function NodeRow({ node, tokens, selected, onSelect }) {
               color: 'var(--color-text-faint)',
               fontStyle: 'italic',
             }}>
-              {tokens == null && !node.role ? 'not triggered' : node.role}
+              {node.role}
             </span>
           )}
           {/* Show "not triggered" for nodes without data and without a role */}
-          {!node.role && tokens == null && (
+          {!node.role && !hasData && (
             <span style={{
               fontSize: 9,
               color: 'var(--color-text-faint)',
               fontStyle: 'italic',
             }}>
-              --
+              not triggered
             </span>
           )}
         </div>
