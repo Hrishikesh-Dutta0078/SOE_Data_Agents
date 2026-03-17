@@ -227,3 +227,10 @@ Critical rules that MUST be followed when generating SQL queries:
 - The opportunity amount column is `Oppty` (aliased `OPPTY`, FLOAT) in `vw_TF_EBI_P2S`, aggregated via `SUM(Oppty)` for pipeline totals.
 - Always include `vw_TD_EBI_ROLE_Coverage` (joined on `ROLE_COVERAGE_ID`) in quota and pipeline queries to group by `ROLE_COVERAGE_BU` and `ROLE_COVERAGE_BU_GROUP`.
 
+### Country Dimension (TD_EBI_COUNTRY)
+- **Always filter** `IS_ACTIVE = 1` when querying TD_EBI_COUNTRY to exclude deactivated records.
+- **Geographic Hierarchy** (top to bottom): GEO > SALES_REGION > MARKET_AREA > SUB_MARKET_AREA > COUNTRY
+- **GEO values**: AMERICAS (1), EMEA (2), APAC (3), and NOT ASSIGNED (0)
+- When users say "country", resolve via TD_EBI_COUNTRY.COUNTRY_NAME
+- When users say "market area" or "sub market area", resolve via TD_EBI_COUNTRY (not vw_td_ebi_region_rpt which has overlapping but rep-assignment-scoped values)
+- **Join key mapping**: ACCOUNT_COUNTRY_ID in fact tables = COUNTRY_ID in TD_EBI_COUNTRY
