@@ -49,14 +49,15 @@ const WorkflowState = Annotation.Root({
   currentQueryIndex: Annotation({ reducer: (_, b) => b, default: () => 0 }),
   subQueryMatchFound: Annotation({ reducer: (_, b) => b, default: () => false }),
 
-  // --- Research Agent output ---
-  researchBrief: Annotation({ reducer: (_, b) => b, default: () => null }),
-  researchToolCalls: Annotation({ reducer: (_, b) => b, default: () => [] }),
+  // --- Context Fetch output ---
+  contextBundle: Annotation({ reducer: (a, b) => b ?? a, default: () => null }),
 
-  // --- SQL Writer Agent output ---
+  // --- Generate SQL output ---
   sql: Annotation({ reducer: (_, b) => b, default: () => '' }),
   reasoning: Annotation({ reducer: (_, b) => b, default: () => '' }),
-  agentToolCalls: Annotation({ reducer: (_, b) => b, default: () => [] }),
+
+  // --- Correction guidance (set by correct node, consumed by generateSql) ---
+  correctionGuidance: Annotation({ reducer: (a, b) => b ?? a, default: () => null }),
 
   // --- Reflect output ---
   reflectionConfidence: Annotation({ reducer: (_, b) => b, default: () => 0 }),
