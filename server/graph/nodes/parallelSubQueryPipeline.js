@@ -1,16 +1,16 @@
 /**
  * Parallel Sub-Query Pipeline Node (Option A)
  *
- * Runs all sub-queries in parallel: for each index, subQueryMatch → research (or skip if template)
- * → sqlWriter → injectRls → validate → execute. Failed sub-queries get one correction pass
- * (correct → injectRls → validate → execute) in parallel. Merges results into state.queries
+ * Runs all sub-queries in parallel: for each index, subQueryMatch → contextFetch → generateSql
+ * → injectRls → validate → execute. Failed sub-queries get one correction pass
+ * (correct → generateSql → injectRls → validate → execute) in parallel. Merges results into state.queries
  * and sets currentQueryIndex = plan.length so the graph routes to checkResults → present/dashboard.
  */
 
 const { findSubQueryMatch, findSubQueryMatchLLMFallback } = require('./subQueryMatch');
 const { loadGoldIndex } = require('./classify');
-const { researchAgentNode } = require('./researchAgent');
-const { sqlWriterAgentNode } = require('./sqlWriterAgent');
+const { contextFetchNode } = require('./contextFetch');
+const { generateSqlNode } = require('./generateSql');
 const { injectRlsNode } = require('./injectRls');
 const { validateNode } = require('./validate');
 const { executeNode } = require('./execute');
@@ -32,7 +32,7 @@ function buildStateSlice(baseState, plan, index) {
     questionCategory: baseState.questionCategory,
     questionSubCategory: baseState.questionSubCategory,
     attempts: { ...baseState.attempts, correction: 0, reflection: 0, resultCheck: 0 },
-    // Preserve request-level toggles so tool filtering is applied in researchAgent/sqlWriterAgent
+    // Preserve request-level toggles so tool filtering is applied in contextFetch/generateSql
     enabledTools: baseState.enabledTools,
     nodeModelOverrides: baseState.nodeModelOverrides,
   };
@@ -74,18 +74,21 @@ async function runOneSubQuery(baseState, plan, index, emit) {
   if (!match) match = findSubQueryMatch(subQuestion);
   if (!match) match = await findSubQueryMatchLLMFallback(subQuestion);
   if (match && !hasUserParams) {
-    // Exact template match with no user params — use gold SQL directly, skip writer + validation
+    // Exact template match with no user params — run through contextFetch + generateSql with template
     state = {
       ...state,
-      sql: match.sql,
       templateSql: match.sql,
       subQueryMatchFound: true,
-      researchBrief: null,
-      matchType: 'exact',
-      reasoning: `Direct template match: ${match.id}`,
-      validationEnabled: false,
+      matchType: 'template',
     };
-    logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (using gold SQL directly)`);
+    logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (template match, routing to contextFetch + generateSql)`);
+
+    emitProgress('research');
+    const contextResult = await contextFetchNode(state);
+    Object.assign(state, contextResult);
+    emitProgress('sql');
+    const sqlResult = await generateSqlNode(state);
+    Object.assign(state, sqlResult);
   } else if (match && hasUserParams) {
     state = {
       ...state,
@@ -93,25 +96,26 @@ async function runOneSubQuery(baseState, plan, index, emit) {
       subQueryMatchFound: true,
       matchType: 'partial',
     };
-    logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (skipping research, routing to writer for user params)`);
+    logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (partial match with user params, routing to contextFetch + generateSql)`);
 
-    // Skip research — template provides table/column/join context.
-    // Writer adapts template SQL with user param filters.
-    emitProgress('sql');
-    const writerUpdate = await sqlWriterAgentNode(state);
-    state = { ...state, ...writerUpdate };
-  } else {
-    // No template match — full research + writer path
     emitProgress('research');
-    const researchUpdate = await researchAgentNode(state);
-    state = { ...state, ...researchUpdate };
-    if (!state.researchBrief) {
-      logger.warn(`[ParallelPipeline] [${index + 1}/${total}] Research produced no brief, continuing anyway`);
+    const contextResult = await contextFetchNode(state);
+    Object.assign(state, contextResult);
+    emitProgress('sql');
+    const sqlResult = await generateSqlNode(state);
+    Object.assign(state, sqlResult);
+  } else {
+    // No template match — full contextFetch + generateSql path
+    emitProgress('research');
+    const contextResult = await contextFetchNode(state);
+    Object.assign(state, contextResult);
+    if (!state.contextBundle) {
+      logger.warn(`[ParallelPipeline] [${index + 1}/${total}] contextFetch produced no bundle, continuing anyway`);
     }
 
     emitProgress('sql');
-    const writerUpdate = await sqlWriterAgentNode(state);
-    state = { ...state, ...writerUpdate };
+    const sqlResult = await generateSqlNode(state);
+    Object.assign(state, sqlResult);
   }
 
   if (!state.sql) {
@@ -125,7 +129,7 @@ async function runOneSubQuery(baseState, plan, index, emit) {
       execution: { success: false, rowCount: 0, columns: [], rows: [], error: 'No SQL produced' },
       validationReport: null,
       errorType: '',
-      researchBrief: state.researchBrief || null,
+      contextBundle: state.contextBundle || null,
     };
   }
 
@@ -150,7 +154,7 @@ async function runOneSubQuery(baseState, plan, index, emit) {
     execution: state.execution || { success: false, rowCount: 0, columns: [], rows: [], error: 'No execution' },
     validationReport: state.validationReport || null,
     errorType: state.errorType || '',
-    researchBrief: state.researchBrief || null,
+    contextBundle: state.contextBundle || null,
   };
 
   if (emit) {
@@ -191,15 +195,15 @@ async function runOneSubQueryCorrection(baseState, plan, index, previousResult, 
     });
   }
 
-  // Build column reference once from the research brief
+  // Build column reference once from the context bundle
   let correctionColumnReference = '';
-  const briefTables = previousResult.researchBrief?.tables || [];
-  if (briefTables.length > 0) {
-    const parts = briefTables
-      .map((bt) => {
-        const meta = bt.columnMetadata || '';
+  const bundleColMeta = previousResult.contextBundle?.columnMetadata || {};
+  const colMetaEntries = Object.entries(bundleColMeta);
+  if (colMetaEntries.length > 0) {
+    const parts = colMetaEntries
+      .map(([tableName, meta]) => {
         if (!meta) return null;
-        return `-- ${bt.name}:\n${meta}`;
+        return `-- ${tableName}:\n${meta}`;
       })
       .filter(Boolean);
     if (parts.length > 0) {
@@ -225,7 +229,7 @@ async function runOneSubQueryCorrection(baseState, plan, index, previousResult, 
       reasoning: current.reasoning || '',
       validationReport: current.validationReport || null,
       errorType,
-      researchBrief: current.researchBrief || previousResult.researchBrief || null,
+      contextBundle: current.contextBundle || previousResult.contextBundle || null,
       correctionColumnReference,
       attempts: { ...baseState.attempts, correction: round - 1, reflection: 0, resultCheck: 0 },
       trace: lastState?.trace || [
@@ -233,8 +237,10 @@ async function runOneSubQueryCorrection(baseState, plan, index, previousResult, 
       ],
     };
 
-    const correctUpdate = await correctNode(state);
-    state = { ...state, ...correctUpdate };
+    const correctionResult = await correctNode(state);
+    Object.assign(state, correctionResult);
+    const regenResult = await generateSqlNode(state);
+    Object.assign(state, regenResult);
     if (!state.sql) {
       logger.warn(`[ParallelPipeline] [${index + 1}/${total}] Correction round ${round} produced no SQL`);
       break;
@@ -260,7 +266,7 @@ async function runOneSubQueryCorrection(baseState, plan, index, previousResult, 
         reasoning: state.reasoning || '',
         execution: state.execution,
         validationReport: state.validationReport || null,
-        researchBrief: state.researchBrief || previousResult.researchBrief || null,
+        contextBundle: state.contextBundle || previousResult.contextBundle || null,
       };
     }
 
@@ -302,7 +308,7 @@ async function parallelSubQueryPipelineNode(state) {
       sql: '',
       reasoning: '',
       execution: null,
-      researchBrief: null,
+      contextBundle: null,
       templateSql: '',
       subQueryMatchFound: false,
       trace: [{ node: 'parallelSubQueryPipeline', timestamp: start, duration: Date.now() - start, error: 'No plan' }],
@@ -315,7 +321,7 @@ async function parallelSubQueryPipelineNode(state) {
     total,
   });
 
-  // Preserve request-level Haiku/tool toggles so researchAgent and sqlWriterAgent use them in multi-query flow
+  // Preserve request-level tool toggles so contextFetch and generateSql use them in multi-query flow
   const baseState = {
     ...state,
     queries: [],
@@ -336,7 +342,7 @@ async function parallelSubQueryPipelineNode(state) {
         execution: { success: false, rowCount: 0, columns: [], rows: [], error: err.message },
         validationReport: null,
         errorType: 'EXECUTION_ERROR',
-        researchBrief: null,
+        contextBundle: null,
       };
     })
   );
@@ -399,7 +405,8 @@ async function parallelSubQueryPipelineNode(state) {
     sql: primaryResult?.sql || '',
     reasoning: primaryResult?.reasoning || '',
     execution: primaryResult?.execution || null,
-    researchBrief: null,
+    contextBundle: null,
+    correctionGuidance: null,
     researchToolCalls: [],
     validationReport: null,
     errorType: '',

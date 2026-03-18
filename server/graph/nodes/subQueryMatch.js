@@ -1,11 +1,11 @@
 /**
  * SubQueryMatch Node — Checks each decomposed sub-query against gold examples
- * before sending it to the research agent.
+ * before sending it to the contextFetch node.
  *
  * 1. Programmatic token-overlap matching (same as classify, lower threshold).
  * 2. If no match: LLM-based partial match fallback with gold templates in context.
- * When a match is found (either way) the template SQL is forwarded to sqlWriterAgent,
- * skipping the research step entirely.
+ * When a match is found (either way) the template SQL is forwarded to contextFetch + generateSql,
+ * which uses the template as a reference for SQL generation.
  */
 
 const { z } = require('zod');
