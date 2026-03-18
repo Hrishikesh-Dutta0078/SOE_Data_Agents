@@ -42,7 +42,7 @@ function normalizeEnabledTools(value) {
 }
 
 const VALID_NODE_KEYS = new Set([
-  'classify', 'decompose', 'researchAgent_phase1', 'researchAgent_phase2',
+  'classify', 'decompose', 'researchAgent',
   'sqlWriterAgent', 'subQueryMatch', 'correct',
   'semanticValidatorFast', 'semanticValidatorOpus',
   'presentInsights', 'presentChart', 'dashboardAgent',

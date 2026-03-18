@@ -21,7 +21,6 @@ const checkNullRatio = require('../../tools/checkNullRatio');
 const searchSessionMemoryMod = require('../../tools/searchSessionMemory');
 const submitResearch = require('../../tools/submitResearch');
 const { enrichBriefWithSchema } = require('../../tools/submitResearch');
-const finishDiscovery = require('../../tools/finishDiscovery');
 const { formatConversationContext } = require('../../utils/conversationContext');
 const { z } = require('zod');
 
@@ -32,16 +31,6 @@ const RESEARCH_TOOLS = [
   checkNullRatio,
   searchSessionMemoryMod.tool || searchSessionMemoryMod,
   submitResearch,
-];
-
-/** Phase 1 (Fast mode): discovery tools only + finish_discovery. No submit_research. */
-const DISCOVERY_TOOLS = [
-  discoverContext,
-  queryDistinctValues,
-  inspectTableColumns,
-  checkNullRatio,
-  searchSessionMemoryMod.tool || searchSessionMemoryMod,
-  finishDiscovery,
 ];
 
 const RESEARCH_TOOL_NAMES = RESEARCH_TOOLS.map((t) => t.name);
@@ -235,11 +224,7 @@ function filterToolsByEnabled(allTools, enabledNames) {
 
 function createMemoizedTools(cacheStats, toolTimings, enabledToolNames, sessionId, currentQueryIndex, opts = {}) {
   const baseTools = opts.toolsOverride || RESEARCH_TOOLS;
-  const phase1Mode = opts.phase1Mode || false;
   let toolsToUse = filterToolsByEnabled(baseTools, enabledToolNames);
-  if (phase1Mode && !toolsToUse.some((t) => t.name === 'finish_discovery')) {
-    toolsToUse = [...toolsToUse, finishDiscovery];
-  }
   const toolCache = new Map();
   let discoverContextAlreadyRun = false;
   return toolsToUse.map((tool) => new DynamicStructuredTool({
@@ -278,9 +263,7 @@ function createMemoizedTools(cacheStats, toolTimings, enabledToolNames, sessionI
       if (tool.name === 'discover_context') {
         if (discoverContextAlreadyRun) {
           logger.info(`  [Tool] ${tool.name}() -> skipped (already run once this research step)`);
-          return phase1Mode
-            ? 'Context was already discovered in this step. Use that result and proceed to finish_discovery. Do not call discover_context again.'
-            : 'Context was already discovered in this step. Use that result and proceed to submit_research with your findings. Do not call discover_context again.';
+          return 'Context was already discovered in this step. Use that result and proceed to submit_research with your findings. Do not call discover_context again.';
         }
         discoverContextAlreadyRun = true;
       }
@@ -431,38 +414,6 @@ This is an action-oriented question. Focus your research on:
   return prompt;
 }
 
-/** Phase 1 prompt for Fast mode: discovery only, end with finish_discovery (no submit_research). */
-function buildResearchSystemPromptPhase1(state) {
-  const base = buildResearchSystemPrompt(state);
-  return base
-    .replace(/submit_research/g, 'finish_discovery')
-    .replace(/Call finish_discovery with your complete findings/, 'Call finish_discovery when you have gathered enough context')
-    .replace(/EFFICIENCY:.*?submit_research.*?\./s, 'EFFICIENCY: Call discover_context (once only) and search_session_memory in parallel in your first step if needed. Then call query_distinct_values / inspect_table_columns / finish_discovery together if possible.')
-    .replace(/WHEN DONE: Call finish_discovery when you have gathered enough context including:/, 'WHEN DONE: Call finish_discovery when you have gathered enough context. Before calling it, ensure you have:')
-    .replace(/Include the current fiscal period in your finish_discovery call/, 'Include the current fiscal period in your findings so the next phase can use it');
-}
-
-function formatPhase1MessagesForPrompt(messages) {
-  const parts = [];
-  for (const msg of messages || []) {
-    const type = msg.constructor?.name || msg._getType?.() || 'Message';
-    if (type === 'HumanMessage' || msg.role === 'human') {
-      parts.push(`[USER]\n${typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)}\n`);
-    } else if (type === 'AIMessage' || msg.role === 'assistant') {
-      let text = typeof msg.content === 'string' ? msg.content : '';
-      if (msg.tool_calls?.length > 0) {
-        text += '\n' + msg.tool_calls.map((tc) => `Tool call: ${tc.name}(${JSON.stringify(tc.args || {})})`).join('\n');
-      }
-      if (text.trim()) parts.push(`[ASSISTANT]\n${text}\n`);
-    } else if (type === 'ToolMessage' || msg.role === 'tool') {
-      const content = typeof msg.content === 'string' ? msg.content : String(msg.content);
-      const truncated = content.length > 8000 ? content.substring(0, 8000) + '\n...[truncated]' : content;
-      parts.push(`[TOOL RESULT: ${msg.name || 'tool'}]\n${truncated}\n`);
-    }
-  }
-  return parts.join('\n');
-}
-
 function parseResearchBrief(result) {
   const messages = result.messages || [];
 
@@ -499,11 +450,6 @@ function extractToolCalls(result) {
   }
 
   return toolCalls;
-}
-
-function phase1CalledFinishDiscovery(result) {
-  const toolCalls = extractToolCalls(result);
-  return toolCalls.some((tc) => tc.name === 'finish_discovery');
 }
 
 async function researchAgentNode(state) {
@@ -556,25 +502,24 @@ async function researchAgentNode(state) {
   let llmMeta;
 
   try {
-  // --- Phase 1: discovery only ---
-  const phase1Model = getModel({
+  // --- Single-pass Opus agent: discovery + brief synthesis ---
+  const model = getModel({
     temperature: 0,
     maxTokens: 4096,
-    nodeKey: 'researchAgent_phase1',
-    profile: state.nodeModelOverrides?.researchAgent_phase1,
+    nodeKey: 'researchAgent',
+    profile: state.nodeModelOverrides?.researchAgent,
   });
-  llmMeta = getModelMeta(phase1Model);
-  const phase1Tools = createMemoizedTools(cacheStats, toolTimings, enabledNames, state.sessionId ?? null, qIdx, {
-    toolsOverride: DISCOVERY_TOOLS,
-    phase1Mode: true,
+  llmMeta = getModelMeta(model);
+  const tools = createMemoizedTools(cacheStats, toolTimings, enabledNames, state.sessionId ?? null, qIdx, {
+    toolsOverride: RESEARCH_TOOLS,
   });
-  const phase1Prompt = buildResearchSystemPromptPhase1(state);
-  logger.info('Research agent Phase 1: discovery', { tools: phase1Tools.map((t) => t.name) });
+  const systemPrompt = buildResearchSystemPrompt(state);
+  logger.info('Research agent: single-pass', { tools: tools.map((t) => t.name) });
 
-  const phase1Agent = createReactAgent({
-    llm: phase1Model,
-    tools: phase1Tools,
-    stateModifier: new SystemMessage(phase1Prompt),
+  const agent = createReactAgent({
+    llm: model,
+    tools,
+    stateModifier: new SystemMessage(systemPrompt),
   });
 
   try {
@@ -587,13 +532,13 @@ async function researchAgentNode(state) {
       ? `Given the conversation context in the system prompt, research what is needed for this follow-up question:\n\n${activeQuestion}`
       : activeQuestion;
 
-    const stream = await phase1Agent.stream(
+    const stream = await agent.stream(
       { messages: [new HumanMessage(humanMsg)] },
       { recursionLimit: 16, signal: controller.signal, streamMode: 'updates' }
     );
 
     let lastAgentState = null;
-    let finishedDiscovery = false;
+    let finishedResearch = false;
     const seenToolCallKeys = new Set();
     const seenToolResultKeys = new Set();
     let toolCallCount = 0;
@@ -611,7 +556,7 @@ async function researchAgentNode(state) {
             seenToolCallKeys.add(dedupKey);
             toolCallCount++;
             _researchToolEvents.emit('tool_call', { name: tc.name, index: toolCallCount, attempt: attempts.agent, phase: 'research', sessionId: state.sessionId || '' });
-            if (tc.name === 'finish_discovery') finishedDiscovery = true;
+            if (tc.name === 'submit_research') finishedResearch = true;
           }
         }
         if (msg.name && msg.content) {
@@ -624,42 +569,13 @@ async function researchAgentNode(state) {
           _researchToolEvents.emit('tool_result', { name: msg.name, index: toolCallCount, attempt: attempts.agent, phase: 'research', sessionId: state.sessionId || '' });
         }
       }
-      if (finishedDiscovery) break;
+      if (finishedResearch) break;
     }
 
     result = accumulatedMessages.length > 0
       ? { ...lastAgentState, messages: accumulatedMessages }
       : lastAgentState;
 
-    // --- Phase 2: brief synthesis ---
-    if (result?.messages?.length > 0 && (finishedDiscovery || discoverContextContent)) {
-      try {
-        const opusModel = getModel({
-          temperature: 0,
-          maxTokens: 4096,
-          nodeKey: 'researchAgent_phase2',
-          profile: state.nodeModelOverrides?.researchAgent_phase2,
-        });
-        const structuredModel = opusModel.withStructuredOutput(ResearchBriefSchema);
-        const convText = formatPhase1MessagesForPrompt(result.messages);
-        const phase2Prompt = `You are synthesizing a research brief from a discovery conversation. The assistant (Haiku) ran discovery tools. Extract and structure the findings into the required JSON format.
-
-=== DISCOVERY CONVERSATION ===
-${convText}
-
-=== INSTRUCTIONS ===
-Generate the research brief as JSON with: tables (name, relevantColumns, description), joins (from, to, type), businessRules, examplePatterns, filterValues (column, values), fiscalPeriod, reasoning.
-Use ONLY tables and columns that appear in the discovery results. Do not invent column names.`;
-
-        const briefRaw = await structuredModel.invoke([new HumanMessage(phase2Prompt)]);
-        const brief = briefRaw ? enrichBriefWithSchema(briefRaw) : null;
-        if (brief) {
-          result = { ...result, _phase2Brief: brief };
-        }
-      } catch (phase2Err) {
-        logger.warn('Phase 2 brief synthesis failed', { error: phase2Err?.message });
-      }
-    }
     clearTimeout(timeout);
   } catch (err) {
     if (typeof timeout !== 'undefined') clearTimeout(timeout);
@@ -693,10 +609,10 @@ Use ONLY tables and columns that appear in the discovery results. Do not invent 
     };
   }
 
-  let brief = result?._phase2Brief || parseResearchBrief(result);
+  let brief = parseResearchBrief(result);
   const toolCalls = extractToolCalls(result);
   const duration = Date.now() - start;
-  let briefSource = result?._phase2Brief ? 'phase2_opus' : 'submit_research';
+  let briefSource = 'submit_research';
 
   const toolSummary = toolTimings.map((t) => `${t.name}(${t.ms}ms)`).join(', ');
   logger.info(`Research done (${duration}ms)`, {

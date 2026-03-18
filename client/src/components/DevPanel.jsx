@@ -9,8 +9,7 @@ const NODE_CONFIG = [
     { key: 'decompose', label: 'Decompose' },
   ]},
   { group: 'Execution', nodes: [
-    { key: 'researchAgent_phase1', label: 'Research Phase 1', role: 'discovery' },
-    { key: 'researchAgent_phase2', label: 'Research Phase 2', role: 'synthesis' },
+    { key: 'researchAgent', label: 'Research Agent', role: 'discovery + synthesis' },
     { key: 'sqlWriterAgent', label: 'SQL Writer', role: 'generation' },
     { key: 'subQueryMatch', label: 'Sub-Query Match' },
     { key: 'correct', label: 'Correct', role: 'error fixing' },
@@ -37,7 +36,7 @@ const BUILTIN_PRESETS = {
   'All Opus': Object.fromEntries(ALL_NODE_KEYS.map(k => [k, 'opus'])),
   'Balanced': {
     classify: 'opus', decompose: 'opus',
-    researchAgent_phase1: 'haiku', researchAgent_phase2: 'sonnet',
+    researchAgent: 'opus',
     sqlWriterAgent: 'sonnet', subQueryMatch: 'opus', correct: 'opus',
     semanticValidatorFast: 'sonnet', semanticValidatorOpus: 'sonnet',
     presentInsights: 'sonnet', presentChart: 'sonnet', dashboardAgent: 'sonnet',
