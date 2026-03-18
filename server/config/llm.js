@@ -82,13 +82,17 @@ function getEnvValue(name, fallback = '') {
 }
 
 const FAST_NODE_KEYS = new Set([
-  'researchAgent', 'researchAgent_phase1',
   'sqlAgent', 'sqlWriterAgent',
+]);
+
+const SONNET_NODE_KEYS = new Set([
+  'correct', 'presentChart',
 ]);
 
 function resolveProfileName(opts) {
   if (opts.profile && MODEL_PROFILES[opts.profile]) return opts.profile;
   if (opts.nodeKey && FAST_NODE_KEYS.has(opts.nodeKey)) return 'haiku';
+  if (opts.nodeKey && SONNET_NODE_KEYS.has(opts.nodeKey)) return 'sonnet';
   return 'opus';
 }
 
