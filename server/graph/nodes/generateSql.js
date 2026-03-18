@@ -394,11 +394,15 @@ IMPORTANT: Adapt this template rather than writing from scratch. Add WHERE claus
     }
   }
 
-  // ── 15. Conversation context ──
-  const convContext = formatConversationContext(conversationHistory);
-  if (convContext) {
-    prompt += '\n' + convContext;
-    prompt += 'Use the prior SQL as a reference for table selections, joins, and column names when adapting for the current question.\n';
+  // ── 15. Conversation context (follow-up only — explicit via UI button) ──
+  // Only inject prior conversation when the user explicitly clicked follow-up.
+  // Otherwise each query is independent — no blending of prior context.
+  if (isFollowUp) {
+    const convContext = formatConversationContext(conversationHistory);
+    if (convContext) {
+      prompt += '\n' + convContext;
+      prompt += 'Use the prior SQL as a reference for table selections, joins, and column names when adapting for the current question.\n';
+    }
   }
 
   // ── 16. Mandatory SQL rules ──
