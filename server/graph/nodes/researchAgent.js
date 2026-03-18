@@ -303,6 +303,8 @@ RESEARCH WORKFLOW:
 
 CRITICAL: discover_context now includes distinct values. In most cases you should NOT need to call query_distinct_values at all. Go directly from discover_context to submit_research.
 
+OUTPUT FORMAT: Do NOT generate free-text analysis or summaries. Put ALL your analysis in the "reasoning" field of submit_research. Your turn after discover_context should contain ONLY a submit_research tool call — no prose before it. If you need to call query_distinct_values or inspect_table_columns first, do so, then immediately call submit_research on your next turn.
+
 WHEN DONE: Call submit_research with your complete findings including:
 - All relevant tables and their key columns
 - Join relationships between tables
@@ -506,7 +508,7 @@ async function researchAgentNode(state) {
   // --- Single-pass Opus agent: discovery + brief synthesis ---
   const model = getModel({
     temperature: 0,
-    maxTokens: 4096,
+    maxTokens: 16384,
     nodeKey: 'researchAgent',
     profile: state.nodeModelOverrides?.researchAgent,
   });
@@ -625,6 +627,25 @@ async function researchAgentNode(state) {
     tools: `${toolCalls.length} [${toolSummary}]`,
     cache: `${cacheStats.hits}hit/${cacheStats.misses}miss`,
   });
+
+  // Diagnostic: log last assistant message to understand submit_research success/failure
+  const lastAssistantMsg = (result?.messages || [])
+    .filter((m) => m._getType?.() === 'ai' || m.role === 'assistant').pop();
+  if (lastAssistantMsg) {
+    const contentLen = typeof lastAssistantMsg.content === 'string'
+      ? lastAssistantMsg.content.length
+      : JSON.stringify(lastAssistantMsg.content || '').length;
+    const hasToolCalls = lastAssistantMsg.tool_calls?.length > 0;
+    const stopReason = lastAssistantMsg.response_metadata?.stop_reason
+      || lastAssistantMsg.additional_kwargs?.stop_reason
+      || 'unknown';
+    logger.info('Research agent final response', {
+      contentChars: contentLen,
+      hasToolCalls,
+      stopReason,
+      hasBrief: !!brief,
+    });
+  }
 
   if (!brief && discoverContextContent) {
     logger.warn('Research agent did not call submit_research; building fallback brief from discover_context');
