@@ -8,9 +8,6 @@ const router = express.Router();
 const { getWorkflow } = require('../graph/workflow');
 const { resetUsage, getUsage, getUsageByNodeAndModel } = require('../config/llm');
 const { resetStartTime } = require('../tools/getElapsedTime');
-const { setSessionId } = require('../tools/searchSessionMemory');
-const { researchToolEvents } = require('../graph/nodes/researchAgent');
-const { writerToolEvents } = require('../graph/nodes/sqlWriterAgent');
 const { presentEvents } = require('../graph/nodes/present');
 const { decomposeEvents } = require('../graph/nodes/decompose');
 const { accumulateEvents } = require('../graph/nodes/accumulateResult');
@@ -497,7 +494,6 @@ router.post('/analyze', async (req, res) => {
   const requestStart = Date.now();
 
   const sessionId = req.headers['x-session-id'] || `session-${Date.now()}`;
-  if (setSessionId) setSessionId(sessionId);
 
   try {
     const workflow = getWorkflow();
@@ -570,7 +566,6 @@ router.post('/analyze-stream', async (req, res) => {
   const requestStart = Date.now();
 
   const sessionId = req.headers['x-session-id'] || `session-${Date.now()}`;
-  if (setSessionId) setSessionId(sessionId);
 
   const inputs = {
     question: question.trim(),
@@ -590,12 +585,6 @@ router.post('/analyze-stream', async (req, res) => {
     nodeModelOverrides: normalizeNodeModelOverrides(nodeModelOverrides),
   };
 
-  let onToolCall = null;
-  let onToolResult = null;
-  let onPrefetchStart = null;
-  let onPrefetchComplete = null;
-  let onPrefetchAllComplete = null;
-  let onDiscoverContextPrefetchUsed = null;
   let onInsightToken = null;
   let onQueryPlan = null;
   let onQueryProgress = null;
@@ -616,85 +605,6 @@ router.post('/analyze-stream', async (req, res) => {
     const workflow = getWorkflow();
     const threadConfig = { configurable: { thread_id: sessionId } };
     const stream = await workflow.stream(inputs, { ...threadConfig, recursionLimit: 100, streamMode: 'updates' });
-    const seenToolEvents = new Set();
-
-    const shouldEmitToolEvent = (kind, data) => {
-      const eventSession = data.sessionId || sessionId;
-      if (eventSession !== sessionId) return false;
-
-      const key = [
-        kind,
-        eventSession,
-        data.attempt || 0,
-        data.index || 0,
-        data.name || '',
-        data.callId || '',
-      ].join('|');
-
-      if (seenToolEvents.has(key)) return false;
-      seenToolEvents.add(key);
-      return true;
-    };
-
-    onToolCall = (data) => {
-      if (!shouldEmitToolEvent('tool_call', data)) return;
-      const event = { type: 'tool_call', ...data, elapsed: Date.now() - requestStart };
-      res.write(`event: tool_call\ndata: ${JSON.stringify(event)}\n\n`);
-      const label = data.name === 'discover_context'
-        ? 'Discover context...'
-        : `Running ${data.name}...`;
-      emitThinking(label, data.phase || 'tool');
-    };
-    onToolResult = (data) => {
-      if (!shouldEmitToolEvent('tool_result', data)) return;
-      const event = { type: 'tool_result', ...data, elapsed: Date.now() - requestStart };
-      res.write(`event: tool_result\ndata: ${JSON.stringify(event)}\n\n`);
-    };
-
-    researchToolEvents.on('tool_call', onToolCall);
-    researchToolEvents.on('tool_result', onToolResult);
-    writerToolEvents.on('tool_call', onToolCall);
-    writerToolEvents.on('tool_result', onToolResult);
-
-    onPrefetchStart = (data) => {
-      if (data.sessionId && data.sessionId !== sessionId) return;
-      const n = data.total ?? 0;
-      emitThinking(
-        n === 1
-          ? 'Parallel research started (1 sub-query)'
-          : `Parallel research started (${n} sub-queries)`,
-        'researchAgent'
-      );
-    };
-    onPrefetchComplete = (data) => {
-      if (data.sessionId && data.sessionId !== sessionId) return;
-      const { index, total } = data;
-      if (total == null || total <= 0) return;
-      emitThinking(
-        `Parallel research: context ready for sub-query ${index + 1}/${total + 1}`,
-        'researchAgent'
-      );
-    };
-    onPrefetchAllComplete = (data) => {
-      if (data.sessionId && data.sessionId !== sessionId) return;
-      const n = data.total ?? 0;
-      emitThinking(
-        n === 1
-          ? 'Parallel research complete (1/1)'
-          : `Parallel research complete (${n}/${n})`,
-        'researchAgent'
-      );
-    };
-    researchToolEvents.on('prefetch_start', onPrefetchStart);
-    researchToolEvents.on('prefetch_complete', onPrefetchComplete);
-    researchToolEvents.on('prefetch_all_complete', onPrefetchAllComplete);
-
-    onDiscoverContextPrefetchUsed = (data) => {
-      if (data.sessionId && data.sessionId !== sessionId) return;
-      const n = (data.queryIndex ?? 0) + 1;
-      emitThinking(`Using prefetched context (sub-query ${n})`, 'researchAgent');
-    };
-    researchToolEvents.on('discover_context_prefetch_used', onDiscoverContextPrefetchUsed);
 
     onInsightToken = (data) => {
       if (data.sessionId && data.sessionId !== sessionId) return;
@@ -864,18 +774,6 @@ router.post('/analyze-stream', async (req, res) => {
       : usage;
     logCycleUsage('analyze-stream', sessionId, usageWithTiming);
 
-    if (onToolCall) {
-      researchToolEvents.removeListener('tool_call', onToolCall);
-      writerToolEvents.removeListener('tool_call', onToolCall);
-    }
-    if (onToolResult) {
-      researchToolEvents.removeListener('tool_result', onToolResult);
-      writerToolEvents.removeListener('tool_result', onToolResult);
-    }
-    if (onPrefetchStart) researchToolEvents.removeListener('prefetch_start', onPrefetchStart);
-    if (onPrefetchComplete) researchToolEvents.removeListener('prefetch_complete', onPrefetchComplete);
-    if (onPrefetchAllComplete) researchToolEvents.removeListener('prefetch_all_complete', onPrefetchAllComplete);
-    if (onDiscoverContextPrefetchUsed) researchToolEvents.removeListener('discover_context_prefetch_used', onDiscoverContextPrefetchUsed);
     if (onInsightToken) presentEvents.removeListener('insight_token', onInsightToken);
     if (onQueryPlan) decomposeEvents.removeListener('query_plan', onQueryPlan);
     if (onQueryProgress) accumulateEvents.removeListener('query_progress', onQueryProgress);
@@ -893,18 +791,6 @@ router.post('/analyze-stream', async (req, res) => {
     res.write(`event: done\ndata: ${JSON.stringify(finalPayload)}\n\n`);
     res.end();
   } catch (err) {
-    if (onToolCall) {
-      researchToolEvents.removeListener('tool_call', onToolCall);
-      writerToolEvents.removeListener('tool_call', onToolCall);
-    }
-    if (onToolResult) {
-      researchToolEvents.removeListener('tool_result', onToolResult);
-      writerToolEvents.removeListener('tool_result', onToolResult);
-    }
-    if (onPrefetchStart) researchToolEvents.removeListener('prefetch_start', onPrefetchStart);
-    if (onPrefetchComplete) researchToolEvents.removeListener('prefetch_complete', onPrefetchComplete);
-    if (onPrefetchAllComplete) researchToolEvents.removeListener('prefetch_all_complete', onPrefetchAllComplete);
-    if (onDiscoverContextPrefetchUsed) researchToolEvents.removeListener('discover_context_prefetch_used', onDiscoverContextPrefetchUsed);
     if (onInsightToken) presentEvents.removeListener('insight_token', onInsightToken);
     if (onQueryPlan) decomposeEvents.removeListener('query_plan', onQueryPlan);
     if (onQueryProgress) accumulateEvents.removeListener('query_progress', onQueryProgress);

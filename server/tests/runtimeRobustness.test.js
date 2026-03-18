@@ -109,17 +109,3 @@ test('auto-rewrite strategy widens QTR_BKT_IND = 0 safely', () => {
   assert.match(rewrite.sql, /QTR_BKT_IND IN \(0,1\)/);
 });
 
-test('discover_context output includes distinct values section for selected columns', async () => {
-  const { loadDistinctValuesAsync } = require('../vectordb/distinctValuesFetcher');
-  await loadDistinctValuesAsync();
-
-  const { appendDistinctValuesSection } = require('../tools/discoverContext').__testables;
-
-  const tableNames = ['vw_TF_EBI_P2S', 'vw_TF_EBI_QUOTA'];
-  const sections = [];
-  appendDistinctValuesSection(sections, tableNames);
-
-  const output = sections.join('\n');
-  assert.ok(output.includes('=== DISTINCT VALUES'), 'Should contain distinct values header');
-  assert.ok(typeof output === 'string');
-});
