@@ -73,6 +73,7 @@ const WorkflowState = Annotation.Root({
   execution: Annotation({ reducer: (_, b) => b, default: () => null }),
   resultsSuspicious: Annotation({ reducer: (_, b) => b, default: () => false }),
   diagnostics: Annotation({ reducer: (_, b) => b, default: () => null }),
+  zeroRowGuidance: Annotation({ reducer: (_, b) => b, default: () => null }),
 
   // --- Presentation ---
   insights: Annotation({ reducer: (_, b) => b, default: () => '' }),

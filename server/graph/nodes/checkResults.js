@@ -13,6 +13,21 @@ function computeNullRatios(rows, columns) {
   return ratios;
 }
 
+function generateZeroRowSuggestion(state) {
+  const question = state.question || '';
+  const entities = state.entities || {};
+  const category = state.questionCategory || '';
+
+  if (entities.filters?.length > 0) {
+    const stripped = question.replace(/\b(for|in|with)\s+\S+(\s+\S+)?$/i, '').trim();
+    return `Try without filters: "${stripped}"`;
+  }
+  if (category === 'WHAT_HAPPENED') {
+    return 'Try a broader time range: "last 4 quarters" or "year to date"';
+  }
+  return `Try being more specific: "${question} for current quarter"`;
+}
+
 async function checkResultsNode(state) {
   const exec = state.execution;
   const warnings = [];
@@ -39,6 +54,14 @@ async function checkResultsNode(state) {
     resultsSuspicious = true;
   }
 
+  let zeroRowGuidance = null;
+  if (exec.rowCount === 0) {
+    zeroRowGuidance = {
+      message: 'Your query returned no results. The filters may be too narrow for the available data.',
+      suggestion: generateZeroRowSuggestion(state),
+    };
+  }
+
   if (exec.rowCount >= QUERY_RESULT_ROW_LIMIT) {
     warnings.push(`Results capped at ${QUERY_RESULT_ROW_LIMIT} rows for display. Use the dashboard view for full data exploration.`);
   }
@@ -63,6 +86,7 @@ async function checkResultsNode(state) {
   return {
     warnings,
     resultsSuspicious,
+    zeroRowGuidance,
     attempts: { ...state.attempts, resultCheck: (state.attempts?.resultCheck || 0) + 1 },
     trace: [{
       node: 'checkResults',
