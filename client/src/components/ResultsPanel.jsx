@@ -434,7 +434,7 @@ function SubQuerySection({ query, index }) {
   );
 }
 
-export default function ResultsPanel({ execution, insights, chart, queries = [], isPartial = false, confidence, retrySuggestions, onRetrySuggestion, sessionId, question, sql }) {
+export default function ResultsPanel({ execution, insights, chart, queries = [], isPartial = false, confidence, retrySuggestions, onRetrySuggestion, sessionId, question, sql, zeroRowGuidance }) {
   const [activeTab, setActiveTab] = useState('insights');
   const [showDetail, setShowDetail] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -582,6 +582,18 @@ export default function ResultsPanel({ execution, insights, chart, queries = [],
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {zeroRowGuidance && (
+          <div className="mt-3 p-3 rounded-xl bg-amber-50/50 border border-amber-100">
+            <div className="text-[11px] font-semibold text-amber-700 mb-2">{zeroRowGuidance.message}</div>
+            {zeroRowGuidance.suggestion && (
+              <button onClick={() => onRetrySuggestion?.(zeroRowGuidance.suggestion)}
+                className="text-left text-[12px] text-amber-800 hover:text-amber-950 px-2 py-1 rounded-lg hover:bg-amber-100/50 cursor-pointer transition-colors bg-transparent border-none">
+                {zeroRowGuidance.suggestion}
+              </button>
+            )}
           </div>
         )}
       </div>

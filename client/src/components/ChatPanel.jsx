@@ -397,6 +397,17 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       });
     } else if (eventType === 'query_summary') {
       setQuerySummary(eventData.summary || '');
+    } else if (eventType === 'data_ready') {
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (!last || last.role !== 'assistant') return prev;
+        return [...prev.slice(0, -1), {
+          ...last,
+          dataReady: eventData.execution,
+          sql: eventData.sql ? { generated: eventData.sql } : last.sql,
+          zeroRowGuidance: eventData.zeroRowGuidance,
+        }];
+      });
     } else if (eventType === 'done') {
       if (onMetricsUpdate) {
         onMetricsUpdate({
@@ -652,9 +663,9 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         );
       })()}
 
-      {(msg.insights || msg.chart || (msg.execution?.success && msg.execution.rows?.length > 0) || (msg.queries?.length > 0)) && (
+      {(msg.dataReady || msg.insights || msg.chart || (msg.execution?.success && msg.execution.rows?.length > 0) || (msg.queries?.length > 0)) && (
         <ResultsPanel
-          execution={msg.execution}
+          execution={msg.execution || msg.dataReady}
           insights={msg.insights}
           chart={msg.chart}
           queries={msg.queries || []}
@@ -664,6 +675,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           sessionId={sessionId}
           question={msg.content}
           sql={msg.content}
+          zeroRowGuidance={msg.zeroRowGuidance}
         />
       )}
 
