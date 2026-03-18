@@ -9,10 +9,10 @@ const NODE_CONFIG = [
     { key: 'decompose', label: 'Decompose' },
   ]},
   { group: 'Execution', nodes: [
-    { key: 'researchAgent', label: 'Research Agent', role: 'discovery + synthesis' },
-    { key: 'sqlWriterAgent', label: 'SQL Writer', role: 'generation' },
+    { key: 'contextFetch', label: 'Context Fetch', role: 'table selection' },
+    { key: 'generateSql', label: 'Generate SQL', role: 'SQL generation' },
     { key: 'subQueryMatch', label: 'Sub-Query Match' },
-    { key: 'correct', label: 'Correct', role: 'error fixing' },
+    { key: 'correct', label: 'Correct', role: 'error analysis' },
   ]},
   { group: 'Validation', nodes: [
     { key: 'semanticValidatorFast', label: 'Semantic Validator (fast)' },
@@ -36,8 +36,8 @@ const BUILTIN_PRESETS = {
   'All Opus': Object.fromEntries(ALL_NODE_KEYS.map(k => [k, 'opus'])),
   'Balanced': {
     classify: 'opus', decompose: 'opus',
-    researchAgent: 'opus',
-    sqlWriterAgent: 'sonnet', subQueryMatch: 'opus', correct: 'sonnet',
+    contextFetch: 'opus', generateSql: 'opus',
+    subQueryMatch: 'opus', correct: 'sonnet',
     semanticValidatorFast: 'sonnet', semanticValidatorOpus: 'sonnet',
     presentInsights: 'sonnet', presentChart: 'sonnet', dashboardAgent: 'sonnet',
   },
