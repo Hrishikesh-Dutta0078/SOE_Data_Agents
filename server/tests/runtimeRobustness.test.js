@@ -115,12 +115,9 @@ test('discover_context output includes distinct values section for selected colu
 
   const { appendDistinctValuesSection } = require('../tools/discoverContext').__testables;
 
-  const columnsByTable = {
-    'vw_TF_EBI_P2S': ['SALES_STAGE_ID', 'REGION_ID'],
-    'vw_TF_EBI_QUOTA': ['SEGMENT_ID'],
-  };
+  const tableNames = ['vw_TF_EBI_P2S', 'vw_TF_EBI_QUOTA'];
   const sections = [];
-  appendDistinctValuesSection(sections, columnsByTable);
+  appendDistinctValuesSection(sections, tableNames);
 
   const output = sections.join('\n');
   assert.ok(output.includes('=== DISTINCT VALUES'), 'Should contain distinct values header');

@@ -18,7 +18,7 @@ const { searchRules } = require('../vectordb/rulesFetcher');
 const { searchKpis } = require('../vectordb/kpiFetcher');
 const { getJoinRulesForTables, formatJoinRulesText } = require('../vectordb/joinRuleFetcher');
 const { fetchFiscalPeriod } = require('../vectordb/fiscalPeriodFetcher');
-const { getDistinctValues } = require('../vectordb/distinctValuesFetcher');
+const { getDistinctValues, getAvailableColumns } = require('../vectordb/distinctValuesFetcher');
 const logger = require('../utils/logger');
 
 function buildEnrichedQuery(query, entities) {
@@ -41,11 +41,13 @@ function buildEnrichedQuery(query, entities) {
 
 const COLUMN_METADATA_TOP_N = 12;
 const DISTINCT_VALUES_LIMIT = 15;
+const DISTINCT_VALUES_MAX_COLS_PER_TABLE = 30;
 
-function appendDistinctValuesSection(sections, columnsByTable) {
+function appendDistinctValuesSection(sections, tableNames) {
   const dvLines = [];
-  for (const [tableName, columns] of Object.entries(columnsByTable)) {
-    for (const col of columns) {
+  for (const tableName of tableNames) {
+    const allCols = getAvailableColumns(tableName);
+    for (const col of allCols.slice(0, DISTINCT_VALUES_MAX_COLS_PER_TABLE)) {
       const result = getDistinctValues(tableName, col, DISTINCT_VALUES_LIMIT);
       if (result.available && result.values && result.values.length > 0) {
         dvLines.push(`  ${tableName}.${col}: ${result.values.join(', ')}`);
@@ -192,7 +194,7 @@ const discoverContextTool = new DynamicStructuredTool({
       sections.push(`\n=== CURRENT FISCAL PERIOD ===\nFiscal Year: ${fiscalPeriod.FISCAL_YR}\nFiscal Quarter: ${fiscalPeriod.FISCAL_YR_AND_QTR_DESC}\nFiscal Month: ${fiscalPeriod.FISCAL_MTH}`);
     }
 
-    appendDistinctValuesSection(sections, columnsByTable);
+    appendDistinctValuesSection(sections, tableNames);
 
     return sections.join('\n');
   },
