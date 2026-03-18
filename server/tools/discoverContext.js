@@ -18,6 +18,7 @@ const { searchRules } = require('../vectordb/rulesFetcher');
 const { searchKpis } = require('../vectordb/kpiFetcher');
 const { getJoinRulesForTables, formatJoinRulesText } = require('../vectordb/joinRuleFetcher');
 const { fetchFiscalPeriod } = require('../vectordb/fiscalPeriodFetcher');
+const { getDistinctValues } = require('../vectordb/distinctValuesFetcher');
 const logger = require('../utils/logger');
 
 function buildEnrichedQuery(query, entities) {
@@ -39,12 +40,31 @@ function buildEnrichedQuery(query, entities) {
 }
 
 const COLUMN_METADATA_TOP_N = 12;
+const DISTINCT_VALUES_LIMIT = 15;
+
+function appendDistinctValuesSection(sections, columnsByTable) {
+  const dvLines = [];
+  for (const [tableName, columns] of Object.entries(columnsByTable)) {
+    for (const col of columns) {
+      const result = getDistinctValues(tableName, col, DISTINCT_VALUES_LIMIT);
+      if (result.available && result.values && result.values.length > 0) {
+        dvLines.push(`  ${tableName}.${col}: ${result.values.join(', ')}`);
+      }
+    }
+  }
+  if (dvLines.length > 0) {
+    sections.push('\n=== DISTINCT VALUES (pre-fetched for selected columns) ===');
+    sections.push('Use these values for WHERE clause filters. No need to call query_distinct_values unless you need a column not listed here.');
+    sections.push(dvLines.join('\n'));
+  }
+}
 
 const discoverContextTool = new DynamicStructuredTool({
   name: 'discover_context',
   description:
     'Discover all relevant context for a query in one call: schema tables, example SQL patterns, ' +
-    'business rules, join rules, column metadata for top tables, and the current fiscal period. ' +
+    'business rules, join rules, column metadata for top tables, the current fiscal period, ' +
+    'and pre-fetched distinct values for selected columns. ' +
     'Pass the user question and optionally the detected entities to boost search accuracy.',
   schema: z.object({
     query: z.string().describe('The user question or search terms'),
@@ -172,8 +192,11 @@ const discoverContextTool = new DynamicStructuredTool({
       sections.push(`\n=== CURRENT FISCAL PERIOD ===\nFiscal Year: ${fiscalPeriod.FISCAL_YR}\nFiscal Quarter: ${fiscalPeriod.FISCAL_YR_AND_QTR_DESC}\nFiscal Month: ${fiscalPeriod.FISCAL_MTH}`);
     }
 
+    appendDistinctValuesSection(sections, columnsByTable);
+
     return sections.join('\n');
   },
 });
 
 module.exports = discoverContextTool;
+module.exports.__testables = { appendDistinctValuesSection };

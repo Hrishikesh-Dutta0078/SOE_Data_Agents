@@ -108,3 +108,21 @@ test('auto-rewrite strategy widens QTR_BKT_IND = 0 safely', () => {
   assert.equal(rewrite.strategy, 'widen_qtr_bucket_zero_eq');
   assert.match(rewrite.sql, /QTR_BKT_IND IN \(0,1\)/);
 });
+
+test('discover_context output includes distinct values section for selected columns', async () => {
+  const { loadDistinctValuesAsync } = require('../vectordb/distinctValuesFetcher');
+  await loadDistinctValuesAsync();
+
+  const { appendDistinctValuesSection } = require('../tools/discoverContext').__testables;
+
+  const columnsByTable = {
+    'vw_TF_EBI_P2S': ['SALES_STAGE_ID', 'REGION_ID'],
+    'vw_TF_EBI_QUOTA': ['SEGMENT_ID'],
+  };
+  const sections = [];
+  appendDistinctValuesSection(sections, columnsByTable);
+
+  const output = sections.join('\n');
+  assert.ok(output.includes('=== DISTINCT VALUES'), 'Should contain distinct values header');
+  assert.ok(typeof output === 'string');
+});
