@@ -56,7 +56,7 @@ Build a keyword index over `schema-knowledge.json` (same pattern as `examplesFet
 - `schemaToMarkdown()` receives only the candidate tables' schema (not the full `rawSchema`).
 - Cache the full `schemaToMarkdown()` output at module level (computed once, schema doesn't change at runtime). Used as fallback when keyword search returns < 2 tables.
 
-**Safety fallback:** If keyword search returns fewer than 2 tables, fall back to the full cached schema markdown.
+**Safety fallback:** If keyword search returns fewer than 3 tables, fall back to the full cached schema markdown. This guards against both empty results and wrong results (e.g., ambiguous terms like "pipeline" matching ETL tables instead of sales pipeline). A threshold of 3 ensures the LLM always has enough candidates for meaningful column selection.
 
 ### Impact
 
@@ -121,13 +121,23 @@ execution: state.execution ? {
 } : null,
 ```
 
-Same treatment for `queries[].execution` in the multi-query path.
+Same treatment for `queries[].execution` in the multi-query path — strip rows from each sub-query's execution in the `queries` array mapping:
+
+```js
+queries: queries.map((q) => ({
+  ...q,
+  execution: q.execution ? { ...q.execution, rows: [] } : null,
+})),
+```
+
+**Backward compatibility:** The batch `/analyze` endpoint (non-SSE) has no `data_ready` event, so it must continue to include rows in its response. Only strip rows from the SSE `done` event, not from the batch endpoint's `res.json()` response.
 
 **Client changes:**
 
 - Handle `data_ready` event in `ChatPanel` — render the data table immediately.
 - Insight text continues to arrive via `insight_token` events (already rendered progressively).
 - Chart spec arrives in the `done` event (rendered when available).
+- Handle edge case: `data_ready` fires but present node later fails — client should gracefully render data-only results without insights.
 
 ### Impact
 
@@ -162,6 +172,10 @@ Set `QUERY_RESULT_ROW_LIMIT = 100` in `server/config/constants.js`.
 - For dashboard data with pagination, the `/dashboard-data` endpoint already has its own pagination logic independent of this limit.
 - If a future need arises for more rows, the constant is trivially adjustable.
 
+### Note
+
+`checkResults.js` warns when `rowCount >= QUERY_RESULT_ROW_LIMIT`. With this change, users will see "Query hit the 100-row limit" more often. Consider updating the warning message to clarify this is a display limit: "Results capped at 100 rows for display. Use the dashboard view for full data exploration."
+
 ### Files
 
 | File | Action |
@@ -192,14 +206,19 @@ Eliminate the two-phase split. Run a single Opus ReAct agent that calls the disc
 - Use `RESEARCH_TOOLS` (includes `submit_research`) instead of `DISCOVERY_TOOLS` (includes `finish_discovery`).
 - Use `buildResearchSystemPrompt()` (original, instructs agent to call `submit_research`) instead of `buildResearchSystemPromptPhase1()`.
 - Use a single Opus model (via `getModel({ nodeKey: 'researchAgent' })`).
-- Remove the Phase 2 block (lines 634-662): `formatPhase1MessagesForPrompt`, Opus synthesis call, `_phase2Brief`.
+- Remove the Phase 2 block: `formatPhase1MessagesForPrompt`, Opus synthesis call, `_phase2Brief`.
+- Remove Phase 1 scaffolding that becomes dead code: `buildResearchSystemPromptPhase1()`, `DISCOVERY_TOOLS` array, `phase1CalledFinishDiscovery()`, `phase1Mode` logic in `createMemoizedTools`.
 - Keep the fallback brief builder (`buildFallbackBriefFromDiscoverContext`) for timeout/error cases.
+
+**CRITICAL: Update `server/config/llm.js`** — `'researchAgent'` is currently in `FAST_NODE_KEYS` (line 84-87), which would resolve it to Haiku instead of Opus. Remove `'researchAgent'` and `'researchAgent_phase1'` from `FAST_NODE_KEYS` so the merged agent defaults to Opus.
+
+**Update `server/routes/textToSql.js`** — the `VALID_NODE_KEYS` set (line 44-49) contains `'researchAgent_phase1'` and `'researchAgent_phase2'`. Replace both with `'researchAgent'` so the DevPanel override works with the merged node.
 
 **Remove `server/tools/finishDiscovery.js`** — no longer needed.
 
 **`nodeModelOverrides` key:** Changes from `researchAgent_phase1` / `researchAgent_phase2` → single `researchAgent`. DevPanel UI updated accordingly.
 
-**Prefetch system preserved:** The `discover_context` prefetch for sub-queries 2-N (lines 519-544) is independent of the Phase 1/2 split and continues to work unchanged.
+**Prefetch system preserved:** The `discover_context` prefetch for sub-queries 2-N is independent of the Phase 1/2 split and continues to work unchanged.
 
 ### Trade-offs
 
@@ -212,6 +231,8 @@ Eliminate the two-phase split. Run a single Opus ReAct agent that calls the disc
 | File | Action |
 |------|--------|
 | `server/graph/nodes/researchAgent.js` | **Modify** — remove Phase 1/2 split, single Opus agent |
+| `server/config/llm.js` | **Modify** — remove `researchAgent` and `researchAgent_phase1` from `FAST_NODE_KEYS` |
+| `server/routes/textToSql.js` | **Modify** — update `VALID_NODE_KEYS` (replace phase1/phase2 with single `researchAgent`) |
 | `server/tools/finishDiscovery.js` | **Remove** |
 | `client/src/components/DevPanel.jsx` | **Modify** — update nodeKey from phase1/phase2 → single `researchAgent` |
 
@@ -223,13 +244,13 @@ Eliminate the two-phase split. Run a single Opus ReAct agent that calls the disc
 
 The correction node uses Opus (`nodeKey: 'correct'`) for SQL fixes. SQL corrections are mechanical — fix column names, balance parentheses, adjust WHERE clauses based on error messages. This doesn't require Opus-level reasoning.
 
+### Prerequisites
+
+Enhancements #5 and #6 require Sonnet Azure endpoint env vars to be configured: `AZURE_ANTHROPIC_SONNET_ENDPOINT`, `AZURE_ANTHROPIC_SONNET_API_KEY`, `AZURE_ANTHROPIC_SONNET_MODEL_NAME`. The `sonnet` profile exists in `MODEL_PROFILES` (constants.js) but is not documented in CLAUDE.md. Update `.env` documentation to reflect the three-profile setup (opus/sonnet/haiku).
+
 ### Solution
 
-Change the default model profile for the `correct` nodeKey to Sonnet by adding it to the fast-node routing in `server/config/llm.js`, or by setting the default profile directly in `correct.js`.
-
-### Design
-
-In `server/config/llm.js`, add `'correct'` to the list of node keys that default to a non-Opus profile. Or in `server/graph/nodes/correct.js`, pass `profile: state.nodeModelOverrides?.correct || 'sonnet'` to `getModel()`.
+Change the default model profile for the `correct` nodeKey to Sonnet. Create a new `SONNET_NODE_KEYS` set in `server/config/llm.js` (analogous to `FAST_NODE_KEYS` for Haiku) and add `'correct'` to it. Update `resolveProfileName()` to check this set.
 
 Still overridable via `nodeModelOverrides.correct` from the DevPanel.
 
@@ -261,37 +282,33 @@ Still overridable via `nodeModelOverrides.presentChart`.
 
 ---
 
-## Enhancement #7: Eager-Load Knowledge at Startup
+## Enhancement #7: Add Schema Searcher to Startup Eager-Load
 
-### Problem
+### Current State
 
-All knowledge fetchers (schema, examples, rules, KPIs, distinct values, join rules) use lazy loading — first request triggers file I/O and parsing. This adds 200-500ms to the first query after server start.
+Eager loading is **already implemented** in `server/index.js` (lines 151-166). All existing fetchers (schema, examples, rules, KPIs, distinct values, join rules) are loaded via `Promise.allSettled` at startup.
 
 ### Solution
 
-Call all `loadAsync()` functions in `Promise.all` during server initialization, before the first request arrives.
-
-### Design
-
-Add a startup initialization block in `server/server.js` (or a new `server/startup.js` module):
+Add the new `schemaSearcher` from Enhancement #1 to the existing loader array in `server/index.js`:
 
 ```js
-await Promise.all([
-  loadSchemaKnowledgeAsync(),
-  loadExamplesAsync(),
-  loadKpiGlossaryAsync(),
-  // ... all other fetcher loadAsync functions
-  // Include the new schemaSearcher from Enhancement #1
-]);
+const loaders = [
+  ['distinctValues', loadDistinctValuesAsync],
+  ['schema', loadSchemaKnowledgeAsync],
+  ['examples', loadExamplesAsync],
+  ['rules', loadRulesAsync],
+  ['joinKnowledge', loadJoinKnowledgeAsync],
+  ['kpiGlossary', loadKpiGlossaryAsync],
+  ['schemaSearcher', loadSchemaSearcherAsync],  // NEW from Enhancement #1
+];
 ```
-
-Call this after Express middleware setup, before `app.listen()`.
 
 ### Files
 
 | File | Action |
 |------|--------|
-| `server/server.js` or new `server/startup.js` | **Modify/Create** — eager-load all knowledge |
+| `server/index.js` | **Modify** — add `schemaSearcher` to existing loader array |
 
 ---
 
@@ -343,7 +360,7 @@ const joinRules = getJoinRulesForTables(tableNames);
 const fiscalPeriod = await fiscalPromise;
 ```
 
-Note: `searchExamples/Rules/Kpis` are synchronous functions (return immediately from in-memory index), so `Promise.all` is technically unnecessary — but wrapping them this way makes the intent clear and handles any future async changes.
+**Note:** `searchExamples/Rules/Kpis` are synchronous functions (return immediately from in-memory index). The real optimization here is starting the LLM promise before running the sync calls, so the LLM call is in flight while the sync work happens. The latency saving is negligible (<5ms) since the sync calls are near-instant. This is primarily a **code clarity improvement** — making the independence of these calls explicit and future-proofing for any async changes.
 
 ### Files
 
@@ -455,9 +472,17 @@ Generate zero-row guidance earlier in the pipeline (in `checkResults` node or SS
 
 ### Design
 
+**CRITICAL: Add `zeroRowGuidance` to LangGraph state definition.**
+
+In `server/graph/state.js`, add a new state channel. Without this, `checkResults` can set the value but LangGraph will silently drop it during state merge — downstream nodes and the final state would never see it:
+
+```js
+zeroRowGuidance: Annotation({ reducer: (_, b) => b, default: () => null }),
+```
+
 **Modified `checkResultsNode()` in `server/graph/nodes/checkResults.js`:**
 
-When `rowCount === 0`, generate a `zeroRowGuidance` object in the state:
+When `rowCount === 0`, generate a `zeroRowGuidance` object in the return value:
 
 ```js
 zeroRowGuidance: {
@@ -466,7 +491,7 @@ zeroRowGuidance: {
 }
 ```
 
-Suggestion generation logic (reused from existing present.js lines 324-333):
+Suggestion generation logic (reused from existing present.js retry suggestions):
 - If filters detected in entities → suggest removing the most restrictive filter
 - If time-based question category → suggest broadening time range
 - Fallback → suggest rephrasing with "for current quarter"
@@ -481,12 +506,13 @@ Also include `zeroRowGuidance` in `buildFinalResponse()` so the client has it re
 
 **Client rendering:**
 
-Display the guidance message + clickable suggestion using the same UI pattern as existing `retrySuggestions` (ResultsPanel.jsx lines 574-581).
+Display the guidance message + clickable suggestion using the same UI pattern as existing `retrySuggestions` in ResultsPanel.jsx. Client must also handle the case where `data_ready` fires with 0 rows and then `done` arrives without insights (present node was skipped).
 
 ### Files
 
 | File | Action |
 |------|--------|
+| `server/graph/state.js` | **Modify** — add `zeroRowGuidance` channel |
 | `server/graph/nodes/checkResults.js` | **Modify** — generate `zeroRowGuidance` |
 | `server/routes/textToSql.js` | **Modify** — include in `data_ready` and `done` events |
 | `client/src/components/ResultsPanel.jsx` | **Modify** — render zero-row guidance |
@@ -509,16 +535,17 @@ Display the guidance message + clickable suggestion using the same UI pattern as
 | File | Enhancements |
 |------|-------------|
 | `server/config/constants.js` | #3 (row limit), #8 (pool min), #10 (correction rounds) |
-| `server/config/llm.js` | #5 (correct→Sonnet), #6 (chart→Sonnet) |
+| `server/config/llm.js` | #4 (remove researchAgent from FAST_NODE_KEYS), #5 (correct→Sonnet), #6 (chart→Sonnet) |
+| `server/graph/state.js` | #14 (add `zeroRowGuidance` state channel) |
 | `server/vectordb/llmSchemaSelector.js` | #1 (schema pre-filter, cache markdown) |
-| `server/tools/discoverContext.js` | #9 (parallel knowledge searches) |
+| `server/tools/discoverContext.js` | #9 (restructure for clarity) |
 | `server/graph/nodes/researchAgent.js` | #4 (merge Phase 1+2) |
 | `server/graph/nodes/checkResults.js` | #14 (zero-row guidance) |
 | `server/graph/nodes/present.js` | #6 (chart→Sonnet) |
 | `server/graph/nodes/correct.js` | #5 (correct→Sonnet) |
 | `server/graph/nodes/parallelSubQueryPipeline.js` | #12 (skip research for template+params) |
-| `server/routes/textToSql.js` | #2 (data_ready event, strip rows from done), #14 (zero-row guidance) |
-| `server/server.js` | #7 (eager-load knowledge) |
+| `server/routes/textToSql.js` | #2 (data_ready event, strip rows from SSE done), #4 (update VALID_NODE_KEYS), #14 (zero-row guidance) |
+| `server/index.js` | #7 (add schemaSearcher to existing loader array) |
 | `client/src/components/ChatPanel.jsx` | #2 (handle data_ready event) |
 | `client/src/components/ResultsPanel.jsx` | #2 (render from data_ready), #14 (zero-row guidance) |
 | `client/src/components/DevPanel.jsx` | #4 (update nodeKey labels) |
