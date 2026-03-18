@@ -9,6 +9,7 @@
 const { z } = require('zod');
 const { getModel } = require('../config/llm');
 const { loadSchemaKnowledgeAsync, fuzzyResolveTable } = require('./schemaFetcher');
+const { searchTables } = require('./schemaSearcher');
 const logger = require('../utils/logger');
 
 const SchemaSelectionSchema = z.object({
@@ -126,6 +127,8 @@ function validateAndResolve(tableNames, columnsByTable, knowledge) {
  * @param {{ metrics?: string[], dimensions?: string[], filters?: string[], operations?: string[] }|null} [entities]
  * @returns {Promise<{ tableNames: string[], columnsByTable: Record<string, string[]> }>}
  */
+let _fullSchemaMarkdownCache = null;
+
 async function selectTablesAndColumnsByLLM(query, entities = null) {
   const knowledge = await loadSchemaKnowledgeAsync();
   const rawSchema = knowledge.tables || {};
@@ -134,7 +137,28 @@ async function selectTablesAndColumnsByLLM(query, entities = null) {
     return { tableNames: [], columnsByTable: {} };
   }
 
-  const schemaMarkdown = schemaToMarkdown(rawSchema);
+  // Cache full markdown for fallback
+  if (!_fullSchemaMarkdownCache) {
+    _fullSchemaMarkdownCache = schemaToMarkdown(rawSchema);
+  }
+
+  // Pre-filter: keyword search to narrow candidate tables
+  const candidateNames = searchTables(query, entities, 8);
+  let schemaMarkdown;
+  if (candidateNames.length >= 3) {
+    const filtered = {};
+    for (const name of candidateNames) {
+      const lower = name.toLowerCase();
+      const entry = Object.entries(rawSchema).find(([k]) => k.toLowerCase() === lower);
+      if (entry) filtered[entry[0]] = entry[1];
+    }
+    schemaMarkdown = schemaToMarkdown(filtered);
+    logger.info('Schema pre-filter', { candidates: candidateNames.length, fullTables: Object.keys(rawSchema).length });
+  } else {
+    schemaMarkdown = _fullSchemaMarkdownCache;
+    logger.info('Schema pre-filter fallback: using full schema', { candidates: candidateNames.length });
+  }
+
   const { system, user } = buildSelectionPrompt(query, entities, schemaMarkdown);
 
   const model = getModel({
