@@ -83,6 +83,38 @@ function suggestTablesForInvalidName(badTable, maxSuggestions = 3) {
   return candidates.slice(0, maxSuggestions).map((c) => c.table);
 }
 
+/**
+ * Identify columns in SQL that are likely causing type conversion errors.
+ * Looks for columns compared to numeric literals (col > 30) or used in
+ * CAST/CONVERT expressions that could fail on varchar data.
+ */
+function identifyTypeConversionSuspects(sql, sampleValue, targetType) {
+  const suspects = new Set();
+
+  // Pattern 1: column > number, column < number, column = number, column BETWEEN
+  const comparisonPattern = /(\w+\.\w+|\w+)\s*(?:>|<|>=|<=|=|<>|!=|BETWEEN)\s*\d/gi;
+  let m;
+  while ((m = comparisonPattern.exec(sql)) !== null) {
+    suspects.add(m[1]);
+  }
+
+  // Pattern 2: CAST(column AS int/numeric/...) or CONVERT(int, column)
+  const castPattern = /CAST\s*\(\s*(\w+\.\w+|\w+)\s+AS\s+\w+/gi;
+  while ((m = castPattern.exec(sql)) !== null) {
+    suspects.add(m[1]);
+  }
+  const convertPattern = /CONVERT\s*\(\s*\w+\s*,\s*(\w+\.\w+|\w+)/gi;
+  while ((m = convertPattern.exec(sql)) !== null) {
+    suspects.add(m[1]);
+  }
+
+  // Filter out obvious non-columns (numeric literals, keywords)
+  return [...suspects].filter((s) =>
+    !['AND', 'OR', 'NOT', 'NULL', 'TOP', 'SELECT', 'WHERE', 'FROM', 'JOIN', 'ON', 'SET', 'AS'].includes(s.toUpperCase())
+    && !/^\d+$/.test(s)
+  );
+}
+
 function formatIssues(passes) {
   if (!passes) return [];
   return Object.values(passes)
@@ -123,8 +155,20 @@ function buildCorrectionGuidance({ sql, errorType, validationReport, contextBund
   // Type conversion
   const typeMatch = issueText.match(/Conversion failed when converting (?:the )?(\w+) value '([^']+)' to data type (\w+)/i);
   if (typeMatch) {
-    const [, , sampleValue, targetType] = typeMatch;
-    guidance += `\nCRITICAL — TYPE CONVERSION ERROR: Column has mixed types (e.g., '${sampleValue}'). Replace ALL CAST(col AS ${targetType}) with TRY_CAST. Replace ALL CONVERT(${targetType}, col) with TRY_CONVERT.`;
+    const [, sourceType, sampleValue, targetType] = typeMatch;
+    // Identify which columns in the SQL might be causing the implicit conversion
+    const suspectColumns = identifyTypeConversionSuspects(sql || '', sampleValue, targetType);
+    const suspectList = suspectColumns.length > 0
+      ? `\nSuspect column(s) causing this: ${suspectColumns.join(', ')}. These columns contain text values like '${sampleValue}' but your SQL compares them as ${targetType}.`
+      : '';
+
+    guidance += `\nCRITICAL — TYPE CONVERSION ERROR: A ${sourceType} column contains values like '${sampleValue}' which cannot be converted to ${targetType}.${suspectList}
+You MUST fix ALL of these patterns:
+1. Replace col > N, col < N, col = N, col BETWEEN with TRY_CAST(col AS ${targetType}) > N (or remove the comparison if the column is a text bucket like '0-30', '30-60')
+2. Replace CAST(col AS ${targetType}) with TRY_CAST(col AS ${targetType})
+3. Replace CONVERT(${targetType}, col) with TRY_CONVERT(${targetType}, col)
+4. For SUM/AVG on text columns: use SUM(TRY_CAST(col AS ${targetType}))
+5. If the column holds RANGE BUCKETS (e.g., '0-30', '30-60', '90-180'), do NOT compare it numerically — use it as-is in SELECT/GROUP BY or filter with string comparison (col = '0-30')`;
   }
 
   // Invalid object (table)

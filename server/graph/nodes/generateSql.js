@@ -340,18 +340,25 @@ IMPORTANT: Adapt this template rather than writing from scratch. Add WHERE claus
   }
 
   // ── 13. Correction section (only on retries) ──
+  // correctionGuidance is a STRING from correctionAnalyzer.buildCorrectionGuidance()
+  // The prior SQL, error type, and validation report come from state (passed via params.state)
   if (correctionGuidance) {
-    prompt += '\n=== CORRECTION — FIX THE SQL BELOW ===\n';
-    prompt += 'Your previous SQL attempt had validation errors. Fix the issues listed below.\n\n';
+    const priorSql = state?.sql || '';
+    const errType = state?.errorType || 'UNKNOWN';
+    const valReport = state?.validationReport;
 
-    if (correctionGuidance.priorSql) {
-      prompt += `=== YOUR PREVIOUS SQL (fix this) ===\n${correctionGuidance.priorSql}\n\n`;
+    prompt += '\n=== CORRECTION — FIX THE SQL BELOW ===\n';
+    prompt += 'Your previous SQL attempt failed. You MUST fix the issues listed below.\n\n';
+
+    if (priorSql) {
+      prompt += `=== YOUR PREVIOUS SQL (this failed — fix it) ===\n${priorSql}\n\n`;
     }
-    if (correctionGuidance.errorType) {
-      prompt += `Error type: ${correctionGuidance.errorType}\n`;
-    }
-    if (correctionGuidance.validationReport?.passes) {
-      const issues = Object.values(correctionGuidance.validationReport.passes)
+
+    prompt += `Error type: ${errType}\n`;
+
+    // Format validation issues from state
+    if (valReport?.passes) {
+      const issues = Object.values(valReport.passes)
         .flatMap((p) => p.issues)
         .filter(Boolean)
         .map((issue) => {
@@ -363,6 +370,16 @@ IMPORTANT: Adapt this template rather than writing from scratch. Add WHERE claus
         prompt += `\nValidation issues:\n${issues.map((i) => `- ${i}`).join('\n')}\n`;
       }
     }
+
+    // Execution error (direct from state for EXECUTION_ERROR type)
+    if (state?.execution?.error) {
+      prompt += `\nExecution error: ${state.execution.error}\n`;
+    }
+
+    // Inject the error-specific guidance from correctionAnalyzer
+    // (column suggestions, table suggestions, TRY_CAST hints, prior attempts)
+    prompt += `\n=== ERROR-SPECIFIC GUIDANCE ===\n${correctionGuidance}\n`;
+
     prompt += '\nFix ALL the issues above. Do NOT repeat the same mistakes.\n';
   }
 
