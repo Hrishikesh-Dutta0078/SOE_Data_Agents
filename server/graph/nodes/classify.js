@@ -376,7 +376,7 @@ Return only what is explicitly stated in the user parameters.`;
     const duration = Date.now() - start;
     const category = exactMatch.questionCategory || 'WHAT_HAPPENED';
     const subCategory = exactMatch.questionSubCategory || '';
-    logger.info(`Classify (${duration}ms)`, { intent: 'SQL_QUERY', matchType: 'exact', matchId: exactMatch.id, score: exactMatch.score.toFixed(2) });
+    logger.info(`Classify (${duration}ms)`, { intent: 'SQL_QUERY', matchType: 'template', matchId: exactMatch.id, score: exactMatch.score.toFixed(2) });
     return {
       ...stateReset,
       intent: 'SQL_QUERY',
@@ -385,12 +385,12 @@ Return only what is explicitly stated in the user parameters.`;
       questionCategory: category,
       questionSubCategory: subCategory,
       templateSql: exactMatch.sql,
-      matchType: 'exact',
+      matchType: 'template',
       sql: exactMatch.sql,
       clarificationQuestions: [],
       generalChatReply: '',
-      orchestrationReasoning: `Exact match to gold template ${exactMatch.id} (score: ${exactMatch.score.toFixed(2)})`,
-      trace: [{ node: 'classify', timestamp: start, duration, intent: 'SQL_QUERY', matchType: 'exact', matchId: exactMatch.id, questionCategory: category }],
+      orchestrationReasoning: `Template match to gold example ${exactMatch.id} (score: ${exactMatch.score.toFixed(2)})`,
+      trace: [{ node: 'classify', timestamp: start, duration, intent: 'SQL_QUERY', matchType: 'template', matchId: exactMatch.id, questionCategory: category }],
     };
   }
 
@@ -431,10 +431,6 @@ Return only what is explicitly stated in the user parameters.`;
         orchestrationReasoning: 'Explicit follow-up from UI — reusing prior SQL as template.',
         trace: [{ node: 'classify', timestamp: start, duration, intent: 'SQL_QUERY', matchType: 'followup', isExplicitFollowUp: true, questionCategory: category }],
       };
-
-      if (priorResearchBrief) {
-        output.researchBrief = priorResearchBrief;
-      }
 
       return output;
     }
@@ -488,8 +484,8 @@ Return only what is explicitly stated in the user parameters.`;
     const matched = examplesMap.get(result.matched_example_id);
     if (matched?.sql) {
       templateSql = matched.sql;
-      matchType = 'partial';
-      logger.info('  Classify: partial template match', { id: result.matched_example_id });
+      matchType = 'template';
+      logger.info('  Classify: template match', { id: result.matched_example_id });
     } else {
       logger.warn('  Classify: matched_example_id not found in gold examples', { id: result.matched_example_id });
     }
@@ -558,7 +554,7 @@ Return only what is explicitly stated in the user parameters.`;
   const needsDecomposition = !!(
     (result.needs_decomposition || blueprintId)
     && (result.intent === 'SQL_QUERY' || isDashboard)
-    && !matchType.match(/^(exact|partial|followup)$/)
+    && !matchType.match(/^(template|followup)$/)
   );
 
   const decompLabel = needsDecomposition ? ' | MULTI-QUERY' : '';
@@ -596,10 +592,6 @@ Return only what is explicitly stated in the user parameters.`;
       llm: llmMeta,
     }],
   };
-
-  if (matchType === 'followup' && priorResearchBrief) {
-    output.researchBrief = priorResearchBrief;
-  }
 
   return output;
 }
