@@ -26,7 +26,8 @@ const { z } = require('zod');
 
 const RESEARCH_TOOLS = [
   discoverContext,
-  queryDistinctValues,
+  // queryDistinctValues removed — distinct values are now embedded in discover_context output.
+  // Both tools read from the same in-memory store; keeping it just wastes LLM roundtrips.
   inspectTableColumns,
   checkNullRatio,
   searchSessionMemoryMod.tool || searchSessionMemoryMod,
@@ -294,16 +295,11 @@ function buildResearchSystemPrompt(state) {
 YOUR GOAL: Gather all the context needed to write accurate SQL. Do NOT write SQL yourself — your job is research only.
 
 RESEARCH WORKFLOW:
-1. Call discover_context exactly ONCE with the user's question and detected entities. This returns tables, example SQL patterns, business rules, join rules, column details, the current fiscal period, AND pre-fetched distinct values for selected columns — all in one call. Do NOT call discover_context multiple times.
-2. Review the discover_context results:
-   a. The DISTINCT VALUES section already contains filter values for the most relevant columns. Use these directly — do NOT call query_distinct_values for columns already listed there.
-   b. ONLY call query_distinct_values if you need values for a column NOT included in the distinct values section. If you do, batch ALL needed columns into a single call.
-   c. If you need column details for a table not in the COLUMN DETAILS section, call inspect_table_columns.
+1. Call discover_context exactly ONCE with the user's question and detected entities. This returns tables, example SQL patterns, business rules, join rules, column details, the current fiscal period, AND pre-fetched distinct values for all available columns — everything you need in one call.
+2. Review the discover_context results. The DISTINCT VALUES section contains filter values for all columns in the store — use these directly for WHERE clause filters. If you need column details for a table not in the COLUMN DETAILS section, call inspect_table_columns.
 3. Call submit_research with your complete findings.
 
-CRITICAL: discover_context now includes distinct values. In most cases you should NOT need to call query_distinct_values at all. Go directly from discover_context to submit_research.
-
-OUTPUT FORMAT: Do NOT generate free-text analysis or summaries. Put ALL your analysis in the "reasoning" field of submit_research. Your turn after discover_context should contain ONLY a submit_research tool call — no prose before it. If you need to call query_distinct_values or inspect_table_columns first, do so, then immediately call submit_research on your next turn.
+OUTPUT FORMAT: Do NOT generate free-text analysis or summaries. Put ALL your analysis in the "reasoning" field of submit_research. After discover_context returns, your next action MUST be submit_research (or inspect_table_columns if needed, then submit_research). Never end your turn with text — always end with a tool call.
 
 WHEN DONE: Call submit_research with your complete findings including:
 - All relevant tables and their key columns
