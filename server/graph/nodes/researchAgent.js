@@ -416,6 +416,7 @@ This is an action-oriented question. Focus your research on:
 function parseResearchBrief(result) {
   const messages = result.messages || [];
 
+  // First: look for tool RESULTS (ToolMessage with name='submit_research')
   for (const msg of messages) {
     if (msg.name === 'submit_research' && msg.content) {
       const content = msg.content;
@@ -425,6 +426,19 @@ function parseResearchBrief(result) {
         const jsonEnd = content.lastIndexOf('}');
         const jsonStr = jsonEnd >= 0 ? content.substring(0, jsonEnd + 1) : content;
         try { return JSON.parse(jsonStr); } catch { /* fall through */ }
+      }
+    }
+  }
+
+  // Fallback: extract from tool CALL args (AIMessage) when the tool never executed
+  // This happens when LangGraph stream ends before the tools node runs submit_research
+  for (const msg of messages) {
+    if (msg.tool_calls?.length > 0) {
+      for (const tc of msg.tool_calls) {
+        if (tc.name === 'submit_research' && tc.args) {
+          logger.info('Parsed submit_research from tool call args (tool did not execute)');
+          return enrichBriefWithSchema(tc.args);
+        }
       }
     }
   }
@@ -635,12 +649,28 @@ async function researchAgentNode(state) {
     const stopReason = lastAssistantMsg.response_metadata?.stop_reason
       || lastAssistantMsg.additional_kwargs?.stop_reason
       || 'unknown';
+    const toolNames = (lastAssistantMsg.tool_calls || []).map((tc) => tc.name);
     logger.info('Research agent final response', {
       contentChars: contentLen,
       hasToolCalls,
+      toolNames: toolNames.join(', ') || 'none',
       stopReason,
       hasBrief: !!brief,
     });
+  }
+
+  // Diagnostic: check for submit_research tool result errors (Zod validation failures)
+  const allMsgs = result?.messages || [];
+  for (const msg of allMsgs) {
+    if (msg.name === 'submit_research' && msg.content) {
+      const content = typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content);
+      const isError = content.includes('Received:') || content.includes('validation') || content.includes('Expected');
+      if (isError) {
+        logger.warn('submit_research tool result was an error (likely Zod validation)', {
+          contentPreview: content.substring(0, 500),
+        });
+      }
+    }
   }
 
   if (!brief && discoverContextContent) {
