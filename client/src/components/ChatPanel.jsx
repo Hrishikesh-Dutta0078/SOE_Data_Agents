@@ -443,7 +443,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     setProgress(null);
     setStreamingInsights('');
     setStreamingData(null);
-    streamingDataRef.current = null;
+    // NOTE: do NOT clear streamingDataRef here — handleResponse reads it after runStream returns.
+    // It gets overwritten at the start of the next stream call.
     setActiveTools([]);
     return result;
   }, [streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, nodeModelOverrides]);
