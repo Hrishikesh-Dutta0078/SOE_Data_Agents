@@ -87,19 +87,16 @@ async function runOneSubQuery(baseState, plan, index, emit) {
     };
     logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (using gold SQL directly)`);
   } else if (match && hasUserParams) {
-    // Template match WITH user params — need research + writer to adapt the SQL with filters
     state = {
       ...state,
       templateSql: match.sql,
       subQueryMatchFound: true,
       matchType: 'partial',
     };
-    logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (routing through writer for user params)`);
+    logger.info(`[ParallelPipeline] [${index + 1}/${total}] Template hit for "${subQuestion.substring(0, 60)}" → ${match.id} (skipping research, routing to writer for user params)`);
 
-    emitProgress('research');
-    const researchUpdate = await researchAgentNode(state);
-    state = { ...state, ...researchUpdate };
-
+    // Skip research — template provides table/column/join context.
+    // Writer adapts template SQL with user param filters.
     emitProgress('sql');
     const writerUpdate = await sqlWriterAgentNode(state);
     state = { ...state, ...writerUpdate };
