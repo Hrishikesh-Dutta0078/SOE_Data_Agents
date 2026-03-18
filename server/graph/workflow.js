@@ -1,17 +1,17 @@
 /**
- * LangGraph Workflow — multi-agent architecture with checkpointing.
+ * LangGraph Workflow — simplified pipeline with checkpointing.
  *
- * Graph: Classify -> [Decompose] -> ResearchAgent -> SqlWriterAgent ->
+ * Graph: Classify -> ContextFetch -> GenerateSql ->
  *        InjectRLS -> Validate -> Execute -> CheckResults -> [AccumulateResult loop] -> Present
- * with follow-up branches into DiagnoseEmptyResults or Present.
+ * with correction loop via Correct -> GenerateSql.
  */
 
 const { StateGraph, MemorySaver } = require('@langchain/langgraph');
 const { WorkflowState } = require('./state');
 const { classifyNode } = require('./nodes/classify');
 const { decomposeNode } = require('./nodes/decompose');
-const { researchAgentNode } = require('./nodes/researchAgent');
-const { sqlWriterAgentNode } = require('./nodes/sqlWriterAgent');
+const { contextFetchNode } = require('./nodes/contextFetch');
+const { generateSqlNode } = require('./nodes/generateSql');
 const { injectRlsNode } = require('./nodes/injectRls');
 const { validateNode } = require('./nodes/validate');
 const { correctNode } = require('./nodes/correct');
@@ -32,20 +32,8 @@ const logger = require('../utils/logger');
 
 function routeAfterClassify(state) {
   if (state.matchType === 'dashboard_refine') {
-    logger.info('Fast path: dashboard refinement, routing directly to dashboardAgent');
+    logger.info('Fast path: dashboard refinement, routing to dashboardAgent');
     return 'dashboardAgent';
-  }
-  if (state.matchType === 'exact') {
-    logger.info('Fast path: exact variant match, skipping research + writer');
-    return 'injectRls';
-  }
-  if (state.matchType === 'partial') {
-    logger.info('Fast path: partial match, skipping research');
-    return 'sqlWriterAgent';
-  }
-  if (state.matchType === 'followup') {
-    logger.info('Fast path: follow-up question, skipping research (using prior SQL as template)');
-    return 'sqlWriterAgent';
   }
   if (state.intent === 'DASHBOARD') {
     if (state.dashboardHasDataRequest) {
@@ -53,45 +41,28 @@ function routeAfterClassify(state) {
         logger.info('Dashboard path B: multi-query, routing to decompose');
         return 'decompose';
       }
-      logger.info('Dashboard path B: single query, routing to researchAgent');
-      return 'researchAgent';
+      logger.info('Dashboard path B: single query, routing to contextFetch');
+      return 'contextFetch';
     }
     logger.info('Dashboard path A: assembling from conversation history');
     return 'dashboardAgent';
   }
   if (state.intent === 'SQL_QUERY') {
     if (state.needsDecomposition) {
-      if (state.blueprintId) {
-        logger.info(`Blueprint path: "${state.blueprintId}" → routing to decompose (deterministic plan)`);
-      } else {
-        logger.info('Multi-query path: routing to decompose');
-      }
+      logger.info(state.blueprintId
+        ? `Blueprint path: "${state.blueprintId}" → decompose`
+        : 'Multi-query path: routing to decompose');
       return 'decompose';
     }
-    return 'researchAgent';
+    logger.info(`SQL path: matchType=${state.matchType || 'research'}, routing to contextFetch`);
+    return 'contextFetch';
   }
   return '__end__';
 }
 
-function routeAfterSqlWriter(state) {
-  if (!state.sql) {
-    logger.warn('No SQL produced (writer error/timeout), ending workflow');
-    return '__end__';
-  }
-  return 'injectRls';
-}
-
 function routeAfterInjectRls(state) {
   if (state.validationEnabled === false) {
-    logger.info('Validation disabled by user, skipping to execute');
-    return 'execute';
-  }
-  if (state.matchType === 'exact') {
-    logger.info('Fast path: skipping validation for exact template match');
-    return 'execute';
-  }
-  if (state.matchType === 'followup') {
-    logger.info('Fast path: skipping validation for follow-up (prior SQL already validated)');
+    logger.info('Validation disabled, skipping to execute');
     return 'execute';
   }
   return 'validate';
@@ -180,11 +151,8 @@ function routeAfterDiagnose(state) {
 }
 
 function routeAfterSubQueryMatch(state) {
-  if (state.subQueryMatchFound) {
-    logger.info('Sub-query fast path: template match found, skipping research');
-    return 'sqlWriterAgent';
-  }
-  return 'researchAgent';
+  // All sub-queries go through contextFetch regardless of template match
+  return 'contextFetch';
 }
 
 function routeAfterDecompose(state) {
@@ -208,8 +176,8 @@ function buildWorkflow() {
   const graph = new StateGraph(WorkflowState)
     .addNode('classify', classifyNode)
     .addNode('decompose', decomposeNode)
-    .addNode('researchAgent', researchAgentNode)
-    .addNode('sqlWriterAgent', sqlWriterAgentNode)
+    .addNode('contextFetch', contextFetchNode)
+    .addNode('generateSql', generateSqlNode)
     .addNode('injectRls', injectRlsNode)
     .addNode('validate', validateNode)
     .addNode('correct', correctNode)
@@ -224,15 +192,15 @@ function buildWorkflow() {
     .addNode('dashboardAgent', dashboardAgentNode)
 
     .addEdge('__start__', 'classify')
-    .addConditionalEdges('classify', routeAfterClassify, ['decompose', 'researchAgent', 'sqlWriterAgent', 'injectRls', 'dashboardAgent', '__end__'])
+    .addConditionalEdges('classify', routeAfterClassify, ['decompose', 'contextFetch', 'dashboardAgent', '__end__'])
     .addEdge('decompose', 'alignSubQueries')
     .addConditionalEdges('alignSubQueries', routeAfterAlign, ['parallelSubQueryPipeline', 'subQueryMatch'])
-    .addConditionalEdges('subQueryMatch', routeAfterSubQueryMatch, ['researchAgent', 'sqlWriterAgent'])
-    .addEdge('researchAgent', 'sqlWriterAgent')
-    .addConditionalEdges('sqlWriterAgent', routeAfterSqlWriter, ['injectRls', '__end__'])
+    .addEdge('subQueryMatch', 'contextFetch')
+    .addEdge('contextFetch', 'generateSql')
+    .addEdge('generateSql', 'injectRls')
     .addConditionalEdges('injectRls', routeAfterInjectRls, ['validate', 'execute'])
     .addConditionalEdges('validate', routeAfterValidate, ['execute', 'correct', 'accumulateResult', 'present', '__end__'])
-    .addEdge('correct', 'injectRls')
+    .addEdge('correct', 'generateSql')
     .addConditionalEdges('execute', routeAfterExecute, ['checkResults', 'correct'])
     .addConditionalEdges('checkResults', routeAfterCheckResults, ['present', 'dashboardAgent', 'accumulateResult', 'diagnoseEmptyResults', '__end__'])
     .addEdge('parallelSubQueryPipeline', 'checkResults')
@@ -257,7 +225,6 @@ module.exports = {
   buildWorkflow,
   __testables: {
     routeAfterClassify,
-    routeAfterSqlWriter,
     routeAfterInjectRls,
     routeAfterValidate,
     routeAfterExecute,
