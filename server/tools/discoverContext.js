@@ -56,14 +56,21 @@ const discoverContextTool = new DynamicStructuredTool({
     }).nullable().optional().describe('Detected entities from classification (metrics, dimensions, filters, operations)'),
   }),
   func: async ({ query, entities }) => {
-    const fiscalPromise = fetchFiscalPeriod();
     const enrichedQuery = buildEnrichedQuery(query, entities);
 
-    const { tableNames, columnsByTable } = await selectTablesAndColumnsByLLM(query, entities || null);
+    // Start async calls first — these run in parallel
+    const fiscalPromise = fetchFiscalPeriod();
+    const llmPromise = selectTablesAndColumnsByLLM(query, entities || null);
+
+    // Keyword searches don't depend on LLM result — run while LLM processes
     const examples = searchExamples(enrichedQuery, 5);
     const rules = searchRules(enrichedQuery, 8);
     const kpis = searchKpis(enrichedQuery, 5);
 
+    // Wait for LLM table/column selection
+    const { tableNames, columnsByTable } = await llmPromise;
+
+    // These depend on tableNames from LLM
     const joinRules = getJoinRulesForTables(tableNames);
     const joinText = formatJoinRulesText(joinRules);
 
