@@ -37,7 +37,7 @@ const BUILTIN_PRESETS = {
   'Balanced': {
     classify: 'opus', decompose: 'opus',
     researchAgent: 'opus',
-    sqlWriterAgent: 'sonnet', subQueryMatch: 'opus', correct: 'opus',
+    sqlWriterAgent: 'sonnet', subQueryMatch: 'opus', correct: 'sonnet',
     semanticValidatorFast: 'sonnet', semanticValidatorOpus: 'sonnet',
     presentInsights: 'sonnet', presentChart: 'sonnet', dashboardAgent: 'sonnet',
   },
