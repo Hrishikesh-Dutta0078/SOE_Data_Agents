@@ -28,19 +28,23 @@ const NODE_CONFIG = [
 const ALL_NODE_KEYS = NODE_CONFIG.flatMap(g => g.nodes.map(n => n.key));
 
 /* ------------------------------------------------------------------ */
+/*  Server defaults — mirrors resolveProfileName() in llm.js           */
+/*  SONNET_NODE_KEYS: correct, presentChart                            */
+/*  Everything else: opus                                               */
+/* ------------------------------------------------------------------ */
+const SONNET_NODES = new Set(['correct', 'presentChart']);
+const SERVER_DEFAULTS = Object.fromEntries(
+  ALL_NODE_KEYS.map(k => [k, SONNET_NODES.has(k) ? 'sonnet' : 'opus'])
+);
+
+/* ------------------------------------------------------------------ */
 /*  Built-in presets                                                    */
 /* ------------------------------------------------------------------ */
 const BUILTIN_PRESETS = {
   'All Haiku': Object.fromEntries(ALL_NODE_KEYS.map(k => [k, 'haiku'])),
   'All Sonnet': Object.fromEntries(ALL_NODE_KEYS.map(k => [k, 'sonnet'])),
   'All Opus': Object.fromEntries(ALL_NODE_KEYS.map(k => [k, 'opus'])),
-  'Balanced': {
-    classify: 'opus', decompose: 'opus',
-    contextFetch: 'opus', generateSql: 'opus',
-    subQueryMatch: 'opus', correct: 'sonnet',
-    semanticValidatorFast: 'sonnet', semanticValidatorOpus: 'sonnet',
-    presentInsights: 'sonnet', presentChart: 'sonnet', dashboardAgent: 'sonnet',
-  },
+  'Balanced': { ...SERVER_DEFAULTS },
 };
 
 /* ------------------------------------------------------------------ */
@@ -154,7 +158,7 @@ export default function DevPanel({ nodeModelOverrides, setNodeModelOverrides, sa
   }, [setNodeModelOverrides]);
 
   const resetDefaults = useCallback(() => {
-    setNodeModelOverrides({});
+    setNodeModelOverrides({ ...SERVER_DEFAULTS });
   }, [setNodeModelOverrides]);
 
   const savePreset = useCallback(() => {
@@ -182,7 +186,7 @@ export default function DevPanel({ nodeModelOverrides, setNodeModelOverrides, sa
   const totals = useMemo(() => getTotalMetrics(lastRunMetrics), [lastRunMetrics]);
 
   const getSelectedModel = useCallback((nodeKey) => {
-    return nodeModelOverrides[nodeKey] || null;
+    return nodeModelOverrides[nodeKey] || SERVER_DEFAULTS[nodeKey] || null;
   }, [nodeModelOverrides]);
 
   return (
