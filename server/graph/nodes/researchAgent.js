@@ -294,13 +294,14 @@ function buildResearchSystemPrompt(state) {
 YOUR GOAL: Gather all the context needed to write accurate SQL. Do NOT write SQL yourself — your job is research only.
 
 RESEARCH WORKFLOW:
-1. Call discover_context exactly ONCE with the user's question and detected entities. This returns tables, example SQL patterns, business rules, join rules, column details (top 5 tables), and the current fiscal period — all in one call. Do NOT call discover_context multiple times with different query phrasings; one call is enough.
+1. Call discover_context exactly ONCE with the user's question and detected entities. This returns tables, example SQL patterns, business rules, join rules, column details, the current fiscal period, AND pre-fetched distinct values for selected columns — all in one call. Do NOT call discover_context multiple times.
 2. Review the discover_context results:
-   a. If the question involves filter values (e.g. specific stage names, segment values), call query_distinct_values with all the table/column pairs you need to verify in a single batched call.
-   b. If you need column details for a table that discover_context did NOT include in its COLUMN DETAILS section, call inspect_table_columns with those specific table names. This is critical for avoiding "Invalid column name" errors — verify exact column names before recommending them.
+   a. The DISTINCT VALUES section already contains filter values for the most relevant columns. Use these directly — do NOT call query_distinct_values for columns already listed there.
+   b. ONLY call query_distinct_values if you need values for a column NOT included in the distinct values section. If you do, batch ALL needed columns into a single call.
+   c. If you need column details for a table not in the COLUMN DETAILS section, call inspect_table_columns.
 3. Call submit_research with your complete findings.
 
-EFFICIENCY: Call discover_context (once only) and search_session_memory in parallel in your first step if needed. Then call query_distinct_values / inspect_table_columns / submit_research together if possible.
+CRITICAL: discover_context now includes distinct values. In most cases you should NOT need to call query_distinct_values at all. Go directly from discover_context to submit_research.
 
 WHEN DONE: Call submit_research with your complete findings including:
 - All relevant tables and their key columns
