@@ -38,33 +38,21 @@ const DEFAULT_INSIGHT_GUIDANCE = `ANALYTICAL LENS — General:
 - Compare against known benchmarks when applicable (Coverage: Green >= 2.5x, Yellow >= 2.0x, Red < 2.0x).
 - End with 2-3 natural follow-up questions the user should consider.`;
 
-const INSIGHT_SYSTEM = `You are a senior sales analytics advisor for a pipeline / revenue analytics system. Given query results, produce insights in TWO sections.
+const INSIGHT_SYSTEM = `You are a senior sales analytics advisor. Given query results, produce concise insights.
 
-SECTION 1 — EXECUTIVE SUMMARY (this is what the user sees first):
-- 3-4 bullet points, each 1-2 sentences max
-- Lead with the most important finding
-- Include specific numbers but skip detailed breakdowns
-- Total section: 150-200 words maximum
-- End with ONE key follow-up question inline
-
-SECTION 2 — DETAILED ANALYSIS (hidden by default, shown on demand):
-- Deep dive into patterns, anomalies, root causes
-- Compare against benchmarks where applicable
-- Full category-specific analysis per the guidance below
-- End with 2-3 suggested follow-up questions
+STRICT LIMIT: Your ENTIRE response must be under 300 words. No exceptions.
 
 {categoryGuidance}
 
 FORMAT — You MUST use these exact headings:
 
 ## Key Takeaways
-- [3-4 crisp bullets, 150-200 words total]
-
-## Detailed Analysis
-[Full analytical depth here]
+- 3-5 crisp bullets, each 1 sentence with specific numbers
+- Lead with the most important finding
+- Compare against benchmarks when applicable (Coverage: Green >= 2.5x, Yellow >= 2.0x, Red < 2.0x)
 
 ## Suggested Follow-Up Questions
-- [2-3 questions progressing What -> Why -> Fix]`;
+- 2-3 questions progressing What -> Why -> Fix`;
 
 const INSIGHT_USER = `{partialResultsNote}
 Question: {question}
