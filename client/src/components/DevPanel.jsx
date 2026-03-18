@@ -4,24 +4,15 @@ import React, { useState, useCallback, useMemo } from 'react';
 /*  Node configuration – groups of pipeline nodes                      */
 /* ------------------------------------------------------------------ */
 const NODE_CONFIG = [
-  { group: 'Planning', nodes: [
-    { key: 'classify', label: 'Classify' },
-    { key: 'decompose', label: 'Decompose' },
-  ]},
-  { group: 'Execution', nodes: [
-    { key: 'contextFetch', label: 'Context Fetch', role: 'table selection' },
+  { group: 'Pipeline', nodes: [
+    { key: 'classify', label: 'Classify', role: 'intent + entities' },
+    { key: 'decompose', label: 'Decompose', role: 'multi-query split' },
     { key: 'generateSql', label: 'Generate SQL', role: 'SQL generation' },
-    { key: 'subQueryMatch', label: 'Sub-Query Match' },
-    { key: 'correct', label: 'Correct', role: 'error analysis' },
-  ]},
-  { group: 'Validation', nodes: [
-    { key: 'semanticValidatorFast', label: 'Semantic Validator (fast)' },
-    { key: 'semanticValidatorOpus', label: 'Semantic Validator (thorough)' },
   ]},
   { group: 'Output', nodes: [
-    { key: 'presentInsights', label: 'Present Insights' },
-    { key: 'presentChart', label: 'Present Chart' },
-    { key: 'dashboardAgent', label: 'Dashboard Agent' },
+    { key: 'presentInsights', label: 'Insights', role: 'analysis' },
+    { key: 'presentChart', label: 'Chart', role: 'visualization' },
+    { key: 'dashboardAgent', label: 'Dashboard', role: 'tile layout' },
   ]},
 ];
 
@@ -29,10 +20,10 @@ const ALL_NODE_KEYS = NODE_CONFIG.flatMap(g => g.nodes.map(n => n.key));
 
 /* ------------------------------------------------------------------ */
 /*  Server defaults — mirrors resolveProfileName() in llm.js           */
-/*  SONNET_NODE_KEYS: correct, presentChart                            */
+/*  SONNET_NODE_KEYS: presentChart                                     */
 /*  Everything else: opus                                               */
 /* ------------------------------------------------------------------ */
-const SONNET_NODES = new Set(['correct', 'presentChart']);
+const SONNET_NODES = new Set(['presentChart']);
 const SERVER_DEFAULTS = Object.fromEntries(
   ALL_NODE_KEYS.map(k => [k, SONNET_NODES.has(k) ? 'sonnet' : 'opus'])
 );
