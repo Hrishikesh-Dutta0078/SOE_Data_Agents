@@ -20,6 +20,11 @@ const { buildUsageSnapshot, buildUsageBreakdown } = require('../utils/usageMetri
 const { DB_REQUEST_TIMEOUT, DASHBOARD_DB_TIMEOUT } = require('../config/constants');
 const logger = require('../utils/logger');
 
+function stripExecutionRows(exec) {
+  if (!exec) return null;
+  return { ...exec, rows: [] };
+}
+
 function stableStringify(value) {
   if (value == null) return 'null';
   if (typeof value !== 'object') return JSON.stringify(value);
@@ -410,7 +415,7 @@ function extractNodeModel(update) {
   return trace[trace.length - 1]?.llm || null;
 }
 
-function buildFinalResponse(state, usage, runtimeMetrics = null, usageByNodeAndModel = null) {
+function buildFinalResponse(state, usage, runtimeMetrics = null, usageByNodeAndModel = null, { stripRows = false } = {}) {
   const queries = state.queries || [];
   const payload = {
     intent: state.intent,
@@ -426,19 +431,20 @@ function buildFinalResponse(state, usage, runtimeMetrics = null, usageByNodeAndM
       purpose: q.purpose,
       sql: q.sql,
       reasoning: q.reasoning,
-      execution: q.execution,
+      execution: stripRows ? stripExecutionRows(q.execution) : q.execution,
     })),
     clarificationQuestions: state.clarificationQuestions,
     generalChatReply: state.generalChatReply,
     orchestrationReasoning: state.orchestrationReasoning,
     sql: state.sql ? { generated: state.sql, reasoning: state.reasoning } : null,
-    execution: state.execution,
+    execution: stripRows ? stripExecutionRows(state.execution) : state.execution,
     diagnostics: state.diagnostics,
     insights: state.insights,
     chart: state.chart,
     suggestedFollowUps: state.suggestedFollowUps || [],
     retrySuggestions: state.retrySuggestions || [],
     partialResultsSummary: state.partialResultsSummary || null,
+    zeroRowGuidance: state.zeroRowGuidance || null,
     dashboardSpec: state.dashboardSpec || null,
     trace: state.trace,
     warnings: state.warnings,
@@ -804,6 +810,37 @@ router.post('/analyze-stream', async (req, res) => {
         res.write(`event: query_summary\ndata: ${JSON.stringify(summaryEvent)}\n\n`);
       }
 
+      // Emit data_ready for early table rendering
+      if (nodeName === 'checkResults') {
+        const exec = lastState.execution;
+        if (exec?.success && exec?.rowCount > 0) {
+          const CLIENT_ROW_LIMIT = 100;
+          const dataReadyEvent = {
+            type: 'data_ready',
+            execution: {
+              success: true,
+              columns: exec.columns || [],
+              rows: (exec.rows || []).slice(0, CLIENT_ROW_LIMIT),
+              rowCount: exec.rowCount,
+              truncated: exec.rowCount > CLIENT_ROW_LIMIT,
+            },
+            sql: lastState.sql || '',
+            zeroRowGuidance: null,
+            elapsed: Date.now() - requestStart,
+          };
+          res.write(`event: data_ready\ndata: ${JSON.stringify(dataReadyEvent)}\n\n`);
+        } else if (exec?.success && exec?.rowCount === 0) {
+          const dataReadyEvent = {
+            type: 'data_ready',
+            execution: { success: true, columns: exec.columns || [], rows: [], rowCount: 0, truncated: false },
+            sql: lastState.sql || '',
+            zeroRowGuidance: lastState.zeroRowGuidance || null,
+            elapsed: Date.now() - requestStart,
+          };
+          res.write(`event: data_ready\ndata: ${JSON.stringify(dataReadyEvent)}\n\n`);
+        }
+      }
+
       const event = {
         node: nodeName,
         duration,
@@ -851,7 +888,7 @@ router.post('/analyze-stream', async (req, res) => {
     if (onDashboardProgress) dashboardEvents.removeListener('dashboard_progress', onDashboardProgress);
 
     const usageByNodeAndModel = buildUsageBreakdown(getUsageByNodeAndModel());
-    const finalPayload = buildFinalResponse(lastState, usageWithTiming, runtimeMetrics, usageByNodeAndModel);
+    const finalPayload = buildFinalResponse(lastState, usageWithTiming, runtimeMetrics, usageByNodeAndModel, { stripRows: true });
     finalPayload.confidence = computeConfidence(lastState);
     res.write(`event: done\ndata: ${JSON.stringify(finalPayload)}\n\n`);
     res.end();
