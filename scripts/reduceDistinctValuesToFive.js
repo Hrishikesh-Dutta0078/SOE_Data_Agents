@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Reduce distinct-values.json so each column has at most 5 distinct values,
+ * Reduce schema-knowledge.json so each column's distinct_values has at most 5 values,
  * chosen randomly from the existing values. Overwrites the file in place.
  *
  * Run from project root: node scripts/reduceDistinctValuesToFive.js
@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 
 const KNOWLEDGE_DIR = path.join(__dirname, '..', 'server', 'context', 'knowledge');
-const FILE = path.join(KNOWLEDGE_DIR, 'distinct-values.json');
+const FILE = path.join(KNOWLEDGE_DIR, 'schema-knowledge.json');
 
 const MAX_VALUES = 5;
 
@@ -26,28 +26,31 @@ function randomSample(arr, n) {
 }
 
 function main() {
-  const data = JSON.parse(fs.readFileSync(FILE, 'utf-8'));
+  const schema = JSON.parse(fs.readFileSync(FILE, 'utf-8'));
 
   let totalCols = 0;
   let reducedCols = 0;
 
-  for (const tableName of Object.keys(data)) {
-    const table = data[tableName];
-    if (!table || typeof table !== 'object' || table.error) continue;
+  for (const tableName of Object.keys(schema)) {
+    const tableData = schema[tableName];
+    if (!tableData?.columns) continue;
 
-    for (const colName of Object.keys(table)) {
-      const val = table[colName];
+    for (const colName of Object.keys(tableData.columns)) {
+      const colData = tableData.columns[colName];
+      if (!colData.distinct_values) continue;
+
       totalCols++;
-      if (Array.isArray(val) && val.length > MAX_VALUES) {
-        table[colName] = randomSample(val, MAX_VALUES);
+      if (Array.isArray(colData.distinct_values) && colData.distinct_values.length > MAX_VALUES) {
+        colData.distinct_values = randomSample(colData.distinct_values, MAX_VALUES);
         reducedCols++;
-      } else if (val && typeof val === 'object' && val.error) {
-        // leave error entries as-is
       }
     }
   }
 
-  fs.writeFileSync(FILE, JSON.stringify(data, null, 2), 'utf-8');
+  const tmpFile = FILE + '.tmp';
+  fs.writeFileSync(tmpFile, JSON.stringify(schema, null, 2), 'utf-8');
+  fs.renameSync(tmpFile, FILE);
+
   console.log(`Reduced ${reducedCols} columns to ${MAX_VALUES} values (total columns: ${totalCols}).`);
   console.log(`Written: ${FILE}`);
 }

@@ -1,10 +1,10 @@
 /**
  * Distinct Values Fetcher — programmatic, deterministic distinct value retrieval.
  *
- * Loads pre-harvested distinct values from distinct-values.json into memory
+ * Loads pre-harvested distinct values from schema-knowledge.json into memory
  * and serves them via fast Map lookups. No SQL Server calls at runtime.
  *
- * If distinct-values.json does not exist yet, returns graceful "not available"
+ * If schema-knowledge.json does not exist yet, returns graceful "not available"
  * responses (the harvest script must be run first).
  *
  * Usage:
@@ -22,20 +22,20 @@ const DISTINCT_VALUES_PATH = path.join(
   '..',
   'context',
   'knowledge',
-  'distinct-values.json'
+  'schema-knowledge.json'
 );
 
 let _store = null;
 let _loadPromise = null;
 
-function buildStoreFromRaw(raw) {
+function buildStoreFromSchema(schema) {
   const tableIndex = new Map();
-  for (const [tableName, columns] of Object.entries(raw)) {
+  for (const [tableName, tableData] of Object.entries(schema)) {
+    if (!tableData?.columns) continue;
     const colMap = new Map();
-    for (const [colName, values] of Object.entries(columns)) {
-      if (values && typeof values === 'object' && values.error) continue;
-      if (Array.isArray(values)) {
-        colMap.set(colName.toUpperCase(), values);
+    for (const [colName, colData] of Object.entries(tableData.columns)) {
+      if (colData.distinct_values && Array.isArray(colData.distinct_values)) {
+        colMap.set(colName.toUpperCase(), colData.distinct_values);
       }
     }
     if (colMap.size > 0) {
@@ -57,8 +57,8 @@ async function loadDistinctValuesAsync() {
       _store = { tableIndex: new Map(), available: false };
       return _store;
     }
-    const raw = JSON.parse(await fs.promises.readFile(DISTINCT_VALUES_PATH, 'utf-8'));
-    _store = buildStoreFromRaw(raw);
+    const schema = JSON.parse(await fs.promises.readFile(DISTINCT_VALUES_PATH, 'utf-8'));
+    _store = buildStoreFromSchema(schema);
     return _store;
   })();
 

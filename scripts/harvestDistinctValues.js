@@ -2,10 +2,10 @@
 
 /**
  * Harvest distinct values for all important columns from SQL Server
- * and write to distinct-values.json.
+ * and inject them into schema-knowledge.json as distinct_values fields.
  *
  * Reads schema-knowledge.json to determine which tables/columns to query.
- * Runs SELECT DISTINCT TOP 50 for each column.
+ * Runs SELECT DISTINCT TOP 10 for each column.
  *
  * Prerequisites:
  *   - SQL Server accessible (server .env: DB_SERVER, DB_DATABASE, DB_USER, DB_PASSWORD)
@@ -23,7 +23,6 @@ const { getPool, closePool, getDbConfig } = require(path.join(__dirname, '..', '
 
 const KNOWLEDGE_DIR = path.join(__dirname, '..', 'server', 'context', 'knowledge');
 const SCHEMA_FILE = path.join(KNOWLEDGE_DIR, 'schema-knowledge.json');
-const OUTPUT_FILE = path.join(KNOWLEDGE_DIR, 'distinct-values.json');
 
 const DISTINCT_LIMIT = 10;
 const QUERY_TIMEOUT = 30000;
@@ -61,6 +60,14 @@ async function main() {
   const schema = JSON.parse(fs.readFileSync(SCHEMA_FILE, 'utf-8'));
   const tableNames = Object.keys(schema);
 
+  // Clear existing distinct_values from schema
+  for (const tableName of tableNames) {
+    const columns = schema[tableName].columns || {};
+    for (const colName of Object.keys(columns)) {
+      delete columns[colName].distinct_values;
+    }
+  }
+
   const { config } = getDbConfig();
   console.log(`Harvesting distinct values for ${tableNames.length} tables...`);
   console.log(`Server: ${config.server}, DB: ${config.database}\n`);
@@ -68,7 +75,6 @@ async function main() {
   const pool = await getPool();
   console.log('Connected to SQL Server.\n');
 
-  const allValues = {};
   let totalColumns = 0;
   let successColumns = 0;
   let errorColumns = 0;
@@ -82,28 +88,38 @@ async function main() {
 
     try {
       const tableValues = await harvestTable(pool, tableName, columns);
-      allValues[tableName] = tableValues;
 
-      const errors = Object.values(tableValues).filter((v) => v && typeof v === 'object' && v.error);
-      successColumns += colCount - errors.length;
-      errorColumns += errors.length;
+      // Inject harvested values into schema
+      for (const [colName, values] of Object.entries(tableValues)) {
+        if (values && typeof values === 'object' && values.error) {
+          errorColumns++;
+          continue;
+        }
+        if (Array.isArray(values) && values.length > 0) {
+          columns[colName].distinct_values = values;
+          successColumns++;
+        }
+      }
 
-      console.log(`    OK: ${colCount - errors.length} columns, ${errors.length} errors`);
+      const errorCount = Object.values(tableValues).filter((v) => v && typeof v === 'object' && v.error).length;
+      console.log(`    OK: ${colCount - errorCount} columns, ${errorCount} errors`);
     } catch (err) {
       console.error(`    TABLE ERROR ${tableName}: ${err.message}`);
-      allValues[tableName] = { _error: err.message };
       errorColumns += colCount;
     }
   }
 
   await closePool();
 
-  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(allValues, null, 2), 'utf-8');
+  // Atomic write: write to temp file, then rename
+  const tmpFile = SCHEMA_FILE + '.tmp';
+  fs.writeFileSync(tmpFile, JSON.stringify(schema, null, 2), 'utf-8');
+  fs.renameSync(tmpFile, SCHEMA_FILE);
 
   console.log(`\nDone!`);
   console.log(`  Tables: ${tableNames.length}`);
   console.log(`  Columns harvested: ${successColumns}/${totalColumns} (${errorColumns} errors)`);
-  console.log(`  Output: ${OUTPUT_FILE}`);
+  console.log(`  Output: ${SCHEMA_FILE}`);
 }
 
 main().catch((err) => {
