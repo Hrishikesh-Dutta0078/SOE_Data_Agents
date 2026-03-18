@@ -40,7 +40,7 @@ async function checkResultsNode(state) {
   }
 
   if (exec.rowCount >= QUERY_RESULT_ROW_LIMIT) {
-    warnings.push(`Query hit the ${QUERY_RESULT_ROW_LIMIT}-row limit — results may be truncated`);
+    warnings.push(`Results capped at ${QUERY_RESULT_ROW_LIMIT} rows for display. Use the dashboard view for full data exploration.`);
   }
 
   if (exec?.rows?.length > 0 && exec?.columns?.length > 0) {

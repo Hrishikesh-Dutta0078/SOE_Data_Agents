@@ -32,7 +32,7 @@ module.exports = {
   // --- Database ---
   DB_REQUEST_TIMEOUT: 60000, // 1 minute query timeout
   DB_CONNECTION_TIMEOUT: 15000,
-  DB_POOL_MIN: 0,
+  DB_POOL_MIN: 2,
   DB_POOL_MAX: 10,
   DB_POOL_IDLE_TIMEOUT: 30000,
 
@@ -43,13 +43,13 @@ module.exports = {
   // --- Agent Limits ---
   SQL_AGENT_TIMEOUT_MS: 180000,
   SQL_AGENT_TIMEOUT_COMPLEX_MS: 300000,
-  MAX_CORRECTION_ROUNDS: 3,
+  MAX_CORRECTION_ROUNDS: 2,
   /** Correction attempts per failed sub-query in the parallel pipeline (1–2 recommended for latency). */
   PARALLEL_CORRECTION_ROUNDS: 2,
   MAX_RESULT_RETRIES: 2,
 
   // --- Query Execution ---
-  QUERY_RESULT_ROW_LIMIT: 1000,
+  QUERY_RESULT_ROW_LIMIT: 100,
   INSIGHT_SAMPLE_ROWS: 50,
   CHART_SAMPLE_ROWS: 20,
 
