@@ -97,6 +97,9 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const [querySummary, setQuerySummary] = useState('');
   const [confidence, setConfidence] = useState(null);
 
+  const [streamingData, setStreamingData] = useState(null);
+  const streamingDataRef = useRef(null);
+
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const saveTimerRef = useRef(null);
@@ -250,6 +253,11 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     }
 
     if (intent === 'SQL_QUERY' || data.sql) {
+      // Merge rows from data_ready capture — the SSE done payload strips rows for payload size
+      const capturedRows = streamingDataRef.current?.rows;
+      const finalExecution = data.execution
+        ? { ...data.execution, rows: capturedRows || data.execution.rows || [] }
+        : (streamingDataRef.current || null);
       setMessages((prev) => [
         ...prev,
         {
@@ -258,7 +266,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           content: data.sql?.generated || data.sql || '',
           sqlReasoning: data.sql?.reasoning || '',
           orchestration: { intent: data.intent, complexity: data.complexity },
-          execution: data.execution || null,
+          execution: finalExecution,
           insights: data.insights || null,
           chart: data.chart || null,
           queries: data.queries || [],
@@ -398,16 +406,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     } else if (eventType === 'query_summary') {
       setQuerySummary(eventData.summary || '');
     } else if (eventType === 'data_ready') {
-      setMessages((prev) => {
-        const last = prev[prev.length - 1];
-        if (!last || last.role !== 'assistant') return prev;
-        return [...prev.slice(0, -1), {
-          ...last,
-          dataReady: eventData.execution,
-          sql: eventData.sql ? { generated: eventData.sql } : last.sql,
-          zeroRowGuidance: eventData.zeroRowGuidance,
-        }];
-      });
+      streamingDataRef.current = eventData.execution;
+      setStreamingData(eventData.execution);
     } else if (eventType === 'done') {
       if (onMetricsUpdate) {
         onMetricsUpdate({
@@ -442,6 +442,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
 
     setProgress(null);
     setStreamingInsights('');
+    setStreamingData(null);
+    streamingDataRef.current = null;
     setActiveTools([]);
     return result;
   }, [streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, nodeModelOverrides]);
@@ -1142,6 +1144,14 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                     chart={null}
                     queries={partialQueries.filter(Boolean)}
                     isPartial={true}
+                  />
+                )}
+                {streamingData && streamingData.rowCount > 0 && (
+                  <ResultsPanel
+                    execution={streamingData}
+                    insights={null}
+                    chart={null}
+                    queries={[]}
                   />
                 )}
                 {streamingInsights && (

@@ -538,7 +538,8 @@ async function researchAgentNode(state) {
     );
 
     let lastAgentState = null;
-    let finishedResearch = false;
+    let submitResearchCalled = false;
+    let submitResearchResultReceived = false;
     const seenToolCallKeys = new Set();
     const seenToolResultKeys = new Set();
     let toolCallCount = 0;
@@ -556,12 +557,15 @@ async function researchAgentNode(state) {
             seenToolCallKeys.add(dedupKey);
             toolCallCount++;
             _researchToolEvents.emit('tool_call', { name: tc.name, index: toolCallCount, attempt: attempts.agent, phase: 'research', sessionId: state.sessionId || '' });
-            if (tc.name === 'submit_research') finishedResearch = true;
+            if (tc.name === 'submit_research') submitResearchCalled = true;
           }
         }
         if (msg.name && msg.content) {
           if (msg.name === 'discover_context' && typeof msg.content === 'string' && msg.content.length > 500) {
             discoverContextContent = msg.content;
+          }
+          if (msg.name === 'submit_research') {
+            submitResearchResultReceived = true;
           }
           const resultKey = msg.tool_call_id ? `${msg.name}|${msg.tool_call_id}` : `${msg.name}|${typeof msg.content === 'string' ? msg.content.substring(0, 240) : ''}`;
           if (seenToolResultKeys.has(resultKey)) continue;
@@ -569,7 +573,8 @@ async function researchAgentNode(state) {
           _researchToolEvents.emit('tool_result', { name: msg.name, index: toolCallCount, attempt: attempts.agent, phase: 'research', sessionId: state.sessionId || '' });
         }
       }
-      if (finishedResearch) break;
+      // Break only after the tool RESULT is received, not just the tool call
+      if (submitResearchResultReceived) break;
     }
 
     result = accumulatedMessages.length > 0
