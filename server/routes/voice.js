@@ -112,17 +112,17 @@ function buildPhrases() {
       }
     }
 
-    // 2. KPI abbreviations and their full names from kpi-glossary.json
+    // 2. KPI abbreviations and their full names from definitions.json
     try {
-      const glossary = JSON.parse(fs.readFileSync(path.join(knowledgeDir, 'kpi-glossary.json'), 'utf8'));
-      if (glossary.abbreviations && typeof glossary.abbreviations === 'object') {
-        for (const [abbr, fullName] of Object.entries(glossary.abbreviations)) {
+      const definitions = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'context', 'definitions.json'), 'utf8'));
+      if (definitions.abbreviations && typeof definitions.abbreviations === 'object') {
+        for (const [abbr, fullName] of Object.entries(definitions.abbreviations)) {
           phrases.add(abbr);
           phrases.add(fullName);
         }
       }
     } catch (_) {
-      // kpi-glossary.json not available — continue
+      // definitions.json not available — continue
     }
 
     // Now add column names (priority 3)
@@ -133,9 +133,9 @@ function buildPhrases() {
     // schema-knowledge.json not available — continue
   }
 
-  // 4. Business terms from business-context.md
+  // 4. Business terms from business-rules.md
   try {
-    const businessContext = fs.readFileSync(path.join(knowledgeDir, 'business-context.md'), 'utf8');
+    const businessContext = fs.readFileSync(path.join(knowledgeDir, 'business-rules.md'), 'utf8');
 
     // Capitalized multi-word terms
     const multiWordRegex = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+\b/g;
