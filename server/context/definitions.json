@@ -1,0 +1,63 @@
+{
+  "thresholds": {
+    "coverage": { "green": 2.5, "yellow": 2.0, "label": "Coverage_Quality" },
+    "creation": { "green": 2.5, "yellow": 2.0, "label": "Creation_Coverage_Quality" },
+    "dsScore": { "high": 65, "medium": 40 },
+    "propensity": { "high": 0.8 },
+    "stalled": { "dsnsm": 30, "altDays": 90, "altDsnsm": 15 }
+  },
+  "salesStageMapping": {
+    "-1": "N/A",
+    "1": "Closed - Booked",
+    "2": "S7",
+    "3": "S6",
+    "4": "S5",
+    "5": "S4",
+    "6": "S3",
+    "7": "S2",
+    "8": "S1",
+    "9": "Closed Lost from Pipe",
+    "10": "Closed CleanUp from Pipe",
+    "11": "Closed Lost from Non Pipe",
+    "12": "Closed CleanUp from Non Pipe"
+  },
+  "activePipelineStages": ["S3", "S4", "S5", "S6", "S7"],
+  "activePipelineStageIds": [2, 3, 4, 5, 6],
+  "mandatoryFilters": [
+    { "id": "role_type", "sql": "r.ROLE_TYPE_DISPLAY = 'AE'", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true },
+    { "id": "bu_group", "sql": "rc.ROLE_COVERAGE_BU_GROUP = 'DMX'", "appliesTo": ["vw_TD_EBI_ROLE_Coverage"], "always": true },
+    { "id": "sales_team_bu", "sql": "r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true },
+    { "id": "pay_measure", "sql": "PAY_MEASURE_ID = 0", "appliesTo": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA"], "always": true },
+    { "id": "exclude_advertising", "sql": "o.MOPG1 <> 'ADVERTISING'", "appliesTo": ["vw_EBI_OPG"], "always": true },
+    { "id": "exclude_ppbu", "sql": "o.DMX_SOLUTION_GROUP <> 'PPBU'", "appliesTo": ["vw_EBI_OPG"], "always": true },
+    { "id": "exclude_dme_region", "sql": "(r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true },
+    { "id": "exclude_teams", "sql": "r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true },
+    { "id": "snapshot_week", "sql": "c.WEEK_SORT_ORDER_REVERSE = 0", "appliesTo": ["vw_EBI_CALDATE"], "always": true, "note": "Join pipeline/quota facts to vw_EBI_CALDATE on SNAPSHOT_DATE_ID = DATE_KEY" },
+    { "id": "global_region", "sql": "r.GLOBAL_REGION IN ('AMERICAS','EMEA','APAC','WW')", "appliesTo": ["vw_td_ebi_region_rpt"], "always": false, "note": "Only when filtering by GLOBAL_REGION" },
+    { "id": "rpt_hierarchy", "sql": "IS_CY_RPT_HIER = 1", "appliesTo": ["vw_td_ebi_region_rpt"], "always": false, "note": "When reporting hierarchy column is in scope" },
+    { "id": "dummy_terr", "sql": "r.TERR_ID NOT LIKE '%_%Dummy%'", "appliesTo": ["vw_td_ebi_region_rpt"], "always": false, "note": "For quota queries" }
+  ],
+  "abbreviations": {
+    "W": "Won", "F": "Forecast", "UC": "Upside Committed",
+    "CQ": "Current Quarter", "PQ": "Previous Quarter", "FQ": "Future Quarter",
+    "QTD": "Quarter to Date", "YTD": "Year to Date", "H1": "First Half (Q1+Q2)",
+    "LTG": "Left to Go", "Covx": "Coverage", "BOQ": "Beginning of Quarter",
+    "DSNSM": "Days Since Next Step Modified", "SD": "Stage Duration",
+    "RBOB": "Renewal Base of Business", "GNARR": "Gross New ARR",
+    "ARRAVG": "ARR Average", "R4Q": "Rolling 4 Quarters",
+    "IC": "In Contract", "OOC": "Out of Contract",
+    "FLM": "First Level Manager", "SLM": "Second Level Manager",
+    "TLM": "Third Level Manager", "AE": "Account Executive",
+    "QRF": "Quarterly Revenue Forecast",
+    "S3": "Sales Stage 3", "S4": "Sales Stage 4", "S5": "Sales Stage 5",
+    "S3+": "Sales Stage 3 and above", "S5+": "Sales Stage 5 and above",
+    "SS5+": "Sales Stage 5 and above"
+  },
+  "creationTargetWeights": {
+    "0": "IN_QTR_GC_TARGET",
+    "1": "PIPE_TARGET_SURVIVAL_RATE * 0.4",
+    "2": "PIPE_TARGET_SURVIVAL_RATE * 0.4",
+    "3": "PIPE_TARGET_SURVIVAL_RATE * 0.14",
+    "4": "PIPE_TARGET_SURVIVAL_RATE * 0.05"
+  }
+}
