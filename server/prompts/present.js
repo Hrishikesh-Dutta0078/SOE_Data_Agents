@@ -6,11 +6,18 @@
  */
 
 const { ChatPromptTemplate } = require('@langchain/core/prompts');
+const { getThreshold } = require('../vectordb/definitionsFetcher');
+
+function coverageThresholdText() {
+  const t = getThreshold('coverage');
+  if (!t.green) return 'Coverage: Green >= 2.5x, Yellow >= 2.0x, Red < 2.0x';
+  return `Coverage: Green >= ${t.green}x, Yellow >= ${t.yellow}x, Red < ${t.yellow}x`;
+}
 
 const CATEGORY_INSIGHT_GUIDANCE = {
   WHAT_HAPPENED: `ANALYTICAL LENS — "What Happened" (Facts & State):
 - Highlight anomalies and outliers in the data (which regions/segments/products deviate most).
-- Compare against known benchmarks: Coverage Green >= 2.5x, Yellow >= 2.0x, Red < 2.0x.
+- Compare against known benchmarks: ${coverageThresholdText()}.
 - Flag whether values are "good or bad" relative to typical patterns at this point in the quarter.
 - Quantify deltas: show absolute and percentage differences vs benchmarks or prior periods.
 - Call out concentration risk if a small number of deals/reps/accounts dominate the results.
@@ -35,7 +42,7 @@ const CATEGORY_INSIGHT_GUIDANCE = {
 
 const DEFAULT_INSIGHT_GUIDANCE = `ANALYTICAL LENS — General:
 - Highlight key findings, trends, and anomalies. Be specific with numbers.
-- Compare against known benchmarks when applicable (Coverage: Green >= 2.5x, Yellow >= 2.0x, Red < 2.0x).
+- Compare against known benchmarks when applicable (${coverageThresholdText()}).
 - End with 2-3 natural follow-up questions the user should consider.`;
 
 const INSIGHT_SYSTEM = `You are a senior sales analytics advisor. Given query results, produce concise insights.
@@ -49,7 +56,7 @@ FORMAT — You MUST use these exact headings:
 ## Key Takeaways
 - 3-5 crisp bullets, each 1 sentence with specific numbers
 - Lead with the most important finding
-- Compare against benchmarks when applicable (Coverage: Green >= 2.5x, Yellow >= 2.0x, Red < 2.0x)
+- Compare against benchmarks when applicable (${coverageThresholdText()})
 
 ## Suggested Follow-Up Questions
 - 2-3 questions progressing What -> Why -> Fix`;
