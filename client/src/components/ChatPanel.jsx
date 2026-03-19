@@ -4,7 +4,7 @@ import { analyzeQuestionStream, fetchBlueprints } from '../utils/api';
 import ResultsPanel from './ResultsPanel';
 
 import NarrativeCard from './NarrativeCard';
-import ProgressTimeline from './ProgressTimeline';
+import ThinkingBubble from './ThinkingBubble';
 import DashboardOverlay from './DashboardOverlay';
 import VoiceInput from './VoiceInput';
 import BlueprintPicker from './BlueprintPicker';
@@ -110,6 +110,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const [partialQueries, setPartialQueries] = useState([]);
   const [querySummary, setQuerySummary] = useState('');
   const [confidence, setConfidence] = useState(null);
+  const [isComplete, setIsComplete] = useState(false);
 
   const [streamingData, setStreamingData] = useState(null);
   const streamingDataRef = useRef(null);
@@ -118,6 +119,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const inputRef = useRef(null);
   const saveTimerRef = useRef(null);
   const voiceStopRef = useRef(null);
+  const progressTimeoutRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -344,20 +346,45 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const streamOnEvent = useCallback((eventType, eventData) => {
     if (eventType === 'node_complete') {
       setActiveTools([]);
-      if (eventData.node && eventData.duration != null) {
-        nodeDurationsRef.current[eventData.node] = eventData.duration;
-      }
-      setProgress((prev) => {
+      nodeDurationsRef.current[eventData.node] = eventData.duration;
+      setProgress(prev => {
         if (!prev) return prev;
-        const steps = prev.steps
-          .map((s) =>
-            s.status === 'active'
-              ? { ...s, node: eventData.node, status: 'completed', duration: eventData.duration, summary: eventData.summary, model: eventData.model }
-              : s
-          );
-        steps.push({ node: '_pending', status: 'active' });
-        return { ...prev, steps, usage: eventData.usage || prev.usage };
+        return {
+          ...prev,
+          steps: [
+            ...prev.steps,
+            {
+              node: eventData.node,
+              status: 'completed',
+              duration: eventData.duration,
+              summary: eventData.summary,
+              model: eventData.model,
+            },
+          ],
+          usage: { ...prev.usage, ...eventData.usage },
+        };
       });
+      // Pipe node completion into reasoning stream with natural language
+      const nodeThinking = {
+        classify: (s) => s ? `Understood — this looks like ${s.toLowerCase()}` : 'Figured out what kind of question this is',
+        decompose: (s) => s || 'Breaking this down into smaller pieces to tackle one at a time...',
+        alignSubQueries: (s) => s || 'Matching sub-questions against known query patterns...',
+        contextFetch: (s) => s || 'Digging through the schema to find the right tables and columns...',
+        researchAgent: (s) => s || 'Researching the database structure to understand how things connect...',
+        generateSql: (s) => s || 'Drafting the SQL query now — piecing together the joins and filters...',
+        sqlWriterAgent: (s) => s || 'Writing the SQL — choosing the right approach for this data...',
+        injectRls: () => 'Applying row-level security filters to keep the data properly scoped',
+        validate: (s) => s || 'Double-checking the query logic — making sure everything looks right...',
+        correct: (s) => s || 'Found an issue, revising the query to fix it...',
+        execute: (s) => s ? `Running the query... ${s}` : 'Executing the query against the database now...',
+        checkResults: (s) => s || 'Reviewing what came back — checking if the results make sense...',
+        diagnoseEmptyResults: () => 'Got no results back — investigating why and trying a different approach...',
+        present: () => 'Putting together the final answer with insights...',
+        dashboardAgent: () => 'Building the dashboard layout and charts...',
+      };
+      const thinkFn = nodeThinking[eventData.node];
+      const msg = thinkFn ? thinkFn(eventData.summary) : (eventData.summary || `Processing ${eventData.node}...`);
+      setThinkingEntries(prev => [...prev, { message: msg, category: eventData.node }]);
     } else if (eventType === 'tool_call') {
       setActiveTools((prev) => [
         ...prev.filter((t) => t.status !== 'done'),
@@ -430,12 +457,19 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         });
       }
       nodeDurationsRef.current = {};
+      setIsComplete(true);
     }
   }, [onMetricsUpdate]);
 
   const runStream = useCallback(async (question, history, entities, resolved, { isFollowUp = false } = {}) => {
+    // Cancel any pending progress-clear timeout from a previous query
+    if (progressTimeoutRef.current) {
+      clearTimeout(progressTimeoutRef.current);
+      progressTimeoutRef.current = null;
+    }
     const startTime = Date.now();
-    setProgress({ steps: [{ node: '_pending', status: 'active' }], usage: {}, startTime });
+    setProgress({ steps: [], usage: {}, startTime });
+    setIsComplete(false);
     setStreamingInsights('');
     setActiveTools([]);
     setThinkingEntries([]);
@@ -489,8 +523,12 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         { role: 'assistant', type: 'chat', content: `Error: ${err.message || 'Something went wrong.'}` },
       ]);
     } finally {
-      setProgress(null);
       setLoading(false);
+      progressTimeoutRef.current = setTimeout(() => {
+        setProgress(null);
+        setIsComplete(false);
+        progressTimeoutRef.current = null;
+      }, 800);
     }
   };
 
@@ -590,13 +628,17 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       );
       if (result) handleResponse(result);
     } catch (err) {
-      setProgress(null);
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', type: 'chat', content: `Error: ${err.message || 'Something went wrong.'}` },
       ]);
     } finally {
       setLoading(false);
+      progressTimeoutRef.current = setTimeout(() => {
+        setProgress(null);
+        setIsComplete(false);
+        progressTimeoutRef.current = null;
+      }, 800);
     }
   };
 
@@ -945,7 +987,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           </div>
         ))}
 
-        {loading && progress && (
+        {progress && (
           <div
             className="max-w-[88%]"
             style={{
@@ -956,18 +998,15 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
               overflow: 'hidden',
             }}
           >
-            <ProgressTimeline
+            <ThinkingBubble
               steps={progress.steps}
-              usage={progress.usage}
+              thinkingEntries={thinkingEntries}
               startTime={progress.startTime}
               activeTools={activeTools}
-              collapsed={false}
+              isComplete={isComplete}
             />
             {/* Preserve streaming content below the progress bar */}
             <div className="px-5 pb-4">
-              {querySummary && (
-                <div className="text-[12px] mb-2 italic" style={{ color: 'var(--color-text-muted)' }}>{querySummary}</div>
-              )}
               {partialQueries.filter(Boolean).map((pq, i) => (
                 <div key={i} className="text-[12px] mb-2 p-2 rounded-lg" style={{ background: 'rgba(99,102,241,0.04)', color: 'var(--color-text-secondary)' }}>
                   <span className="font-semibold text-[11px] mr-1.5" style={{ color: '#6366F1' }}>Q{i + 1}</span>

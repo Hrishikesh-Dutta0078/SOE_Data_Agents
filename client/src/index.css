@@ -256,20 +256,6 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulse-step-dot {
-  0%, 100% { box-shadow: 0 0 0 4px rgba(99,102,241,0.2); }
-  50% { box-shadow: 0 0 0 8px rgba(99,102,241,0.08); }
-}
-
-@keyframes spin-progress {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes tool-badge-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
-
 /* ===== Logo float ===== */
 @keyframes logo-float {
   0%, 100% { transform: translateY(0); }
@@ -450,3 +436,17 @@ body {
 .react-resizable-hide > .react-resizable-handle {
   display: none;
 }
+
+/* ThinkingBubble */
+@keyframes thinking-bubble-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px rgba(99,102,241,0.2); }
+  50% { box-shadow: 0 0 0 8px rgba(99,102,241,0.08); }
+}
+
+@keyframes thinking-bubble-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.thinking-bubble-scroll::-webkit-scrollbar { display: none; }
+.thinking-bubble-scroll { scrollbar-width: none; }
