@@ -18,6 +18,7 @@ const { searchKpis } = require('../../vectordb/kpiFetcher');
 const { getJoinRulesForTables, formatJoinRulesText } = require('../../vectordb/joinRuleFetcher');
 const { fetchFiscalPeriod } = require('../../vectordb/fiscalPeriodFetcher');
 const { getDistinctValues, getAvailableColumns } = require('../../vectordb/distinctValuesFetcher');
+const { getMandatoryFiltersForTables } = require('../../vectordb/definitionsFetcher');
 const logger = require('../../utils/logger');
 
 const MAX_COLUMN_METADATA_TABLES = 12;
@@ -152,6 +153,9 @@ async function contextFetchNode(state) {
   // Distinct values for WHERE clause filter hints
   const distinctValues = collectDistinctValues(tableNames);
 
+  // Mandatory filters (e.g., ROLE_TYPE_DISPLAY = 'AE') from definitions.json
+  const mandatoryFilters = getMandatoryFiltersForTables(tableNames);
+
   const duration = Date.now() - start;
   logger.info('contextFetch complete', {
     tables: tableNames.join(', '),
@@ -177,6 +181,7 @@ async function contextFetchNode(state) {
       kpis,
       fiscalPeriod,
       distinctValues,
+      mandatoryFilters,
     },
     trace: [{
       node: 'contextFetch',

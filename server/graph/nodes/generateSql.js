@@ -137,6 +137,22 @@ function formatDistinctValues(distinctValues) {
 }
 
 /**
+ * Format mandatory filters from definitions.json.
+ * filters is an array of { id, sql, appliesTo, always, note? }.
+ */
+function formatMandatoryFilters(filters) {
+  if (!filters || filters.length === 0) return '';
+  const lines = filters.map(f => {
+    let line = `- ${f.sql}`;
+    const tables = (f.appliesTo || []).join(', ');
+    if (tables) line += `  [${tables}]`;
+    if (f.note) line += `  -- ${f.note}`;
+    return line;
+  });
+  return `=== MANDATORY FILTERS ===\nApply ALL filters below that match tables in your query:\n\n${lines.join('\n')}`;
+}
+
+/**
  * Format detected entities — metrics, dimensions, filters, operations.
  */
 function formatEntities(entities) {
@@ -271,6 +287,10 @@ Write SQL that answers the user's ACTUAL question, using the template's tables a
   } else {
     prompt += 'Your context team has gathered all schema and business context. Write the SQL query using ONLY the information provided below.\n\n';
   }
+
+  // ── 1b. Mandatory filters (before schema so the LLM sees constraints first) ──
+  const mandatoryFiltersBlock = formatMandatoryFilters(bundle.mandatoryFilters);
+  if (mandatoryFiltersBlock) prompt += '\n\n' + mandatoryFiltersBlock;
 
   // ── 2. Schema section ──
   const schemaText = formatSchema(bundle.schema);
