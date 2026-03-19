@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import ResultsPanel from './ResultsPanel';
 
 /**
  * NarrativeCard — Executive-first response card.
@@ -320,45 +321,19 @@ export default function NarrativeCard({
 
       {/* Expanded pill content */}
       {expandedPill === 'table' && execution?.rows?.length > 0 && (
-        <div className="mt-3 rounded-xl overflow-hidden border" style={{ borderColor: 'rgba(200,195,220,0.25)', animation: 'reveal-section 0.3s ease forwards' }}>
-          {/* Export buttons */}
-          <div className="flex gap-2 px-3 py-2" style={{ borderBottom: '1px solid rgba(200,195,220,0.15)' }}>
-            <button
-              onClick={() => {
-                const cols = execution.columns || Object.keys(execution.rows[0] || {});
-                const csv = [cols.join(','), ...execution.rows.map(r => cols.map(c => `"${String(r[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n');
-                const blob = new Blob([csv], { type: 'text/csv' });
-                const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'export.csv'; a.click();
-              }}
-              className="text-[10px] font-medium px-2.5 py-1 rounded-md border cursor-pointer"
-              style={{ color: '#6366F1', background: 'rgba(99,102,241,0.06)', borderColor: 'rgba(99,102,241,0.1)' }}
-            >
-              Export CSV
-            </button>
-            <span className="text-[10px] ml-auto" style={{ color: 'var(--color-text-muted)', alignSelf: 'center' }}>
-              {execution.rows.length} rows
-            </span>
-          </div>
-          <div className="overflow-x-auto" style={{ maxHeight: 320 }}>
-            <table className="w-full text-[12px]" style={{ color: 'var(--color-text-secondary)' }}>
-              <thead>
-                <tr style={{ background: 'rgba(0,0,0,0.02)' }}>
-                  {(execution.columns || Object.keys(execution.rows[0] || {})).map(col => (
-                    <th key={col} className="text-left px-3 py-2 font-semibold sticky top-0" style={{ background: 'rgba(250,250,249,0.95)', borderBottom: '1px solid rgba(200,195,220,0.2)' }}>{col}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {execution.rows.map((row, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid rgba(200,195,220,0.1)' }}>
-                    {(execution.columns || Object.keys(row)).map(col => (
-                      <td key={col} className="px-3 py-1.5">{row[col] ?? '—'}</td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="mt-3 rounded-xl overflow-hidden bg-white p-3" style={{ animation: 'reveal-section 0.3s ease forwards' }}>
+          <ResultsPanel
+            execution={execution}
+            insights=""
+            chart={null}
+            queries={[]}
+            isPartial={false}
+            confidence={confidence}
+            sessionId={sessionId}
+            question={question}
+            sql={sql}
+            initialTab="table"
+          />
         </div>
       )}
 
