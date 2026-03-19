@@ -101,7 +101,8 @@ function loadGoldIndex() {
 
   try {
     const filePath = path.join(__dirname, '..', '..', 'context', 'goldExamples.json');
-    const raw = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const parsed = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const raw = Array.isArray(parsed) ? parsed : (parsed.examples || []);
 
     for (const ex of raw) {
       examplesMap.set(ex.id, ex);

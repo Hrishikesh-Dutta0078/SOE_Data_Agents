@@ -78,7 +78,8 @@ async function loadExamplesAsync() {
       _store = { examples: [], keywordIndex: new Map() };
       return _store;
     }
-    const raw = JSON.parse(await fs.promises.readFile(EXAMPLES_FILE, 'utf-8'));
+    const parsed = JSON.parse(await fs.promises.readFile(EXAMPLES_FILE, 'utf-8'));
+    const raw = Array.isArray(parsed) ? parsed : (parsed.examples || []);
     _store = buildExamplesStoreFromRaw(raw);
     return _store;
   })();
