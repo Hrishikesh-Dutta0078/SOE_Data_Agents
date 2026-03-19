@@ -1,7 +1,7 @@
 /**
  * Rules Fetcher — programmatic, deterministic business rule retrieval.
  *
- * Parses business-context.md at first load into an in-memory array of
+ * Parses business-rules.md at first load into an in-memory array of
  * categorized rules with keyword indexes for fast search. No ChromaDB
  * or embedding calls.
  *
@@ -19,20 +19,26 @@ const BUSINESS_RULES_FILE = path.join(
   '..',
   'context',
   'knowledge',
-  'business-context.md'
+  'business-rules.md'
 );
 
 const CATEGORY_MAP = {
+  classification: /classif|taxonomy|follow.up progr/i,
   terminology: /terminolog|key term/i,
   account_hierarchy: /account hierarch/i,
   scoring: /scoring|profil|icp|ucp|aes/i,
   products: /product|solution|opg/i,
   sales_org: /sales org|structure|region/i,
-  opportunity: /opportunit|deal/i,
+  opportunity: /opportunit|deal field/i,
+  pipeline_walk: /pipeline walk/i,
   time_dimensions: /time dim|fiscal|calendar/i,
   user_context: /current user|user context/i,
   ambiguity: /ambigu|watch for|clarif/i,
   sql_rules: /sql generat|sql rule|query rule|mandatory filter/i,
+  signals: /signal defin|leading.*lagging/i,
+  deal_sensei: /deal sensei|ds score interp/i,
+  interventions: /intervention|stall reason/i,
+  benchmarks: /benchmark|week.in.quarter/i,
 };
 
 const STOP_WORDS = new Set([
