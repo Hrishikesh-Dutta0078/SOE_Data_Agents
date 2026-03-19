@@ -110,7 +110,6 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const [partialQueries, setPartialQueries] = useState([]);
   const [querySummary, setQuerySummary] = useState('');
   const [confidence, setConfidence] = useState(null);
-  const [progressCollapsed, setProgressCollapsed] = useState(false);
 
   const [streamingData, setStreamingData] = useState(null);
   const streamingDataRef = useRef(null);
@@ -424,7 +423,6 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       streamingDataRef.current = eventData.execution;
       setStreamingData(eventData.execution);
     } else if (eventType === 'done') {
-      setProgressCollapsed(true);
       if (onMetricsUpdate) {
         onMetricsUpdate({
           usageByNodeAndModel: eventData.usageByNodeAndModel || null,
@@ -436,7 +434,6 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   }, [onMetricsUpdate]);
 
   const runStream = useCallback(async (question, history, entities, resolved, { isFollowUp = false } = {}) => {
-    setProgressCollapsed(false);
     const startTime = Date.now();
     setProgress({ steps: [{ node: '_pending', status: 'active' }], usage: {}, startTime });
     setStreamingInsights('');
@@ -457,8 +454,6 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       opts,
     );
 
-    // Don't null out progress here — let it persist so the collapse animation
-    // can play. It gets reset at the start of the next runStream call (line 441).
     setStreamingInsights('');
     setStreamingData(null);
     // NOTE: do NOT clear streamingDataRef here — handleResponse reads it after runStream returns.
@@ -489,12 +484,12 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       );
       if (result) handleResponse(result);
     } catch (err) {
-      setProgress(null);
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', type: 'chat', content: `Error: ${err.message || 'Something went wrong.'}` },
       ]);
     } finally {
+      setProgress(null);
       setLoading(false);
     }
   };
@@ -950,7 +945,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           </div>
         ))}
 
-        {loading && progress && !progressCollapsed && (
+        {loading && progress && (
           <div
             className="max-w-[88%]"
             style={{
