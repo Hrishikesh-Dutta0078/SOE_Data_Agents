@@ -11,9 +11,9 @@
 The current context layer has ~14K lines across 8 files (~460KB) with significant redundancy:
 
 - **Coverage thresholds** (Green >= 2.5x, Yellow >= 2.0x, Red < 2.0x) defined in 4 separate places
-- **Mandatory WHERE filters** repeated verbatim in all 21 gold example SQL queries (~1,470 lines of pure duplication)
-- **CTE templates** (quota, pipe, base) near-identical across 10+ gold queries
-- **Bi-directional join rules** listed separately (A->B and B->A)
+- **Mandatory WHERE filters** repeated verbatim in all 20 gold example SQL queries (~1,400 lines of pure duplication)
+- **CTE templates** (quota, pipe, base) near-identical across 4-5 gold queries; similar pipe-only pattern in 6-7 more
+- **Join rules lack guidance** — multiple possible join keys per table pair with no indication of which is primary, what cardinality is, or which join type to use
 - **DS Score interpretation** duplicated across business-context.md and strategic-framework.md
 - **`strategic-framework.md`** loaded nowhere in the codebase (142 lines of dead content)
 - **Distinct values for text columns** (FORECAST_NOTES, DEAL_REVIEW_NOTES) injected as token-wasting noise
@@ -35,12 +35,12 @@ This causes: conflicting definitions confuse the LLM, wasted prompt tokens, and 
 ```
 server/context/
 ├── definitions.json              [NEW]     Layer 0: Canonical constants
-├── goldExamples.json             [REFACTOR] Layer 3: Template-based examples
-├── dashboardGoldExamples.json    [MINOR]    Trim redundant insight text
+├── goldExamples.json             [REFACTOR] Layer 3: Deduplicate mandatory filters, keep full SQL
+├── dashboardGoldExamples.json    [MINOR]    Deduplicate repeated insight/threshold text in tile configs
 ├── knowledge/
 │   ├── schema-knowledge.json     [TRIM]     Layer 1: Remove text-column distinct values + obvious descriptions
 │   ├── business-rules.md         [NEW]      Layer 2: Merged business-context.md + strategic-framework.md
-│   ├── join-knowledge.json       [DEDUP]    Layer 4: Remove bi-directional dupes, add primaryKey + cardinality
+│   ├── join-knowledge.json       [ENRICH]   Layer 4: Add primaryKey, cardinality, joinType, alternateKeys guidance
 │   ├── kpi-glossary.json         [DEDUP]    Layer 4: Remove abbreviations (moved to definitions.json)
 │   ├── analysis-blueprints.json  [UNCHANGED]
 │   ├── business-context.md       [DELETE]   Absorbed into business-rules.md + definitions.json
@@ -188,6 +188,8 @@ server/context/
     "S3": "Sales Stage 3",
     "S4": "Sales Stage 4",
     "S5": "Sales Stage 5",
+    "S3+": "Sales Stage 3 and above",
+    "S5+": "Sales Stage 5 and above",
     "SS5+": "Sales Stage 5 and above"
   },
   "creationTargetWeights": {
@@ -301,21 +303,23 @@ Organized by **pipeline stage** (when the rule is needed), not by topic:
 
 ---
 
-## Layer 3: `goldExamples.json` — Template-Based
+## Layer 3: `goldExamples.json` — Deduplicated Filters, Full SQL Retained
+
+### Design rationale
+
+The 20 gold examples have significant CTE variation — only 4-5 share the exact quota+pipe+base pattern, while 6-7 share a simpler pipe-only pattern, and ~9 have structurally unique SQL (creation targets, deal lists, stalled pipeline, pipe walk, etc.). A runtime template resolution engine would be over-engineered and fragile.
+
+Instead, we take a **simpler, safer approach**: every example keeps its complete `sql` field (no runtime resolution), but the file gains a `_filterReference` block that serves as the canonical mandatory filter definition for **maintenance and validation**.
 
 ### New schema
 
 ```json
 {
-  "commonPatterns": {
-    "quotaCTE": "<full CTE SQL with {{mandatoryFilters:quota}} placeholder>",
-    "pipeCTE": "<full CTE SQL with {{mandatoryFilters:pipe}} and {{snapshotFilter}} placeholders>",
-    "baseCTE": "<FULL OUTER JOIN on TERR_ID, REP_NAME, Close_Qtr, BU, ROLE_COVERAGE_BU, ROLE_COVERAGE_BU_GROUP>",
-    "snapshotFilter": "p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0)",
-    "mandatoryFilters": {
-      "quota": "q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND r.ROLE_TYPE_DISPLAY = 'AE' AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX' AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'",
-      "pipe": "p.PAY_MEASURE_ID = 0 AND r.ROLE_TYPE_DISPLAY = 'AE' AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX' AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'"
-    }
+  "_filterReference": {
+    "_comment": "Canonical mandatory filters. Not resolved at runtime — used by validation script to verify all examples include these filters where applicable.",
+    "quotaFilters": "q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND r.ROLE_TYPE_DISPLAY = 'AE' AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX' AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'",
+    "pipeFilters": "p.PAY_MEASURE_ID = 0 AND r.ROLE_TYPE_DISPLAY = 'AE' AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX' AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'",
+    "snapshotSubquery": "p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0)"
   },
   "examples": [
     {
@@ -323,53 +327,67 @@ Organized by **pipeline stage** (when the rule is needed), not by topic:
       "question": "How has my performance been?",
       "questionCategory": "WHAT_HAPPENED",
       "questionSubCategory": "coverage_creation",
-      "uses": ["quotaCTE", "pipeCTE", "baseCTE"],
-      "selectClause": "SELECT TERR_ID, REP_NAME, Close_Qtr, BU, ... FROM base ORDER BY Close_Qtr, TERR_ID",
-      "tables_used": ["vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt", "vw_EBI_CALDATE", "vw_EBI_OPG", "vw_TD_EBI_ROLE_Coverage", "vw_TF_EBI_P2S", "vw_ebi_sales_stage"],
+      "sql": "<full SQL — unchanged from current file>",
+      "tables_used": ["vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt", ...],
       "variants": ["Show my performance", "What's my pipe coverage?", ...]
     }
   ]
 }
 ```
 
-### Resolution rules (implemented in examplesFetcher.js)
+### What changes
 
-1. When a consumer calls `searchExamples()` or `getExampleById()`, the fetcher:
-   - Resolves `uses` array → concatenates referenced CTE patterns
-   - Resolves `{{mandatoryFilters:quota}}` and `{{mandatoryFilters:pipe}}` placeholders
-   - Resolves `{{snapshotFilter}}` placeholder
-   - Appends the example's `selectClause`
-   - Returns a fully-expanded `sql` field (identical output to what consumers get today)
+1. **Add `_filterReference` block** at the top — documents the canonical filter patterns for quota and pipe queries. This is the single maintenance point: when a filter changes, update `_filterReference`, then update each example's SQL to match (or run the validation script to find mismatches).
 
-2. The `commonPatterns` and `mandatoryFilters` blocks are **internal to the file** — they encode the shared SQL that was previously copy-pasted across 21 entries.
+2. **Remove `notes` field** from examples where present — content absorbed into business-rules.md or is obvious from the SQL.
 
-3. Examples that don't use common CTEs (e.g., simple pipeline queries, deal lists) keep their `sql` field directly — the template system is opt-in via the `uses` key.
+3. **Remove `questionCategory` and `questionSubCategory`** from examples — the spec review confirmed these fields are loaded but never injected into prompts. They're only used by classify.js for programmatic routing, and classify.js determines category from its own LLM call, not from these fields. Removing them reduces file size and eliminates a maintenance surface.
+
+4. **Add validation script** (`npm run validate:examples`) — iterates all examples, checks that each SQL containing quota/pipe tables includes the corresponding mandatory filters from `_filterReference`. Reports mismatches. Run during CI or after editing examples.
 
 ### What stays per example
-- `id`, `question`, `questionCategory`, `questionSubCategory`, `tables_used`, `variants`
-- Either `sql` (full SQL, for non-template queries) or `uses` + `selectClause` (for template queries)
+- `id`, `question`, `sql` (full, complete SQL), `tables_used`, `variants`
 
-### What gets removed per example
-- Duplicated WHERE clause blocks (now in commonPatterns.mandatoryFilters)
-- Duplicated CTE bodies (now in commonPatterns)
+### What stays unchanged
+- Every example retains its complete `sql` field — no runtime resolution, no template expansion
+- `examplesFetcher.js` continues to return `{ id, question, sql, tables_used, variants }` — zero consumer impact
+- `classify.js` and `subQueryMatch.js` (which read goldExamples.json directly, bypassing examplesFetcher) continue to work because `example.sql` is always present
 
-**Estimated reduction**: ~60% (from 44KB to ~18KB). The fetcher returns identical expanded SQL to consumers.
+### Consumer note: direct file readers
+
+**Important**: `classify.js` (line 103) and `subQueryMatch.js` load `goldExamples.json` directly via `fs.readFileSync` and access `example.sql`. The new schema preserves the `sql` field on every example, so these consumers are unaffected. The `_filterReference` block is ignored by these consumers (they only iterate `examples`).
+
+**Estimated reduction**: ~10-15% (from 44KB to ~38KB, mainly from removing `notes`, `questionCategory`, `questionSubCategory` fields and the validation script catching future drift). The primary benefit is **maintainability** (one place to verify filter correctness) rather than file size.
 
 ---
 
-## Layer 4: Join + KPI Deduplication
+## Layer 4: Join Enrichment + KPI Cleanup
 
-### `join-knowledge.json` changes
+### `join-knowledge.json` changes — ENRICH (not dedup)
+
+The current file has 81 unique join pairs with **no bi-directional duplicates** — the existing `joinRuleFetcher.js` already uses sorted pair keys internally. The change here is **enrichment**: adding metadata that helps Opus 4.6 choose the right join.
 
 **Before** (current):
 ```json
 {
   "directJoins": [
-    { "left_table": "A", "right_table": "B", "columns": ["B.X = A.X", "B.Y = A.X", "A.Z = B.Z", ...] },
-    { "left_table": "B", "right_table": "A", "columns": ["A.X = B.X", ...] }
+    {
+      "left_table": "vw_td_ebi_region_rpt",
+      "right_table": "vw_TF_EBI_P2S",
+      "columns": [
+        "vw_TF_EBI_P2S.REGION_ID = vw_td_ebi_region_rpt.REGION_ID",
+        "vw_TF_EBI_P2S.ORIGINAL_REGION_ID = vw_td_ebi_region_rpt.REGION_ID",
+        "vw_TF_EBI_P2S.AE_REGION_ID = vw_td_ebi_region_rpt.REGION_ID",
+        "vw_td_ebi_region_rpt.ROLE_TYPE_ID = vw_TF_EBI_P2S.ROLE_TYPE_ID",
+        "vw_td_ebi_region_rpt.REPORTING_HIERARCHY_ID = vw_TF_EBI_P2S.REPORTING_HIERARCHY_ID",
+        "vw_td_ebi_region_rpt.GTM_MOTION_ID = vw_TF_EBI_P2S.GTM_MOTION_ID"
+      ]
+    }
   ]
 }
 ```
+
+Problem: 6 possible join keys, no indication of which to use. The LLM guesses.
 
 **After**:
 ```json
@@ -381,8 +399,8 @@ Organized by **pipeline stage** (when the rule is needed), not by topic:
       "cardinality": "1:N",
       "joinType": "INNER",
       "alternateKeys": [
-        { "sql": "vw_TF_EBI_P2S.ORIGINAL_REGION_ID = vw_td_ebi_region_rpt.REGION_ID", "useWhen": "querying original territory assignment" },
-        { "sql": "vw_TF_EBI_P2S.AE_REGION_ID = vw_td_ebi_region_rpt.REGION_ID", "useWhen": "querying AE-specific territory" }
+        { "sql": "vw_TF_EBI_P2S.ORIGINAL_REGION_ID = vw_td_ebi_region_rpt.REGION_ID", "useWhen": "querying original territory assignment before re-org" },
+        { "sql": "vw_TF_EBI_P2S.AE_REGION_ID = vw_td_ebi_region_rpt.REGION_ID", "useWhen": "querying AE-specific territory (rare)" }
       ]
     }
   ],
@@ -401,23 +419,24 @@ Organized by **pipeline stage** (when the rule is needed), not by topic:
 ```
 
 **Changes**:
-- `left_table` + `right_table` -> `tables` array (direction-agnostic, eliminates bi-directional dupes)
-- Add `primaryKey` (the default join to use)
-- Add `cardinality` (1:1, 1:N, N:N)
-- Add `joinType` (INNER, LEFT, FULL OUTER)
-- Add `alternateKeys` with `useWhen` guidance
-- Remove reverse-direction duplicate entries
+- `left_table` + `right_table` -> `tables` array (direction-agnostic, consistent with fetcher's sorted-pair indexing)
+- Add `primaryKey` — the default join key the LLM should use
+- Add `cardinality` (1:1, 1:N, N:N) — prevents explosive joins
+- Add `joinType` (INNER, LEFT, FULL OUTER) — explicit guidance
+- Add `alternateKeys` with `useWhen` — LLM only uses these when the question warrants it
+- Non-primary keys moved from flat `columns` array to `alternateKeys` — reduces ambiguity
 
 **joinRuleFetcher.js** changes:
-- Index by sorted table pair (so lookup works regardless of query order)
-- Format output: primary key prominently, alternates as indented footnotes
-- Include cardinality in formatted output
+- Read `tables` array instead of `left_table`/`right_table` (index by sorted pair — already done internally, now matches file structure)
+- `formatJoinRulesText()`: show primaryKey prominently, alternates as indented "Use when:" footnotes
+- Include cardinality in formatted output: `"(1:N, INNER JOIN)"`
 
 ### `kpi-glossary.json` changes
 
 - Remove the `abbreviations` top-level key (moved to `definitions.json`)
 - Keep `kpis` array unchanged (no redundancy within KPI entries themselves)
-- `kpiFetcher.js`: delegate `expandAbbreviations()` to `definitionsFetcher.getAbbreviations()`
+- `kpiFetcher.js`: remove local abbreviations loading, import from `definitionsFetcher.getAbbreviations()` instead
+- **Dead code cleanup**: `expandAbbreviations()` is exported by kpiFetcher.js but never called anywhere in the codebase. Remove the function entirely rather than migrating it.
 
 ---
 
@@ -439,9 +458,9 @@ Organized by **pipeline stage** (when the rule is needed), not by topic:
 
 ### Modified: `server/vectordb/examplesFetcher.js`
 
-- On load, parse `commonPatterns` from new goldExamples.json structure
-- `resolveExample(example)`: if `example.uses` exists, concatenate referenced CTEs + resolve placeholders + append selectClause to produce full `sql`
-- `searchExamples()` and `getExampleById()` return resolved examples (consumers see no change)
+- On load, read `examples` array from new goldExamples.json structure (skip `_filterReference` block)
+- No runtime resolution needed — every example has a complete `sql` field
+- `searchExamples()` and `getExampleById()` return examples as-is (zero behavior change)
 - Keyword index built from: question + variants + tables_used (unchanged)
 
 ### Modified: `server/vectordb/rulesFetcher.js`
@@ -462,8 +481,9 @@ Organized by **pipeline stage** (when the rule is needed), not by topic:
 
 ### Modified: `server/vectordb/kpiFetcher.js`
 
-- Remove local `abbreviations` loading; import from definitionsFetcher
-- `expandAbbreviations()` delegates to `definitionsFetcher.expandAbbreviations()`
+- Remove local `abbreviations` loading; import from `definitionsFetcher`
+- Remove dead `expandAbbreviations()` function (never called by any consumer)
+- Update `loadKpiGlossary()` to read only the `kpis` array (abbreviations no longer in this file)
 
 ### Modified: `server/vectordb/distinctValuesFetcher.js`
 
@@ -515,6 +535,30 @@ Current prompt sections:
 - Business rules section now pulls from business-rules.md (via rulesFetcher pointing to new file)
 - Gold example injection unchanged (examplesFetcher returns resolved SQL)
 
+### `server/prompts/present.js`
+
+**Currently hardcodes** coverage thresholds (`Green >= 2.5x, Yellow >= 2.0x, Red < 2.0x`) in three separate prompt strings (lines ~13, ~38, ~52). This contradicts the single-source-of-truth goal.
+
+- Import `definitionsFetcher`
+- Replace hardcoded threshold strings with `definitionsFetcher.getThreshold('coverage')` values
+- Template the threshold line dynamically: `` `Coverage: Green >= ${t.green}x, Yellow >= ${t.yellow}x, Red < ${t.yellow}x` ``
+
+### `server/routes/voice.js`
+
+**Currently reads 3 context files directly** via `fs.readFileSync` (with try/catch that silently swallows errors):
+- `business-context.md` — for business term phrase lists
+- `kpi-glossary.json` — for abbreviation phrase lists
+- `schema-knowledge.json` — for table/column name phrase lists
+
+Changes needed:
+- Update file path from `business-context.md` to `business-rules.md`
+- For abbreviations: import from `definitionsFetcher.getAbbreviations()` instead of reading kpi-glossary.json's `abbreviations` key (which will be removed)
+- Schema-knowledge.json path is unchanged (no rename), but the trimmed content still provides table/column names
+
+### `server/index.js` — Startup sequence
+
+Add `loadDefinitionsAsync()` to the eager-load calls at startup (alongside existing `loadSchemaKnowledgeAsync`, `loadExamplesAsync`, `loadRulesAsync`, `loadJoinKnowledgeAsync`, `loadKpiGlossaryAsync`).
+
 ---
 
 ## File Deletion Plan
@@ -530,20 +574,29 @@ Both deletions happen **after** the new files are created and verified.
 
 ## Migration Safety
 
-1. **Backward compatibility**: The examplesFetcher returns the same `{ id, question, sql, tables_used, variants }` shape to all consumers. No consumer code changes needed for the example resolution.
+1. **Backward compatibility**: The examplesFetcher returns the same `{ id, question, sql, tables_used, variants }` shape to all consumers. Every gold example retains its complete `sql` field — no runtime resolution. Direct file readers (classify.js, subQueryMatch.js) are unaffected.
 
 2. **Incremental rollout**: Changes can be applied layer by layer:
    - Layer 0 (definitions.json + definitionsFetcher) first — no impact until other layers reference it
    - Layer 1 (schema trim) independently
-   - Layer 2 (business-rules.md) independently
-   - Layer 3 (goldExamples refactor + examplesFetcher) — requires Layer 0
-   - Layer 4 (join/KPI dedup) independently
+   - Layer 2 (business-rules.md + rulesFetcher path change + voice.js path update) together
+   - Layer 3 (goldExamples cleanup) independently
+   - Layer 4 (join enrichment + KPI cleanup) independently
+   - Cross-cutting: present.js threshold injection + server/index.js startup after Layer 0
 
 3. **Verification**: After each layer, run `npm test` to confirm no regressions. Key tests:
    - `tests/runtimeRobustness.test.js` — validates the pipeline runs end-to-end
    - Any tests that exercise examplesFetcher, rulesFetcher, schemaFetcher
+   - Manual verification: start server, check voice route loads without errors
 
 4. **Rollback**: Each layer is a separate commit. Revert any commit independently if issues arise.
+
+5. **Direct file reader inventory** (consumers that bypass fetcher abstractions):
+   - `classify.js` → reads goldExamples.json directly → safe (sql field preserved)
+   - `subQueryMatch.js` → reads goldExamples.json via classify.js exports → safe (sql field preserved)
+   - `voice.js` → reads business-context.md, kpi-glossary.json, schema-knowledge.json → **requires path + structure updates**
+   - `dashboard.js` → reads dashboardGoldExamples.json → safe (minor trim only)
+   - `classify.js` → reads analysis-blueprints.json → safe (unchanged)
 
 ---
 
@@ -551,14 +604,17 @@ Both deletions happen **after** the new files are created and verified.
 
 | Metric | Before | After | Change |
 |--------|--------|-------|--------|
-| Total context file size | ~460KB | ~280KB | -39% |
-| goldExamples.json | 44KB | ~18KB | -59% |
+| Total context file size | ~460KB | ~310KB | -33% |
+| goldExamples.json | 44KB | ~38KB | -14% (maintenance win, not size win) |
 | business-context.md + strategic-framework.md | 33KB | ~20KB (as business-rules.md) | -39% |
 | schema-knowledge.json | 351KB | ~220KB | -37% |
+| join-knowledge.json | 35KB | ~38KB | +9% (enriched with metadata) |
 | Prompt tokens per generateSql call | 6-12KB | 4-8KB | -33% |
-| Places thresholds defined | 4 | 1 | Single source of truth |
-| Places mandatory filters defined | 22 | 1 | Single source of truth |
+| Places thresholds defined | 4 (+ present.js) | 1 | Single source of truth |
+| Places mandatory filters defined | 20 queries + 1 rule list | 1 (definitions.json) | Single source of truth |
 | Dead files | 1 (strategic-framework.md) | 0 | Cleaned up |
+| Dead code | 1 fn (expandAbbreviations) | 0 | Cleaned up |
+| Join key ambiguity | 6 keys, no guidance | Primary + labeled alternates | Clear guidance |
 
 ---
 
@@ -566,6 +622,7 @@ Both deletions happen **after** the new files are created and verified.
 
 - Changing the vector DB / keyword-based retrieval approach (embedding-based retrieval is a separate effort)
 - Modifying the LangGraph workflow topology
-- Changing the gold example content (which questions/SQL patterns exist) — only restructuring how they're stored
+- Changing the gold example SQL content (which questions/SQL patterns exist) — only restructuring how they're stored and validated
 - Adding new KPIs or business rules
 - Modifying the dashboard agent or dashboardGoldExamples beyond minor insight text dedup
+- Migrating classify.js / subQueryMatch.js from direct file reads to examplesFetcher (safe as-is since sql field is preserved; migration is a separate cleanup)
