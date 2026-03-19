@@ -88,6 +88,7 @@ function MiniChart({ chart, rows }) {
       <div className="text-[11px] font-medium mb-2.5" style={{ color: 'var(--color-text-muted)' }}>
         {config.title || `${yKey} by ${xKey}`}
       </div>
+      {/* Bar area — fixed height for the bars only */}
       <div className="flex items-end gap-2.5" style={{ height: 72 }}>
         {sorted.map((row, i) => {
           const val = Number(row[yKey]) || 0;
@@ -99,14 +100,23 @@ function MiniChart({ chart, rows }) {
                 style={{
                   height: `${pct}%`,
                   background: `linear-gradient(180deg, ${barColor(i)}, ${barColor(i).replace('0.55', '0.25')})`,
-                  marginBottom: 4,
                 }}
               />
+            </div>
+          );
+        })}
+      </div>
+      {/* Labels below bars — outside the fixed-height container so they don't clip */}
+      <div className="flex gap-2.5 mt-1.5">
+        {sorted.map((row, i) => {
+          const val = Number(row[yKey]) || 0;
+          return (
+            <div key={i} className="flex-1 text-center min-w-0">
               <div className="text-[10px] font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                 {typeof val === 'number' && !Number.isInteger(val) ? val.toFixed(2) : val}
               </div>
-              <div className="text-[9px] mt-0.5 truncate max-w-full" style={{ color: 'var(--color-text-muted)' }}>
-                {String(row[xKey]).length > 10 ? String(row[xKey]).slice(0, 9) + '...' : row[xKey]}
+              <div className="text-[9px] mt-0.5 truncate" title={String(row[xKey])} style={{ color: 'var(--color-text-muted)' }}>
+                {row[xKey]}
               </div>
             </div>
           );
