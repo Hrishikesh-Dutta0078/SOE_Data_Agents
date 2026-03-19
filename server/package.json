@@ -13,7 +13,8 @@
     "ssl:gen": "node scripts/generate-ssl-cert.js",
     "harvest:schema": "node ../scripts/generateSchemaKnowledge.js",
     "harvest:values": "node ../scripts/harvestDistinctValues.js",
-    "deploy:prepare": "node ../scripts/prepare-deploy.js"
+    "deploy:prepare": "node ../scripts/prepare-deploy.js",
+    "validate:examples": "node ../scripts/validate-examples.js"
   },
   "engines": {
     "node": ">=18"
