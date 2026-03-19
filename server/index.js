@@ -66,6 +66,7 @@ const { loadRulesAsync } = require('./vectordb/rulesFetcher');
 const { loadJoinKnowledgeAsync } = require('./vectordb/joinRuleFetcher');
 const { loadKpiGlossaryAsync } = require('./vectordb/kpiFetcher');
 const { loadSchemaSearcherAsync } = require('./vectordb/schemaSearcher');
+const { loadDefinitionsAsync } = require('./vectordb/definitionsFetcher');
 const { requireAuthorization } = require('./auth/requireAuth');
 const { analysisLimiter, impersonateLimiter } = require('./middleware/rateLimiter');
 const { voiceRateLimiter } = require('./middleware/voiceRateLimit');
@@ -157,6 +158,7 @@ async function start() {
     ['joinKnowledge', loadJoinKnowledgeAsync],
     ['kpiGlossary', loadKpiGlossaryAsync],
     ['schemaSearcher', loadSchemaSearcherAsync],
+    ['definitions', loadDefinitionsAsync],
   ];
   const results = await Promise.allSettled(loaders.map(([name, fn]) => fn()));
   for (let i = 0; i < results.length; i++) {
