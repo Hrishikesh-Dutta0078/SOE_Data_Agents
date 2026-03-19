@@ -42,19 +42,23 @@ let _loadPromise = null;
 function buildJoinKnowledgeFromRaw(raw) {
   const directIndex = new Map();
   for (const rule of raw.directJoins || []) {
-    const key = makePairKey(rule.left_table, rule.right_table);
+    const tableA = rule.tables ? rule.tables[0] : rule.left_table;
+    const tableB = rule.tables ? rule.tables[1] : rule.right_table;
+    const key = makePairKey(tableA, tableB);
     if (!directIndex.has(key)) directIndex.set(key, []);
     directIndex.get(key).push(rule);
   }
   const multihopIndex = new Map();
-  for (const rule of raw.multihopJoins || []) {
-    const key = makePairKey(rule.left_table, rule.right_table);
+  for (const rule of raw.indirectJoins || raw.multihopJoins || []) {
+    const tableA = rule.tables ? rule.tables[0] : rule.left_table;
+    const tableB = rule.tables ? rule.tables[1] : rule.right_table;
+    const key = makePairKey(tableA, tableB);
     if (!multihopIndex.has(key)) multihopIndex.set(key, []);
     multihopIndex.get(key).push(rule);
   }
   return {
     directJoins: raw.directJoins || [],
-    multihopJoins: raw.multihopJoins || [],
+    multihopJoins: raw.indirectJoins || raw.multihopJoins || [],
     directIndex,
     multihopIndex,
   };
@@ -150,15 +154,30 @@ function getJoinRulesForTables(tableNames) {
           if (seenKeys.has(dedupeKey)) continue;
           seenKeys.add(dedupeKey);
 
-          const joinColumnsStr = rule.columns.join(' | ');
+          const tableA = rule.tables ? rule.tables[0] : rule.left_table;
+          const tableB = rule.tables ? rule.tables[1] : rule.right_table;
+
+          let joinColumnsStr;
+          if (rule.primaryKey) {
+            const parts = [rule.primaryKey];
+            if (rule.alternateKeys) parts.push(...rule.alternateKeys.map(a => a.sql));
+            joinColumnsStr = parts.join(' | ');
+          } else {
+            joinColumnsStr = (rule.columns || []).join(' | ');
+          }
+
           results.push({
-            left_table: rule.left_table,
-            right_table: rule.right_table,
+            left_table: tableA,
+            right_table: tableB,
             bridge_table: null,
             category: 'join',
             type: 'join_rule',
             join_columns: joinColumnsStr,
-            text: `${rule.left_table} joins to ${rule.right_table}. Join columns: ${rule.columns.join('; ')}`,
+            primaryKey: rule.primaryKey || null,
+            cardinality: rule.cardinality || null,
+            joinType: rule.joinType || null,
+            alternateKeys: rule.alternateKeys || null,
+            text: `${tableA} joins to ${tableB}. Join columns: ${joinColumnsStr}`,
           });
         }
       }
@@ -167,7 +186,11 @@ function getJoinRulesForTables(tableNames) {
       const multihopRules = knowledge.multihopIndex.get(key);
       if (multihopRules) {
         for (const rule of multihopRules) {
-          const dedupeKey = `multihop::${key}::${rule.bridge_table.toLowerCase()}`;
+          const tableA = rule.tables ? rule.tables[0] : rule.left_table;
+          const tableB = rule.tables ? rule.tables[1] : rule.right_table;
+          const bridgeTable = rule.bridge || rule.bridge_table;
+
+          const dedupeKey = `multihop::${key}::${bridgeTable.toLowerCase()}`;
           if (seenKeys.has(dedupeKey)) continue;
           seenKeys.add(dedupeKey);
 
@@ -176,13 +199,13 @@ function getJoinRulesForTables(tableNames) {
             .join('\n  ');
 
           results.push({
-            left_table: rule.left_table,
-            right_table: rule.right_table,
-            bridge_table: rule.bridge_table,
+            left_table: tableA,
+            right_table: tableB,
+            bridge_table: bridgeTable,
             category: 'multihop_join',
             type: 'join_rule',
             join_columns: null,
-            text: `${rule.left_table} cannot join directly to ${rule.right_table}. Use ${rule.bridge_table} as bridge:\n  ${stepsText}`,
+            text: `${tableA} cannot join directly to ${tableB}. Use ${bridgeTable} as bridge:\n  ${stepsText}`,
           });
         }
       }
@@ -204,14 +227,24 @@ function getJoinRulesForTables(tableNames) {
  */
 function formatJoinRulesText(joinRules) {
   if (!joinRules || joinRules.length === 0) return '';
-
   const joinLines = joinRules.map((j) => {
     if (j.category === 'multihop_join') {
       return `${j.left_table} \u2192 ${j.bridge_table} \u2192 ${j.right_table} (multi-hop)\n  ${j.text}`;
     }
-    return `${j.left_table} \u2194 ${j.right_table}\n  Columns: ${j.join_columns || j.text}`;
+    let line = `${j.left_table} <-> ${j.right_table}`;
+    if (j.cardinality) line += ` (${j.cardinality}, ${j.joinType || 'INNER'} JOIN)`;
+    if (j.primaryKey) {
+      line += `\n  Primary: ${j.primaryKey}`;
+      if (j.alternateKeys && j.alternateKeys.length > 0) {
+        for (const alt of j.alternateKeys) {
+          line += `\n    Alt: ${alt.sql}${alt.useWhen ? ' -- Use when: ' + alt.useWhen : ''}`;
+        }
+      }
+    } else {
+      line += `\n  Columns: ${j.join_columns || j.text}`;
+    }
+    return line;
   });
-
   return `=== VALID JOINS ===\n\n${joinLines.join('\n\n')}`;
 }
 
