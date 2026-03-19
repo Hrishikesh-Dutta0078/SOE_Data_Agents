@@ -53,7 +53,9 @@ test('rate limiting middleware is configured', () => {
   const source = fs.readFileSync(INDEX_PATH, 'utf8');
   assert.ok(source.includes('rateLimiter'), 'Rate limiting should be imported');
   assert.ok(source.includes('analysisLimiter'), 'Analysis rate limiter should be applied');
-  assert.ok(source.includes('loginLimiter'), 'Login rate limiter should be applied');
+  // loginLimiter is applied in routes/auth.js, not index.js
+  const authSource = fs.readFileSync(path.join(__dirname, '..', '..', 'routes', 'auth.js'), 'utf8');
+  assert.ok(authSource.includes('loginLimiter'), 'Login rate limiter should be applied in auth routes');
 });
 
 test('rate limiter module exports expected limiters', () => {
