@@ -179,25 +179,44 @@ export default function App() {
             {/* Chat History */}
             <div className="flex-1 min-h-0 flex flex-col" style={{ animation: 'slide-in-left 0.5s 0.4s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
               <div className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-muted)' }}>Chat History</div>
-              <div className="flex-1 overflow-y-auto flex flex-col gap-0.5">
-                {['Pipeline by region analysis', 'Top deals closing this quarter', 'Revenue trend YoY', 'Rep performance breakdown', 'EMEA pipeline hygiene', 'Stalled deals last 90 days'].map((title, i) => (
-                  <div
-                    key={title}
-                    className={`flex items-center gap-2 px-2.5 py-2 rounded-[10px] text-[13px] cursor-pointer transition-all duration-150 ${i === 0 ? 'font-medium' : ''}`}
-                    style={{
-                      color: i === 0 ? 'var(--color-accent-hover)' : 'var(--color-text-secondary)',
-                      background: i === 0 ? 'var(--color-accent-light)' : 'transparent',
-                    }}
-                  >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" style={{ color: i === 0 ? 'var(--color-accent)' : 'var(--color-text-faint)' }}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <span className="truncate">{title}</span>
+              <div className="flex-1 overflow-y-auto flex flex-col gap-0">
+                {[
+                  { group: 'Today', items: [
+                    { title: 'Pipeline by region analysis', time: '2m', active: true },
+                    { title: 'Top deals closing this quarter', time: '1h' },
+                    { title: 'Revenue trend YoY', time: '3h' },
+                  ]},
+                  { group: 'Yesterday', items: [
+                    { title: 'Rep performance breakdown', time: '18h' },
+                    { title: 'EMEA pipeline hygiene', time: '22h' },
+                  ]},
+                  { group: 'Last Week', items: [
+                    { title: 'Stalled deals last 90 days', time: '5d' },
+                  ]},
+                ].map(({ group, items }) => (
+                  <div key={group}>
+                    <div className="text-[9px] font-semibold uppercase tracking-wider px-2.5 pt-3 pb-1.5" style={{ color: 'var(--color-text-faint)' }}>{group}</div>
+                    {items.map(({ title, time, active }) => (
+                      <div
+                        key={title}
+                        className={`flex items-center gap-2 px-2.5 py-2 rounded-[10px] text-[13px] cursor-pointer transition-all duration-150 ${active ? 'font-medium' : ''}`}
+                        style={{
+                          color: active ? 'var(--color-accent-hover)' : 'var(--color-text-secondary)',
+                          background: active ? 'var(--color-accent-light)' : 'transparent',
+                        }}
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" style={{ color: active ? 'var(--color-accent)' : 'var(--color-text-faint)' }}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span className="truncate flex-1">{title}</span>
+                        <span className="text-[9px] shrink-0" style={{ color: 'var(--color-text-faint)' }}>{time}</span>
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Bottom: Impersonate */}
-            <div className="pt-5 space-y-4" style={{ borderTop: '1px solid rgba(160,150,200,0.2)', animation: 'slide-in-left 0.5s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
+            <div className="pt-3 space-y-4" style={{ borderTop: '1px solid rgba(160,150,200,0.2)', animation: 'slide-in-left 0.5s 0.5s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
               <div className="relative" ref={impersonateDropdownRef}>
                 <div className="text-xs font-semibold mb-1" style={{ color: 'var(--color-text-secondary)' }}>Impersonate</div>
                 <div className="text-[11px] mt-0.5 mb-2" style={{ color: 'var(--color-text-muted)' }}>Search by name to filter data</div>
@@ -218,7 +237,7 @@ export default function App() {
                       style={{ background: 'var(--glass-bg-light)', border: '1px solid var(--color-border)', color: 'var(--color-text-secondary)' }}
                     />
                     {impersonateDropdownOpen && (impersonateSearch.trim().length >= 2 || impersonateResults.length > 0) && (
-                      <div className="absolute left-0 right-0 mt-1 max-h-40 overflow-y-auto rounded-[12px] z-50" style={{ background: 'var(--glass-bg-heavy)', backdropFilter: 'var(--glass-blur)', border: '1px solid var(--color-border-white)', boxShadow: 'var(--shadow-elevated)' }}>
+                      <div className="absolute left-0 right-0 bottom-full mb-1 max-h-48 overflow-y-auto rounded-[12px] z-50" style={{ background: 'var(--color-bg, #1a1a2e)', border: '1px solid var(--color-border-white)', boxShadow: 'var(--shadow-elevated)' }}>
                         {impersonateLoading ? (
                           <div className="px-3 py-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>Searching...</div>
                         ) : impersonateResults.length === 0 ? (
