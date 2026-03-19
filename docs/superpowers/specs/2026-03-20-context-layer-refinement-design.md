@@ -341,12 +341,12 @@ Instead, we take a **simpler, safer approach**: every example keeps its complete
 
 2. **Remove `notes` field** from examples where present — content absorbed into business-rules.md or is obvious from the SQL.
 
-3. **Remove `questionCategory` and `questionSubCategory`** from examples — the spec review confirmed these fields are loaded but never injected into prompts. They're only used by classify.js for programmatic routing, and classify.js determines category from its own LLM call, not from these fields. Removing them reduces file size and eliminates a maintenance surface.
+3. **Keep `questionCategory` and `questionSubCategory`** on examples — classify.js's exact-match path (which skips the LLM call) reads these fields directly at lines 377-378 to set routing state. Removing them would silently degrade classification for all template-matched queries.
 
 4. **Add validation script** (`npm run validate:examples`) — iterates all examples, checks that each SQL containing quota/pipe tables includes the corresponding mandatory filters from `_filterReference`. Reports mismatches. Run during CI or after editing examples.
 
 ### What stays per example
-- `id`, `question`, `sql` (full, complete SQL), `tables_used`, `variants`
+- `id`, `question`, `questionCategory`, `questionSubCategory`, `sql` (full, complete SQL), `tables_used`, `variants`
 
 ### What stays unchanged
 - Every example retains its complete `sql` field — no runtime resolution, no template expansion
