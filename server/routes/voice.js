@@ -151,7 +151,7 @@ function buildPhrases() {
       phrases.add(acronym);
     }
   } catch (_) {
-    // business-context.md not available — continue
+    // business-rules.md not available — continue
   }
 
   // 5. SQL keywords
