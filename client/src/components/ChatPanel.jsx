@@ -424,7 +424,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       streamingDataRef.current = eventData.execution;
       setStreamingData(eventData.execution);
     } else if (eventType === 'done') {
-      setTimeout(() => setProgressCollapsed(true), 500);
+      setProgressCollapsed(true);
       if (onMetricsUpdate) {
         onMetricsUpdate({
           usageByNodeAndModel: eventData.usageByNodeAndModel || null,
@@ -950,7 +950,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           </div>
         ))}
 
-        {loading && progress && (
+        {loading && progress && !progressCollapsed && (
           <div
             className="max-w-[88%]"
             style={{
@@ -966,7 +966,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
               usage={progress.usage}
               startTime={progress.startTime}
               activeTools={activeTools}
-              collapsed={progressCollapsed}
+              collapsed={false}
             />
             {/* Preserve streaming content below the progress bar */}
             <div className="px-5 pb-4">
