@@ -434,8 +434,8 @@ function SubQuerySection({ query, index }) {
   );
 }
 
-export default function ResultsPanel({ execution, insights, chart, queries = [], isPartial = false, confidence, retrySuggestions, onRetrySuggestion, sessionId, question, sql, zeroRowGuidance }) {
-  const [activeTab, setActiveTab] = useState('insights');
+export default function ResultsPanel({ execution, insights, chart, queries = [], isPartial = false, confidence, retrySuggestions, onRetrySuggestion, sessionId, question, sql, zeroRowGuidance, initialTab = 'insights' }) {
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [showDetail, setShowDetail] = useState(false);
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState(null);
