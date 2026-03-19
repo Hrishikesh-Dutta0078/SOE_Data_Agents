@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
-import ResultsPanel from './ResultsPanel';
 
 /**
  * NarrativeCard — Executive-first response card.
@@ -300,13 +299,7 @@ export default function NarrativeCard({
         {execution?.rows?.length > 0 && (
           <button onClick={() => togglePill('table')} className="text-[11px] font-medium px-3 py-1.5 rounded-lg border flex items-center gap-1 cursor-pointer" style={{ color: '#6366F1', background: expandedPill === 'table' ? 'rgba(99,102,241,0.12)' : 'rgba(99,102,241,0.06)', borderColor: 'rgba(99,102,241,0.1)' }}>
             {expandedPill === 'table' ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-            View table
-          </button>
-        )}
-        {chart?.charts?.length > 0 && (
-          <button onClick={() => togglePill('chart')} className="text-[11px] font-medium px-3 py-1.5 rounded-lg border flex items-center gap-1 cursor-pointer" style={{ color: '#6366F1', background: expandedPill === 'chart' ? 'rgba(99,102,241,0.12)' : 'rgba(99,102,241,0.06)', borderColor: 'rgba(99,102,241,0.1)' }}>
-            {expandedPill === 'chart' ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-            Full chart
+            Table
           </button>
         )}
         {sql && (
@@ -404,29 +397,6 @@ export default function NarrativeCard({
         </div>
       )}
 
-      {expandedPill === 'chart' && chart?.charts?.length > 0 && (
-        <div className="mt-3" style={{ animation: 'reveal-section 0.3s ease forwards' }}>
-          {/* Render full interactive charts directly using ResultsPanel's ChartsView.
-              NOTE: ResultsPanel.jsx must be modified to export ChartsView as a named export,
-              OR render ResultsPanel here with initialTab="chart" (requires adding initialTab prop).
-              The implementer should add `initialTab` prop support to ResultsPanel:
-              change `const [activeTab, setActiveTab] = useState('insights');`
-              to `const [activeTab, setActiveTab] = useState(initialTab || 'insights');`
-              and add `initialTab` to the destructured props. */}
-          <ResultsPanel
-            execution={execution}
-            insights=""
-            chart={chart}
-            queries={[]}
-            isPartial={false}
-            confidence={confidence}
-            sessionId={sessionId}
-            question={question}
-            sql={sql}
-            initialTab="chart"
-          />
-        </div>
-      )}
     </div>
   );
 }
