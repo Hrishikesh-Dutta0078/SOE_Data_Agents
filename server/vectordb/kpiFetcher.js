@@ -5,9 +5,8 @@
  * KPI names, aliases, definitions, and formula terms. No embeddings.
  *
  * Usage:
- *   const { searchKpis, expandAbbreviations } = require('./vectordb/kpiFetcher');
+ *   const { searchKpis } = require('./vectordb/kpiFetcher');
  *   const kpis = searchKpis('gnarr participation coverage', 5);
- *   const expanded = expandAbbreviations('W+F+UC LTG Covx');
  */
 
 const fs = require('fs');
@@ -48,9 +47,6 @@ let _loadPromise = null;
 
 function buildKpiStoreFromData(data) {
   const kpis = Array.isArray(data.kpis) ? data.kpis : [];
-  const abbreviations = data.abbreviations && typeof data.abbreviations === 'object'
-    ? data.abbreviations
-    : {};
   const keywordIndex = new Map();
   for (let idx = 0; idx < kpis.length; idx++) {
     const kpi = kpis[idx];
@@ -77,7 +73,7 @@ function buildKpiStoreFromData(data) {
       keywordIndex.get(kw).add(idx);
     }
   }
-  return { kpis, keywordIndex, abbreviations };
+  return { kpis, keywordIndex };
 }
 
 async function loadKpiGlossaryAsync() {
@@ -86,7 +82,7 @@ async function loadKpiGlossaryAsync() {
   _loadPromise = (async () => {
     if (!fs.existsSync(KPI_GLOSSARY_FILE)) {
       logger.warn('KPI glossary not found', { path: KPI_GLOSSARY_FILE });
-      _store = { kpis: [], keywordIndex: new Map(), abbreviations: {} };
+      _store = { kpis: [], keywordIndex: new Map() };
       return _store;
     }
     let data;
@@ -95,7 +91,7 @@ async function loadKpiGlossaryAsync() {
       data = JSON.parse(raw);
     } catch (err) {
       logger.warn('Failed to parse KPI glossary', { path: KPI_GLOSSARY_FILE, error: err.message });
-      _store = { kpis: [], keywordIndex: new Map(), abbreviations: {} };
+      _store = { kpis: [], keywordIndex: new Map() };
       return _store;
     }
     _store = buildKpiStoreFromData(data);
@@ -106,7 +102,7 @@ async function loadKpiGlossaryAsync() {
 
 function loadKpiGlossary() {
   if (_store) return _store;
-  return { kpis: [], keywordIndex: new Map(), abbreviations: {} };
+  return { kpis: [], keywordIndex: new Map() };
 }
 
 /**
@@ -161,38 +157,10 @@ function formatKpiForOutput(kpi) {
   };
 }
 
-/**
- * Expand known abbreviations in a query or text.
- * Replaces abbreviations (e.g. W, F, UC, LTG, Covx) with their full form.
- *
- * @param {string} query - Text that may contain abbreviations (e.g. "W+F+UC LTG Covx")
- * @returns {string} - Text with abbreviations expanded in parentheses, e.g. "W(Forecast)+F(Won)+UC(Upside Committed) LTG(Left to Go) Covx(Coverage)"
- */
-function expandAbbreviations(query) {
-  if (!query || typeof query !== 'string') return '';
-  const store = loadKpiGlossary();
-  const abbr = store.abbreviations;
-  if (Object.keys(abbr).length === 0) return query;
-
-  const sortedKeys = Object.keys(abbr).sort((a, b) => b.length - a.length);
-  let result = query;
-  for (const key of sortedKeys) {
-    const val = abbr[key];
-    if (!val) continue;
-    const re = new RegExp(`\\b${escapeRegex(key)}\\b`, 'gi');
-    result = result.replace(re, `${key} (${val})`);
-  }
-  return result;
-}
-
-function escapeRegex(s) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
 function reloadKpiGlossary() {
   _store = null;
   _loadPromise = null;
   return loadKpiGlossary();
 }
 
-module.exports = { searchKpis, expandAbbreviations, reloadKpiGlossary, loadKpiGlossaryAsync };
+module.exports = { searchKpis, reloadKpiGlossary, loadKpiGlossaryAsync };
