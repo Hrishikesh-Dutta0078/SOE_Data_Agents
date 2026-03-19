@@ -3,7 +3,8 @@ import ReactMarkdown from 'react-markdown';
 import { analyzeQuestionStream, fetchBlueprints } from '../utils/api';
 import ResultsPanel from './ResultsPanel';
 
-import ThinkingPanel from './ThinkingPanel';
+import NarrativeCard from './NarrativeCard';
+import ProgressTimeline from './ProgressTimeline';
 import DashboardOverlay from './DashboardOverlay';
 import VoiceInput from './VoiceInput';
 import BlueprintPicker from './BlueprintPicker';
@@ -34,6 +35,19 @@ function formatDurationMs(ms) {
   if (ms == null || !Number.isFinite(ms)) return null;
   return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
 }
+
+const NODE_LABELS = {
+  classify: 'Classify', decompose: 'Decompose', contextFetch: 'Context Fetch',
+  generateSql: 'Generate SQL', presentInsights: 'Insights', presentChart: 'Chart',
+  dashboardAgent: 'Dashboard', correct: 'Correct', researchAgent: 'Research',
+  sqlWriterAgent: 'SQL Writer',
+};
+
+const MODEL_BADGE = {
+  opus:   { color: '#7C3AED', bg: 'rgba(139,92,246,0.1)' },
+  sonnet: { color: '#4F46E5', bg: 'rgba(99,102,241,0.1)' },
+  haiku:  { color: '#059669', bg: 'rgba(16,185,129,0.12)' },
+};
 
 function getModelsFromTrace(trace) {
   const models = new Set();
@@ -96,6 +110,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const [partialQueries, setPartialQueries] = useState([]);
   const [querySummary, setQuerySummary] = useState('');
   const [confidence, setConfidence] = useState(null);
+  const [progressCollapsed, setProgressCollapsed] = useState(false);
 
   const [streamingData, setStreamingData] = useState(null);
   const streamingDataRef = useRef(null);
@@ -338,7 +353,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         const steps = prev.steps
           .map((s) =>
             s.status === 'active'
-              ? { ...s, node: eventData.node, status: 'completed', duration: eventData.duration, summary: eventData.summary }
+              ? { ...s, node: eventData.node, status: 'completed', duration: eventData.duration, summary: eventData.summary, model: eventData.model }
               : s
           );
         steps.push({ node: '_pending', status: 'active' });
@@ -409,6 +424,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       streamingDataRef.current = eventData.execution;
       setStreamingData(eventData.execution);
     } else if (eventType === 'done') {
+      setTimeout(() => setProgressCollapsed(true), 500);
       if (onMetricsUpdate) {
         onMetricsUpdate({
           usageByNodeAndModel: eventData.usageByNodeAndModel || null,
@@ -420,6 +436,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   }, [onMetricsUpdate]);
 
   const runStream = useCallback(async (question, history, entities, resolved, { isFollowUp = false } = {}) => {
+    setProgressCollapsed(false);
     const startTime = Date.now();
     setProgress({ steps: [{ node: '_pending', status: 'active' }], usage: {}, startTime });
     setStreamingInsights('');
@@ -625,219 +642,39 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   // --- Render helpers ---
 
   const renderSqlMessage = (msg, idx) => (
-    <>
-      <div className="mb-2 flex flex-wrap gap-1">
-        {msg.orchestration?.intent && (
-          <Badge className="bg-blue-100 text-blue-800">{msg.orchestration.intent}</Badge>
-        )}
-        {msg.orchestration?.complexity && (
-          <Badge className="bg-amber-100 text-amber-800">{msg.orchestration.complexity}</Badge>
-        )}
-        {msg.execution && (
-          <Badge className={msg.execution.success ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}>
-            {msg.execution.success
-              ? `${msg.execution.rowCount ?? msg.execution.rows?.length ?? 0} row${(msg.execution.rowCount ?? msg.execution.rows?.length ?? 0) !== 1 ? 's' : ''}`
-              : 'Execution Failed'}
-          </Badge>
-        )}
-      </div>
-
-      {msg.entities && (() => {
-        const entries = Object.entries(msg.entities).filter(([, v]) => Array.isArray(v) && v.length > 0);
-        if (entries.length === 0) return null;
-        return (
-          <div className="mb-3 p-2.5 bg-stone-50 border border-stone-200 rounded-[12px] text-xs leading-relaxed text-stone-700">
-            <div className="font-semibold text-[11px] text-stone-500 mb-1">
-              Detected Entities
-            </div>
-            {entries.map(([key, values]) => (
-              <div key={key} className="flex gap-1.5 mb-0.5 flex-wrap items-baseline">
-                <span className="font-semibold text-stone-600 min-w-[80px]">{key}:</span>
-                <span>
-                  {values.map((v, i) => (
-                    <span key={i} className="inline-block px-2 py-px bg-stone-100 rounded-full text-[11px] text-stone-600 mr-1">
-                      {v}
-                    </span>
-                  ))}
-                </span>
-              </div>
-            ))}
-          </div>
-        );
-      })()}
-
-      {(msg.dataReady || msg.insights || msg.chart || (msg.execution?.success && msg.execution.rows?.length > 0) || (msg.queries?.length > 0)) && (
-        <ResultsPanel
-          execution={msg.execution || msg.dataReady}
-          insights={msg.insights}
-          chart={msg.chart}
-          queries={msg.queries || []}
-          confidence={msg.confidence}
-          retrySuggestions={msg.retrySuggestions}
-          onRetrySuggestion={(text) => handleSend(text)}
-          sessionId={sessionId}
-          question={msg.content}
-          sql={msg.content}
-          zeroRowGuidance={msg.zeroRowGuidance}
-        />
-      )}
-
-      {msg.execution && !msg.execution.success && (
-        <div className="mt-2.5 p-2.5 bg-red-50/50 border border-red-100 rounded-[12px] text-xs text-red-700 leading-relaxed">
-          <div className="font-semibold text-[11px] text-red-600 mb-1">
-            Query execution failed
-          </div>
-          {msg.execution.error}
-        </div>
-      )}
-
-      {msg.content && (
-        <div className="mt-2">
-          <button
-            className="text-[13px] font-medium text-indigo-500 hover:text-indigo-600 cursor-pointer bg-transparent border-none p-0 transition-colors"
-            onClick={() => toggle(`${idx}-sql`)}
-          >
-            {expanded[`${idx}-sql`] ? 'Hide SQL' : 'Show generated SQL'}
-          </button>
-          {expanded[`${idx}-sql`] && (
-            <>
-              {msg.sqlReasoning && (
-                <div className="mt-2 p-2.5 bg-indigo-50/50 border border-indigo-100 rounded-[12px] text-[12px] text-indigo-700 leading-relaxed whitespace-pre-wrap">
-                  {msg.sqlReasoning}
-                </div>
-              )}
-              <div className="mt-2 relative bg-gray-900 text-gray-200 rounded-[12px] p-3 text-[13px] font-mono overflow-x-auto whitespace-pre-wrap break-all leading-relaxed">
-                <button
-                  className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-gray-300 border-none rounded-[6px] px-2 py-0.5 text-[11px] cursor-pointer transition-colors"
-                  onClick={() => copyToClipboard(msg.content, idx)}
-                >
-                  {copiedIdx === idx ? 'Copied!' : 'Copy'}
-                </button>
-                {msg.content}
-              </div>
-            </>
-          )}
-        </div>
-      )}
-
-
-      {(msg.usage || msg.usageByNodeAndModel) && (
-        <div className="mt-2 text-[10px] text-stone-400">
-          {msg.usageByNodeAndModel ? (
-            <div className="space-y-1">
-              {[
-                { key: 'researchAgent', label: 'Research Agent' },
-                { key: 'sqlWriterAgent', label: 'SQL Writer Agent' },
-              ].map(({ key, label }) => {
-                const byModel = msg.usageByNodeAndModel[key];
-                if (!byModel) return null;
-                const fmt = (u) => {
-                  if (!u || (u.inputTokens === 0 && u.outputTokens === 0)) return null;
-                  const inStr = formatTokensInMillions(u.inputTokens) || '—';
-                  const outStr = formatTokensInMillions(u.outputTokens) || '—';
-                  return `${inStr} in / ${outStr} out`;
-                };
-                const opus = fmt(byModel.opus);
-                const haiku = fmt(byModel.haiku);
-                if (!opus && !haiku) return null;
-                return (
-                  <div key={key} className="flex flex-wrap gap-x-3 gap-y-0.5">
-                    <span className="font-medium text-stone-500 min-w-[100px]">{label}:</span>
-                    {opus && <span>Opus {opus}</span>}
-                    {opus && haiku && <span>·</span>}
-                    {haiku && <span>Haiku {haiku}</span>}
-                  </div>
-                );
-              })}
-              {msg.usage?.totalTokens > 0 &&
-                !['researchAgent', 'sqlWriterAgent'].some(
-                  (k) =>
-                    (msg.usageByNodeAndModel[k]?.opus?.totalTokens ?? 0) +
-                    (msg.usageByNodeAndModel[k]?.haiku?.totalTokens ?? 0) > 0
-                ) && (
-                  <div className="pt-0.5 border-t border-stone-200 mt-1">
-                    <span className="text-stone-500">Total: </span>
-                    <span>{formatTokensInMillions(msg.usage.totalTokens)} tokens</span>
-                    {formatDurationMs(msg.usage?.duration) && (
-                      <span className="text-stone-500"> · {formatDurationMs(msg.usage.duration)}</span>
-                    )}
-                    <span className="text-stone-500"> (classify, present, etc.)</span>
-                  </div>
-                )}
-              {formatDurationMs(msg.usage?.duration) &&
-                ['researchAgent', 'sqlWriterAgent'].some(
-                  (k) =>
-                    (msg.usageByNodeAndModel[k]?.opus?.totalTokens ?? 0) +
-                    (msg.usageByNodeAndModel[k]?.haiku?.totalTokens ?? 0) > 0
-                ) && (
-                  <div className="pt-0.5 border-t border-stone-200 mt-1">
-                    <span className="text-stone-500">Query time: </span>
-                    <span>{formatDurationMs(msg.usage.duration)}</span>
-                  </div>
-                )}
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {formatTokensInMillions(msg.usage?.totalTokens) && (
-                <span>{formatTokensInMillions(msg.usage.totalTokens)} tokens</span>
-              )}
-              {formatDurationMs(msg.usage?.duration) && (
-                <span>· {formatDurationMs(msg.usage.duration)}</span>
-              )}
-              {getModelsFromTrace(msg.trace).length > 0 ? (
-                <span>· {getModelsFromTrace(msg.trace).join(', ')}</span>
-              ) : (
-                <span>· —</span>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {msg.warnings && msg.warnings.length > 0 && (
-        <div className="mt-2 p-2.5 bg-amber-50/50 border border-amber-100 rounded-[12px] text-[11px] text-amber-700 space-y-0.5">
-          {msg.warnings.map((w, i) => (
-            <div key={i} className="flex gap-1.5 items-start">
-              <span className="shrink-0">&#9888;</span>
-              <span>{typeof w === 'string' ? w : w.message || JSON.stringify(w)}</span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {msg.suggestedFollowUps && msg.suggestedFollowUps.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-stone-100">
-          <div className="text-[12px] font-medium text-stone-400 mb-2">
-            Suggested Follow-Ups
-          </div>
-          <div className="flex flex-col gap-1.5">
-            {msg.suggestedFollowUps.map((q, i) => (
-              <button
-                key={i}
-                className="text-left px-3 py-2.5 text-[13px] text-stone-700 bg-stone-50 border border-stone-200 rounded-[12px]
-                           hover:bg-stone-100 hover:shadow-[0_1px_2px_rgba(0,0,0,0.03)] cursor-pointer transition-all leading-relaxed"
-                onClick={() => handleSend(q, { isFollowUp: true })}
-                disabled={loading}
-              >
-                {q}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {msg.type === 'sql' && msg.execution?.success && !loading && (
-        <div className="mt-2 pt-2 border-t border-slate-100">
-          <button
-            className="px-3.5 py-1.5 text-[12px] font-medium text-indigo-500 bg-indigo-50 border border-indigo-100
-                       rounded-[8px] hover:bg-indigo-100 cursor-pointer transition-all"
-            onClick={() => setFollowUpMode(true)}
-          >
-            Follow Up
-          </button>
-        </div>
-      )}
-    </>
+    <div
+      style={{
+        background: 'rgba(255,255,255,0.55)',
+        borderRadius: 16,
+        border: '1px solid rgba(255,255,255,0.5)',
+        boxShadow: '0 2px 12px rgba(100,80,160,0.04)',
+        overflow: 'hidden',
+        maxWidth: '88%',
+      }}
+    >
+      <NarrativeCard
+        execution={msg.execution}
+        insights={msg.insights}
+        chart={msg.chart}
+        confidence={msg.confidence}
+        sql={msg.content}
+        entities={{
+          intent: msg.orchestration?.intent,
+          complexity: msg.orchestration?.complexity,
+          metrics: msg.entities?.metrics,
+          dimensions: msg.entities?.dimensions,
+        }}
+        onFollowUp={() => setFollowUpMode(true)}
+        queries={msg.queries}
+        isPartial={false}
+        retrySuggestions={msg.retrySuggestions}
+        onRetrySuggestion={(s) => handleSend(s)}
+        zeroRowGuidance={msg.zeroRowGuidance}
+        sessionId={sessionId}
+        question={messages[messages.indexOf(msg) - 1]?.content}
+        animate={messages.indexOf(msg) === messages.length - 1}
+      />
+    </div>
   );
 
   const renderClarificationMessage = (msg, idx) => {
@@ -992,29 +829,24 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       </button>
       {(msg.usage || msg.usageByNodeAndModel) && (
         <div className="mt-2 text-[10px] text-stone-400">
-          {msg.usageByNodeAndModel ? (
+          {msg.usageByNodeAndModel && Object.keys(msg.usageByNodeAndModel).length > 0 ? (
             <div className="space-y-1">
-              {[
-                { key: 'researchAgent', label: 'Research Agent' },
-                { key: 'sqlWriterAgent', label: 'SQL Writer Agent' },
-              ].map(({ key, label }) => {
-                const byModel = msg.usageByNodeAndModel[key];
-                if (!byModel) return null;
-                const fmt = (u) => {
-                  if (!u || (u.inputTokens === 0 && u.outputTokens === 0)) return null;
-                  const inStr = formatTokensInMillions(u.inputTokens) || '—';
-                  const outStr = formatTokensInMillions(u.outputTokens) || '—';
-                  return `${inStr} in / ${outStr} out`;
-                };
-                const opus = fmt(byModel.opus);
-                const haiku = fmt(byModel.haiku);
-                if (!opus && !haiku) return null;
+              {Object.entries(msg.usageByNodeAndModel).map(([nodeKey, byModel]) => {
+                const models = Object.entries(byModel).filter(([, u]) => u.totalTokens > 0);
+                if (models.length === 0) return null;
+                const label = NODE_LABELS[nodeKey] || nodeKey;
                 return (
-                  <div key={key} className="flex flex-wrap gap-x-3 gap-y-0.5">
-                    <span className="font-medium text-stone-500 min-w-[100px]">{label}:</span>
-                    {opus && <span>Opus {opus}</span>}
-                    {opus && haiku && <span>·</span>}
-                    {haiku && <span>Haiku {haiku}</span>}
+                  <div key={nodeKey} className="flex items-center gap-x-3 gap-y-0.5 flex-wrap">
+                    <span className="font-medium text-stone-500 min-w-[90px]">{label}</span>
+                    {models.map(([model, u]) => {
+                      const badge = MODEL_BADGE[model];
+                      return (
+                        <span key={model} className="flex items-center gap-1">
+                          {badge && <span className="font-semibold px-1.5 py-0.5 rounded-full" style={{ color: badge.color, background: badge.bg, fontSize: 9 }}>{model.charAt(0).toUpperCase() + model.slice(1)}</span>}
+                          <span>{formatTokensInMillions(u.totalTokens) || '—'} tok</span>
+                        </span>
+                      );
+                    })}
                   </div>
                 );
               })}
@@ -1023,11 +855,6 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
             <div className="flex flex-wrap gap-2">
               {formatTokensInMillions(msg.usage?.totalTokens) && (
                 <span>{formatTokensInMillions(msg.usage.totalTokens)} tokens</span>
-              )}
-              {getModelsFromTrace(msg.trace).length > 0 ? (
-                <span>· {getModelsFromTrace(msg.trace).join(', ')}</span>
-              ) : (
-                <span>· —</span>
               )}
             </div>
           )}
@@ -1048,8 +875,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     const base = 'px-4 py-3 rounded-[20px] text-sm leading-relaxed break-words';
     if (msg.role === 'user')
       return `${base} self-end max-w-[70%] bubble-user text-white rounded-br-[8px] whitespace-pre-wrap`;
+    if (msg.type === 'sql') return 'self-start w-[90%]';
     const assistantBase = `${base} self-start bubble-assistant text-stone-800 rounded-bl-[8px]`;
-    if (msg.type === 'sql' && msg.execution?.success) return `${assistantBase} w-[90%]`;
     if (msg.type === 'dashboard') return `${assistantBase} max-w-[70%]`;
     return `${assistantBase} max-w-[70%]`;
   };
@@ -1122,53 +949,51 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           </div>
         ))}
 
-        {loading && (
-          <div className="self-start w-[90%] px-4 py-3 rounded-2xl rounded-bl-sm text-sm bubble-assistant">
-            {progress ? (
-              <>
-                <ThinkingPanel
-                  entries={thinkingEntries}
-                  queryPlan={queryPlan}
-                  startTime={progress.startTime}
-                />
-                {querySummary && (
-                  <div className="mx-0 mb-2 mt-2 px-4 py-2.5 rounded-xl text-[13px] text-indigo-800"
-                       style={{ background: 'linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%)', border: '1px solid rgba(99,102,241,0.15)' }}>
-                    <span className="font-semibold text-indigo-600 mr-1.5">Plan:</span>
-                    {querySummary}
-                  </div>
-                )}
-                {partialQueries.filter(Boolean).length > 0 && (
-                  <ResultsPanel
-                    execution={null}
-                    insights={null}
-                    chart={null}
-                    queries={partialQueries.filter(Boolean)}
-                    isPartial={true}
-                  />
-                )}
-                {streamingData && streamingData.rowCount > 0 && (
-                  <ResultsPanel
-                    execution={streamingData}
-                    insights={null}
-                    chart={null}
-                    queries={[]}
-                  />
-                )}
-                {streamingInsights && (
-                  <div className="mt-3 pt-3 border-t border-stone-100 text-[13px] leading-relaxed text-stone-700">
-                    <ReactMarkdown>{streamingInsights}</ReactMarkdown>
-                    <span className="inline-block w-0.5 h-[18px] bg-indigo-500 rounded-full animate-subtle-pulse align-text-bottom ml-0.5" />
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="flex items-center gap-1.5 py-1">
-                <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '0ms'}} />
-                <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '200ms'}} />
-                <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '400ms'}} />
-              </div>
-            )}
+        {loading && progress && (
+          <div
+            className="max-w-[88%]"
+            style={{
+              background: 'rgba(255,255,255,0.55)',
+              borderRadius: 16,
+              border: '1px solid rgba(255,255,255,0.5)',
+              boxShadow: '0 2px 12px rgba(100,80,160,0.04)',
+              overflow: 'hidden',
+            }}
+          >
+            <ProgressTimeline
+              steps={progress.steps}
+              usage={progress.usage}
+              startTime={progress.startTime}
+              activeTools={activeTools}
+              collapsed={progressCollapsed}
+            />
+            {/* Preserve streaming content below the progress bar */}
+            <div className="px-5 pb-4">
+              {querySummary && (
+                <div className="text-[12px] mb-2 italic" style={{ color: 'var(--color-text-muted)' }}>{querySummary}</div>
+              )}
+              {partialQueries.filter(Boolean).map((pq, i) => (
+                <div key={i} className="text-[12px] mb-2 p-2 rounded-lg" style={{ background: 'rgba(99,102,241,0.04)', color: 'var(--color-text-secondary)' }}>
+                  <span className="font-semibold text-[11px] mr-1.5" style={{ color: '#6366F1' }}>Q{i + 1}</span>
+                  {pq.subQuestion || `Sub-query ${i + 1} complete`}
+                  {pq.execution?.rowCount != null && <span className="ml-1.5 text-[10px]" style={{ color: 'var(--color-text-muted)' }}>({pq.execution.rowCount} rows)</span>}
+                </div>
+              ))}
+              {streamingInsights && (
+                <div className="text-[13px] leading-relaxed mt-2" style={{ color: '#44403C' }}>
+                  <ReactMarkdown>{streamingInsights}</ReactMarkdown>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {loading && !progress && (
+          <div className="self-start max-w-[70%] px-4 py-3 rounded-2xl rounded-bl-sm text-sm bubble-assistant">
+            <div className="flex items-center gap-1.5 py-1">
+              <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '0ms'}} />
+              <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '200ms'}} />
+              <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '400ms'}} />
+            </div>
           </div>
         )}
 
