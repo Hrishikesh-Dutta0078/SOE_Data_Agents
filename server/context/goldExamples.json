@@ -247,13 +247,15 @@
     {
       "id": "exact__top_pushed_deals",
       "question": "Top deals pushed multiple times",
-      "sql": "SELECT TOP 20\n  opp.OPP_NAME,\n  r.REP_NAME,\n  r.FLM_NAME,\n  r.GLOBAL_REGION,\n  s.SALES_STAGE,\n  opp.PUSHED_COUNT,\n  p.Oppty AS ARR\nFROM vw_TF_EBI_P2S p\nJOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nJOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\nWHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3')\n  AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0)\n  AND p.PAY_MEASURE_ID = 0\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND opp.PUSHED_COUNT >= 2\n  AND c.QTR_BKT_IND = 0\nORDER BY p.Oppty DESC",
+      "sql": "SELECT TOP 20\n  opp.OPP_NAME,\n  r.REP_NAME,\n  r.FLM_NAME,\n  r.GLOBAL_REGION,\n  s.SALES_STAGE,\n  opp.PUSHED_COUNT,\n  p.Oppty AS ARR\nFROM vw_TF_EBI_P2S p\nJOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nJOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3')\n  AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0)\n  AND p.PAY_MEASURE_ID = 0\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND o.MOPG1 <> 'ADVERTISING'\n  AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n  AND opp.PUSHED_COUNT >= 2\n  AND c.QTR_BKT_IND = 0\nORDER BY p.Oppty DESC",
       "tables_used": [
         "vw_TF_EBI_P2S",
         "vw_TD_EBI_OPP",
         "vw_td_ebi_region_rpt",
         "vw_ebi_sales_stage",
-        "vw_EBI_CALDATE"
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
       ],
       "questionCategory": "WHAT_HAPPENED",
       "questionSubCategory": "deal_lists",
@@ -269,13 +271,15 @@
     {
       "id": "exact__deals_by_ds_score",
       "question": "Which deals to focus on by Deal Sensei score?",
-      "sql": "SELECT TOP 30\n  opp.OPP_NAME,\n  r.REP_NAME,\n  r.FLM_NAME,\n  s.SALES_STAGE,\n  r.GLOBAL_REGION,\n  p.Oppty AS ARR,\n  opp.DS_SCORE,\n  CASE\n    WHEN opp.DS_SCORE >= 65 THEN 'High Priority'\n    WHEN opp.DS_SCORE >= 40 THEN 'Review'\n    ELSE 'At Risk'\n  END AS DS_Priority\nFROM vw_TF_EBI_P2S p\nJOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nJOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\nWHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3')\n  AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0)\n  AND p.PAY_MEASURE_ID = 0\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND c.QTR_BKT_IND = 0\n  AND opp.DS_SCORE IS NOT NULL\nORDER BY p.Oppty DESC, opp.DS_SCORE DESC",
+      "sql": "SELECT TOP 30\n  opp.OPP_NAME,\n  r.REP_NAME,\n  r.FLM_NAME,\n  s.SALES_STAGE,\n  r.GLOBAL_REGION,\n  p.Oppty AS ARR,\n  opp.DS_SCORE,\n  CASE\n    WHEN opp.DS_SCORE >= 65 THEN 'High Priority'\n    WHEN opp.DS_SCORE >= 40 THEN 'Review'\n    ELSE 'At Risk'\n  END AS DS_Priority\nFROM vw_TF_EBI_P2S p\nJOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nJOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3')\n  AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0)\n  AND p.PAY_MEASURE_ID = 0\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND o.MOPG1 <> 'ADVERTISING'\n  AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n  AND c.QTR_BKT_IND = 0\n  AND opp.DS_SCORE IS NOT NULL\nORDER BY p.Oppty DESC, opp.DS_SCORE DESC",
       "tables_used": [
         "vw_TF_EBI_P2S",
         "vw_TD_EBI_OPP",
         "vw_td_ebi_region_rpt",
         "vw_ebi_sales_stage",
-        "vw_EBI_CALDATE"
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
       ],
       "questionCategory": "WHAT_TO_DO",
       "questionSubCategory": "deal_focus",
@@ -339,12 +343,15 @@
       "question": "What is the stalled pipeline?",
       "questionCategory": "WHAT_HAPPENED",
       "questionSubCategory": "pipeline_level_mix",
-      "sql": "WITH pipe AS (\n  SELECT p.OPP_ID, p.Oppty, p.Region_Id, p.OPP_CLOSE_DATE_ID, opp.DAYS_SINCE_NEXT_STEPS_MODIFIED AS DSNSM, opp.STAGE_DURATION AS SD\n  FROM vw_TF_EBI_P2S p\n  JOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\n  JOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\n  JOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\n  WHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3') AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0) AND p.PAY_MEASURE_ID = 0 AND c.QTR_BKT_IND IN (0,1)\n),\nstalled AS (\n  SELECT OPP_ID, Oppty, CASE WHEN (DSNSM > 30 OR (SD > 90 AND DSNSM > 15)) THEN 1 ELSE 0 END AS Is_Stalled FROM pipe\n)\nSELECT SUM(CASE WHEN Is_Stalled = 1 THEN Oppty ELSE 0 END) AS Stalled_Pipe, SUM(Oppty) AS Total_Pipe, ROUND(SUM(CASE WHEN Is_Stalled = 1 THEN Oppty ELSE 0 END) * 100.0 / NULLIF(SUM(Oppty), 0), 2) AS Stalled_Pct FROM stalled",
+      "sql": "WITH pipe AS (\n  SELECT p.OPP_ID, p.Oppty, p.Region_Id, p.OPP_CLOSE_DATE_ID, opp.DAYS_SINCE_NEXT_STEPS_MODIFIED AS DSNSM, opp.STAGE_DURATION AS SD\n  FROM vw_TF_EBI_P2S p\n  JOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\n  JOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\n  JOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\n  JOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\n  JOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\n  JOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n  WHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3') AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0) AND p.PAY_MEASURE_ID = 0 AND r.ROLE_TYPE_DISPLAY = 'AE' AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX' AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU' AND c.QTR_BKT_IND IN (0,1)\n),\nstalled AS (\n  SELECT OPP_ID, Oppty, CASE WHEN (DSNSM > 30 OR (SD > 90 AND DSNSM > 15)) THEN 1 ELSE 0 END AS Is_Stalled FROM pipe\n)\nSELECT SUM(CASE WHEN Is_Stalled = 1 THEN Oppty ELSE 0 END) AS Stalled_Pipe, SUM(Oppty) AS Total_Pipe, ROUND(SUM(CASE WHEN Is_Stalled = 1 THEN Oppty ELSE 0 END) * 100.0 / NULLIF(SUM(Oppty), 0), 2) AS Stalled_Pct FROM stalled",
       "tables_used": [
         "vw_TF_EBI_P2S",
         "vw_TD_EBI_OPP",
+        "vw_td_ebi_region_rpt",
         "vw_ebi_sales_stage",
-        "vw_EBI_CALDATE"
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
       ],
       "variants": [
         "Stalled pipeline percent",
@@ -359,13 +366,15 @@
       "question": "Show stalled deals",
       "questionCategory": "WHAT_HAPPENED",
       "questionSubCategory": "deal_lists",
-      "sql": "SELECT opp.OPP_NAME,\n  r.REP_NAME,\n  r.FLM_NAME,\n  r.GLOBAL_REGION,\n  s.SALES_STAGE,\n  p.Oppty AS ARR,\n  opp.DAYS_SINCE_NEXT_STEPS_MODIFIED AS DSNSM,\n  opp.STAGE_DURATION AS SD\nFROM vw_TF_EBI_P2S p\nJOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nJOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\nWHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3')\n  AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0)\n  AND p.PAY_MEASURE_ID = 0\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND c.QTR_BKT_IND IN (0,1)\n  AND (opp.DAYS_SINCE_NEXT_STEPS_MODIFIED > 30 OR (opp.STAGE_DURATION > 90 AND opp.DAYS_SINCE_NEXT_STEPS_MODIFIED > 15))\nORDER BY p.Oppty DESC",
+      "sql": "SELECT opp.OPP_NAME,\n  r.REP_NAME,\n  r.FLM_NAME,\n  r.GLOBAL_REGION,\n  s.SALES_STAGE,\n  p.Oppty AS ARR,\n  opp.DAYS_SINCE_NEXT_STEPS_MODIFIED AS DSNSM,\n  opp.STAGE_DURATION AS SD\nFROM vw_TF_EBI_P2S p\nJOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nJOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3')\n  AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0)\n  AND p.PAY_MEASURE_ID = 0\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND o.MOPG1 <> 'ADVERTISING'\n  AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n  AND c.QTR_BKT_IND IN (0,1)\n  AND (opp.DAYS_SINCE_NEXT_STEPS_MODIFIED > 30 OR (opp.STAGE_DURATION > 90 AND opp.DAYS_SINCE_NEXT_STEPS_MODIFIED > 15))\nORDER BY p.Oppty DESC",
       "tables_used": [
         "vw_TF_EBI_P2S",
         "vw_TD_EBI_OPP",
         "vw_td_ebi_region_rpt",
         "vw_ebi_sales_stage",
-        "vw_EBI_CALDATE"
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
       ],
       "variants": [
         "Stalled deals list",
@@ -381,13 +390,15 @@
       "question": "Top S4 deals for progression",
       "questionCategory": "WHAT_TO_DO",
       "questionSubCategory": "progression_actions",
-      "sql": "SELECT TOP 5\n  ROW_NUMBER() OVER (ORDER BY opp.DS_SCORE DESC, p.Oppty DESC) AS Progression_Rank,\n  opp.OPP_NAME,\n  r.REP_NAME,\n  r.GLOBAL_REGION,\n  s.SALES_STAGE,\n  c.FISCAL_YR_AND_QTR_DESC AS Close_Qtr,\n  p.Oppty AS Pipeline_Amount,\n  opp.DS_SCORE,\n  opp.DS_EXPLANATION,\n  opp.DS_NEXT_BEST_ACTIONS,\n  opp.MUTUAL_PLAN_STATUS,\n  opp.AUTHORITY,\n  opp.BUDGET,\n  opp.TECHNICAL_FIT,\n  opp.TIMING,\n  opp.SUCCESS,\n  opp.NEXT_STEP,\n  opp.DAYS_SINCE_NEXT_STEPS_MODIFIED\nFROM vw_TF_EBI_P2S p\nJOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nJOIN vw_td_ebi_region_rpt r ON p.REGION_ID = r.REGION_ID\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\nWHERE s.SALES_STAGE = 'S4'\n  AND c.FISCAL_YR_AND_QTR_DESC = '2026-Q2'\n  AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0 AND p2.REGION_ID IN (SELECT rls_r.REGION_ID FROM vw_td_ebi_region_rpt rls_r WHERE rls_r.FLM_ID = 310978))\n  AND p.PAY_MEASURE_ID = 0\n  AND p.REGION_ID IN (SELECT rls_r.REGION_ID FROM vw_td_ebi_region_rpt rls_r WHERE rls_r.FLM_ID = 310978)\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\nORDER BY opp.DS_SCORE DESC, p.Oppty DESC",
+      "sql": "SELECT TOP 5\n  ROW_NUMBER() OVER (ORDER BY opp.DS_SCORE DESC, p.Oppty DESC) AS Progression_Rank,\n  opp.OPP_NAME,\n  r.REP_NAME,\n  r.GLOBAL_REGION,\n  s.SALES_STAGE,\n  c.FISCAL_YR_AND_QTR_DESC AS Close_Qtr,\n  p.Oppty AS Pipeline_Amount,\n  opp.DS_SCORE,\n  opp.DS_EXPLANATION,\n  opp.DS_NEXT_BEST_ACTIONS,\n  opp.MUTUAL_PLAN_STATUS,\n  opp.AUTHORITY,\n  opp.BUDGET,\n  opp.TECHNICAL_FIT,\n  opp.TIMING,\n  opp.SUCCESS,\n  opp.NEXT_STEP,\n  opp.DAYS_SINCE_NEXT_STEPS_MODIFIED\nFROM vw_TF_EBI_P2S p\nJOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nJOIN vw_td_ebi_region_rpt r ON p.REGION_ID = r.REGION_ID\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE s.SALES_STAGE = 'S4'\n  AND c.FISCAL_YR_AND_QTR_DESC = '2026-Q2'\n  AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0 AND p2.REGION_ID IN (SELECT rls_r.REGION_ID FROM vw_td_ebi_region_rpt rls_r WHERE rls_r.FLM_ID = 310978))\n  AND p.PAY_MEASURE_ID = 0\n  AND p.REGION_ID IN (SELECT rls_r.REGION_ID FROM vw_td_ebi_region_rpt rls_r WHERE rls_r.FLM_ID = 310978)\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND o.MOPG1 <> 'ADVERTISING'\n  AND o.DMX_SOLUTION_GROUP <> 'PPBU'\nORDER BY opp.DS_SCORE DESC, p.Oppty DESC",
       "tables_used": [
         "vw_TF_EBI_P2S",
         "vw_TD_EBI_OPP",
         "vw_td_ebi_region_rpt",
         "vw_ebi_sales_stage",
-        "vw_EBI_CALDATE"
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
       ],
       "variants": [
         "Top deals for progression",
@@ -402,13 +413,15 @@
       "question": "S5+ coverage for next quarter",
       "questionCategory": "WHAT_HAPPENED",
       "questionSubCategory": "coverage_creation",
-      "sql": "WITH s5_pipe AS (\n  SELECT SUM(p.Oppty) AS S5_Pipe\n  FROM vw_TF_EBI_P2S p\n  JOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\n  JOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\n  WHERE s.SALES_STAGE IN ('S6','S7') AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0) AND p.PAY_MEASURE_ID = 0 AND c.QTR_BKT_IND = 1\n),\nquota_q1 AS (\n  SELECT SUM(q.QUOTA_ACTUAL) AS Quota\n  FROM vw_TF_EBI_QUOTA q\n  JOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\n  JOIN vw_EBI_CALDATE c ON q.Quota_Fiscal_Quarter_ID = c.DATE_KEY\n  WHERE q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND c.QTR_BKT_IND = 1 AND r.ROLE_TYPE_DISPLAY = 'AE' AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n)\nSELECT s.S5_Pipe, t.Quota, ROUND(CAST(s.S5_Pipe AS FLOAT) / NULLIF(t.Quota, 0), 4) AS S5_Covx FROM s5_pipe s CROSS JOIN quota_q1 t",
+      "sql": "WITH s5_pipe AS (\n  SELECT SUM(p.Oppty) AS S5_Pipe\n  FROM vw_TF_EBI_P2S p\n  JOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\n  JOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\n  JOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\n  JOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\n  JOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n  WHERE s.SALES_STAGE IN ('S6','S7') AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = 0) AND p.PAY_MEASURE_ID = 0 AND r.ROLE_TYPE_DISPLAY = 'AE' AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX' AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU' AND c.QTR_BKT_IND = 1\n),\nquota_q1 AS (\n  SELECT SUM(q.QUOTA_ACTUAL) AS Quota\n  FROM vw_TF_EBI_QUOTA q\n  JOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\n  JOIN vw_EBI_CALDATE c ON q.Quota_Fiscal_Quarter_ID = c.DATE_KEY\n  JOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\n  JOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n  WHERE q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND c.QTR_BKT_IND = 1 AND r.ROLE_TYPE_DISPLAY = 'AE' AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX' AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n)\nSELECT s.S5_Pipe, t.Quota, ROUND(CAST(s.S5_Pipe AS FLOAT) / NULLIF(t.Quota, 0), 4) AS S5_Covx FROM s5_pipe s CROSS JOIN quota_q1 t",
       "tables_used": [
         "vw_TF_EBI_P2S",
+        "vw_td_ebi_region_rpt",
         "vw_ebi_sales_stage",
         "vw_EBI_CALDATE",
-        "vw_TF_EBI_QUOTA",
-        "vw_td_ebi_region_rpt"
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage",
+        "vw_TF_EBI_QUOTA"
       ],
       "variants": [
         "Mature pipeline coverage next quarter",
