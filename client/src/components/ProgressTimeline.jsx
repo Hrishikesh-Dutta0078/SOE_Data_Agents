@@ -1,49 +1,21 @@
 import React, { useState, useEffect } from 'react';
 
 const NODE_META = {
-  classify:            { color: 'bg-violet-500',  label: 'Classify' },
-  decompose:           { color: 'bg-purple-500',  label: 'Decompose' },
-  researchAgent:       { color: 'bg-indigo-500',  label: 'Research' },
-  sqlWriterAgent:      { color: 'bg-blue-500',    label: 'SQL Writer' },
-  sqlAgent:            { color: 'bg-blue-500',    label: 'SQL Agent' },
-  injectRls:           { color: 'bg-cyan-500',    label: 'Inject RLS' },
-  validate:            { color: 'bg-teal-500',    label: 'Validate' },
-  correct:             { color: 'bg-orange-500',  label: 'Correct' },
-  execute:             { color: 'bg-emerald-500', label: 'Execute' },
-  checkResults:        { color: 'bg-lime-500',    label: 'Check Results' },
-  accumulateResult:    { color: 'bg-amber-500',   label: 'Next Query' },
-  diagnoseEmptyResults:{ color: 'bg-rose-500',    label: 'Diagnose' },
-  present:             { color: 'bg-fuchsia-500', label: 'Present' },
+  classify:             { label: 'Classify' },
+  decompose:            { label: 'Decompose' },
+  researchAgent:        { label: 'Research' },
+  sqlWriterAgent:       { label: 'SQL Writer' },
+  generateSql:          { label: 'SQL Writer' },
+  injectRls:            { label: 'Inject RLS' },
+  validate:             { label: 'Validate' },
+  correct:              { label: 'Correct' },
+  execute:              { label: 'Execute' },
+  checkResults:         { label: 'Check Results' },
+  accumulateResult:     { label: 'Next Query' },
+  diagnoseEmptyResults: { label: 'Diagnose' },
+  present:              { label: 'Present' },
+  contextFetch:         { label: 'Context' },
 };
-
-function formatDuration(ms) {
-  if (ms == null) return '';
-  return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
-}
-
-function formatTokensInMillions(n) {
-  if (n == null || !Number.isFinite(n)) return null;
-  const millions = n / 1e6;
-  return millions >= 0.001 ? `${millions.toFixed(3)}M` : '<0.001M';
-}
-
-function StepDot({ status, color }) {
-  if (status === 'completed') {
-    return (
-      <div className={`w-4 h-4 rounded-full ${color} flex items-center justify-center shrink-0`}>
-        <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
-    );
-  }
-  if (status === 'active') {
-    return (
-      <div className="w-4 h-4 rounded-full bg-indigo-500 shrink-0 animate-subtle-pulse" />
-    );
-  }
-  return <div className="w-4 h-4 rounded-full bg-slate-200 shrink-0" />;
-}
 
 const TOOL_LABELS = {
   discover_context: 'Discovery',
@@ -54,75 +26,139 @@ const TOOL_LABELS = {
   submit_sql: 'Submit SQL',
 };
 
-export default function ProgressTimeline({ steps, usage, startTime, activeTools = [] }) {
+function formatDuration(ms) {
+  if (ms == null) return '';
+  return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
+}
+
+function StepDot({ status }) {
+  if (status === 'completed') {
+    return (
+      <div className="w-3 h-3 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+        <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={4}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+    );
+  }
+  if (status === 'active') {
+    return (
+      <div
+        className="w-3 h-3 rounded-full shrink-0"
+        style={{ background: '#6366F1', animation: 'pulse-step-dot 1.5s ease infinite' }}
+      />
+    );
+  }
+  return <div className="w-3 h-3 rounded-full shrink-0" style={{ background: 'rgba(200,195,220,0.4)' }} />;
+}
+
+export default function ProgressTimeline({ steps, usage, startTime, activeTools = [], collapsed = false }) {
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setElapsed(Date.now() - startTime);
-    }, 200);
+    if (collapsed) return;
+    const interval = setInterval(() => setElapsed(Date.now() - startTime), 200);
     return () => clearInterval(interval);
-  }, [startTime]);
+  }, [startTime, collapsed]);
+
+  const allDone = steps.length > 0 && steps.every(s => s.status === 'completed');
+  const totalDuration = usage?.duration || elapsed;
+  const activeStep = steps.find(s => s.status === 'active');
+  const runningTools = activeTools.filter(t => t.status === 'running');
 
   return (
-    <div className="min-w-[240px]">
-      <div className="space-y-0">
-        {steps.map((step, i) => {
-          const meta = NODE_META[step.node] || { color: 'bg-slate-400', label: step.node };
-          const isLast = i === steps.length - 1;
+    <div
+      className="overflow-hidden"
+      style={{
+        maxHeight: collapsed ? 0 : 200,
+        padding: collapsed ? '0 20px' : '14px 20px',
+        opacity: collapsed ? 0 : 1,
+        borderBottom: collapsed ? 'none' : '1px solid rgba(200,195,220,0.15)',
+        transition: 'max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1), padding 0.5s ease, opacity 0.4s ease, border-bottom-color 0.3s ease',
+      }}
+    >
+      <div className="flex justify-between items-center mb-3">
+        <div className="text-xs font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+          {allDone ? `Completed in ${formatDuration(totalDuration)}` : 'Analyzing your question...'}
+        </div>
+        <div className="text-[11px] tabular-nums" style={{ color: 'var(--color-text-muted)' }}>
+          {formatDuration(totalDuration)}
+        </div>
+      </div>
 
+      <div className="flex items-center mb-3">
+        {steps.map((step, i) => {
+          const meta = NODE_META[step.node] || { label: step.node };
+          const isLast = i === steps.length - 1;
           return (
-            <div key={step.node + '-' + i} className="flex gap-2.5">
+            <React.Fragment key={`${step.node}-${i}`}>
               <div className="flex flex-col items-center">
-                <StepDot status={step.status} color={meta.color} />
-                {!isLast && (
-                  <div className={`w-px flex-1 min-h-[16px] ${step.status === 'completed' ? 'bg-stone-300' : 'bg-stone-100'}`} />
-                )}
-              </div>
-              <div className={`pb-2 flex-1 min-w-0 ${step.status === 'pending' ? 'opacity-40' : ''}`}>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[11px] font-semibold text-stone-700">{meta.label}</span>
-                  {step.status === 'completed' && step.duration != null && (
-                    <span className="text-[10px] text-stone-400 font-mono">{formatDuration(step.duration)}</span>
-                  )}
-                  {step.status === 'active' && (
-                    <span className="text-[10px] text-indigo-500 italic">running...</span>
-                  )}
+                <StepDot status={step.status} />
+                <div
+                  className="text-[8px] mt-1 whitespace-nowrap font-medium"
+                  style={{
+                    color: step.status === 'completed' ? '#059669'
+                      : step.status === 'active' ? '#6366F1'
+                      : 'var(--color-text-muted)',
+                    fontWeight: step.status === 'active' ? 600 : 500,
+                  }}
+                >
+                  {meta.label}
                 </div>
-                {step.summary && step.status === 'completed' && (
-                  <div className="text-[10px] text-stone-500 mt-0.5 truncate">{step.summary}</div>
-                )}
-                {step.status === 'active' && activeTools.length > 0 && (
-                  <div className="mt-0.5 flex flex-wrap gap-1">
-                    {activeTools.map((t, ti) => (
-                      <span
-                        key={`${t.name}-${ti}`}
-                        className={`inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full ${
-                          t.status === 'running'
-                            ? 'bg-indigo-50 text-indigo-600 border border-indigo-100'
-                            : 'bg-stone-50 text-stone-400 border border-stone-200'
-                        }`}
-                      >
-                        {t.status === 'running' && (
-                          <span className="w-1 h-1 rounded-full bg-indigo-500 animate-subtle-pulse" />
-                        )}
-                        {TOOL_LABELS[t.name] || t.name}
-                      </span>
-                    ))}
+                {step.status === 'completed' && step.duration != null && (
+                  <div className="text-[7px] mt-0.5 tabular-nums" style={{ color: 'var(--color-text-faint)' }}>
+                    {formatDuration(step.duration)}
                   </div>
                 )}
               </div>
-            </div>
+              {!isLast && (
+                <div
+                  className="flex-1 h-0.5 min-w-4"
+                  style={{
+                    background:
+                      step.status === 'completed' && steps[i + 1]?.status === 'completed' ? '#10B981'
+                      : step.status === 'completed' && steps[i + 1]?.status === 'active' ? 'linear-gradient(90deg, #10B981, #6366F1)'
+                      : 'rgba(200,195,220,0.3)',
+                  }}
+                />
+              )}
+            </React.Fragment>
           );
         })}
       </div>
 
-      <div className="mt-2 pt-2 border-t border-stone-100 flex flex-wrap gap-3 text-[10px] text-stone-400 font-mono">
-        {formatTokensInMillions(usage?.totalTokens) && (
-          <span>{formatTokensInMillions(usage.totalTokens)} tokens</span>
-        )}
-        <span>Net time: {usage?.duration != null ? `${(usage.duration / 1000).toFixed(1)}s` : formatDuration(elapsed)}</span>
-      </div>
+      {activeStep && !allDone && (
+        <div className="flex items-center gap-2 rounded-[9px] px-3 py-2" style={{ background: 'rgba(99,102,241,0.04)' }}>
+          <div
+            className="w-4 h-4 rounded-full border-2 shrink-0"
+            style={{
+              borderColor: 'rgba(99,102,241,0.15)',
+              borderTopColor: '#6366F1',
+              animation: 'spin-progress 0.8s linear infinite',
+            }}
+          />
+          <div className="text-[11px] font-medium" style={{ color: 'var(--color-text-primary)' }}>
+            {NODE_META[activeStep.node]?.label || activeStep.node}...
+          </div>
+          {runningTools.length > 0 && (
+            <div className="ml-auto flex gap-1">
+              {runningTools.map(t => (
+                <span
+                  key={t.name}
+                  className="text-[9px] font-medium px-2 py-0.5 rounded"
+                  style={{
+                    background: 'rgba(99,102,241,0.1)',
+                    color: '#6366F1',
+                    animation: 'tool-badge-pulse 1.2s ease infinite',
+                  }}
+                >
+                  {TOOL_LABELS[t.name] || t.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
