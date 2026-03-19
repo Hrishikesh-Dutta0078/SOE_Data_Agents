@@ -457,7 +457,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       opts,
     );
 
-    setProgress(null);
+    // Don't null out progress here — let it persist so the collapse animation
+    // can play. It gets reset at the start of the next runStream call (line 441).
     setStreamingInsights('');
     setStreamingData(null);
     // NOTE: do NOT clear streamingDataRef here — handleResponse reads it after runStream returns.
