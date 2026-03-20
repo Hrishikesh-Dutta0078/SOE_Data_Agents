@@ -11,7 +11,6 @@ client/node_modules/
 .claude/settings.local.json
 
 # Local-only docs and files
-CLAUDE.md
 deployment_checklist.md
 okta_implementation.md
 to_remove_from_DWH.md
