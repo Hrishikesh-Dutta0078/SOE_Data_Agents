@@ -236,7 +236,11 @@ function buildSystemPrompt(params) {
   let prompt = 'You are a precise T-SQL writer for Microsoft SQL Server.\n\n';
 
   // ── Route-specific intro ──
-  if (isFollowUp) {
+  if (isFollowUp && !correctionGuidance) {
+    // Only show follow-up adaptation context on the FIRST attempt.
+    // During correction retries, suppress this to avoid conflicting with correction instructions
+    // (the LLM would re-derive from the original SQL instead of fixing the broken SQL).
+
     // Resolve prior question from conversation history
     let priorQuestion = '';
     const history = conversationHistory || [];
@@ -269,6 +273,11 @@ ${templateSql || '(no prior SQL available)'}
       if (priorEntities.filters?.length > 0) prompt += `  Filters: ${priorEntities.filters.join(', ')}\n`;
       if (priorEntities.operations?.length > 0) prompt += `  Operations: ${priorEntities.operations.join(', ')}\n`;
     }
+  } else if (isFollowUp && correctionGuidance) {
+    // Correction retry for a follow-up query — provide context about the original question
+    // but do NOT show the "adapt this" SQL (the correction section handles the SQL to fix).
+    prompt += `This is a FOLLOW-UP query that failed on a previous attempt. Focus on FIXING the SQL error below, not re-adapting from scratch.\n`;
+    prompt += `Original question context: "${state?.question || ''}"\n\n`;
   } else if (hasTemplate && !bundle.schema?.length) {
     // Template-only path (no research brief)
     prompt += `A related SQL template has been found for a similar question.
@@ -328,9 +337,9 @@ Write SQL that answers the user's ACTUAL question, using the template's tables a
   }
 
   // ── 10. Route-specific section ──
-  if (isFollowUp) {
+  if (isFollowUp && !correctionGuidance) {
     // Follow-up: conversation context already injected above.
-    // Add adapt instructions.
+    // Add adapt instructions (only on first attempt, not during correction retries).
     prompt += `
 Adapt the prior SQL to answer the follow-up question.
 Common modifications: changing filters/time ranges, adding/removing dimensions, adjusting aggregation level, adding TOP N.
@@ -421,7 +430,9 @@ IMPORTANT: Adapt this template rather than writing from scratch. Add WHERE claus
     const convContext = formatConversationContext(conversationHistory);
     if (convContext) {
       prompt += '\n' + convContext;
-      prompt += 'Use the prior SQL as a reference for table selections, joins, and column names when adapting for the current question.\n';
+      if (!correctionGuidance) {
+        prompt += 'Use the prior SQL as a reference for table selections, joins, and column names when adapting for the current question.\n';
+      }
     }
   }
 

@@ -26,13 +26,21 @@ async function correctNode(state) {
   });
 
   // Build error-specific guidance (no LLM call)
-  const correctionGuidance = buildCorrectionGuidance({
+  let correctionGuidance = buildCorrectionGuidance({
     sql: state.sql,
     errorType,
     validationReport: state.validationReport,
     contextBundle: state.contextBundle,
     trace: state.trace,
+    executionError: state.execution?.error,
   });
+
+  // Ensure non-empty guidance so generateSql always shows the correction section
+  if (!correctionGuidance) {
+    correctionGuidance = state.execution?.error
+      ? `Execution failed: ${state.execution.error}\nFix the SQL to resolve this error.`
+      : 'Review and fix the SQL to address the validation issues.';
+  }
 
   // Build supplemental column metadata for tables in the failed SQL
   // that might not be in contextBundle
@@ -75,6 +83,7 @@ async function correctNode(state) {
       duration,
       errorType,
       attempt: attempts.correction,
+      priorSqlSnippet: (state.sql || '').substring(0, 300),
     }],
   };
 }

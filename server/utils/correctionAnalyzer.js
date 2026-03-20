@@ -131,8 +131,11 @@ function formatIssues(passes) {
  * Analyze validation errors and build correction guidance string.
  * No LLM call — pure error analysis with schema lookups.
  */
-function buildCorrectionGuidance({ sql, errorType, validationReport, contextBundle, trace }) {
+function buildCorrectionGuidance({ sql, errorType, validationReport, contextBundle, trace, executionError }) {
   const issues = formatIssues(validationReport?.passes);
+  if (executionError) {
+    issues.push(executionError);
+  }
   const issueText = issues.join(' ');
   const tableNames = extractTableNames(sql || '');
   let guidance = '';
@@ -147,8 +150,22 @@ function buildCorrectionGuidance({ sql, errorType, validationReport, contextBund
     if (suggestions.length > 0) guidance += `\nSuggested replacement(s): ${suggestions.join('; ')}.`;
   }
 
-  // Syntax error
-  if (/Incorrect syntax near|syntax\s*error|unbalanced\s*paren|near\s*'\)'/i.test(issueText)) {
+  // Syntax error — extract the specific token for targeted guidance
+  const syntaxNearMatch = issueText.match(/Incorrect syntax near (?:the keyword )?'([^']+)'/i);
+  if (syntaxNearMatch) {
+    const nearToken = syntaxNearMatch[1];
+    guidance += `\nCRITICAL — SQL SYNTAX ERROR near '${nearToken}'. `;
+    if (['AND', 'OR', 'WHERE', 'GROUP', 'ORDER', 'HAVING', 'ON', 'FROM', 'JOIN', 'SELECT'].includes(nearToken.toUpperCase())) {
+      guidance += `This typically means a subquery or expression BEFORE '${nearToken}' is incomplete — a missing closing parenthesis, an incomplete JOIN ON clause, or a truncated WHERE condition. `
+        + `Check: (1) Every opening parenthesis has a matching close BEFORE the '${nearToken}' keyword. `
+        + `(2) Subqueries in WHERE/HAVING are complete (have their own FROM, WHERE, closing paren) before the outer '${nearToken}'. `
+        + `(3) Every JOIN...ON has a complete condition before the next clause.`;
+    } else if (nearToken === ')') {
+      guidance += `Check: extra closing parenthesis, missing expression before ), trailing comma inside function call or subquery.`;
+    } else {
+      guidance += `Check: balanced parentheses, commas in SELECT/GROUP BY/ORDER BY, no trailing commas before closing parens.`;
+    }
+  } else if (/syntax\s*error|unbalanced\s*paren/i.test(issueText)) {
     guidance += `\nCRITICAL — SQL SYNTAX ERROR. Check: balanced parentheses, commas in SELECT/GROUP BY/ORDER BY, no trailing commas before closing parens.`;
   }
 
@@ -186,13 +203,26 @@ You MUST fix ALL of these patterns:
     }
   }
 
-  // Prior attempts
+  // Prior attempts — include SQL snippets and escalation
   const priorCorrections = (trace || []).filter((t) => t.node === 'correct' || (t.node === 'execute' && t.error));
   if (priorCorrections.length > 0) {
-    guidance += '\n\nPRIOR CORRECTION ATTEMPTS (do NOT repeat):';
+    const attemptCount = priorCorrections.filter((t) => t.node === 'correct').length;
+
+    guidance += '\n\nPRIOR CORRECTION ATTEMPTS FAILED — you MUST try a DIFFERENT approach:';
     for (const t of priorCorrections) {
       if (t.node === 'execute' && t.error) guidance += `\n- Execution failed: ${t.error}`;
-      else if (t.node === 'correct') guidance += `\n- Correction attempt ${t.attempt || '?'}: fixed ${t.errorType || 'unknown'}`;
+      else if (t.node === 'correct') {
+        guidance += `\n- Attempt ${t.attempt || '?'}: tried to fix ${t.errorType || 'unknown'}`;
+        if (t.priorSqlSnippet) guidance += ` — prior SQL started with: ${t.priorSqlSnippet.substring(0, 150)}...`;
+      }
+    }
+
+    // Escalation strategy based on how many corrections have already failed
+    if (attemptCount >= 2) {
+      guidance += '\n\nESCALATION (attempt 3+): Previous fixes both failed with the SAME error. You MUST REWRITE the problematic section from scratch. '
+        + 'Try a completely different approach: replace nested subqueries with a CTE, replace correlated subqueries with a JOIN, or simplify the query structure entirely.';
+    } else if (attemptCount >= 1) {
+      guidance += '\n\nESCALATION: Your previous fix did NOT work — the same error recurred. Make a MORE SUBSTANTIAL change: restructure the problematic clause rather than making minor tweaks.';
     }
   }
 
