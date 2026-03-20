@@ -4,7 +4,7 @@
     "creation": { "green": 2.5, "yellow": 2.0, "label": "Creation_Coverage_Quality" },
     "dsScore": { "high": 65, "medium": 40 },
     "propensity": { "high": 0.8 },
-    "stalled": { "dsnsm": 30, "altDays": 90, "altDsnsm": 15 }
+    "stalled": { "flag": "STALLED_BUT_INACTIVE", "value": "Stalled & Inactive", "table": "vw_TF_EBI_P2S" }
   },
   "salesStageMapping": {
     "-1": "N/A",

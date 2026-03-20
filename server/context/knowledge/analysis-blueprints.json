@@ -33,7 +33,7 @@
         {
           "id": "q3",
           "templateId": "exact__stalled_deals",
-          "purpose": "Stalled deals (DSNSM > 30 days or SD > 90 and DSNSM > 15) — pipeline that needs cleanup or action"
+          "purpose": "Stalled deals (STALLED_BUT_INACTIVE = 'Stalled & Inactive') — pipeline that needs cleanup or action"
         }
       ],
       "presentationHint": "Synthesize as an action-oriented pipeline hygiene report. Structure: (1) Pipeline snapshot — summarize the S3/S4 landscape, (2) High-value risk — call out the 1M+ deals needing review, (3) Stalled pipeline — quantify and highlight deals requiring cleanup. End with 3-5 prioritized action items the manager should take this week.",

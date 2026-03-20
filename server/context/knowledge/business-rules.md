@@ -83,8 +83,8 @@ The natural analytical flow is **What -> Why -> Fix**. After answering one tier,
 - **SALES_STAGE**: Current stage of a deal. Stage names do NOT equal SALES_STAGE_ID; see stage mapping in system configuration.
 - **PUSHED_COUNT / PUSH_COUNT**: Times a deal's close date was pushed. Deals pushed 2+ times are at significantly higher risk.
 - **DS_SCORE (Deal Sensei Score)**: AI-generated deal health score. Interpretation thresholds defined in system configuration.
-- **STALLED_BUT_INACTIVE**: Flag for stalled deals with no recent activity (in vw_TD_EBI_OPP).
-- **NEXT_STEP / DAYS_SINCE_NEXT_STEPS_MODIFIED**: Next step text and staleness. High DSNSM correlates with stalls.
+- **STALLED_BUT_INACTIVE**: Canonical flag for identifying stalled deals. Filter with `STALLED_BUT_INACTIVE = 'Stalled & Inactive'` on vw_TF_EBI_P2S. Always use this flag instead of DSNSM/SD-based thresholds.
+- **NEXT_STEP / DAYS_SINCE_NEXT_STEPS_MODIFIED**: Next step text and staleness indicator.
 
 ## Pipeline Walk
 

@@ -572,15 +572,14 @@
       "aliases": ["stalled pipeline", "stalled percent", "stalled pipeline percent"],
       "personas": ["AE", "Manager", "VP"],
       "section": "Pipeline L2",
-      "definition": "% of stalled pipeline $ w.r.t. total pipeline $. Stalled = (DSNSM > 30 Days) OR (SD > 90 Days AND DSNSM > 15 Days). Active = Total Pipe - Stalled.",
-      "formula": "Total Stalled Pipeline $ / Total pipeline $ where close quarter = CQ+1 (or CQ+2, CQ+3). Stalled: DSNSM > 30 OR (SD > 90 AND DSNSM > 15)",
+      "definition": "% of stalled pipeline $ w.r.t. total pipeline $. Use STALLED_BUT_INACTIVE = 'Stalled & Inactive' flag on vw_TF_EBI_P2S to identify stalled deals. Active = Total Pipe - Stalled.",
+      "formula": "SUM(CASE WHEN STALLED_BUT_INACTIVE = 'Stalled & Inactive' THEN OPPTY ELSE 0 END) / SUM(OPPTY) where IN_PIPELINE = 1",
       "components": {
-        "DSNSM": "Days Since Next Step Modified",
-        "SD": "Stage Duration"
+        "STALLED_BUT_INACTIVE": "Stalled/inactive deal indicator flag on vw_TF_EBI_P2S"
       },
       "timeVariants": ["Q+1", "Q+2", "Q+3"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID", "DAYS_SINCE_NEXT_STEPS_MODIFIED", "STAGE_DURATION"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TD_EBI_OPP", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "relatedColumns": ["Oppty", "STALLED_BUT_INACTIVE", "IN_PIPELINE"],
+      "relatedTables": ["vw_TF_EBI_P2S", "vw_td_ebi_region_rpt"]
     },
     {
       "id": "ae_12x_s5_pct",

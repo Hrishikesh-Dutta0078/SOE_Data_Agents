@@ -343,13 +343,11 @@
       "question": "What is the stalled pipeline?",
       "questionCategory": "WHAT_HAPPENED",
       "questionSubCategory": "pipeline_level_mix",
-      "sql": "WITH pipe AS (\n  SELECT p.OPP_ID, p.Oppty, p.Region_Id, p.OPP_CLOSE_DATE_ID, opp.DAYS_SINCE_NEXT_STEPS_MODIFIED AS DSNSM, opp.STAGE_DURATION AS SD\n  FROM vw_TF_EBI_P2S p\n  JOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\n  JOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\n  JOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\n  JOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\n  JOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\n  JOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n  WHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3') AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = '0') AND p.PAY_MEASURE_ID = 0 AND r.ROLE_TYPE_DISPLAY = 'AE' AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX' AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU' AND c.QTR_BKT_IND IN (0,1)\n),\nstalled AS (\n  SELECT OPP_ID, Oppty, CASE WHEN (DSNSM > 30 OR (SD > 90 AND DSNSM > 15)) THEN 1 ELSE 0 END AS Is_Stalled FROM pipe\n)\nSELECT SUM(CASE WHEN Is_Stalled = 1 THEN Oppty ELSE 0 END) AS Stalled_Pipe, SUM(Oppty) AS Total_Pipe, ROUND(SUM(CASE WHEN Is_Stalled = 1 THEN Oppty ELSE 0 END) * 100.0 / NULLIF(SUM(Oppty), 0), 2) AS Stalled_Pct FROM stalled",
+      "sql": "SELECT\n  SUM(CASE WHEN p.STALLED_BUT_INACTIVE = 'Stalled & Inactive' THEN p.OPPTY ELSE 0 END) AS Stalled_Pipe,\n  SUM(p.OPPTY) AS Total_Pipe,\n  ROUND(SUM(CASE WHEN p.STALLED_BUT_INACTIVE = 'Stalled & Inactive' THEN p.OPPTY ELSE 0 END) * 100.0 / NULLIF(SUM(p.OPPTY), 0), 2) AS Stalled_Pct\nFROM vw_TF_EBI_P2S p\nJOIN vw_td_ebi_region_rpt r ON p.REGION_ID = r.REGION_ID\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3')\n  AND p.PAY_MEASURE_ID = 0\n  AND p.IN_PIPELINE = 1\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND o.MOPG1 <> 'ADVERTISING'\n  AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n  AND p.SNAPSHOT_DATE = (SELECT MAX(p2.SNAPSHOT_DATE) FROM vw_TF_EBI_P2S p2)",
       "tables_used": [
         "vw_TF_EBI_P2S",
-        "vw_TD_EBI_OPP",
         "vw_td_ebi_region_rpt",
         "vw_ebi_sales_stage",
-        "vw_EBI_CALDATE",
         "vw_EBI_OPG",
         "vw_TD_EBI_ROLE_Coverage"
       ],
@@ -358,31 +356,32 @@
         "Show stalled pipeline",
         "What percent of pipeline is stalled?",
         "STALLED %",
-        "Pipeline stalled by DSNSM"
+        "Stalled and inactive pipeline",
+        "Stalled & inactive percent"
       ]
     },
     {
       "id": "exact__stalled_deals",
-      "question": "Show stalled deals",
+      "question": "Top stalled deals by ARR with rep name, FLM name, segment and region",
       "questionCategory": "WHAT_HAPPENED",
       "questionSubCategory": "deal_lists",
-      "sql": "SELECT opp.OPP_NAME,\n  r.REP_NAME,\n  r.FLM_NAME,\n  r.GLOBAL_REGION,\n  s.SALES_STAGE,\n  p.Oppty AS ARR,\n  opp.DAYS_SINCE_NEXT_STEPS_MODIFIED AS DSNSM,\n  opp.STAGE_DURATION AS SD\nFROM vw_TF_EBI_P2S p\nJOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nJOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3')\n  AND p.SNAPSHOT_DATE_ID = (SELECT MAX(p2.SNAPSHOT_DATE_ID) FROM vw_TF_EBI_P2S p2 JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY WHERE c2.WEEK_SORT_ORDER_REVERSE = '0')\n  AND p.PAY_MEASURE_ID = 0\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND o.MOPG1 <> 'ADVERTISING'\n  AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n  AND c.QTR_BKT_IND IN (0,1)\n  AND (opp.DAYS_SINCE_NEXT_STEPS_MODIFIED > 30 OR (opp.STAGE_DURATION > 90 AND opp.DAYS_SINCE_NEXT_STEPS_MODIFIED > 15))\nORDER BY p.Oppty DESC",
+      "sql": "SELECT TOP 100\n    p.OPP_ID,\n    r.REP_NAME,\n    r.FLM,\n    r.MARKET_SEGMENT AS SEGMENT,\n    r.GLOBAL_REGION AS REGION,\n    SUM(p.OPPTY) AS ARR,\n    p.STALLED_BUT_INACTIVE\nFROM vw_TF_EBI_P2S p\nJOIN vw_td_ebi_region_rpt r ON p.REGION_ID = r.REGION_ID\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3')\n  AND p.PAY_MEASURE_ID = 0\n  AND p.IN_PIPELINE = 1\n  AND p.STALLED_BUT_INACTIVE = 'Stalled & Inactive'\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND o.MOPG1 <> 'ADVERTISING'\n  AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n  AND p.SNAPSHOT_DATE = (SELECT MAX(p2.SNAPSHOT_DATE) FROM vw_TF_EBI_P2S p2)\nGROUP BY\n    p.OPP_ID,\n    r.REP_NAME,\n    r.FLM,\n    r.MARKET_SEGMENT,\n    r.GLOBAL_REGION,\n    p.STALLED_BUT_INACTIVE\nORDER BY ARR DESC",
       "tables_used": [
         "vw_TF_EBI_P2S",
-        "vw_TD_EBI_OPP",
         "vw_td_ebi_region_rpt",
         "vw_ebi_sales_stage",
-        "vw_EBI_CALDATE",
         "vw_EBI_OPG",
         "vw_TD_EBI_ROLE_Coverage"
       ],
       "variants": [
+        "Show stalled deals",
         "Stalled deals list",
         "Which deals are stalled?",
-        "Deals with no recent next steps",
+        "Top stalled deals by ARR",
         "List stalled opportunities",
         "Stalled opportunities",
-        "Deals stalled by DSNSM"
+        "Stalled and inactive deals",
+        "Stalled deals with rep and FLM"
       ]
     },
     {
