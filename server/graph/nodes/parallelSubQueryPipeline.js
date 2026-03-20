@@ -72,7 +72,7 @@ async function runOneSubQuery(baseState, plan, index, emit) {
     }
   }
   if (!match) match = findSubQueryMatch(subQuestion);
-  if (!match) match = await findSubQueryMatchLLMFallback(subQuestion);
+  if (!match) match = await findSubQueryMatchLLMFallback(subQuestion, state);
   if (match && !hasUserParams) {
     // Exact template match with no user params — run through contextFetch + generateSql with template
     state = {

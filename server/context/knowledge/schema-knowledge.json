@@ -352,22 +352,6 @@
           "JAPAN FY22"
         ]
       },
-      "AREA": {
-        "type": "NVARCHAR",
-        "description": "area grouping",
-        "distinct_values": [
-          "DX/DME",
-          "DX",
-          "DME",
-          "#N/A",
-          "AMERICAS F22",
-          "DX/CONNECT",
-          "APAC FY22",
-          "EMEA FY22",
-          "CONNECT",
-          "JAPAN FY22"
-        ]
-      },
       "EMP_ROLE_TYPE": {
         "type": "NVARCHAR",
         "description": "role type (AccountManager, BDR, SE)",
@@ -5632,7 +5616,7 @@
       },
       "WEEK_SORT_ORDER_REVERSE": {
         "type": "VARCHAR",
-        "description": "Snapshot week bucket (Snapshot_Week_bkt). Use WEEK_SORT_ORDER_REVERSE = 0 for mandatory global filter. In vw_EBI_CALDATE; join from pipeline/quota via SNAPSHOT_DATE_ID = DATE_KEY.",
+        "description": "Snapshot week bucket (Snapshot_Week_bkt). VARCHAR column — use WEEK_SORT_ORDER_REVERSE = '0' (string comparison) for mandatory global filter. In vw_EBI_CALDATE; join from pipeline/quota via SNAPSHOT_DATE_ID = DATE_KEY.",
         "distinct_values": [
           "-62",
           "-46",

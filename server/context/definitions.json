@@ -32,7 +32,7 @@
     { "id": "exclude_ppbu", "sql": "o.DMX_SOLUTION_GROUP <> 'PPBU'", "appliesTo": ["vw_EBI_OPG"], "always": true },
     { "id": "exclude_dme_region", "sql": "(r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true },
     { "id": "exclude_teams", "sql": "r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true },
-    { "id": "snapshot_week", "sql": "c.WEEK_SORT_ORDER_REVERSE = 0", "appliesTo": ["vw_EBI_CALDATE"], "always": true, "note": "Join pipeline/quota facts to vw_EBI_CALDATE on SNAPSHOT_DATE_ID = DATE_KEY" },
+    { "id": "snapshot_week", "sql": "c.WEEK_SORT_ORDER_REVERSE = '0'", "appliesTo": ["vw_EBI_CALDATE"], "always": true, "note": "Join pipeline/quota facts to vw_EBI_CALDATE on SNAPSHOT_DATE_ID = DATE_KEY. WEEK_SORT_ORDER_REVERSE is VARCHAR — always compare as string." },
     { "id": "global_region", "sql": "r.GLOBAL_REGION IN ('AMERICAS','EMEA','APAC','WW')", "appliesTo": ["vw_td_ebi_region_rpt"], "always": false, "note": "Only when filtering by GLOBAL_REGION" },
     { "id": "rpt_hierarchy", "sql": "IS_CY_RPT_HIER = 1", "appliesTo": ["vw_td_ebi_region_rpt"], "always": false, "note": "When reporting hierarchy column is in scope" },
     { "id": "dummy_terr", "sql": "r.TERR_ID NOT LIKE '%_%Dummy%'", "appliesTo": ["vw_td_ebi_region_rpt"], "always": false, "note": "For quota queries" }

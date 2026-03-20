@@ -51,7 +51,7 @@ async function alignSubQueriesToTemplatesNode(state) {
     }
 
     let match = findSubQueryMatch(sub);
-    if (!match) match = await findSubQueryMatchLLMFallback(sub);
+    if (!match) match = await findSubQueryMatchLLMFallback(sub, state);
 
     if (match) {
       const example = examplesMap.get(match.id);
