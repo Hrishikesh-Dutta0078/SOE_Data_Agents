@@ -163,6 +163,80 @@ function buildDataContext(dataSources) {
     + dataSources.map((s, i) => summarizeDataSource(s, i)).join('\n\n');
 }
 
+function formatProfileContext(profiles) {
+  if (!profiles || profiles.length === 0) return null;
+
+  const blocks = profiles.map((profile, i) => {
+    const parts = [`--- Source ${i} ---`];
+    parts.push('Columns:');
+    for (const col of profile.columns) {
+      let desc = `  ${col.name} (${col.inferredType}, ${col.cardinality} distinct`;
+      if (col.inferredType === 'categorical' && col.distinctValues && col.distinctValues.length <= 10) {
+        desc += `: ${col.distinctValues.join(', ')}`;
+      }
+      if (col.inferredType === 'numeric' && col.distribution) {
+        desc += `, range: ${col.distribution.min}–${col.distribution.max}, mean: ${col.distribution.mean.toFixed(1)}`;
+      }
+      if (col.nullRatio > 0.05) desc += `, ${(col.nullRatio * 100).toFixed(0)}% null`;
+      desc += ')';
+      parts.push(desc);
+    }
+
+    if (profile.shapes) {
+      if (profile.shapes.isTimeSeries) {
+        const ts = profile.shapes.isTimeSeries;
+        parts.push(`\nShape: time-series (${ts.dateColumn} × ${ts.measureColumns.join(', ')})`);
+      }
+      if (profile.shapes.categoricalGroups.length > 0) {
+        const groups = profile.shapes.categoricalGroups.map((g) => `${g.dimension}(${g.cardinality})`).join(', ');
+        parts.push(`Categorical groups: ${groups}`);
+      }
+    }
+
+    if (profile.chartRecommendations?.length > 0) {
+      parts.push('\nRecommended charts:');
+      for (const rec of profile.chartRecommendations.slice(0, 3)) {
+        parts.push(`  ${rec.chartType} (${rec.xAxis} × ${rec.yAxis.join(', ')}${rec.groupBy ? `, groupBy: ${rec.groupBy}` : ''}) — ${rec.reason}`);
+      }
+    }
+
+    if (profile.shapes?.kpiCandidates?.length > 0) {
+      parts.push('\nKPI candidates:');
+      for (const kpi of profile.shapes.kpiCandidates) {
+        parts.push(`  ${kpi.column} (${kpi.suggestedAgg}) ${kpi.prefix ? `prefix: "${kpi.prefix}"` : ''}${kpi.suffix ? ` suffix: "${kpi.suffix}"` : ''}`);
+      }
+    }
+
+    const allAnomalies = [
+      ...(profile.anomalies?.outliers || []),
+      ...(profile.anomalies?.trend || []),
+      ...(profile.anomalies?.concentration || []),
+      ...(profile.anomalies?.periodChange || []),
+    ];
+    if (allAnomalies.length > 0) {
+      parts.push('\nAnomalies:');
+      for (const a of allAnomalies.slice(0, 5)) parts.push(`  - ${a}`);
+    }
+
+    const slicerDims = profile.preComputed?.slicerValues
+      ? Object.entries(profile.preComputed.slicerValues).map(([k, v]) => `${k}(${v.length})`).join(', ')
+      : '';
+    if (slicerDims) parts.push(`\nSlicer-eligible dimensions: ${slicerDims}`);
+
+    return parts.join('\n');
+  });
+
+  const overlap = profiles[0]?.dimensionOverlap;
+  if (overlap && Object.keys(overlap).length > 0) {
+    blocks.push('\n=== CROSS-SOURCE DIMENSIONS ===');
+    for (const [dim, info] of Object.entries(overlap)) {
+      blocks.push(`"${dim}" — shared across sources ${info.sources.join(', ')}`);
+    }
+  }
+
+  return `=== DATA SOURCE PROFILES (${profiles.length} total) ===\n\n${blocks.join('\n\n')}`;
+}
+
 function buildDashboardInputs(state) {
   const isRefinement = !!(state.previousDashboardSpec && state.dashboardRefinement);
 
@@ -229,7 +303,12 @@ function buildDashboardInputs(state) {
     }
   }
 
+  // If profiles are available, use them instead of raw data context
+  if (state.dataProfiles && state.dataProfiles.length > 0) {
+    return { dataContext: formatProfileContext(state.dataProfiles), question: state.question, isRefinement: false };
+  }
+
   return { dataContext: buildDataContext(dataSources), question: state.question, isRefinement: false };
 }
 
-module.exports = { dashboardPrompt, dashboardRefinePrompt, buildDashboardInputs, summarizeDataSource };
+module.exports = { dashboardPrompt, dashboardRefinePrompt, buildDashboardInputs, summarizeDataSource, formatProfileContext };

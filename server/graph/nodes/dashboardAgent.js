@@ -153,6 +153,9 @@ async function dashboardAgentNode(state) {
 }
 
 function getSourceColumns(state, sourceIndex, isRefinement) {
+  if (state.dataProfiles?.[sourceIndex]?.columns) {
+    return state.dataProfiles[sourceIndex].columns.map((c) => c.name);
+  }
   if (isRefinement) {
     const src = (state.dashboardDataSources || [])[sourceIndex];
     return src?.execution?.columns || [];
@@ -276,4 +279,8 @@ function buildFallbackSpec(state, sourceCount) {
   };
 }
 
-module.exports = { dashboardAgentNode, dashboardEvents: _dashboardEvents };
+module.exports = {
+  dashboardAgentNode,
+  dashboardEvents: _dashboardEvents,
+  __testables: { validateAndFixSpec, getSourceColumns, buildFallbackSpec, countUsableDataSources },
+};
