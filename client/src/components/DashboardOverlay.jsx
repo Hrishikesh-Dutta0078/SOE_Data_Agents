@@ -83,9 +83,9 @@ function extractInMemorySlicerValues(spec, dataSources) {
 }
 
 export default function DashboardOverlay({ dashboardData, onClose, onSuggestionClick, onRefineDashboard }) {
-  const { spec, dataSources } = dashboardData || {};
+  const { spec, dataSources, slicerValues: precomputedSlicerValues, tileData, profileCacheKey } = dashboardData || {};
   const [activeFilters, setActiveFilters] = useState({});
-  const [slicerValues, setSlicerValues] = useState({});
+  const [slicerValues, setSlicerValues] = useState(precomputedSlicerValues || {});
   const [slicersLoading, setSlicersLoading] = useState(false);
   const [refineInput, setRefineInput] = useState('');
   const [refining, setRefining] = useState(false);
@@ -117,6 +117,12 @@ export default function DashboardOverlay({ dashboardData, onClose, onSuggestionC
   }, [refineInput, refining, onRefineDashboard]);
 
   useEffect(() => {
+    // Skip fetch if we already have precomputed slicer values
+    if (precomputedSlicerValues && Object.keys(precomputedSlicerValues).length > 0) {
+      setSlicerValues(precomputedSlicerValues);
+      return;
+    }
+
     if (!spec?.slicers?.length || !dataSources?.length) return;
     const tiles = spec.tiles || [];
 
@@ -159,7 +165,7 @@ export default function DashboardOverlay({ dashboardData, onClose, onSuggestionC
       setSlicerValues(final);
       setSlicersLoading(false);
     });
-  }, [spec, dataSources]);
+  }, [spec, dataSources, precomputedSlicerValues]);
 
   const enrichedSlicers = useMemo(() => {
     if (!spec?.slicers?.length) return [];
@@ -254,6 +260,7 @@ export default function DashboardOverlay({ dashboardData, onClose, onSuggestionC
             tiles={spec.tiles}
             dataSources={dataSources}
             activeFilters={activeFilters}
+            tileData={tileData}
           />
         ) : (
           <EmptyState onSuggestionClick={(q) => { onClose?.(); onSuggestionClick?.(q); }} />

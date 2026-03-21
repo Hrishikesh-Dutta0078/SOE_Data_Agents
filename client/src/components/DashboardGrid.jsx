@@ -134,7 +134,7 @@ function validateTile(tile, data) {
   return null;
 }
 
-function TileRenderer({ tile, data, sql, activeFilters }) {
+function TileRenderer({ tile, data, sql, activeFilters, precomputed }) {
   const filteredData = filterDataForTile(data, tile, activeFilters);
 
   const error = validateTile(tile, filteredData);
@@ -144,9 +144,12 @@ function TileRenderer({ tile, data, sql, activeFilters }) {
 
   switch (tile.type) {
     case 'kpi':
-      return <KpiSparklineCard config={tile.config} data={filteredData} />;
-    case 'chart':
-      return <DashboardChart config={tile.config} data={filteredData} sql={sql} />;
+      return <KpiSparklineCard config={tile.config} data={filteredData} precomputed={precomputed} />;
+    case 'chart': {
+      // Use server-aggregated rows if available
+      const chartData = precomputed?.rows || filteredData;
+      return <DashboardChart config={tile.config} data={chartData} sql={sql} skipClientAggregation={!!precomputed?.rows} />;
+    }
     case 'table':
       return <div className="flex items-center justify-center h-full text-stone-400 text-sm italic">Data available in paginated view via filters</div>;
     case 'insight':
@@ -156,7 +159,7 @@ function TileRenderer({ tile, data, sql, activeFilters }) {
   }
 }
 
-function FullscreenModal({ tile, data, sql, activeFilters, onClose }) {
+function FullscreenModal({ tile, data, sql, activeFilters, onClose, precomputed }) {
   return (
     <div className="fixed inset-0 z-[60] bg-black/20 backdrop-blur-sm flex items-center justify-center p-6" onClick={onClose}>
       <div
@@ -173,14 +176,14 @@ function FullscreenModal({ tile, data, sql, activeFilters, onClose }) {
           </button>
         </div>
         <div className="flex-1 overflow-hidden p-4">
-          <TileRenderer tile={tile} data={data} sql={sql} activeFilters={activeFilters} />
+          <TileRenderer tile={tile} data={data} sql={sql} activeFilters={activeFilters} precomputed={precomputed} />
         </div>
       </div>
     </div>
   );
 }
 
-export default function DashboardGrid({ tiles: initialTiles, dataSources, activeFilters }) {
+export default function DashboardGrid({ tiles: initialTiles, dataSources, activeFilters, tileData }) {
   const containerRef = useRef(null);
   const width = useWidth(containerRef);
   const [localTiles, setLocalTiles] = useState(initialTiles);
@@ -274,7 +277,7 @@ export default function DashboardGrid({ tiles: initialTiles, dataSources, active
                   </div>
                 </div>
                 <div className="flex-1 overflow-hidden">
-                  <TileRenderer tile={tile} data={sourceData} sql={sourceSql} activeFilters={activeFilters} />
+                  <TileRenderer tile={tile} data={sourceData} sql={sourceSql} activeFilters={activeFilters} precomputed={tileData?.[tile.id] || null} />
                 </div>
               </div>
             );
@@ -289,6 +292,7 @@ export default function DashboardGrid({ tiles: initialTiles, dataSources, active
           sql={dataSources?.[fullscreenTile.sourceIndex]?.sql || null}
           activeFilters={activeFilters}
           onClose={() => setFullscreenTileId(null)}
+          precomputed={tileData?.[fullscreenTile.id] || null}
         />
       )}
     </div>

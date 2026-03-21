@@ -116,14 +116,20 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const streamingDataRef = useRef(null);
 
   const messagesEndRef = useRef(null);
+  const scrollContainerRef = useRef(null);
   const inputRef = useRef(null);
   const saveTimerRef = useRef(null);
   const voiceStopRef = useRef(null);
   const progressTimeoutRef = useRef(null);
 
+  // Scroll messages to bottom so the latest question sits just above the ThinkingBubble
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, progress]);
+    const el = scrollContainerRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+      requestAnimationFrame(() => { if (el) el.scrollTop = el.scrollHeight; });
+    }
+  }, [messages, loading]);
 
   useEffect(() => {
     fetchBlueprints()
@@ -241,7 +247,13 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       }
 
       if (spec.tiles?.length > 0) {
-        setDashboardData({ spec, dataSources: sources });
+        setDashboardData({
+          spec,
+          dataSources: sources,
+          tileData: data.tileData || null,
+          slicerValues: data.slicerValues || null,
+          profileCacheKey: data.profileCacheKey || null,
+        });
         setMessages((prev) => [
           ...prev,
           {
@@ -551,7 +563,9 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       validationEnabled,
       sessionId,
       previousDashboardSpec: dashboardData.spec,
-      dashboardDataSources: serializedSources,
+      ...(dashboardData.profileCacheKey
+        ? { profileCacheKey: dashboardData.profileCacheKey }
+        : { dashboardDataSources: serializedSources }),
       nodeModelOverrides,
       enabledTools: enabledToolsProp ?? null,
     };
@@ -923,7 +937,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     <div className="flex flex-col h-full">
       {/* Chat area */}
       <div className="chat-card">
-      <div className={`flex-1 overflow-y-auto p-5 flex flex-col ${messages.length === 0 && !loading ? 'justify-center items-center' : 'gap-4'}`}>
+      <div ref={scrollContainerRef} className={`flex-1 min-h-0 overflow-y-auto p-5 flex flex-col ${messages.length === 0 && !loading ? 'justify-center items-center' : 'gap-4'}`}>
         {messages.length === 0 && !loading && (
           <SuggestedQuestions
             onSelect={(text) => handleSend(text)}
@@ -987,53 +1001,45 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           </div>
         ))}
 
-        {progress && (
-          <div
-            className="max-w-[88%]"
-            style={{
-              background: 'rgba(255,255,255,0.55)',
-              borderRadius: 16,
-              border: '1px solid rgba(255,255,255,0.5)',
-              boxShadow: '0 2px 12px rgba(100,80,160,0.04)',
-              overflow: 'hidden',
-            }}
-          >
-            <ThinkingBubble
-              steps={progress.steps}
-              thinkingEntries={thinkingEntries}
-              startTime={progress.startTime}
-              activeTools={activeTools}
-              isComplete={isComplete}
-            />
-            {/* Preserve streaming content below the progress bar */}
-            <div className="px-5 pb-4">
-              {partialQueries.filter(Boolean).map((pq, i) => (
-                <div key={i} className="text-[12px] mb-2 p-2 rounded-lg" style={{ background: 'rgba(99,102,241,0.04)', color: 'var(--color-text-secondary)' }}>
-                  <span className="font-semibold text-[11px] mr-1.5" style={{ color: '#6366F1' }}>Q{i + 1}</span>
-                  {pq.subQuestion || `Sub-query ${i + 1} complete`}
-                  {pq.execution?.rowCount != null && <span className="ml-1.5 text-[10px]" style={{ color: 'var(--color-text-muted)' }}>({pq.execution.rowCount} rows)</span>}
-                </div>
-              ))}
-              {streamingInsights && (
-                <div className="text-[13px] leading-relaxed mt-2" style={{ color: '#44403C' }}>
-                  <ReactMarkdown>{streamingInsights}</ReactMarkdown>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-        {loading && !progress && (
-          <div className="self-start max-w-[70%] px-4 py-3 rounded-2xl rounded-bl-sm text-sm bubble-assistant">
-            <div className="flex items-center gap-1.5 py-1">
-              <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '0ms'}} />
-              <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '200ms'}} />
-              <span className="w-2 h-2 rounded-full bg-stone-300 animate-progress-dot" style={{animationDelay: '400ms'}} />
-            </div>
-          </div>
-        )}
-
         <div ref={messagesEndRef} />
       </div>
+
+      {/* ThinkingBubble — pinned below scroll area so it's always visible */}
+      {(loading || progress) && (
+        <div
+          key={progress?.startTime || 'loading'}
+          className="shrink-0 mx-5 mb-2"
+          style={{
+            background: 'rgba(255,255,255,0.55)',
+            borderRadius: 16,
+            border: '1px solid rgba(255,255,255,0.5)',
+            boxShadow: '0 2px 12px rgba(100,80,160,0.04)',
+            overflow: 'hidden',
+          }}
+        >
+          <ThinkingBubble
+            steps={progress?.steps || []}
+            thinkingEntries={thinkingEntries}
+            startTime={progress?.startTime}
+            activeTools={activeTools}
+            isComplete={isComplete}
+          />
+          <div className="px-5 pb-4">
+            {partialQueries.filter(Boolean).map((pq, i) => (
+              <div key={i} className="text-[12px] mb-2 p-2 rounded-lg" style={{ background: 'rgba(99,102,241,0.04)', color: 'var(--color-text-secondary)' }}>
+                <span className="font-semibold text-[11px] mr-1.5" style={{ color: '#6366F1' }}>Q{i + 1}</span>
+                {pq.subQuestion || `Sub-query ${i + 1} complete`}
+                {pq.execution?.rowCount != null && <span className="ml-1.5 text-[10px]" style={{ color: 'var(--color-text-muted)' }}>({pq.execution.rowCount} rows)</span>}
+              </div>
+            ))}
+            {streamingInsights && (
+              <div className="text-[13px] leading-relaxed mt-2" style={{ color: '#44403C' }}>
+                <ReactMarkdown>{streamingInsights}</ReactMarkdown>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Follow-up input */}
       {followUpMode && (
