@@ -443,6 +443,11 @@ function buildFinalResponse(state, usage, runtimeMetrics = null, usageByNodeAndM
     partialResultsSummary: state.partialResultsSummary || null,
     zeroRowGuidance: state.zeroRowGuidance || null,
     dashboardSpec: state.dashboardSpec || null,
+    tileData: state.tileData || null,
+    profileCacheKey: state.profileCacheKey || null,
+    slicerValues: state.dataProfiles
+      ? Object.assign({}, ...state.dataProfiles.map((p) => p.preComputed?.slicerValues || {}))
+      : null,
     trace: state.trace,
     warnings: state.warnings,
     runtimeMetrics,
@@ -848,14 +853,27 @@ function findOuterSelect(sql) {
 router.post('/dashboard-data', async (req, res) => {
   const { mode, sql, page, pageSize, columns } = req.body;
 
-  if (!sql || typeof sql !== 'string' || sql.trim().length === 0) {
-    return res.status(400).json({ error: 'sql is required' });
+  if (mode !== 'tile' && (!sql || typeof sql !== 'string' || sql.trim().length === 0)) {
+    return res.status(400).json({ error: 'sql is required for page/distinct modes' });
   }
-  if (!mode || !['page', 'distinct'].includes(mode)) {
-    return res.status(400).json({ error: 'mode must be "page" or "distinct"' });
+  if (!mode || !['page', 'distinct', 'tile'].includes(mode)) {
+    return res.status(400).json({ error: 'mode must be "page", "distinct", or "tile"' });
   }
 
   try {
+    if (mode === 'tile') {
+      const { profileCacheKey, tileId } = req.body;
+      if (!profileCacheKey || !tileId) {
+        return res.status(400).json({ error: 'profileCacheKey and tileId are required for tile mode' });
+      }
+      const dashboardCache = require('../services/dashboardCache');
+      const cached = dashboardCache.getByKey(profileCacheKey);
+      if (!cached?.tileData?.[tileId]) {
+        return res.status(404).json({ error: 'Tile data not found in cache' });
+      }
+      return res.json(cached.tileData[tileId]);
+    }
+
     const { getPool } = require('../config/database');
     const pool = await getPool();
 
