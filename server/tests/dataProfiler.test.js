@@ -70,3 +70,86 @@ test('analyzeColumn: empty array', () => {
   assert.equal(result.cardinality, 0);
   assert.equal(result.nullRatio, 1.0);
 });
+
+test('detectShapes: time-series detection', () => {
+  const { detectShapes } = require('../services/dataProfiler').__testables;
+  const columns = [
+    { name: 'CloseDate', inferredType: 'date', cardinality: 12 },
+    { name: 'Amount', inferredType: 'numeric', cardinality: 100 },
+    { name: 'Region', inferredType: 'categorical', cardinality: 5 },
+  ];
+  const shapes = detectShapes(columns);
+  assert.ok(shapes.isTimeSeries);
+  assert.equal(shapes.isTimeSeries.dateColumn, 'CloseDate');
+  assert.ok(shapes.isTimeSeries.measureColumns.includes('Amount'));
+});
+
+test('detectShapes: categorical groups', () => {
+  const { detectShapes } = require('../services/dataProfiler').__testables;
+  const columns = [
+    { name: 'Region', inferredType: 'categorical', cardinality: 5 },
+    { name: 'Amount', inferredType: 'numeric', cardinality: 100 },
+    { name: 'Count', inferredType: 'numeric', cardinality: 50 },
+  ];
+  const shapes = detectShapes(columns);
+  assert.ok(shapes.categoricalGroups.length > 0);
+  assert.equal(shapes.categoricalGroups[0].dimension, 'Region');
+});
+
+test('detectShapes: KPI candidates', () => {
+  const { detectShapes } = require('../services/dataProfiler').__testables;
+  const columns = [
+    { name: 'TotalRevenue', inferredType: 'numeric', cardinality: 100 },
+    { name: 'Region', inferredType: 'categorical', cardinality: 3 },
+  ];
+  const shapes = detectShapes(columns);
+  assert.ok(shapes.kpiCandidates.length > 0);
+  assert.equal(shapes.kpiCandidates[0].column, 'TotalRevenue');
+});
+
+test('detectShapes: no date columns -> isTimeSeries is null', () => {
+  const { detectShapes } = require('../services/dataProfiler').__testables;
+  const columns = [
+    { name: 'Region', inferredType: 'categorical', cardinality: 5 },
+    { name: 'Amount', inferredType: 'numeric', cardinality: 50 },
+  ];
+  const shapes = detectShapes(columns);
+  assert.equal(shapes.isTimeSeries, null);
+});
+
+test('recommendCharts: time-series -> line', () => {
+  const { recommendCharts } = require('../services/dataProfiler').__testables;
+  const shapes = {
+    isTimeSeries: { dateColumn: 'Month', measureColumns: ['Revenue'] },
+    categoricalGroups: [],
+    kpiCandidates: [],
+    highCardinalityWarnings: [],
+  };
+  const recs = recommendCharts(shapes);
+  assert.ok(recs.length > 0);
+  assert.equal(recs[0].chartType, 'line');
+});
+
+test('recommendCharts: small categorical -> pie', () => {
+  const { recommendCharts } = require('../services/dataProfiler').__testables;
+  const shapes = {
+    isTimeSeries: null,
+    categoricalGroups: [{ dimension: 'Status', measures: ['Count'], cardinality: 4 }],
+    kpiCandidates: [],
+    highCardinalityWarnings: [],
+  };
+  const recs = recommendCharts(shapes);
+  assert.equal(recs[0].chartType, 'pie');
+});
+
+test('recommendCharts: medium categorical -> bar', () => {
+  const { recommendCharts } = require('../services/dataProfiler').__testables;
+  const shapes = {
+    isTimeSeries: null,
+    categoricalGroups: [{ dimension: 'BU', measures: ['Revenue'], cardinality: 15 }],
+    kpiCandidates: [],
+    highCardinalityWarnings: [],
+  };
+  const recs = recommendCharts(shapes);
+  assert.equal(recs[0].chartType, 'bar');
+});
