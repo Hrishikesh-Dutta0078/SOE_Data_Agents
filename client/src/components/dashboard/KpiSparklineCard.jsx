@@ -26,18 +26,22 @@ function computeKpiValue(data, config) {
   return `${prefix}${formatted}${suffix}`;
 }
 
-export default function KpiSparklineCard({ config, data }) {
+export default function KpiSparklineCard({ config, data, precomputed }) {
   const { delta, trend, sparklineKey, sparklineData } = config || {};
 
-  const displayValue = computeKpiValue(data, config);
+  const displayValue = precomputed?.formatted
+    ? precomputed.formatted
+    : computeKpiValue(data, config);
 
   const trendColor = trend === 'up' ? '#10b981' : trend === 'down' ? '#ef4444' : '#64748b';
   const trendArrow = trend === 'up' ? '\u25B2' : trend === 'down' ? '\u25BC' : '\u25CF';
 
-  const sparkPoints = sparklineData
-    || (sparklineKey && Array.isArray(data)
-      ? data.map((row) => ({ value: Number(row[sparklineKey]) || 0 }))
-      : []);
+  const sparkPoints = precomputed?.sparklinePoints?.length > 0
+    ? precomputed.sparklinePoints
+    : sparklineData
+      || (sparklineKey && Array.isArray(data)
+        ? data.map((row) => ({ value: Number(row[sparklineKey]) || 0 }))
+        : []);
 
   return (
     <div className="flex flex-col items-center justify-center h-full px-4 py-3">

@@ -126,7 +126,7 @@ function applyChartGuards(data, chartType, xKey, yKeys) {
   return result;
 }
 
-export default function DashboardChart({ config, data, sql }) {
+export default function DashboardChart({ config, data, sql, skipClientAggregation }) {
   const {
     chartType = 'bar', xAxis, yAxis, series, tooltipFields,
   } = config || {};
@@ -153,8 +153,9 @@ export default function DashboardChart({ config, data, sql }) {
     ? yAxis.map((y) => (typeof y === 'string' ? y : y.key))
     : [typeof yAxis === 'string' ? yAxis : yAxis?.key].filter(Boolean);
 
-  const rawChartData = prepareData(activeData, config);
-  const chartData = applyChartGuards(rawChartData, chartType, xKey, yKeys);
+  const chartData = skipClientAggregation
+    ? activeData
+    : applyChartGuards(prepareData(activeData, config), chartType, xKey, yKeys);
 
   if (loading) {
     return (
