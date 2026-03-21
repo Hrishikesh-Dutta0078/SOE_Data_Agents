@@ -153,3 +153,77 @@ test('recommendCharts: medium categorical -> bar', () => {
   const recs = recommendCharts(shapes);
   assert.equal(recs[0].chartType, 'bar');
 });
+
+test('detectAnomalies: outliers via IQR', () => {
+  const { detectAnomalies } = require('../services/dataProfiler').__testables;
+  const columns = [{ name: 'Amount', inferredType: 'numeric', distribution: { p25: 100, p75: 500 } }];
+  const rows = [
+    { Amount: 100 }, { Amount: 200 }, { Amount: 300 }, { Amount: 400 },
+    { Amount: 500 }, { Amount: 5000 },
+  ];
+  const anomalies = detectAnomalies(columns, rows, { isTimeSeries: null, categoricalGroups: [] });
+  assert.ok(anomalies.outliers.length > 0);
+  assert.ok(anomalies.outliers[0].includes('Amount'));
+});
+
+test('detectAnomalies: concentration', () => {
+  const { detectAnomalies } = require('../services/dataProfiler').__testables;
+  const columns = [
+    { name: 'Account', inferredType: 'categorical', cardinality: 10 },
+    { name: 'Revenue', inferredType: 'numeric', distribution: { min: 0, max: 1000 } },
+  ];
+  const rows = [
+    { Account: 'A', Revenue: 500 }, { Account: 'B', Revenue: 300 },
+    { Account: 'C', Revenue: 100 }, { Account: 'D', Revenue: 10 },
+    { Account: 'E', Revenue: 10 }, { Account: 'F', Revenue: 10 },
+    { Account: 'G', Revenue: 5 }, { Account: 'H', Revenue: 5 },
+    { Account: 'I', Revenue: 5 }, { Account: 'J', Revenue: 5 },
+  ];
+  const anomalies = detectAnomalies(columns, rows, { isTimeSeries: null, categoricalGroups: [{ dimension: 'Account', measures: ['Revenue'], cardinality: 10 }] });
+  assert.ok(anomalies.concentration.length > 0);
+});
+
+test('detectAnomalies: all identical numeric values — no outliers', () => {
+  const { detectAnomalies } = require('../services/dataProfiler').__testables;
+  const columns = [{ name: 'Val', inferredType: 'numeric', distribution: { p25: 5, p75: 5 } }];
+  const rows = [{ Val: 5 }, { Val: 5 }, { Val: 5 }];
+  const anomalies = detectAnomalies(columns, rows, { isTimeSeries: null, categoricalGroups: [] });
+  assert.equal(anomalies.outliers.length, 0);
+});
+
+test('computePreAggregates: KPI aggregates', () => {
+  const { computePreAggregates } = require('../services/dataProfiler').__testables;
+  const rows = [{ Revenue: 100 }, { Revenue: 200 }, { Revenue: 300 }];
+  const kpiCandidates = [{ column: 'Revenue', suggestedAgg: 'sum', prefix: '$', suffix: '' }];
+  const result = computePreAggregates(rows, kpiCandidates, [], null);
+  assert.equal(result.kpiAggregates.Revenue.sum, 600);
+  assert.equal(result.kpiAggregates.Revenue.avg, 200);
+  assert.equal(result.kpiAggregates.Revenue.count, 3);
+});
+
+test('profileDataSource: full pipeline', () => {
+  const { profileDataSource } = require('../services/dataProfiler');
+  const rows = [
+    { Region: 'AMERICAS', Amount: 1000, CloseDate: '2024-01-15' },
+    { Region: 'EMEA', Amount: 2000, CloseDate: '2024-02-20' },
+    { Region: 'APAC', Amount: 1500, CloseDate: '2024-03-10' },
+    { Region: 'AMERICAS', Amount: 3000, CloseDate: '2024-04-05' },
+    { Region: 'EMEA', Amount: 500, CloseDate: '2024-05-12' },
+  ];
+  const columns = ['Region', 'Amount', 'CloseDate'];
+  const profile = profileDataSource('SELECT * FROM deals', rows, columns);
+  assert.ok(profile.columns.length === 3);
+  assert.ok(profile.shapes);
+  assert.ok(profile.chartRecommendations.length > 0);
+  assert.ok(profile.anomalies);
+  assert.ok(profile.preComputed);
+  assert.ok(profile.sqlHash);
+});
+
+test('profileDataSource: empty rows returns skeleton profile', () => {
+  const { profileDataSource } = require('../services/dataProfiler');
+  const profile = profileDataSource('SELECT 1', [], ['Col1']);
+  assert.equal(profile.columns.length, 1);
+  assert.equal(profile.columns[0].cardinality, 0);
+  assert.equal(profile.chartRecommendations.length, 0);
+});
