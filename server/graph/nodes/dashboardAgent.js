@@ -128,6 +128,26 @@ async function dashboardAgentNode(state) {
 
   spec = validateAndFixSpec(spec, state, isRefinement);
 
+  // Build tile data if profiles are available
+  let tileData = null;
+  if (state.dataProfiles) {
+    try {
+      const { buildTileData } = require('../../services/tileDataBuilder');
+      tileData = buildTileData(spec, state.dataProfiles);
+
+      // Update cache with tile data
+      const dashboardCache = require('../../services/dashboardCache');
+      for (const profile of state.dataProfiles) {
+        const existing = dashboardCache.get(state.sessionId, profile.sqlHash);
+        if (existing) {
+          dashboardCache.set(state.sessionId, profile.sqlHash, { ...existing, tileData });
+        }
+      }
+    } catch (err) {
+      logger.warn('TileDataBuilder failed, client will aggregate', { error: err.message });
+    }
+  }
+
   const duration = Date.now() - start;
   logger.info(`[DashboardAgent] ${spec.tiles.length} tiles, ${spec.slicers.length} slicers${isRefinement ? ' (refinement)' : ''} (${duration}ms)`);
 
@@ -139,6 +159,7 @@ async function dashboardAgentNode(state) {
 
   return {
     dashboardSpec: spec,
+    tileData,
     trace: [{
       node: 'dashboardAgent',
       timestamp: start,
