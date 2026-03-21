@@ -262,6 +262,9 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
             content: spec.title || 'Dashboard',
             dashboardSpec: spec,
             tileCount: spec.tiles.length,
+            tileData: data.tileData || null,
+            slicerValues: data.slicerValues || null,
+            profileCacheKey: data.profileCacheKey || null,
             trace: data.trace || null,
             usage: data.usage || null,
             usageByNodeAndModel: data.usageByNodeAndModel || null,
@@ -873,7 +876,13 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
             const sources = [];
             const history = messages.filter((m) => m.type === 'sql' && m.execution?.success);
             for (const m of history) sources.push({ question: m.content, sql: m.content, execution: m.execution });
-            setDashboardData({ spec: msg.dashboardSpec, dataSources: sources });
+            setDashboardData({
+              spec: msg.dashboardSpec,
+              dataSources: sources,
+              tileData: msg.tileData || null,
+              slicerValues: msg.slicerValues || null,
+              profileCacheKey: msg.profileCacheKey || null,
+            });
           }
         }}
       >

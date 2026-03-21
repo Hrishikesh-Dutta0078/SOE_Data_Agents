@@ -117,9 +117,9 @@ export default function DashboardOverlay({ dashboardData, onClose, onSuggestionC
   }, [refineInput, refining, onRefineDashboard]);
 
   useEffect(() => {
-    // Skip fetch if we already have precomputed slicer values
-    if (precomputedSlicerValues && Object.keys(precomputedSlicerValues).length > 0) {
-      setSlicerValues(precomputedSlicerValues);
+    // Skip fetch if profiler already ran (profileCacheKey exists) — trust precomputed values
+    if (profileCacheKey || (precomputedSlicerValues && Object.keys(precomputedSlicerValues).length > 0)) {
+      setSlicerValues(precomputedSlicerValues || {});
       return;
     }
 
@@ -165,7 +165,7 @@ export default function DashboardOverlay({ dashboardData, onClose, onSuggestionC
       setSlicerValues(final);
       setSlicersLoading(false);
     });
-  }, [spec, dataSources, precomputedSlicerValues]);
+  }, [spec, dataSources, precomputedSlicerValues, profileCacheKey]);
 
   const enrichedSlicers = useMemo(() => {
     if (!spec?.slicers?.length) return [];
