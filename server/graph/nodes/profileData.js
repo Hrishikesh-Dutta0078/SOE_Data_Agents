@@ -3,9 +3,12 @@
 const { profileDataSource } = require('../../services/dataProfiler');
 const dashboardCache = require('../../services/dashboardCache');
 const logger = require('../../utils/logger');
+const { getPool } = require('../../config/database');
 
 // Import dashboard event emitter — shared with dashboardAgent for SSE progress events.
 const { dashboardEvents } = require('./dashboardAgent');
+
+const SAMPLE_LIMIT = 500;
 
 function computeDimensionOverlap(profiles) {
   const dimMap = {};
@@ -30,7 +33,24 @@ function computeDimensionOverlap(profiles) {
   return overlap;
 }
 
-function collectDataSources(state) {
+async function fetchSampleRows(sql) {
+  try {
+    const pool = await getPool();
+    const request = pool.request();
+    request.timeout = 30000;
+    // Wrap the original SQL as a subquery and take a sample
+    const sampleSql = `SELECT TOP ${SAMPLE_LIMIT} * FROM (${sql.replace(/;\s*$/, '')}) _profiler_sample`;
+    const result = await request.query(sampleSql);
+    const rows = result.recordset ?? [];
+    const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
+    return { rows, columns };
+  } catch (err) {
+    logger.warn('ProfileData: failed to fetch sample rows', { error: err.message, sql: sql.substring(0, 80) });
+    return null;
+  }
+}
+
+async function collectDataSources(state) {
   const sources = [];
 
   if (state.dashboardHasDataRequest) {
@@ -46,13 +66,31 @@ function collectDataSources(state) {
       }
     }
   } else {
+    // Path A: conversation history — rows are typically not included.
+    // Fetch sample rows from DB for each SQL we find.
     const history = state.conversationHistory || [];
+    const sqlsToFetch = [];
     for (const msg of history) {
       if (msg.role !== 'assistant') continue;
       if (!msg.sql && !msg.resultSummary) continue;
       const exec = msg.execution;
       if (exec?.rows?.length > 0) {
+        // Rows available in history (rare but possible)
         sources.push({ sql: msg.sql || '', rows: exec.rows, columns: exec.columns || Object.keys(exec.rows[0]) });
+      } else if (msg.sql) {
+        // Has SQL but no rows — need to fetch from DB
+        sqlsToFetch.push(msg.sql);
+      }
+    }
+
+    if (sqlsToFetch.length > 0) {
+      logger.info(`ProfileData: fetching sample rows for ${sqlsToFetch.length} Path A SQL(s)`);
+      const results = await Promise.all(sqlsToFetch.map((sql) => fetchSampleRows(sql)));
+      for (let i = 0; i < sqlsToFetch.length; i++) {
+        const result = results[i];
+        if (result && result.rows.length > 0) {
+          sources.push({ sql: sqlsToFetch[i], rows: result.rows, columns: result.columns });
+        }
       }
     }
   }
@@ -67,7 +105,7 @@ async function profileDataNode(state) {
     return { dataProfiles: state.dataProfiles, profileCacheKey: state.profileCacheKey };
   }
 
-  const sources = collectDataSources(state);
+  const sources = await collectDataSources(state);
 
   if (sources.length === 0) {
     logger.info('ProfileData: no data sources to profile');
