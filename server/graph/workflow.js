@@ -24,6 +24,7 @@ const { alignSubQueriesToTemplatesNode } = require('./nodes/alignSubQueriesToTem
 const { parallelSubQueryPipelineNode } = require('./nodes/parallelSubQueryPipeline');
 const { presentNode } = require('./nodes/present');
 const { dashboardAgentNode } = require('./nodes/dashboardAgent');
+const { profileDataNode } = require('./nodes/profileData');
 const {
   MAX_CORRECTION_ROUNDS,
   MAX_RESULT_RETRIES,
@@ -45,7 +46,7 @@ function routeAfterClassify(state) {
       return 'contextFetch';
     }
     logger.info('Dashboard path A: assembling from conversation history');
-    return 'dashboardAgent';
+    return 'profileData';
   }
   if (state.intent === 'SQL_QUERY') {
     if (state.needsDecomposition) {
@@ -121,15 +122,15 @@ function routeAfterCheckResults(state) {
 
   if (state.execution?.success && state.execution?.rowCount > 0) {
     if (state.intent === 'DASHBOARD') {
-      logger.info('Dashboard intent: routing to dashboardAgent instead of present');
-      return 'dashboardAgent';
+      logger.info('Dashboard intent: routing to profileData instead of present');
+      return 'profileData';
     }
     return 'present';
   }
   if ((state.queries || []).length > 0) {
     logger.info('Sub-queries completed (or partial), routing to present/dashboard');
     if (state.intent === 'DASHBOARD') {
-      return 'dashboardAgent';
+      return 'profileData';
     }
     return 'present';
   }
@@ -190,9 +191,10 @@ function buildWorkflow() {
     .addNode('parallelSubQueryPipeline', parallelSubQueryPipelineNode)
     .addNode('present', presentNode)
     .addNode('dashboardAgent', dashboardAgentNode)
+    .addNode('profileData', profileDataNode)
 
     .addEdge('__start__', 'classify')
-    .addConditionalEdges('classify', routeAfterClassify, ['decompose', 'contextFetch', 'dashboardAgent', '__end__'])
+    .addConditionalEdges('classify', routeAfterClassify, ['decompose', 'contextFetch', 'profileData', 'dashboardAgent', '__end__'])
     .addEdge('decompose', 'alignSubQueries')
     .addConditionalEdges('alignSubQueries', routeAfterAlign, ['parallelSubQueryPipeline', 'subQueryMatch'])
     .addEdge('subQueryMatch', 'contextFetch')
@@ -202,11 +204,12 @@ function buildWorkflow() {
     .addConditionalEdges('validate', routeAfterValidate, ['execute', 'correct', 'accumulateResult', 'present', '__end__'])
     .addEdge('correct', 'generateSql')
     .addConditionalEdges('execute', routeAfterExecute, ['checkResults', 'correct'])
-    .addConditionalEdges('checkResults', routeAfterCheckResults, ['present', 'dashboardAgent', 'accumulateResult', 'diagnoseEmptyResults', '__end__'])
+    .addConditionalEdges('checkResults', routeAfterCheckResults, ['present', 'profileData', 'accumulateResult', 'diagnoseEmptyResults', '__end__'])
     .addEdge('parallelSubQueryPipeline', 'checkResults')
     .addEdge('accumulateResult', 'subQueryMatch')
     .addConditionalEdges('diagnoseEmptyResults', routeAfterDiagnose, ['validate', 'present', '__end__'])
     .addEdge('present', '__end__')
+    .addEdge('profileData', 'dashboardAgent')
     .addEdge('dashboardAgent', '__end__');
 
   return graph.compile({ checkpointer });

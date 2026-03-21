@@ -87,6 +87,9 @@ const WorkflowState = Annotation.Root({
   previousDashboardSpec: Annotation({ reducer: (_, b) => b, default: () => null }),
   dashboardRefinement: Annotation({ reducer: (_, b) => b, default: () => '' }),
   dashboardDataSources: Annotation({ reducer: (_, b) => b, default: () => [] }),
+  dataProfiles: Annotation({ reducer: (_, b) => b, default: () => null }),
+  tileData: Annotation({ reducer: (_, b) => b, default: () => null }),
+  profileCacheKey: Annotation({ reducer: (_, b) => b, default: () => null }),
 
   // --- Tool toggles (testing): { research: string[], sqlWriter: string[] } — if set, only these tools are enabled
   enabledTools: Annotation({ reducer: (_, b) => b, default: () => null }),
