@@ -1409,7 +1409,7 @@
       },
       "DEAL_BAND": {
         "type": "VARCHAR",
-        "description": "deal band label",
+        "description": "deal band label — the ONLY correct column for deal size filtering. NEVER use HAVING SUM(OPPTY) >= threshold or any OPPTY-based threshold to filter deal size. When user asks about deal sizes, deal bands, large deals, or '1M+ deals', always filter with WHERE DEAL_BAND = 'value'. Values: '1M+', '0.5M+', '0.25M+', '0.1M+', '<0.1M'.",
         "distinct_values": [
           "1M+",
           "0.25M+",
@@ -1601,7 +1601,7 @@
       },
       "ADJ_COMMITMENT": {
         "type": "VARCHAR",
-        "description": "adjusted commitment level",
+        "description": "adjusted commitment level. Common abbreviation filter: WFCU/WFC/WFU = ADJ_COMMITMENT IN ('Won','Forecast','Upside'). W = Won, F = Forecast, CU or UC = Upside. Use this filter when users mention WFCU, WFC, WFU, or any combination of W/F/CU/UC commitment categories.",
         "distinct_values": [
           "Won",
           "Lost",
@@ -1961,22 +1961,6 @@
         "distinct_values": [
           "TRUE",
           "FALSE"
-        ]
-      },
-      "TP_ASV": {
-        "type": "MONEY",
-        "description": "total pipeline ASV amount",
-        "distinct_values": [
-          21480.4,
-          311966.0493,
-          10781.37,
-          2998.326,
-          43416.01,
-          83.3333,
-          93465,
-          164100,
-          12217.742,
-          523982.7835
         ]
       },
       "OPP_DRIVER_CRITERIA": {
@@ -2452,7 +2436,7 @@
       },
       "OPPTY": {
         "type": "FLOAT",
-        "description": "opportunity dollar amount",
+        "description": "opportunity or deal dollar amount",
         "distinct_values": [
           23.29,
           300186.54,
@@ -5746,7 +5730,7 @@
       },
       "QTR_BKT_IND": {
         "type": "BIGINT",
-        "description": "quarter bucket indicator (0 = current quarter, 1-4 = future quarters)",
+        "description": "quarter bucket indicator — relative quarter offset from current. Always use QTR_BKT_IND for relative quarter filtering (CQ, PQ, NQ) instead of hardcoding FISCAL_YR_AND_QTR_DESC. Values: -1 = previous quarter, 0 = current quarter, 1 = next quarter, 2-4 = future quarters. Negative values go further into the past.",
         "distinct_values": [
           4,
           -6,

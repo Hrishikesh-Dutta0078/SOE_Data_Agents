@@ -242,16 +242,25 @@ function buildDashboardInputs(state) {
 
   if (isRefinement) {
     const externalSources = state.dashboardDataSources || [];
-    const dataSources = externalSources.map((s) => ({
-      question: s.question || null,
-      sql: s.sql || null,
-      execution: s.execution || null,
-      insights: s.insights || null,
-      chart: s.chart || null,
-    }));
+
+    let dataContext;
+    if (externalSources.length > 0) {
+      const dataSources = externalSources.map((s) => ({
+        question: s.question || null,
+        sql: s.sql || null,
+        execution: s.execution || null,
+        insights: s.insights || null,
+        chart: s.chart || null,
+      }));
+      dataContext = buildDataContext(dataSources);
+    } else if (state.dataProfiles?.length > 0) {
+      dataContext = formatProfileContext(state.dataProfiles);
+    } else {
+      dataContext = 'No data sources available.';
+    }
 
     return {
-      dataContext: buildDataContext(dataSources),
+      dataContext,
       previousSpec: JSON.stringify(state.previousDashboardSpec, null, 2),
       refinement: state.dashboardRefinement,
       isRefinement: true,

@@ -38,10 +38,15 @@ async function fetchSampleRows(sql) {
     const pool = await getPool();
     const request = pool.request();
     request.timeout = 30000;
-    // Wrap the original SQL as a subquery and take a sample
-    const sampleSql = `SELECT TOP ${SAMPLE_LIMIT} * FROM (${sql.replace(/;\s*$/, '')}) _profiler_sample`;
+    const trimmedSql = sql.replace(/;\s*$/, '');
+    // CTEs (WITH ... AS) cannot be wrapped in a derived table in SQL Server.
+    // Execute them directly and truncate in JS.
+    const isCTE = /^\s*WITH\s/i.test(trimmedSql);
+    const sampleSql = isCTE
+      ? trimmedSql
+      : `SELECT TOP ${SAMPLE_LIMIT} * FROM (${trimmedSql}) _profiler_sample`;
     const result = await request.query(sampleSql);
-    const rows = result.recordset ?? [];
+    const rows = (result.recordset ?? []).slice(0, SAMPLE_LIMIT);
     const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
     return { rows, columns };
   } catch (err) {
@@ -68,30 +73,38 @@ async function collectDataSources(state) {
   } else {
     // Path A: conversation history — rows are typically not included.
     // Fetch sample rows from DB for each SQL we find.
+    // IMPORTANT: maintain 1:1 order with history entries so sourceIndex stays aligned
+    // with what the client builds from the same conversation history.
     const history = state.conversationHistory || [];
-    const sqlsToFetch = [];
+    const entries = [];
     for (const msg of history) {
       if (msg.role !== 'assistant') continue;
       if (!msg.sql && !msg.resultSummary) continue;
-      const exec = msg.execution;
-      if (exec?.rows?.length > 0) {
-        // Rows available in history (rare but possible)
-        sources.push({ sql: msg.sql || '', rows: exec.rows, columns: exec.columns || Object.keys(exec.rows[0]) });
-      } else if (msg.sql) {
-        // Has SQL but no rows — need to fetch from DB
-        sqlsToFetch.push(msg.sql);
-      }
+      entries.push(msg);
     }
 
-    if (sqlsToFetch.length > 0) {
-      logger.info(`ProfileData: fetching sample rows for ${sqlsToFetch.length} Path A SQL(s)`);
-      const results = await Promise.all(sqlsToFetch.map((sql) => fetchSampleRows(sql)));
-      for (let i = 0; i < sqlsToFetch.length; i++) {
-        const result = results[i];
-        if (result && result.rows.length > 0) {
-          sources.push({ sql: sqlsToFetch[i], rows: result.rows, columns: result.columns });
-        }
+    const needsFetch = entries.filter((m) => !(m.execution?.rows?.length > 0) && m.sql);
+    if (needsFetch.length > 0) {
+      logger.info(`ProfileData: fetching sample rows for ${needsFetch.length} Path A SQL(s)`);
+    }
+
+    // Resolve each entry: use existing rows or fetch from DB (in parallel)
+    const resolved = await Promise.all(entries.map((msg) => {
+      const exec = msg.execution;
+      if (exec?.rows?.length > 0) {
+        return Promise.resolve({ rows: exec.rows, columns: exec.columns || Object.keys(exec.rows[0]) });
       }
+      if (msg.sql) return fetchSampleRows(msg.sql);
+      return Promise.resolve(null);
+    }));
+
+    for (let i = 0; i < entries.length; i++) {
+      const result = resolved[i];
+      sources.push({
+        sql: entries[i].sql || '',
+        rows: result?.rows || [],
+        columns: result?.columns || [],
+      });
     }
   }
 

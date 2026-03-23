@@ -192,7 +192,13 @@ function getSourceColumns(state, sourceIndex, isRefinement) {
 }
 
 function getSourceCount(state, isRefinement) {
-  if (isRefinement) return (state.dashboardDataSources || []).length;
+  if (isRefinement) {
+    const extLen = (state.dashboardDataSources || []).length;
+    if (extLen > 0) return extLen;
+    // Fallback: profiles restored from cache during refinement
+    if (state.dataProfiles?.length > 0) return state.dataProfiles.length;
+    return countUsableDataSources(state);
+  }
   return countUsableDataSources(state);
 }
 

@@ -9,6 +9,9 @@ export default defineConfig({
     emptyOutDir: true,
   },
   server: {
+    // Listen on all interfaces so other devices on the LAN can use http://<your-IPv4>:5174
+    // (Windows Firewall may need an inbound rule for TCP 5174.)
+    host: true,
     port: 5174,
     proxy: {
       '/api': {

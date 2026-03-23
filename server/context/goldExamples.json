@@ -365,7 +365,7 @@
       "question": "Top stalled deals by ARR with rep name, FLM name, segment and region",
       "questionCategory": "WHAT_HAPPENED",
       "questionSubCategory": "deal_lists",
-      "sql": "SELECT TOP 100\n    p.OPP_ID,\n    r.REP_NAME,\n    r.FLM,\n    r.MARKET_SEGMENT AS SEGMENT,\n    r.GLOBAL_REGION AS REGION,\n    SUM(p.OPPTY) AS ARR,\n    p.STALLED_BUT_INACTIVE\nFROM vw_TF_EBI_P2S p\nJOIN vw_td_ebi_region_rpt r ON p.REGION_ID = r.REGION_ID\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3')\n  AND p.PAY_MEASURE_ID = 0\n  AND p.IN_PIPELINE = 1\n  AND p.STALLED_BUT_INACTIVE = 'Stalled & Inactive'\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND o.MOPG1 <> 'ADVERTISING'\n  AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n  AND p.SNAPSHOT_DATE = (SELECT MAX(p2.SNAPSHOT_DATE) FROM vw_TF_EBI_P2S p2)\nGROUP BY\n    p.OPP_ID,\n    r.REP_NAME,\n    r.FLM,\n    r.MARKET_SEGMENT,\n    r.GLOBAL_REGION,\n    p.STALLED_BUT_INACTIVE\nORDER BY ARR DESC",
+      "sql": "SELECT TOP 5000\n    p.OPP_ID,\n    r.REP_NAME,\n    r.FLM,\n    r.MARKET_SEGMENT AS SEGMENT,\n    r.GLOBAL_REGION AS REGION,\n    SUM(p.OPPTY) AS ARR,\n    p.STALLED_BUT_INACTIVE\nFROM vw_TF_EBI_P2S p\nJOIN vw_td_ebi_region_rpt r ON p.REGION_ID = r.REGION_ID\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE s.SALES_STAGE IN ('S7','S6','S5','S4','S3')\n  AND p.PAY_MEASURE_ID = 0\n  AND p.IN_PIPELINE = 1\n  AND p.STALLED_BUT_INACTIVE = 'Stalled & Inactive'\n  AND r.ROLE_TYPE_DISPLAY = 'AE'\n  AND rc.ROLE_COVERAGE_BU_GROUP = 'DMX'\n  AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n  AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n  AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n  AND o.MOPG1 <> 'ADVERTISING'\n  AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n  AND p.SNAPSHOT_DATE = (SELECT MAX(p2.SNAPSHOT_DATE) FROM vw_TF_EBI_P2S p2)\nGROUP BY\n    p.OPP_ID,\n    r.REP_NAME,\n    r.FLM,\n    r.MARKET_SEGMENT,\n    r.GLOBAL_REGION,\n    p.STALLED_BUT_INACTIVE\nORDER BY ARR DESC",
       "tables_used": [
         "vw_TF_EBI_P2S",
         "vw_td_ebi_region_rpt",
@@ -466,6 +466,87 @@
         "What countries do we have?",
         "Show me the country list",
         "Country dimension data"
+      ]
+    },
+    {
+      "id": "exact__s3_s4_deals_wfcu_emea",
+      "question": "Show S3 and S4 deal details in WFCU in EMEA",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "deal_lists",
+      "sql": "SELECT TOP 5000\n    r.REP_NAME,\n    r.GLOBAL_REGION,\n    r.REGION,\n    s.SALES_STAGE,\n    c.FISCAL_YR_AND_QTR_DESC AS Close_Qtr,\n    opp.OPP_NAME,\n    opp.SFDC_OPP_URL,\n    p.OPP_ID,\n    p.ADJ_COMMITMENT,\n    SUM(p.OPPTY) AS Pipeline_Amount\nFROM vw_TF_EBI_P2S p\nINNER JOIN vw_td_ebi_region_rpt r ON p.REGION_ID = r.REGION_ID\nINNER JOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nINNER JOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\nINNER JOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nWHERE s.SALES_STAGE IN ('S3', 'S4')\n    AND p.ADJ_COMMITMENT IN ('Won','Forecast', 'Upside')\n    AND p.PAY_MEASURE_ID = 0\n    AND r.GLOBAL_REGION LIKE '%EMEA%'\n    AND r.ROLE_TYPE_DISPLAY = 'AE'\n    AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n    AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n    AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n    AND p.SNAPSHOT_DATE_ID = (\n        SELECT MAX(p2.SNAPSHOT_DATE_ID)\n        FROM vw_TF_EBI_P2S p2\n        INNER JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY\n        WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n    )\nGROUP BY\n    r.REP_NAME,\n    r.GLOBAL_REGION,\n    r.REGION,\n    s.SALES_STAGE,\n    c.FISCAL_YR_AND_QTR_DESC,\n    opp.OPP_NAME,\n    opp.SFDC_OPP_URL,\n    p.OPP_ID,\n    p.ADJ_COMMITMENT\nORDER BY Pipeline_Amount DESC",
+      "tables_used": [
+        "vw_TF_EBI_P2S",
+        "vw_td_ebi_region_rpt",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE",
+        "vw_TD_EBI_OPP"
+      ],
+      "filterNotes": "WFCU = Won + Forecast + Upside. Filter on p.ADJ_COMMITMENT IN ('Won','Forecast','Upside'). Abbreviations: W = Won, F = Forecast, CU or UC = Upside. When users say WFC, WFCU, WFU, or any combination of W/F/CU/UC, map to the corresponding ADJ_COMMITMENT values.",
+      "variants": [
+        "S3 S4 deals in WFCU",
+        "Show WFCU deals in EMEA",
+        "EMEA S3 S4 deal details",
+        "Deals in Won Forecast Upside in EMEA",
+        "Show WFC deals",
+        "S3 S4 WFCU pipeline",
+        "Deal list in WFCU",
+        "Show deals in W F CU",
+        "EMEA deals in forecast and upside",
+        "S3 and S4 WFU deals",
+        "Pipeline deals in Won Forecast Upside"
+      ]
+    },
+    {
+      "id": "exact__s3_deals_cq_emea",
+      "question": "Show S3 deal details in CQ in EMEA",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "deal_lists",
+      "sql": "SELECT\n    r.REP_NAME,\n    r.GLOBAL_REGION,\n    r.REGION,\n    r.SUB_REGION,\n    s.SALES_STAGE,\n    c.FISCAL_YR_AND_QTR_DESC AS Close_Qtr,\n    opp.OPP_NAME,\n    opp.SFDC_OPP_ID,\n    opp.OPP_STAGE,\n    opp.DS_SCORE,\n    opp.NEXT_STEP,\n    opp.MUST_WIN,\n    opp.REASON,\n    p.OPPTY,\n    (\n        SELECT COUNT(DISTINCT p3.OPP_ID)\n        FROM vw_TF_EBI_P2S p3\n        INNER JOIN vw_td_ebi_region_rpt r3 ON p3.REGION_ID = r3.REGION_ID\n        INNER JOIN vw_ebi_sales_stage s3 ON p3.SALES_STAGE_ID = s3.SALES_STAGE_ID\n        INNER JOIN vw_EBI_CALDATE c3 ON p3.OPP_CLOSE_DATE_ID = c3.DATE_KEY\n        WHERE s3.SALES_STAGE = 'S3'\n            AND p3.PAY_MEASURE_ID = 0\n            AND c3.QTR_BKT_IND = 0\n            AND r3.GLOBAL_REGION LIKE '%EMEA%'\n            AND r3.ROLE_TYPE_DISPLAY = 'AE'\n            AND r3.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n            AND (r3.SALES_REGION NOT LIKE '%DME%' OR r3.SALES_REGION IS NULL)\n            AND r3.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n            AND p3.SNAPSHOT_DATE_ID = (\n                SELECT MAX(p4.SNAPSHOT_DATE_ID)\n                FROM vw_TF_EBI_P2S p4\n                INNER JOIN vw_EBI_CALDATE c4 ON p4.SNAPSHOT_DATE_ID = c4.DATE_KEY\n                WHERE c4.WEEK_SORT_ORDER_REVERSE = '0'\n            )\n    ) AS Total_Deal_Count\nFROM vw_TF_EBI_P2S p\nINNER JOIN vw_td_ebi_region_rpt r ON p.REGION_ID = r.REGION_ID\nINNER JOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nINNER JOIN vw_EBI_CALDATE c ON p.OPP_CLOSE_DATE_ID = c.DATE_KEY\nINNER JOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nWHERE s.SALES_STAGE = 'S3'\n    AND p.PAY_MEASURE_ID = 0\n    AND c.QTR_BKT_IND = 0\n    AND r.GLOBAL_REGION LIKE '%EMEA%'\n    AND r.ROLE_TYPE_DISPLAY = 'AE'\n    AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')\n    AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n    AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')\n    AND p.SNAPSHOT_DATE_ID = (\n        SELECT MAX(p2.SNAPSHOT_DATE_ID)\n        FROM vw_TF_EBI_P2S p2\n        INNER JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY\n        WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n    )\nORDER BY p.OPPTY DESC",
+      "tables_used": [
+        "vw_TF_EBI_P2S",
+        "vw_td_ebi_region_rpt",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE",
+        "vw_TD_EBI_OPP"
+      ],
+      "filterNotes": "Uses QTR_BKT_IND = 0 for current quarter instead of hardcoded FISCAL_YR_AND_QTR_DESC. Includes correlated subquery for total S3 deal count in same region/quarter. For EMEA filter, use GLOBAL_REGION LIKE '%EMEA%'.",
+      "variants": [
+        "S3 deals in current quarter EMEA",
+        "EMEA S3 deal details",
+        "Show S3 deals in EMEA for CQ",
+        "S3 deal list EMEA current quarter",
+        "What are the S3 deals in EMEA?",
+        "List S3 opportunities in EMEA",
+        "S3 pipeline deal details for EMEA",
+        "EMEA S3 deals this quarter",
+        "Show me S3 deals closing this quarter in EMEA",
+        "S3 deals EMEA CQ"
+      ]
+    },
+    {
+      "id": "exact__1m_deals_no_review_emea",
+      "question": "1M+ deals with no deal review in last 2 months in EMEA",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "deal_lists",
+      "sql": "SELECT TOP 5000\n    opp.OPP_NAME AS Deal_Name,\n    r.REP_NAME,\n    r.GLOBAL_REGION,\n    r.REGION,\n    s.SALES_STAGE,\n    opp.DATE_LAST_REVIEWED,\n    opp.DEAL_REVIEWED_BY,\n    opp.DEAL_REVIEW_NOTES,\n    opp.SFDC_OPP_URL,\n    COUNT(DISTINCT p.OPP_ID) AS Deal_Count,\n    SUM(p.OPPTY) AS Pipeline_Amount\nFROM vw_TF_EBI_P2S p\nINNER JOIN vw_td_ebi_region_rpt r ON p.REGION_ID = r.REGION_ID\nINNER JOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nINNER JOIN vw_TD_EBI_OPP opp ON p.OPP_ID = opp.OPP_ID\nWHERE s.SALES_STAGE IN ('S7', 'S6', 'S5', 'S4', 'S3')\n    AND p.PAY_MEASURE_ID = 0\n    AND p.DEAL_BAND = '1M+'\n    AND r.GLOBAL_REGION LIKE '%EMEA%'\n    AND (opp.DATE_LAST_REVIEWED IS NULL OR opp.DATE_LAST_REVIEWED < DATEADD(MONTH, -2, GETDATE()))\n    AND r.ROLE_TYPE_DISPLAY = 'AE'\n    AND r.SALES_TEAM_BU IN ('#NA', 'DX', 'DX/DME', 'WW')\n    AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)\n    AND r.SALES_TEAM NOT IN ('AMER IND PS DX', 'AMER LATAM PS', 'AMER ENT PS DX', 'AMER PUB SEC SPECIALIST')\n    AND p.SNAPSHOT_DATE_ID = (\n        SELECT MAX(p2.SNAPSHOT_DATE_ID)\n        FROM vw_TF_EBI_P2S p2\n        INNER JOIN vw_EBI_CALDATE c2 ON p2.SNAPSHOT_DATE_ID = c2.DATE_KEY\n        WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n    )\nGROUP BY\n    opp.OPP_NAME,\n    r.REP_NAME,\n    r.GLOBAL_REGION,\n    r.REGION,\n    s.SALES_STAGE,\n    opp.DATE_LAST_REVIEWED,\n    opp.DEAL_REVIEWED_BY,\n    opp.DEAL_REVIEW_NOTES,\n    opp.SFDC_OPP_URL\nORDER BY Pipeline_Amount DESC",
+      "tables_used": [
+        "vw_TF_EBI_P2S",
+        "vw_td_ebi_region_rpt",
+        "vw_ebi_sales_stage",
+        "vw_TD_EBI_OPP"
+      ],
+      "filterNotes": "IMPORTANT: Use p.DEAL_BAND = '1M+' in WHERE clause for deal size filtering. NEVER use HAVING SUM(OPPTY) >= threshold — DEAL_BAND is the canonical column for deal sizes. Deal review staleness: DATE_LAST_REVIEWED IS NULL or older than 2 months via DATEADD(MONTH, -2, GETDATE()). Deal review columns (DATE_LAST_REVIEWED, DEAL_REVIEWED_BY, DEAL_REVIEW_NOTES) come from vw_TD_EBI_OPP.",
+      "variants": [
+        "Large deals with no recent review in EMEA",
+        "1M+ deals not reviewed in EMEA",
+        "EMEA deals over 1M without deal review",
+        "Show big deals with stale reviews in EMEA",
+        "Deals with no deal review in last 2 months",
+        "1M+ pipeline no review EMEA",
+        "Which large deals haven't been reviewed recently?",
+        "Unreviewed 1M+ deals EMEA",
+        "EMEA deals missing deal review",
+        "Show 1M+ deals where review is overdue"
       ]
     }
   ]

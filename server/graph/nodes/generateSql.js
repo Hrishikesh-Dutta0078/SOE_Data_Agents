@@ -443,7 +443,7 @@ MANDATORY SQL RULES:
 - Use ONLY the tables listed in ALLOWED TABLES and ONLY the columns listed in EXACT COLUMN REFERENCE for each table. Any other table or column name does not exist and will cause execution failure.
 - Use table aliases for every column reference (e.g., p.SEGMENT, not SEGMENT).
 - Use NULLIF() for all division operations.
-- Default to TOP 100 unless the user specifies a different limit.
+- Default to TOP 5000 unless the user specifies a different limit.
 - Do NOT include SQL comments (-- or /* */).
 - Do NOT use SUSER_SNAME(), FLM_LDAP, or any session-based user filtering. Row-level security (REGION_ID scoping to "my reps") is automatically injected by the system AFTER you submit SQL. You do not need to filter by the current user — just write the query for the data requested.
 - Do NOT remove REGION_ID / FLM_ID security filters if they already exist in prior SQL being adapted.
@@ -455,7 +455,7 @@ Return your SQL inside a \`\`\`sql code fence, then explain your approach after 
 
 Example:
 \`\`\`sql
-SELECT TOP 100 ...
+SELECT TOP 5000 ...
 \`\`\`
 REASONING: I chose table X because ... joined with Y on ... filtered by ...
 `;

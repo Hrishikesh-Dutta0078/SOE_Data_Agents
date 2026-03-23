@@ -1,0 +1,139 @@
+<h2>Integration: Updated Pipeline Flow</h2>
+<p class="subtitle">Where the profiler plugs into the existing LangGraph workflow</p>
+
+<!-- Full Pipeline -->
+<div class="mockup">
+  <div class="mockup-header">Updated Dashboard Pipeline (Path B — Fresh Queries)</div>
+  <div class="mockup-body" style="padding: 20px;">
+    <div style="font-family: monospace; font-size: 12px; line-height: 2.2;">
+      <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+        <span style="background: #1e293b; border: 1px solid #334155; border-radius: 4px; padding: 4px 10px; color: #94a3b8;">Classify</span>
+        <span style="color: #475569;">→</span>
+        <span style="background: #1e293b; border: 1px solid #334155; border-radius: 4px; padding: 4px 10px; color: #94a3b8;">Decompose</span>
+        <span style="color: #475569;">→</span>
+        <span style="background: #1e293b; border: 1px solid #334155; border-radius: 4px; padding: 4px 10px; color: #94a3b8;">Research + SQL + Validate + Execute</span>
+        <span style="color: #475569;">→</span>
+        <span style="background: #1e293b; border: 1px solid #334155; border-radius: 4px; padding: 4px 10px; color: #94a3b8;">CheckResults</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 4px;">
+        <span style="color: #475569; padding-left: 20px;">→</span>
+        <span style="background: #065f46; border: 2px solid #34d399; border-radius: 4px; padding: 4px 12px; color: #6ee7b7; font-weight: 600;">NEW: ProfileData</span>
+        <span style="color: #475569;">→</span>
+        <span style="background: #4c1d95; border: 2px solid #8b5cf6; border-radius: 4px; padding: 4px 12px; color: #c4b5fd; font-weight: 600;">ENHANCED: DashboardAgent</span>
+        <span style="color: #475569;">→</span>
+        <span style="background: #1e293b; border: 1px solid #334155; border-radius: 4px; padding: 4px 10px; color: #94a3b8;">SSE Response</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Three Path Comparison -->
+<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 20px;">
+  <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 16px;">
+    <div style="color: #818cf8; font-size: 13px; font-weight: 600; margin-bottom: 10px;">Path A: From History</div>
+    <div style="font-family: monospace; font-size: 11px; color: #94a3b8; line-height: 1.8;">
+      <div>1. Classify → DASHBOARD</div>
+      <div style="color: #34d399;">2. ProfileData (from history rows)</div>
+      <div style="color: #8b5cf6;">3. DashboardAgent (with profiles)</div>
+      <div>4. Response + cached aggregates</div>
+    </div>
+    <div style="margin-top: 8px; font-size: 11px; color: #64748b;">Profiler runs on conversation history execution results</div>
+  </div>
+
+  <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 16px;">
+    <div style="color: #818cf8; font-size: 13px; font-weight: 600; margin-bottom: 10px;">Path B: Fresh Queries</div>
+    <div style="font-family: monospace; font-size: 11px; color: #94a3b8; line-height: 1.8;">
+      <div>1. Classify → Decompose → Execute</div>
+      <div style="color: #34d399;">2. ProfileData (from execution rows)</div>
+      <div style="color: #8b5cf6;">3. DashboardAgent (with profiles)</div>
+      <div>4. Response + cached aggregates</div>
+    </div>
+    <div style="margin-top: 8px; font-size: 11px; color: #64748b;">Profiler runs on fresh query results</div>
+  </div>
+
+  <div style="background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 16px;">
+    <div style="color: #818cf8; font-size: 13px; font-weight: 600; margin-bottom: 10px;">Refinement</div>
+    <div style="font-family: monospace; font-size: 11px; color: #94a3b8; line-height: 1.8;">
+      <div>1. Classify → dashboard_refine</div>
+      <div style="color: #fbbf24;">2. Load cached profiles (no re-compute)</div>
+      <div style="color: #8b5cf6;">3. DashboardAgent (profiles from cache)</div>
+      <div>4. Response (reuse cached aggregates)</div>
+    </div>
+    <div style="margin-top: 8px; font-size: 11px; color: #64748b;">Zero profiling cost — reads from state/cache</div>
+  </div>
+</div>
+
+<!-- Files Changed -->
+<div class="mockup" style="margin-top: 20px;">
+  <div class="mockup-header">Files to Create & Modify</div>
+  <div class="mockup-body" style="padding: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+
+      <div>
+        <div style="color: #34d399; font-size: 12px; font-weight: 600; margin-bottom: 10px;">NEW FILES</div>
+        <div style="font-family: monospace; font-size: 11px; line-height: 2;">
+          <div style="color: #6ee7b7;">+ server/services/dataProfiler.js</div>
+          <div style="padding-left: 16px; color: #64748b;">Core profiling engine</div>
+          <div style="color: #6ee7b7;">+ server/graph/nodes/profileData.js</div>
+          <div style="padding-left: 16px; color: #64748b;">LangGraph node wrapper</div>
+          <div style="color: #6ee7b7;">+ server/services/dashboardCache.js</div>
+          <div style="padding-left: 16px; color: #64748b;">Session-scoped profile + aggregate cache</div>
+          <div style="color: #6ee7b7;">+ server/services/tileDataBuilder.js</div>
+          <div style="padding-left: 16px; color: #64748b;">Pre-computes per-tile render data</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="color: #fbbf24; font-size: 12px; font-weight: 600; margin-bottom: 10px;">MODIFIED FILES</div>
+        <div style="font-family: monospace; font-size: 11px; line-height: 2;">
+          <div style="color: #fcd34d;">~ server/graph/workflow.js</div>
+          <div style="padding-left: 16px; color: #64748b;">Add profileData node + routing</div>
+          <div style="color: #fcd34d;">~ server/graph/state.js</div>
+          <div style="padding-left: 16px; color: #64748b;">Add dataProfiles[], tileData[] fields</div>
+          <div style="color: #fcd34d;">~ server/graph/nodes/dashboardAgent.js</div>
+          <div style="padding-left: 16px; color: #64748b;">Use profiles instead of raw samples</div>
+          <div style="color: #fcd34d;">~ server/prompts/dashboard.js</div>
+          <div style="padding-left: 16px; color: #64748b;">Profile-aware prompt template</div>
+          <div style="color: #fcd34d;">~ server/routes/textToSql.js</div>
+          <div style="padding-left: 16px; color: #64748b;">New tile mode + include tileData in SSE</div>
+          <div style="color: #fcd34d;">~ client/.../DashboardOverlay.jsx</div>
+          <div style="padding-left: 16px; color: #64748b;">Consume pre-computed slicers + tileData</div>
+          <div style="color: #fcd34d;">~ client/.../DashboardGrid.jsx</div>
+          <div style="padding-left: 16px; color: #64748b;">Use server aggregates, remove client agg</div>
+          <div style="color: #fcd34d;">~ client/.../DashboardChart.jsx</div>
+          <div style="padding-left: 16px; color: #64748b;">Simplify: render pre-grouped data</div>
+          <div style="color: #fcd34d;">~ client/.../KpiSparklineCard.jsx</div>
+          <div style="padding-left: 16px; color: #64748b;">Use server-computed value, keep fallback</div>
+          <div style="color: #fcd34d;">~ client/.../ChatPanel.jsx</div>
+          <div style="padding-left: 16px; color: #64748b;">Send profileCacheKey on refinement</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Error Handling -->
+<div class="mockup" style="margin-top: 20px;">
+  <div class="mockup-header">Error Handling & Fallbacks</div>
+  <div class="mockup-body" style="padding: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div style="background: #0f172a; border-left: 3px solid #fbbf24; border-radius: 4px; padding: 12px;">
+        <div style="color: #fbbf24; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Profiler Fails</div>
+        <div style="color: #94a3b8; font-size: 12px;">Dashboard agent falls back to current behavior — raw sample rows in prompt. Graceful degradation, never blocks.</div>
+      </div>
+      <div style="background: #0f172a; border-left: 3px solid #fbbf24; border-radius: 4px; padding: 12px;">
+        <div style="color: #fbbf24; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Cache Miss on Refinement</div>
+        <div style="color: #94a3b8; font-size: 12px;">Re-profile from state.queries[] execution rows. Slight delay but transparent to user.</div>
+      </div>
+      <div style="background: #0f172a; border-left: 3px solid #fbbf24; border-radius: 4px; padding: 12px;">
+        <div style="color: #fbbf24; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Tile Data Not Cached</div>
+        <div style="color: #94a3b8; font-size: 12px;">Client falls back to existing behavior — aggregates in-browser from raw rows. KpiSparklineCard keeps its computeKpiValue().</div>
+      </div>
+      <div style="background: #0f172a; border-left: 3px solid #fbbf24; border-radius: 4px; padding: 12px;">
+        <div style="color: #fbbf24; font-size: 12px; font-weight: 600; margin-bottom: 6px;">Large Dataset (>10K rows)</div>
+        <div style="color: #94a3b8; font-size: 12px;">Profiler uses statistical sampling (1K rows) for shape detection. Aggregates computed via SQL (COUNT/SUM/AVG pushed to DB).</div>
+      </div>
+    </div>
+  </div>
+</div>

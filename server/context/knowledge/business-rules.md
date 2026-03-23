@@ -136,7 +136,8 @@ The current user is a First Level Manager (FLM):
 15. When joining vw_TF_EBI_P2S to vw_TF_EBI_QUOTA directly (not via CTEs), match on REGION_ID, OPG_ID, DEAL_TYPE_ID, PAY_MEASURE_ID, SEGMENT_ID, and SNAPSHOT_DATE_ID.
 16. When querying quota data, always include PAY_MEASURE_ID = 0 and exclude dummy territories.
 17. For pipe walk queries, group by WALK_CATEGORY and sum GROSSASV.
-18. Pipeline creation uses QTR_BKT_IND from vw_EBI_CALDATE: 0 = current quarter, 1-4 = future quarters.
+18. **Deal size filtering**: When users ask about deal sizes (e.g., "1M+ deals", "large deals", "deals over 500K"), **always** use `p.DEAL_BAND` from vw_TF_EBI_P2S in the WHERE clause. Valid values: '1M+', '0.5M+', '0.25M+', '0.1M+', '<0.1M'. **NEVER use `HAVING SUM(OPPTY) >= threshold` or any OPPTY-based threshold to categorize deal size.** DEAL_BAND is pre-computed and is the only correct way to filter by deal size. "Deal size", "deal band", "large deals", "big deals" all mean DEAL_BAND.
+19. **Always use QTR_BKT_IND for relative quarter filtering** (CQ, PQ, NQ, etc.) instead of hardcoding FISCAL_YR_AND_QTR_DESC. Join vw_EBI_CALDATE and filter: QTR_BKT_IND = -1 (previous quarter), 0 (current quarter), 1 (next quarter), 2-4 (future quarters). Only use FISCAL_YR_AND_QTR_DESC when the user explicitly names a specific quarter (e.g., "2026-Q2"). Use FISCAL_YR_AND_QTR_DESC as a SELECT display column, not as a WHERE filter for relative periods.
 
 ## Signal Definitions
 

@@ -1,0 +1,187 @@
+<h2>Streaming Reasoning UI — With Step Progress</h2>
+<p class="subtitle">Each approach now includes a step-synced progress loader so users know how far along the pipeline is. Click your favorite.</p>
+
+<div class="cards">
+
+  <!-- Approach A: Inline Thinking Bubble + progress -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0;overflow:hidden;background:#FAFAF9;">
+      <div style="padding:20px;font-family:system-ui,sans-serif;">
+        <div style="background:linear-gradient(135deg,#EEF2FF,#E8E0FF);border-radius:16px 16px 16px 4px;padding:16px 20px;max-width:440px;box-shadow:0 1px 6px rgba(100,80,160,0.08);">
+
+          <!-- Step progress bar -->
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;">
+            <div style="flex:1;height:3px;border-radius:2px;background:rgba(99,102,241,0.1);overflow:hidden;">
+              <div style="width:55%;height:100%;border-radius:2px;background:linear-gradient(90deg,#6366F1,#818CF8);transition:width 0.6s ease;"></div>
+            </div>
+            <span style="font-size:10px;color:#6366F1;font-weight:600;white-space:nowrap;">3 of 6</span>
+          </div>
+
+          <!-- Step dots row -->
+          <div style="display:flex;align-items:center;gap:0;margin-bottom:12px;padding:0 2px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#10B981;"></div>
+              <span style="font-size:7px;color:#10B981;font-weight:600;">Classify</span>
+            </div>
+            <div style="flex:1;height:1.5px;background:#10B981;margin:0 3px;margin-bottom:10px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#10B981;"></div>
+              <span style="font-size:7px;color:#10B981;font-weight:600;">Decompose</span>
+            </div>
+            <div style="flex:1;height:1.5px;margin:0 3px;margin-bottom:10px;background:linear-gradient(90deg,#10B981,#6366F1);"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#6366F1;animation:pulse 1.5s ease infinite;box-shadow:0 0 0 3px rgba(99,102,241,0.15);"></div>
+              <span style="font-size:7px;color:#6366F1;font-weight:600;">Research</span>
+            </div>
+            <div style="flex:1;height:1.5px;background:rgba(200,195,220,0.25);margin:0 3px;margin-bottom:10px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:rgba(200,195,220,0.3);"></div>
+              <span style="font-size:7px;color:#A8A29E;">SQL Write</span>
+            </div>
+            <div style="flex:1;height:1.5px;background:rgba(200,195,220,0.25);margin:0 3px;margin-bottom:10px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:rgba(200,195,220,0.3);"></div>
+              <span style="font-size:7px;color:#A8A29E;">Validate</span>
+            </div>
+            <div style="flex:1;height:1.5px;background:rgba(200,195,220,0.25);margin:0 3px;margin-bottom:10px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+              <div style="width:7px;height:7px;border-radius:50%;background:rgba(200,195,220,0.3);"></div>
+              <span style="font-size:7px;color:#A8A29E;">Execute</span>
+            </div>
+          </div>
+
+          <!-- Thinking header -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#6366F1;animation:pulse 1.5s ease infinite;"></div>
+            <span style="font-size:12px;font-weight:600;color:#6366F1;">Thinking</span>
+            <span style="font-size:11px;color:#A8A29E;font-variant-numeric:tabular-nums;">4.6s</span>
+            <svg style="margin-left:auto;width:14px;height:14px;color:#A8A29E;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+          </div>
+
+          <!-- Reasoning stream -->
+          <div style="font-size:13px;color:#57534E;line-height:1.65;border-left:2px solid rgba(99,102,241,0.2);padding-left:12px;margin-left:3px;">
+            <div style="opacity:0.45;margin-bottom:4px;">Classified as SQL_QUERY</div>
+            <div style="opacity:0.55;margin-bottom:4px;">Decomposed into 2 sub-queries</div>
+            <div style="opacity:0.75;margin-bottom:4px;">Researching schema for revenue and customer segments...</div>
+            <div style="opacity:1;">Found fact_sales, dim_customer, dim_product — checking join paths<span style="display:inline-block;width:2px;height:14px;background:#6366F1;margin-left:2px;vertical-align:text-bottom;animation:blink 0.8s steps(2) infinite;"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. Inline Bubble + Step Track</h3>
+      <p>Chat bubble with a progress bar and labeled step dots at the top. Collapsible reasoning stream below. Users see both <em>where</em> in the pipeline and <em>what</em> it's thinking.</p>
+      <div style="margin-top:8px;">
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#EEF2FF;color:#6366F1;font-weight:500;margin-right:4px;">Familiar</span>
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#FEF3C7;color:#D97706;font-weight:500;">Detailed</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approach B: Phase Pill + thin progress + stream -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0;overflow:hidden;background:#FAFAF9;">
+      <div style="padding:20px;font-family:system-ui,sans-serif;">
+        <div style="background:rgba(255,255,255,0.7);border-radius:16px;border:1px solid rgba(231,229,228,0.5);max-width:440px;overflow:hidden;box-shadow:0 2px 12px rgba(100,80,160,0.04);">
+
+          <!-- Segmented progress bar at very top -->
+          <div style="display:flex;height:3px;gap:1px;">
+            <div style="flex:1;background:#10B981;border-radius:2px 0 0 0;"></div>
+            <div style="flex:1;background:#10B981;"></div>
+            <div style="flex:1;background:#6366F1;animation:barPulse 1.5s ease infinite;"></div>
+            <div style="flex:1;background:rgba(200,195,220,0.2);"></div>
+            <div style="flex:1;background:rgba(200,195,220,0.2);"></div>
+            <div style="flex:1;background:rgba(200,195,220,0.2);border-radius:0 2px 0 0;"></div>
+          </div>
+
+          <div style="padding:14px 18px;">
+            <!-- Phase pill row -->
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.12);">
+                <div style="width:5px;height:5px;border-radius:50%;background:#6366F1;animation:pulse 1.5s ease infinite;"></div>
+                <span style="font-size:11px;font-weight:600;color:#6366F1;">Research</span>
+              </div>
+              <span style="font-size:10px;color:#A8A29E;">Step 3 of 6</span>
+              <span style="font-size:11px;color:#A8A29E;margin-left:auto;font-variant-numeric:tabular-nums;">4.6s</span>
+            </div>
+
+            <!-- Reasoning stream -->
+            <div style="font-size:13px;color:#57534E;line-height:1.7;">
+              <div style="color:#A8A29E;font-size:11px;margin-bottom:6px;">Looking up schema for revenue and customer data...</div>
+              <div>Found <span style="color:#6366F1;font-weight:500;">fact_sales</span>, <span style="color:#6366F1;font-weight:500;">dim_customer</span>, <span style="color:#6366F1;font-weight:500;">dim_product</span> — checking join paths and column types<span style="display:inline-block;width:2px;height:13px;background:#6366F1;margin-left:2px;vertical-align:text-bottom;animation:blink 0.8s steps(2) infinite;"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Segmented Bar + Phase Pill</h3>
+      <p>Thin segmented progress bar at the top — each segment = one pipeline step, color-fills as steps complete. Current phase as a pill. Reasoning streams below. Compact and scannable.</p>
+      <div style="margin-top:8px;">
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#EEF2FF;color:#6366F1;font-weight:500;margin-right:4px;">Compact</span>
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#ECFDF5;color:#059669;font-weight:500;">Scannable</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approach C: Orb + continuous stream + arc progress -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0;overflow:hidden;background:#FAFAF9;">
+      <div style="padding:20px;font-family:system-ui,sans-serif;">
+        <div style="max-width:440px;">
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;background:rgba(255,255,255,0.55);border-radius:16px 16px 16px 4px;border:1px solid rgba(255,255,255,0.5);box-shadow:0 2px 12px rgba(100,80,160,0.04);">
+
+            <!-- Circular progress orb -->
+            <div style="position:relative;width:36px;height:36px;flex-shrink:0;">
+              <svg width="36" height="36" viewBox="0 0 36 36" style="transform:rotate(-90deg);">
+                <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(200,195,220,0.2)" stroke-width="2.5"/>
+                <circle cx="18" cy="18" r="15" fill="none" stroke="#6366F1" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="94.2" stroke-dashoffset="42" style="transition:stroke-dashoffset 0.6s ease;"/>
+              </svg>
+              <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+                <div style="width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#818CF8,#6366F1);animation:pulse 1.5s ease infinite;"></div>
+              </div>
+            </div>
+
+            <!-- Text area -->
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                <span style="font-size:11px;font-weight:600;color:#6366F1;">Research</span>
+                <span style="font-size:10px;color:#A8A29E;">3/6</span>
+                <span style="font-size:11px;color:#A8A29E;margin-left:auto;font-variant-numeric:tabular-nums;">4.6s</span>
+              </div>
+              <div style="font-size:13px;color:#57534E;line-height:1.65;">
+                Researching schema for revenue by customer segment... found <span style="color:#6366F1;font-weight:500;">fact_sales</span>, <span style="color:#6366F1;font-weight:500;">dim_customer</span>, <span style="color:#6366F1;font-weight:500;">dim_product</span> — checking join paths<span style="display:inline-block;width:2px;height:13px;background:#6366F1;margin-left:2px;vertical-align:text-bottom;animation:blink 0.8s steps(2) infinite;"></span>
+              </div>
+
+              <!-- Micro step indicators -->
+              <div style="display:flex;align-items:center;gap:4px;margin-top:8px;">
+                <div style="width:16px;height:2px;border-radius:1px;background:#10B981;"></div>
+                <div style="width:16px;height:2px;border-radius:1px;background:#10B981;"></div>
+                <div style="width:16px;height:2px;border-radius:1px;background:#6366F1;animation:barPulse 1.5s ease infinite;"></div>
+                <div style="width:16px;height:2px;border-radius:1px;background:rgba(200,195,220,0.25);"></div>
+                <div style="width:16px;height:2px;border-radius:1px;background:rgba(200,195,220,0.25);"></div>
+                <div style="width:16px;height:2px;border-radius:1px;background:rgba(200,195,220,0.25);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. Ring Progress + Stream</h3>
+      <p>Circular progress ring shows % complete. Streaming reasoning text with entity highlights. Tiny step bars at the bottom. Ultra-clean — everything in one line, no nesting.</p>
+      <div style="margin-top:8px;">
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#FEF2F2;color:#DC2626;font-weight:500;margin-right:4px;">Ultra-minimal</span>
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#EEF2FF;color:#6366F1;font-weight:500;">Elegant</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  @keyframes barPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  @keyframes ripple { 0%{transform:scale(1);opacity:0.5} 100%{transform:scale(2.2);opacity:0} }
+</style>

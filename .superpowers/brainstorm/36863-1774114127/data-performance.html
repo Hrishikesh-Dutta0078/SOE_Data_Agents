@@ -1,0 +1,136 @@
+<h2>Data Handling & Performance</h2>
+<p class="subtitle">Server-side aggregation, caching, and optimized data flow</p>
+
+<!-- Server-Side Aggregation -->
+<div class="mockup">
+  <div class="mockup-header">Server-Side Aggregation Pipeline</div>
+  <div class="mockup-body" style="padding: 20px;">
+    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px;">Currently the client aggregates all data in-browser. With the profiler, aggregates are pre-computed server-side and sent alongside the spec.</p>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div style="background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 16px;">
+        <div style="color: #f87171; font-size: 12px; font-weight: 600; margin-bottom: 10px;">BEFORE: Client Does Everything</div>
+        <div style="font-family: monospace; font-size: 11px; color: #94a3b8; line-height: 1.8;">
+          <div>Server → sends 5,000 raw rows → Client</div>
+          <div style="padding-left: 16px; color: #f87171;">├ KPI: sum(Amount) in JS</div>
+          <div style="padding-left: 16px; color: #f87171;">├ Chart: groupBy + aggregate in JS</div>
+          <div style="padding-left: 16px; color: #f87171;">├ Sparkline: filter + sort in JS</div>
+          <div style="padding-left: 16px; color: #f87171;">└ Slicer filter: .filter() on 5K rows</div>
+          <div style="margin-top: 4px; color: #f87171;">⚠ ~200-800ms render lag on large sets</div>
+        </div>
+      </div>
+      <div style="background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 16px;">
+        <div style="color: #34d399; font-size: 12px; font-weight: 600; margin-bottom: 10px;">AFTER: Server Pre-Computes</div>
+        <div style="font-family: monospace; font-size: 11px; color: #94a3b8; line-height: 1.8;">
+          <div>Server → sends tileData[] → Client</div>
+          <div style="padding-left: 16px; color: #34d399;">├ KPI: { value: 12450000, formatted: "$12.5M" }</div>
+          <div style="padding-left: 16px; color: #34d399;">├ Chart: 15 pre-grouped rows</div>
+          <div style="padding-left: 16px; color: #34d399;">├ Sparkline: 12 monthly points</div>
+          <div style="padding-left: 16px; color: #34d399;">└ Slicer values: pre-fetched</div>
+          <div style="margin-top: 4px; color: #34d399;">✓ Instant render, minimal payload</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Caching Strategy -->
+<div class="mockup" style="margin-top: 20px;">
+  <div class="mockup-header">Profile & Aggregate Cache</div>
+  <div class="mockup-body" style="padding: 20px;">
+    <div style="display: flex; gap: 12px; align-items: stretch;">
+
+      <div style="flex: 1; background: #0f172a; border-radius: 6px; padding: 14px; border-left: 3px solid #818cf8;">
+        <div style="color: #818cf8; font-size: 12px; font-weight: 600; margin-bottom: 8px;">Layer 1: LangGraph State</div>
+        <ul style="color: #cbd5e1; font-size: 12px; padding-left: 14px; margin: 0; line-height: 1.7;">
+          <li>dataProfiles[] stored in workflow state</li>
+          <li>Survives across nodes within a run</li>
+          <li>Refinements read from state directly</li>
+          <li>No re-profiling, no re-sending rows</li>
+        </ul>
+      </div>
+
+      <div style="flex: 1; background: #0f172a; border-radius: 6px; padding: 14px; border-left: 3px solid #34d399;">
+        <div style="color: #34d399; font-size: 12px; font-weight: 600; margin-bottom: 8px;">Layer 2: Session Cache</div>
+        <ul style="color: #cbd5e1; font-size: 12px; padding-left: 14px; margin: 0; line-height: 1.7;">
+          <li>In-memory Map keyed by SQL hash</li>
+          <li>Stores: profile + pre-computed aggregates</li>
+          <li>TTL: session lifetime (cleared on disconnect)</li>
+          <li>Slicer values served from cache instantly</li>
+        </ul>
+      </div>
+
+      <div style="flex: 1; background: #0f172a; border-radius: 6px; padding: 14px; border-left: 3px solid #fbbf24;">
+        <div style="color: #fbbf24; font-size: 12px; font-weight: 600; margin-bottom: 8px;">Layer 3: Tile Data API</div>
+        <ul style="color: #cbd5e1; font-size: 12px; padding-left: 14px; margin: 0; line-height: 1.7;">
+          <li>New: <code>/dashboard-data?mode=tile</code></li>
+          <li>Returns pre-aggregated data per tile</li>
+          <li>Reads from session cache first</li>
+          <li>Falls back to SQL re-execution if evicted</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Refinement Optimization -->
+<div class="mockup" style="margin-top: 20px;">
+  <div class="mockup-header">Optimized Refinement Flow</div>
+  <div class="mockup-body" style="padding: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div style="background: #0f172a; border-radius: 6px; padding: 14px;">
+        <div style="color: #f87171; font-size: 12px; font-weight: 600; margin-bottom: 8px;">BEFORE</div>
+        <div style="font-family: monospace; font-size: 11px; color: #94a3b8; line-height: 1.8;">
+          <div>Client sends:</div>
+          <div style="padding-left: 12px;">previousDashboardSpec (full JSON)</div>
+          <div style="padding-left: 12px;">dashboardDataSources[] (8 rows each)</div>
+          <div style="padding-left: 12px;">refinementText</div>
+          <div style="margin-top: 6px; color: #f87171;">~15-30KB per refinement request</div>
+        </div>
+      </div>
+      <div style="background: #0f172a; border-radius: 6px; padding: 14px;">
+        <div style="color: #34d399; font-size: 12px; font-weight: 600; margin-bottom: 8px;">AFTER</div>
+        <div style="font-family: monospace; font-size: 11px; color: #94a3b8; line-height: 1.8;">
+          <div>Client sends:</div>
+          <div style="padding-left: 12px;">previousDashboardSpec (full JSON)</div>
+          <div style="padding-left: 12px; color: #34d399;">profileCacheKey (hash reference)</div>
+          <div style="padding-left: 12px;">refinementText</div>
+          <div style="margin-top: 6px; color: #34d399;">~3-5KB per refinement request</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 12px; padding: 10px; background: #1e293b; border-radius: 6px; font-size: 12px; color: #94a3b8;">
+      Server looks up cached profiles by key → feeds them to LLM → no redundant data transfer, no re-profiling
+    </div>
+  </div>
+</div>
+
+<!-- Slicer Loading -->
+<div class="mockup" style="margin-top: 20px;">
+  <div class="mockup-header">Slicer Loading UX Fix</div>
+  <div class="mockup-body" style="padding: 20px;">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+      <div style="background: #0f172a; border-radius: 6px; padding: 14px;">
+        <div style="color: #f87171; font-size: 12px; font-weight: 600; margin-bottom: 8px;">BEFORE: Fetch on Mount</div>
+        <div style="font-family: monospace; font-size: 11px; line-height: 1.8;">
+          <div style="color: #94a3b8;">1. Dashboard opens</div>
+          <div style="color: #f87171;">2. Empty slicer dropdowns shown</div>
+          <div style="color: #94a3b8;">3. N separate DISTINCT queries fire</div>
+          <div style="color: #94a3b8;">4. Values trickle in (500-2000ms)</div>
+          <div style="color: #f87171;">5. Dropdowns populate with flash</div>
+        </div>
+      </div>
+      <div style="background: #0f172a; border-radius: 6px; padding: 14px;">
+        <div style="color: #34d399; font-size: 12px; font-weight: 600; margin-bottom: 8px;">AFTER: Pre-Computed in Profile</div>
+        <div style="font-family: monospace; font-size: 11px; line-height: 1.8;">
+          <div style="color: #94a3b8;">1. Profiler computes distinct values</div>
+          <div style="color: #94a3b8;">2. Values included in dashboard response</div>
+          <div style="color: #34d399;">3. Dashboard opens with slicers ready</div>
+          <div style="color: #34d399;">4. Zero additional queries needed</div>
+          <div style="color: #34d399;">5. Instant, no flash</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -550,6 +550,7 @@ router.post('/analyze-stream', async (req, res) => {
     isFollowUp,
     previousDashboardSpec,
     dashboardDataSources,
+    profileCacheKey,
     enabledTools,
     nodeModelOverrides,
   } = req.body;
@@ -572,6 +573,14 @@ router.post('/analyze-stream', async (req, res) => {
 
   const sessionId = req.headers['x-session-id'] || `session-${Date.now()}`;
 
+  // For dashboard refinement with profileCacheKey, restore cached profiles
+  // so the dashboardAgent can validate sourceIndex and columns.
+  let restoredProfiles = null;
+  if (previousDashboardSpec && profileCacheKey && !dashboardDataSources?.length) {
+    const dashboardCache = require('../services/dashboardCache');
+    restoredProfiles = dashboardCache.getAllProfilesForSession(sessionId);
+  }
+
   const inputs = {
     question: question.trim(),
     conversationHistory: conversationHistory || [],
@@ -586,6 +595,7 @@ router.post('/analyze-stream', async (req, res) => {
     previousDashboardSpec: previousDashboardSpec || null,
     dashboardRefinement: previousDashboardSpec ? question.trim() : '',
     dashboardDataSources: dashboardDataSources || [],
+    ...(restoredProfiles?.length > 0 ? { dataProfiles: restoredProfiles } : {}),
     enabledTools: normalizeEnabledTools(enabledTools),
     nodeModelOverrides: normalizeNodeModelOverrides(nodeModelOverrides),
   };

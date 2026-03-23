@@ -17,7 +17,7 @@ MANDATORY SQL RULES:
 - Use table aliases for every column reference (e.g., p.SEGMENT, not SEGMENT).
 - Sales stage: When filtering by stage name (S3, S4, S5, etc.), join vw_ebi_sales_stage and use s.SALES_STAGE = 'S4'. Never use SALES_STAGE_ID assuming name equals ID — the mapping is non-intuitive (see business-context Sales Stage Source of Truth).
 - Use NULLIF() for all division operations.
-- Default to TOP 1000 unless the user specifies a different limit.
+- Default to TOP 5000 unless the user specifies a different limit.
 - Do NOT include SQL comments (-- or /* */).
 - Always verify filter values exist in the database using query_distinct_values before using them in WHERE clauses.
 

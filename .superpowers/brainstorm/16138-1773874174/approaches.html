@@ -1,0 +1,179 @@
+<h2>Full Redesign: 3 Layout Approaches</h2>
+<p class="subtitle">Same glassmorphism aesthetic, refined — but different ways to organize information. Executive-first: insights lead, details on demand.</p>
+
+<div class="cards">
+
+  <!-- Approach A: Narrative Flow -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 20px; background: linear-gradient(145deg, #E8D5F5 0%, #C8C5F5 50%, #D0E5F8 100%);">
+      <div style="font-family: system-ui; font-size: 11px; color: #6B6B88;">
+        <!-- Mini wireframe -->
+        <div style="display: flex; gap: 12px; height: 220px;">
+          <!-- Sidebar -->
+          <div style="width: 60px; background: rgba(255,255,255,0.4); border-radius: 8px; padding: 8px;">
+            <div style="width: 100%; height: 8px; background: rgba(99,102,241,0.3); border-radius: 4px; margin-bottom: 6px;"></div>
+            <div style="width: 100%; height: 5px; background: rgba(0,0,0,0.08); border-radius: 3px; margin-bottom: 4px;"></div>
+            <div style="width: 80%; height: 5px; background: rgba(0,0,0,0.08); border-radius: 3px; margin-bottom: 4px;"></div>
+            <div style="width: 90%; height: 5px; background: rgba(0,0,0,0.08); border-radius: 3px;"></div>
+          </div>
+          <!-- Main chat -->
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+            <!-- User bubble -->
+            <div style="align-self: flex-end; background: linear-gradient(135deg, #7C6BF5, #6366F1); border-radius: 12px 12px 4px 12px; padding: 6px 10px; color: white; font-size: 9px; max-width: 70%;">Show me Q2 pipeline</div>
+            <!-- Response: Insight narrative first -->
+            <div style="background: rgba(255,255,255,0.6); border-radius: 12px; padding: 10px; flex: 1;">
+              <div style="font-size: 8px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px;">Key Insight</div>
+              <div style="width: 100%; height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px; margin-bottom: 3px;"></div>
+              <div style="width: 90%; height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px; margin-bottom: 3px;"></div>
+              <div style="width: 75%; height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px; margin-bottom: 8px;"></div>
+              <!-- Inline mini chart -->
+              <div style="display: flex; align-items: flex-end; gap: 3px; height: 30px; margin-bottom: 8px;">
+                <div style="width: 14%; height: 60%; background: rgba(99,102,241,0.3); border-radius: 2px;"></div>
+                <div style="width: 14%; height: 80%; background: rgba(99,102,241,0.4); border-radius: 2px;"></div>
+                <div style="width: 14%; height: 45%; background: rgba(99,102,241,0.3); border-radius: 2px;"></div>
+                <div style="width: 14%; height: 100%; background: rgba(99,102,241,0.6); border-radius: 2px;"></div>
+                <div style="width: 14%; height: 70%; background: rgba(99,102,241,0.4); border-radius: 2px;"></div>
+              </div>
+              <!-- Expandable footer -->
+              <div style="border-top: 1px solid rgba(0,0,0,0.06); padding-top: 5px; display: flex; gap: 8px; font-size: 7px; color: #8B8BA0;">
+                <span style="background: rgba(99,102,241,0.08); padding: 2px 6px; border-radius: 4px;">View table</span>
+                <span style="background: rgba(99,102,241,0.08); padding: 2px 6px; border-radius: 4px;">SQL</span>
+                <span style="background: rgba(99,102,241,0.08); padding: 2px 6px; border-radius: 4px;">17 rows</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: Narrative Flow</h3>
+      <p><strong>Insight text leads the response</strong>, followed by an inline sparkline/mini-chart. Table, SQL, entities, and classification are collapsed into small pills at the bottom — expandable on click. No tabs. The response reads like a brief executive report.</p>
+      <div class="pros-cons" style="margin-top: 12px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Most executive-friendly — answer first, details later</li><li>Minimal scrolling for the key info</li><li>Clean, report-like feel</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Charts/tables require a click to expand</li><li>Less at-a-glance data for analysts</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approach B: Split Pane -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 20px; background: linear-gradient(145deg, #E8D5F5 0%, #C8C5F5 50%, #D0E5F8 100%);">
+      <div style="font-family: system-ui; font-size: 11px; color: #6B6B88;">
+        <div style="display: flex; gap: 12px; height: 220px;">
+          <!-- Sidebar -->
+          <div style="width: 60px; background: rgba(255,255,255,0.4); border-radius: 8px; padding: 8px;">
+            <div style="width: 100%; height: 8px; background: rgba(99,102,241,0.3); border-radius: 4px; margin-bottom: 6px;"></div>
+            <div style="width: 100%; height: 5px; background: rgba(0,0,0,0.08); border-radius: 3px; margin-bottom: 4px;"></div>
+            <div style="width: 80%; height: 5px; background: rgba(0,0,0,0.08); border-radius: 3px;"></div>
+          </div>
+          <!-- Left: Chat -->
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+            <div style="align-self: flex-end; background: linear-gradient(135deg, #7C6BF5, #6366F1); border-radius: 12px 12px 4px 12px; padding: 6px 10px; color: white; font-size: 9px; max-width: 85%;">Show me Q2 pipeline</div>
+            <div style="background: rgba(255,255,255,0.6); border-radius: 12px; padding: 10px; flex: 1;">
+              <div style="font-size: 8px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px;">Key Insight</div>
+              <div style="width: 100%; height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px; margin-bottom: 3px;"></div>
+              <div style="width: 85%; height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px; margin-bottom: 3px;"></div>
+              <div style="width: 95%; height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px; margin-bottom: 3px;"></div>
+              <div style="width: 70%; height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px;"></div>
+            </div>
+          </div>
+          <!-- Right: Detail panel -->
+          <div style="width: 120px; background: rgba(255,255,255,0.5); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 7px; font-weight: 700; color: #1a1a2e;">Results</div>
+            <!-- Mini chart -->
+            <div style="display: flex; align-items: flex-end; gap: 2px; height: 35px;">
+              <div style="width: 18%; height: 50%; background: rgba(99,102,241,0.4); border-radius: 2px;"></div>
+              <div style="width: 18%; height: 75%; background: rgba(99,102,241,0.5); border-radius: 2px;"></div>
+              <div style="width: 18%; height: 40%; background: rgba(99,102,241,0.3); border-radius: 2px;"></div>
+              <div style="width: 18%; height: 90%; background: rgba(99,102,241,0.6); border-radius: 2px;"></div>
+            </div>
+            <!-- Mini table -->
+            <div style="font-size: 6px; color: #6B6B88;">
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.06); padding: 2px 0; font-weight: 600;">
+                <span>Rep</span><span>Pipe</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; padding: 2px 0;"><span>Backman</span><span>5.3x</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 2px 0;"><span>Wolfe</span><span>3.8x</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 2px 0;"><span>Speicher</span><span>3.3x</span></div>
+            </div>
+            <div style="font-size: 7px; color: #8B8BA0; margin-top: auto;">
+              <span style="background: rgba(99,102,241,0.08); padding: 2px 5px; border-radius: 3px;">SQL</span>
+              <span style="background: rgba(16,185,129,0.08); padding: 2px 5px; border-radius: 3px; color: #059669;">17 rows</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B: Split Pane</h3>
+      <p><strong>Chat stays narrow on the left, a detail panel opens on the right</strong> when results arrive. The insight narrative lives in the chat; chart + table + SQL live in the side panel. Clicking a different message switches the panel content.</p>
+      <div class="pros-cons" style="margin-top: 12px;">
+        <div class="pros"><h4>Pros</h4><ul><li>See insights AND chart/table simultaneously</li><li>Chat history stays readable, not bloated by results</li><li>Easy to compare across questions</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>More complex layout — narrower chat on smaller screens</li><li>Bigger departure from the current design</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approach C: Accordion Cards -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 20px; background: linear-gradient(145deg, #E8D5F5 0%, #C8C5F5 50%, #D0E5F8 100%);">
+      <div style="font-family: system-ui; font-size: 11px; color: #6B6B88;">
+        <div style="display: flex; gap: 12px; height: 220px;">
+          <!-- Sidebar -->
+          <div style="width: 60px; background: rgba(255,255,255,0.4); border-radius: 8px; padding: 8px;">
+            <div style="width: 100%; height: 8px; background: rgba(99,102,241,0.3); border-radius: 4px; margin-bottom: 6px;"></div>
+            <div style="width: 100%; height: 5px; background: rgba(0,0,0,0.08); border-radius: 3px; margin-bottom: 4px;"></div>
+            <div style="width: 80%; height: 5px; background: rgba(0,0,0,0.08); border-radius: 3px;"></div>
+          </div>
+          <!-- Main -->
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+            <div style="align-self: flex-end; background: linear-gradient(135deg, #7C6BF5, #6366F1); border-radius: 12px 12px 4px 12px; padding: 6px 10px; color: white; font-size: 9px; max-width: 70%;">Show me Q2 pipeline</div>
+            <!-- Compact card -->
+            <div style="background: rgba(255,255,255,0.6); border-radius: 12px; padding: 10px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <div style="font-size: 8px; font-weight: 700; color: #1a1a2e;">Pipeline Coverage Analysis</div>
+                <div style="display: flex; gap: 4px;">
+                  <span style="font-size: 6px; background: rgba(16,185,129,0.1); color: #059669; padding: 1px 5px; border-radius: 3px;">High confidence</span>
+                  <span style="font-size: 6px; background: rgba(99,102,241,0.08); color: #6366F1; padding: 1px 5px; border-radius: 3px;">17 rows</span>
+                </div>
+              </div>
+              <div style="width: 100%; height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px; margin-bottom: 3px;"></div>
+              <div style="width: 80%; height: 4px; background: rgba(0,0,0,0.06); border-radius: 2px; margin-bottom: 8px;"></div>
+              <!-- Accordion sections -->
+              <div style="border-top: 1px solid rgba(0,0,0,0.06); padding-top: 6px;">
+                <div style="display: flex; align-items: center; gap: 4px; font-size: 7px; font-weight: 600; color: #6366F1; cursor: pointer; margin-bottom: 4px;">
+                  <span>▼</span> Chart
+                </div>
+                <div style="display: flex; align-items: flex-end; gap: 3px; height: 30px; margin-bottom: 6px;">
+                  <div style="width: 14%; height: 60%; background: rgba(99,102,241,0.3); border-radius: 2px;"></div>
+                  <div style="width: 14%; height: 80%; background: rgba(99,102,241,0.4); border-radius: 2px;"></div>
+                  <div style="width: 14%; height: 45%; background: rgba(99,102,241,0.3); border-radius: 2px;"></div>
+                  <div style="width: 14%; height: 100%; background: rgba(99,102,241,0.6); border-radius: 2px;"></div>
+                </div>
+              </div>
+              <div style="border-top: 1px solid rgba(0,0,0,0.06); padding-top: 4px;">
+                <div style="display: flex; align-items: center; gap: 4px; font-size: 7px; font-weight: 600; color: #8B8BA0; cursor: pointer;">
+                  <span>▶</span> Table &nbsp;&nbsp; <span>▶</span> SQL &nbsp;&nbsp; <span>▶</span> Entities
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C: Accordion Cards</h3>
+      <p><strong>Each response is a compact card with a headline + insight summary</strong>. Chart, table, SQL, and entities are accordion sections that expand inline. Only one section open at a time. Badges (confidence, row count) sit in the card header, not as separate rows.</p>
+      <div class="pros-cons" style="margin-top: 12px;">
+        <div class="pros"><h4>Pros</h4><ul><li>Familiar single-column chat feel</li><li>Compact by default, details a click away</li><li>Easiest to implement — closest to current structure</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Still vertical stacking — just more compact</li><li>Can't see chart + table simultaneously</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top: 24px; padding: 16px; background: rgba(99,102,241,0.06); border-radius: 12px; border: 1px solid rgba(99,102,241,0.12);">
+  <h3 style="margin: 0 0 8px 0; font-size: 14px;">My Recommendation: Approach A (Narrative Flow)</h3>
+  <p style="margin: 0; font-size: 13px; color: #6B6B88;">Best match for your executive-first goal. Insights lead, everything else is progressive disclosure. Keeps the single-column chat simplicity while dramatically reducing visual clutter. We can borrow the inline mini-chart from B's side panel idea without the layout complexity.</p>
+</div>

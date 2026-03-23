@@ -1,0 +1,127 @@
+<h2>Streaming Reasoning UI — Design Approaches</h2>
+<p class="subtitle">Which direction feels right for showing AI thinking in real-time?</p>
+
+<div class="cards">
+
+  <!-- Approach A: Claude-style collapsible thinking -->
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0;overflow:hidden;background:#FAFAF9;">
+      <div style="padding:16px 20px;font-family:system-ui,sans-serif;">
+        <!-- Simulated chat bubble -->
+        <div style="background:linear-gradient(135deg,#EEF2FF,#E8E0FF);border-radius:16px 16px 16px 4px;padding:16px 20px;max-width:420px;box-shadow:0 1px 6px rgba(100,80,160,0.08);">
+          <!-- Thinking header -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;cursor:pointer;">
+            <div style="width:6px;height:6px;border-radius:50%;background:#6366F1;animation:pulse 1.5s ease infinite;"></div>
+            <span style="font-size:12px;font-weight:600;color:#6366F1;">Thinking</span>
+            <span style="font-size:11px;color:#A8A29E;">4.6s</span>
+            <svg style="margin-left:auto;width:14px;height:14px;color:#A8A29E;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 9l-7 7-7-7"/></svg>
+          </div>
+          <!-- Streaming reasoning text -->
+          <div style="font-size:13px;color:#57534E;line-height:1.65;border-left:2px solid rgba(99,102,241,0.2);padding-left:12px;margin-left:3px;">
+            <div style="opacity:0.5;margin-bottom:4px;">Classifying question as SQL_QUERY...</div>
+            <div style="opacity:0.6;margin-bottom:4px;">Researching schema — looking up tables related to revenue and customer segments...</div>
+            <div style="opacity:0.8;margin-bottom:4px;">Found 3 relevant tables: dim_customer, fact_sales, dim_product</div>
+            <div style="opacity:1;">Writing SQL with JOIN across fact_sales and dim_customer on customer_key<span style="display:inline-block;width:2px;height:14px;background:#6366F1;margin-left:2px;vertical-align:text-bottom;animation:blink 0.8s steps(2) infinite;"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. Inline Thinking Bubble</h3>
+      <p>Reasoning streams directly inside the chat bubble with a subtle left border. Collapsible header with elapsed time. Text fades in line by line. Very ChatGPT/Claude-like.</p>
+      <div style="margin-top:8px;">
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#EEF2FF;color:#6366F1;font-weight:500;margin-right:4px;">Minimal</span>
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#ECFDF5;color:#059669;font-weight:500;">Familiar UX</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approach B: Typewriter with phase indicator -->
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0;overflow:hidden;background:#FAFAF9;">
+      <div style="padding:16px 20px;font-family:system-ui,sans-serif;">
+        <div style="background:rgba(255,255,255,0.7);border-radius:16px;border:1px solid rgba(231,229,228,0.5);max-width:420px;overflow:hidden;box-shadow:0 2px 12px rgba(100,80,160,0.04);">
+          <!-- Thin progress shimmer -->
+          <div style="height:2px;background:linear-gradient(90deg,transparent,rgba(99,102,241,0.3),transparent);background-size:200% 100%;animation:shimmer 2s ease infinite;"></div>
+          <!-- Content -->
+          <div style="padding:14px 18px;">
+            <!-- Active phase pill -->
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <div style="display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.12);">
+                <div style="width:5px;height:5px;border-radius:50%;background:#6366F1;animation:pulse 1.5s ease infinite;"></div>
+                <span style="font-size:11px;font-weight:600;color:#6366F1;">Research</span>
+              </div>
+              <div style="display:flex;gap:3px;margin-left:auto;">
+                <div style="width:6px;height:6px;border-radius:50%;background:#10B981;"></div>
+                <div style="width:6px;height:6px;border-radius:50%;background:#10B981;"></div>
+                <div style="width:6px;height:6px;border-radius:50%;background:#6366F1;animation:pulse 1.5s ease infinite;"></div>
+                <div style="width:6px;height:6px;border-radius:50%;background:rgba(200,195,220,0.4);"></div>
+                <div style="width:6px;height:6px;border-radius:50%;background:rgba(200,195,220,0.4);"></div>
+              </div>
+              <span style="font-size:11px;color:#A8A29E;font-variant-numeric:tabular-nums;">4.6s</span>
+            </div>
+            <!-- Reasoning stream -->
+            <div style="font-size:13px;color:#57534E;line-height:1.7;">
+              <div style="color:#A8A29E;font-size:11px;margin-bottom:6px;">Looking up schema for revenue and customer data...</div>
+              <div>Found <span style="color:#6366F1;font-weight:500;">fact_sales</span>, <span style="color:#6366F1;font-weight:500;">dim_customer</span>, <span style="color:#6366F1;font-weight:500;">dim_product</span> — checking join paths and column types<span style="display:inline-block;width:2px;height:13px;background:#6366F1;margin-left:2px;vertical-align:text-bottom;animation:blink 0.8s steps(2) infinite;"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Phase Pill + Reasoning Stream</h3>
+      <p>Compact phase indicator pill (Research, SQL Write, etc.) with tiny dot progress. Reasoning text streams below with entity highlights. Very minimal footprint.</p>
+      <div style="margin-top:8px;">
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#EEF2FF;color:#6366F1;font-weight:500;margin-right:4px;">Compact</span>
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#FEF3C7;color:#D97706;font-weight:500;">Informative</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Approach C: Ultra-minimal single line -->
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:0;overflow:hidden;background:#FAFAF9;">
+      <div style="padding:16px 20px;font-family:system-ui,sans-serif;">
+        <div style="max-width:420px;">
+          <!-- Single line thinking -->
+          <div style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;background:rgba(255,255,255,0.55);border-radius:16px 16px 16px 4px;border:1px solid rgba(255,255,255,0.5);box-shadow:0 2px 12px rgba(100,80,160,0.04);">
+            <!-- Animated orb -->
+            <div style="position:relative;width:20px;height:20px;flex-shrink:0;margin-top:1px;">
+              <div style="position:absolute;inset:4px;border-radius:50%;background:linear-gradient(135deg,#818CF8,#6366F1);animation:pulse 1.5s ease infinite;"></div>
+              <div style="position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(99,102,241,0.3);animation:ripple 2s ease-out infinite;"></div>
+            </div>
+            <!-- Streaming text area -->
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;color:#57534E;line-height:1.65;">
+                Researching schema for revenue by customer segment... found 3 tables, checking join paths between fact_sales and dim_customer<span style="display:inline-block;width:2px;height:13px;background:#6366F1;margin-left:2px;vertical-align:text-bottom;animation:blink 0.8s steps(2) infinite;"></span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+                <span style="font-size:10px;color:#A8A29E;font-variant-numeric:tabular-nums;">4.6s</span>
+                <div style="flex:1;height:1.5px;background:rgba(200,195,220,0.2);border-radius:1px;overflow:hidden;">
+                  <div style="width:45%;height:100%;background:linear-gradient(90deg,#6366F1,#818CF8);border-radius:1px;transition:width 0.5s ease;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. Orb + Continuous Stream</h3>
+      <p>Single animated orb with continuous reasoning text that flows naturally. No cards, no boxes — just a pulsing indicator and text. Ultra-clean, like a "status line" that thinks out loud.</p>
+      <div style="margin-top:8px;">
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#FEF2F2;color:#DC2626;font-weight:500;margin-right:4px;">Ultra-minimal</span>
+        <span style="display:inline-block;font-size:10px;padding:2px 8px;border-radius:99px;background:#EEF2FF;color:#6366F1;font-weight:500;">Elegant</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+  @keyframes ripple { 0%{transform:scale(1);opacity:0.5} 100%{transform:scale(2.2);opacity:0} }
+</style>

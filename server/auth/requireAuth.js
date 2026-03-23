@@ -36,6 +36,34 @@ function getAllowedUsers() {
 }
 
 /**
+ * When DISABLE_AUTH=true and NODE_ENV is not production, skip Okta and use a dev session user.
+ * Never enable in production (server refuses to start).
+ */
+function isAuthDisabled() {
+  return process.env.DISABLE_AUTH === 'true' && process.env.NODE_ENV !== 'production';
+}
+
+/**
+ * Run after express-session: inject a fake Okta user so /api/auth/me and protected routes work.
+ */
+function devAuthBypassMiddleware(req, res, next) {
+  if (!isAuthDisabled()) {
+    return next();
+  }
+  if (!req.session) {
+    return next();
+  }
+  if (!req.session.okta_user) {
+    req.session.okta_user = {
+      email: process.env.DEV_AUTH_EMAIL || 'dev@localhost',
+      name: 'Dev user (DISABLE_AUTH)',
+      sub: 'dev-disable-auth',
+    };
+  }
+  next();
+}
+
+/**
  * Extract LDAP from Okta user email (part before @).
  * @param {string} email
  * @returns {string}
@@ -51,6 +79,10 @@ function extractLdap(email) {
  * user's LDAP in allowed-users file. Otherwise redirect to /login or 401/403.
  */
 function requireAuthorization(req, res, next) {
+  if (isAuthDisabled()) {
+    return next();
+  }
+
   if (!req.session || !req.session.okta_user) {
     const wantsJson = req.get('Accept') && req.get('Accept').includes('application/json');
     if (wantsJson) {
@@ -77,4 +109,6 @@ module.exports = {
   getAllowedUsers,
   extractLdap,
   requireAuthorization,
+  isAuthDisabled,
+  devAuthBypassMiddleware,
 };

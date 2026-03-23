@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 
 // ─── Node-to-dot mapping (spec table) ───────────────────────────
 const DOT_CONFIG = [
@@ -191,7 +191,6 @@ export default function ThinkingBubble({
   activeTools = [],
   isComplete = false,
 }) {
-  const [collapsed, setCollapsed] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [fillers, setFillers] = useState([]);
   const fillerIdxRef = useRef(0);
@@ -208,16 +207,11 @@ export default function ThinkingBubble({
     if (isComplete && startTime) setElapsed((Date.now() - startTime) / 1000);
   }, [isComplete, startTime]);
 
-  // Auto-collapse 800ms after completion
+  // Clear fillers on completion or when real entries arrive
   useEffect(() => {
-    if (isComplete) {
-      setFillers([]);
-      const t = setTimeout(() => setCollapsed(true), 800);
-      return () => clearTimeout(t);
-    }
+    if (isComplete) setFillers([]);
   }, [isComplete]);
 
-  // Clear fillers when real entries arrive
   useEffect(() => {
     setFillers([]);
     fillerIdxRef.current = 0;
@@ -225,12 +219,11 @@ export default function ThinkingBubble({
 
   const dotStatuses = useMemo(() => deriveDotStatuses(steps, isComplete), [steps, isComplete]);
   const completedCount = useMemo(() => countCompletedDots(steps), [steps]);
-  const latestEntry = thinkingEntries[thinkingEntries.length - 1] ?? null;
 
   // Inject filler messages during silent gaps
   const activeDot = dotStatuses.find(d => d.status === 'active');
   useEffect(() => {
-    if (isComplete || collapsed) return;
+    if (isComplete) return;
     const pool = (activeDot && FILLER_POOL[activeDot.label]) || FILLER_POOL._generic;
     const id = setInterval(() => {
       const msg = pool[fillerIdxRef.current % pool.length];
@@ -238,7 +231,7 @@ export default function ThinkingBubble({
       setFillers(prev => [...prev, { message: msg }]);
     }, 4000);
     return () => clearInterval(id);
-  }, [isComplete, collapsed, activeDot?.label]);
+  }, [isComplete, activeDot?.label]);
 
   // Combine real entries + fillers for display
   const displayEntries = useMemo(() => {
@@ -253,14 +246,13 @@ export default function ThinkingBubble({
       padding: '12px 16px 8px',
       width: '100%',
     }}>
-      {!collapsed && <StepDotTrack dotStatuses={dotStatuses} />}
+      <StepDotTrack dotStatuses={dotStatuses} />
 
-      {/* Collapsible header */}
+      {/* Header */}
       <div
-        onClick={() => setCollapsed(c => !c)}
         style={{
           display: 'flex', alignItems: 'center', gap: 8,
-          cursor: 'pointer', userSelect: 'none', padding: '2px 0',
+          padding: '2px 0',
         }}
       >
         {isComplete
@@ -283,31 +275,13 @@ export default function ThinkingBubble({
         }}>
           {elapsed.toFixed(1)}s
         </span>
-        <ChevronDown size={14} style={{
-          color: 'rgba(100,80,160,0.4)',
-          transform: collapsed ? 'rotate(-90deg)' : 'rotate(0deg)',
-          transition: 'transform 0.3s ease',
-        }} />
       </div>
 
-      {/* Collapsed: one-line summary */}
-      {collapsed && latestEntry && (
-        <div style={{
-          fontSize: 11, color: 'rgba(55,48,107,0.5)',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          marginTop: 2, paddingLeft: 22,
-        }}>
-          {latestEntry.message}
-        </div>
-      )}
-
-      {/* Expanded: streaming reasoning */}
-      {!collapsed && (
-        <ReasoningWindow
-          entries={displayEntries}
-          isComplete={isComplete}
-        />
-      )}
+      {/* Streaming reasoning */}
+      <ReasoningWindow
+        entries={displayEntries}
+        isComplete={isComplete}
+      />
     </div>
   );
 }

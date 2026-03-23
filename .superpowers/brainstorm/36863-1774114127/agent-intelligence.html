@@ -1,0 +1,106 @@
+<h2>Profile-Guided Agent Decisions</h2>
+<p class="subtitle">How data profiles replace guesswork with evidence</p>
+
+<!-- Chart Type Selection Rules -->
+<div class="mockup">
+  <div class="mockup-header">Smart Chart Type Selection</div>
+  <div class="mockup-body" style="padding: 20px;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 13px; color: #cbd5e1;">
+      <thead>
+        <tr style="border-bottom: 2px solid #334155;">
+          <th style="text-align: left; padding: 8px; color: #34d399;">Data Shape Detected</th>
+          <th style="text-align: left; padding: 8px; color: #818cf8;">Chart Type</th>
+          <th style="text-align: left; padding: 8px; color: #fbbf24;">Why</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom: 1px solid #1e293b;">
+          <td style="padding: 8px;">Date column + numeric measures, ordered</td>
+          <td style="padding: 8px;"><code style="background:#1e293b;padding:2px 6px;border-radius:4px;">line</code> or <code style="background:#1e293b;padding:2px 6px;border-radius:4px;">area</code></td>
+          <td style="padding: 8px;">Time-series → trend visualization</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #1e293b;">
+          <td style="padding: 8px;">Categorical col (2-8 distinct) + one numeric</td>
+          <td style="padding: 8px;"><code style="background:#1e293b;padding:2px 6px;border-radius:4px;">pie</code></td>
+          <td style="padding: 8px;">Small set → part-of-whole</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #1e293b;">
+          <td style="padding: 8px;">Categorical col (3-20 distinct) + numeric measures</td>
+          <td style="padding: 8px;"><code style="background:#1e293b;padding:2px 6px;border-radius:4px;">bar</code></td>
+          <td style="padding: 8px;">Medium cardinality → comparison</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #1e293b;">
+          <td style="padding: 8px;">Two categorical cols + numeric measure</td>
+          <td style="padding: 8px;"><code style="background:#1e293b;padding:2px 6px;border-radius:4px;">stacked_bar</code></td>
+          <td style="padding: 8px;">Two dimensions → grouped comparison</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #1e293b;">
+          <td style="padding: 8px;">Two numeric cols, no obvious category</td>
+          <td style="padding: 8px;"><code style="background:#1e293b;padding:2px 6px;border-radius:4px;">scatter</code></td>
+          <td style="padding: 8px;">Numeric × numeric → correlation</td>
+        </tr>
+        <tr>
+          <td style="padding: 8px;">Single aggregatable numeric col</td>
+          <td style="padding: 8px;"><code style="background:#1e293b;padding:2px 6px;border-radius:4px;">kpi</code></td>
+          <td style="padding: 8px;">One number → headline metric</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Insight Generation -->
+<div class="mockup" style="margin-top: 20px;">
+  <div class="mockup-header">Anomaly-Driven Insight Tiles</div>
+  <div class="mockup-body" style="padding: 20px;">
+    <p style="color: #94a3b8; font-size: 13px; margin-bottom: 16px;">Instead of generic summaries, insights are driven by actual anomaly signals from the profiler:</p>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div style="background: #0f172a; border-left: 3px solid #f87171; border-radius: 4px; padding: 12px;">
+        <div style="color: #f87171; font-size: 12px; font-weight: 600; margin-bottom: 4px;">BEFORE (Generic)</div>
+        <div style="color: #94a3b8; font-size: 13px; font-style: italic;">"The data shows pipeline values across regions. AMERICAS has the highest total at $45M."</div>
+      </div>
+      <div style="background: #0f172a; border-left: 3px solid #34d399; border-radius: 4px; padding: 12px;">
+        <div style="color: #34d399; font-size: 12px; font-weight: 600; margin-bottom: 4px;">AFTER (Anomaly-Driven)</div>
+        <div style="color: #cbd5e1; font-size: 13px; font-style: italic;">"EMEA pipeline dropped 23% QoQ — the only region declining. 68% of total pipeline is concentrated in just 3 accounts, creating significant risk."</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 16px; padding: 12px; background: #1e293b; border-radius: 6px;">
+      <div style="color: #fbbf24; font-size: 12px; font-weight: 600; margin-bottom: 8px;">Anomaly signals fed to LLM prompt:</div>
+      <ul style="color: #cbd5e1; font-size: 13px; padding-left: 16px; margin: 0;">
+        <li><strong>Outliers:</strong> "Column 'Amount' has 3 outliers above $12M (IQR method)"</li>
+        <li><strong>Trends:</strong> "Column 'CloseDate' shows decreasing values over time (r=-0.72)"</li>
+        <li><strong>Concentration:</strong> "Top 3 of 45 accounts represent 68% of total Amount"</li>
+        <li><strong>Period change:</strong> "Q1→Q2 delta: EMEA -23%, AMERICAS +8%, APAC +2%"</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Multi-Source Intelligence -->
+<div class="mockup" style="margin-top: 20px;">
+  <div class="mockup-header">Multi-Source Join Detection</div>
+  <div class="mockup-body" style="padding: 20px;">
+    <div style="display: flex; gap: 16px; align-items: flex-start;">
+      <div style="flex: 1; background: #0f172a; border-radius: 6px; padding: 12px;">
+        <div style="color: #818cf8; font-size: 12px; font-weight: 600; margin-bottom: 8px;">Source 0: Pipeline</div>
+        <code style="font-size: 12px; color: #94a3b8;">Region, Stage, Amount, Count</code>
+      </div>
+      <div style="flex: 1; background: #0f172a; border-radius: 6px; padding: 12px;">
+        <div style="color: #818cf8; font-size: 12px; font-weight: 600; margin-bottom: 8px;">Source 1: Quota</div>
+        <code style="font-size: 12px; color: #94a3b8;">Region, QuotaAmount, Attainment</code>
+      </div>
+    </div>
+    <div style="text-align: center; margin: 12px 0;">
+      <span style="background: #065f46; color: #34d399; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600;">Overlap detected: "Region" (exact match, 100% value overlap)</span>
+    </div>
+    <div style="background: #0f172a; border-radius: 6px; padding: 12px;">
+      <div style="color: #34d399; font-size: 12px; font-weight: 600; margin-bottom: 8px;">Agent can now generate:</div>
+      <ul style="color: #cbd5e1; font-size: 13px; padding-left: 16px; margin: 0;">
+        <li>Slicer on "Region" filtering both sources</li>
+        <li>Combined KPI: "Pipeline vs Quota" using both sourceIndex 0 and 1</li>
+        <li>Insight comparing pipeline coverage ratio per region</li>
+      </ul>
+    </div>
+  </div>
+</div>

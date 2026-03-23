@@ -67,7 +67,7 @@ const { loadJoinKnowledgeAsync } = require('./vectordb/joinRuleFetcher');
 const { loadKpiGlossaryAsync } = require('./vectordb/kpiFetcher');
 const { loadSchemaSearcherAsync } = require('./vectordb/schemaSearcher');
 const { loadDefinitionsAsync } = require('./vectordb/definitionsFetcher');
-const { requireAuthorization } = require('./auth/requireAuth');
+const { requireAuthorization, devAuthBypassMiddleware } = require('./auth/requireAuth');
 const { analysisLimiter, impersonateLimiter } = require('./middleware/rateLimiter');
 const { voiceRateLimiter } = require('./middleware/voiceRateLimit');
 
@@ -106,6 +106,9 @@ const useHttps = process.env.USE_HTTPS === 'true' || (
 if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
   throw new Error('SESSION_SECRET environment variable must be set in production');
 }
+if (process.env.NODE_ENV === 'production' && process.env.DISABLE_AUTH === 'true') {
+  throw new Error('DISABLE_AUTH cannot be set when NODE_ENV=production');
+}
 app.use(session({
   secret: process.env.SESSION_SECRET || 'auto-agents-session-secret-change-in-production',
   resave: false,
@@ -117,6 +120,8 @@ app.use(session({
     httpOnly: true,
   },
 }));
+
+app.use(devAuthBypassMiddleware);
 
 app.use((req, res, next) => {
   const pathMatch = PUBLIC_PATHS.some((p) => req.path === p || req.path === p.replace(/^\//, ''));
@@ -137,6 +142,8 @@ app.get('*', (_req, res) => {
 });
 
 const PORT = process.env.PORT || DEFAULT_PORT;
+/** Bind address: default 0.0.0.0 for LAN access; set BIND_HOST=127.0.0.1 for localhost-only. */
+const BIND_HOST = process.env.BIND_HOST || '0.0.0.0';
 
 async function start() {
   try {
@@ -169,6 +176,10 @@ async function start() {
   }
   logger.info('Knowledge preload complete');
 
+  if (process.env.DISABLE_AUTH === 'true') {
+    logger.warn('DISABLE_AUTH is set: Okta authentication is bypassed (non-production only)');
+  }
+
   if (useHttps) {
     const certPath = path.join(__dirname, process.env.SSL_CERT_PATH || 'cert.pem');
     const keyPath = path.join(__dirname, process.env.SSL_KEY_PATH || 'key.pem');
@@ -179,12 +190,12 @@ async function start() {
       },
       app
     );
-    server.listen(PORT, () => {
-      logger.info(`Auto Agents server running on port ${PORT} (HTTPS)`);
+    server.listen(PORT, BIND_HOST, () => {
+      logger.info(`Auto Agents server running on ${BIND_HOST}:${PORT} (HTTPS)`);
     });
   } else {
-    app.listen(PORT, () => {
-      logger.info(`Auto Agents server running on port ${PORT}`);
+    app.listen(PORT, BIND_HOST, () => {
+      logger.info(`Auto Agents server running on ${BIND_HOST}:${PORT}`);
     });
   }
 }

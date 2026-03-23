@@ -73,4 +73,9 @@ function _reset() {
 const _sweepTimer = setInterval(_sweep, SWEEP_INTERVAL_MS);
 _sweepTimer.unref();
 
-module.exports = { set, get, getByKey, invalidate, clearSession, _reset };
+function getAllProfilesForSession(sessionId) {
+  const keys = _sessionKeys.get(sessionId) || [];
+  return keys.map((k) => _store.get(k)?.profile).filter(Boolean);
+}
+
+module.exports = { set, get, getByKey, invalidate, clearSession, getAllProfilesForSession, _reset };

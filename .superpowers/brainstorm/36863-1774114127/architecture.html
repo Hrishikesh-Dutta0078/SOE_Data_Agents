@@ -1,0 +1,101 @@
+<h2>Unified Data Profiling Architecture</h2>
+<p class="subtitle">How the data profiler connects agent intelligence and performance</p>
+
+<div class="mockup">
+  <div class="mockup-header">Data Flow: Before vs After</div>
+  <div class="mockup-body" style="padding: 24px;">
+
+    <!-- BEFORE -->
+    <div style="margin-bottom: 32px;">
+      <h3 style="color: #f87171; margin-bottom: 12px;">BEFORE (Current)</h3>
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-family: monospace; font-size: 13px;">
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px; color: #94a3b8;">SQL Results</div>
+        <span style="color: #475569;">→</span>
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px; color: #94a3b8;">8 sample rows</div>
+        <span style="color: #475569;">→</span>
+        <div style="background: #7c3aed; border: 1px solid #8b5cf6; border-radius: 6px; padding: 8px 12px; color: #e9d5ff;">LLM (guesses chart types)</div>
+        <span style="color: #475569;">→</span>
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px; color: #94a3b8;">Client aggregates everything</div>
+      </div>
+      <ul style="color: #94a3b8; font-size: 13px; margin-top: 8px; padding-left: 20px;">
+        <li>LLM sees only 8 rows, guesses data shape</li>
+        <li>Client does all KPI aggregation in browser</li>
+        <li>Slicers fetched separately on mount</li>
+        <li>Refinement re-sends sample data each time</li>
+      </ul>
+    </div>
+
+    <!-- AFTER -->
+    <div>
+      <h3 style="color: #34d399; margin-bottom: 12px;">AFTER (With Data Profiler)</h3>
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-family: monospace; font-size: 13px;">
+        <div style="background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px; color: #94a3b8;">SQL Results</div>
+        <span style="color: #475569;">→</span>
+        <div style="background: #065f46; border: 2px solid #34d399; border-radius: 6px; padding: 8px 14px; color: #6ee7b7; font-weight: 600;">DATA PROFILER</div>
+        <span style="color: #475569;">→</span>
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #475569;">→</span>
+            <div style="background: #7c3aed; border: 1px solid #8b5cf6; border-radius: 6px; padding: 8px 12px; color: #e9d5ff;">LLM (profile-guided decisions)</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #475569;">→</span>
+            <div style="background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px; color: #94a3b8;">Client (pre-computed aggregates)</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #475569;">→</span>
+            <div style="background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px; color: #94a3b8;">Cache (reused on refinement)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Contents -->
+<div style="margin-top: 24px;">
+  <h3>What the Data Profiler computes per source:</h3>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+  <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px;">
+    <div style="color: #34d399; font-weight: 600; margin-bottom: 8px;">Column Analysis</div>
+    <ul style="color: #cbd5e1; font-size: 13px; padding-left: 16px; margin: 0;">
+      <li>Inferred type (numeric, date, categorical, text)</li>
+      <li>Cardinality (distinct count)</li>
+      <li>Null ratio per column</li>
+      <li>Value distribution (min/max/mean/median)</li>
+      <li>Top N distinct values (for low-cardinality)</li>
+    </ul>
+  </div>
+  <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px;">
+    <div style="color: #818cf8; font-weight: 600; margin-bottom: 8px;">Shape Detection</div>
+    <ul style="color: #cbd5e1; font-size: 13px; padding-left: 16px; margin: 0;">
+      <li>Time-series detection (ordered dates + measures)</li>
+      <li>Categorical grouping candidates</li>
+      <li>KPI candidates (single-value aggregatable)</li>
+      <li>High-cardinality warnings</li>
+      <li>Correlation hints between numeric columns</li>
+    </ul>
+  </div>
+  <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px;">
+    <div style="color: #fbbf24; font-weight: 600; margin-bottom: 8px;">Anomaly Signals</div>
+    <ul style="color: #cbd5e1; font-size: 13px; padding-left: 16px; margin: 0;">
+      <li>Outlier detection (IQR method)</li>
+      <li>Trend direction (increasing/decreasing/flat)</li>
+      <li>Concentration (top 3 values = X% of data)</li>
+      <li>Period-over-period changes</li>
+      <li>Missing data patterns</li>
+    </ul>
+  </div>
+  <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px;">
+    <div style="color: #f472b6; font-weight: 600; margin-bottom: 8px;">Pre-computed Outputs</div>
+    <ul style="color: #cbd5e1; font-size: 13px; padding-left: 16px; margin: 0;">
+      <li>KPI aggregates (sum, avg, count per candidate)</li>
+      <li>Slicer distinct values (ready to serve)</li>
+      <li>Grouped aggregates for top chart candidates</li>
+      <li>Sparkline data for time-series KPIs</li>
+      <li>Cross-source dimension overlap map</li>
+    </ul>
+  </div>
+</div>

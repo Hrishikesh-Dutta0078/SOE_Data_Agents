@@ -1,0 +1,148 @@
+<h2>Section 1: Response Card Redesign</h2>
+<p class="subtitle">The core change — how AI responses present results. Insight narrative leads, everything else is progressive disclosure.</p>
+
+<div class="section">
+  <h3>Current vs. Proposed</h3>
+</div>
+
+<div class="split">
+  <!-- BEFORE -->
+  <div class="mockup">
+    <div class="mockup-header">Before (Current)</div>
+    <div class="mockup-body" style="padding: 16px; background: linear-gradient(145deg, #f0e8f8, #e8e4f8); font-family: system-ui;">
+      <!-- Classification badges row -->
+      <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+        <span style="font-size: 10px; background: rgba(99,102,241,0.1); color: #6366F1; padding: 3px 8px; border-radius: 10px; font-weight: 600;">SQL_QUERY</span>
+        <span style="font-size: 10px; background: rgba(245,158,11,0.1); color: #F59E0B; padding: 3px 8px; border-radius: 10px; font-weight: 600;">MODERATE</span>
+        <span style="font-size: 10px; background: rgba(16,185,129,0.1); color: #10B981; padding: 3px 8px; border-radius: 10px; font-weight: 600;">17 rows</span>
+      </div>
+      <!-- Entity card -->
+      <div style="background: rgba(255,255,255,0.5); border-radius: 10px; padding: 10px; margin-bottom: 10px; border: 1px solid rgba(200,195,220,0.25);">
+        <div style="font-size: 9px; font-weight: 600; color: #6B6B88; margin-bottom: 6px;">Detected Entities</div>
+        <div style="font-size: 8px; color: #6B6B88; margin-bottom: 4px;">
+          <span style="font-weight: 600;">metrics:</span>&nbsp;
+          <span style="background: rgba(0,0,0,0.04); padding: 1px 5px; border-radius: 4px; margin-right: 3px;">pipeline</span>
+          <span style="background: rgba(0,0,0,0.04); padding: 1px 5px; border-radius: 4px; margin-right: 3px;">quota</span>
+          <span style="background: rgba(0,0,0,0.04); padding: 1px 5px; border-radius: 4px;">coverage ratio</span>
+        </div>
+        <div style="font-size: 8px; color: #6B6B88;">
+          <span style="font-weight: 600;">dimensions:</span>&nbsp;
+          <span style="background: rgba(0,0,0,0.04); padding: 1px 5px; border-radius: 4px; margin-right: 3px;">rep_name</span>
+          <span style="background: rgba(0,0,0,0.04); padding: 1px 5px; border-radius: 4px;">close_qtr</span>
+        </div>
+      </div>
+      <!-- Tabs -->
+      <div style="display: flex; gap: 0; margin-bottom: 10px; border-bottom: 1px solid rgba(0,0,0,0.08);">
+        <div style="font-size: 9px; font-weight: 600; color: #1a1a2e; padding: 6px 14px; border-bottom: 2px solid #6366F1;">Insights</div>
+        <div style="font-size: 9px; color: #8B8BA0; padding: 6px 14px;">Charts</div>
+        <div style="font-size: 9px; color: #8B8BA0; padding: 6px 14px;">Table</div>
+        <div style="margin-left: auto; font-size: 8px; background: rgba(16,185,129,0.1); color: #059669; padding: 3px 8px; border-radius: 10px; align-self: center;">High confidence</div>
+      </div>
+      <!-- Insights content -->
+      <div style="font-size: 9px; color: #1a1a2e; line-height: 1.5;">
+        <div style="font-weight: 600; margin-bottom: 4px;">Key Takeaways</div>
+        <div style="margin-bottom: 4px;"><strong>DX coverage is bifurcated:</strong> 3 reps are Green...</div>
+        <div style="margin-bottom: 4px;"><strong>DME Add-On is a near-total gap:</strong> Of 7 reps...</div>
+        <div><strong>AMERICAS 92319976 is the most critical:</strong> With a $572K...</div>
+      </div>
+      <!-- Problems annotated -->
+      <div style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%);">
+        <div style="font-size: 7px; color: #EF4444; background: rgba(239,68,68,0.08); padding: 4px 8px; border-radius: 6px; margin-bottom: 4px; white-space: nowrap;">← Badges take a full row</div>
+        <div style="font-size: 7px; color: #EF4444; background: rgba(239,68,68,0.08); padding: 4px 8px; border-radius: 6px; margin-bottom: 4px; white-space: nowrap;">← Entity card = noise</div>
+        <div style="font-size: 7px; color: #EF4444; background: rgba(239,68,68,0.08); padding: 4px 8px; border-radius: 6px; white-space: nowrap;">← Insights buried under tabs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AFTER -->
+  <div class="mockup">
+    <div class="mockup-header">After (Narrative Flow)</div>
+    <div class="mockup-body" style="padding: 16px; background: linear-gradient(145deg, #f0e8f8, #e8e4f8); font-family: system-ui;">
+      <!-- Response card -->
+      <div style="background: rgba(255,255,255,0.55); border-radius: 14px; padding: 16px; border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 2px 8px rgba(100,80,160,0.04);">
+        <!-- Header: confidence + row count, compact -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <div style="width: 6px; height: 6px; border-radius: 50%; background: #10B981;"></div>
+            <span style="font-size: 9px; color: #059669; font-weight: 500;">High confidence</span>
+          </div>
+          <span style="font-size: 9px; color: #8B8BA0;">17 rows</span>
+        </div>
+
+        <!-- KEY INSIGHT — leads the response -->
+        <div style="font-size: 11px; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; line-height: 1.4;">
+          DX coverage is bifurcated across the team
+        </div>
+        <div style="font-size: 9px; color: #44403C; line-height: 1.6; margin-bottom: 12px;">
+          3 reps are Green (Backman 5.36x, Wolfe 3.81x, Speicher 3.32x), 1 Yellow (Chung 2.03x), and 2 Red. DME Add-On is a near-total gap — only Speicher and Wolfe have any pipeline against $605K quota.
+        </div>
+
+        <!-- Inline mini chart -->
+        <div style="background: rgba(99,102,241,0.04); border-radius: 10px; padding: 10px; margin-bottom: 12px;">
+          <div style="font-size: 8px; color: #8B8BA0; margin-bottom: 6px; font-weight: 500;">Coverage Ratio by Rep</div>
+          <div style="display: flex; align-items: flex-end; gap: 6px; height: 50px;">
+            <div style="flex: 1; text-align: center;">
+              <div style="height: 44px; background: rgba(16,185,129,0.5); border-radius: 4px 4px 0 0; margin-bottom: 2px;"></div>
+              <div style="font-size: 6px; color: #8B8BA0;">Backman</div>
+            </div>
+            <div style="flex: 1; text-align: center;">
+              <div style="height: 32px; background: rgba(16,185,129,0.4); border-radius: 4px 4px 0 0; margin-bottom: 2px;"></div>
+              <div style="font-size: 6px; color: #8B8BA0;">Wolfe</div>
+            </div>
+            <div style="flex: 1; text-align: center;">
+              <div style="height: 28px; background: rgba(16,185,129,0.35); border-radius: 4px 4px 0 0; margin-bottom: 2px;"></div>
+              <div style="font-size: 6px; color: #8B8BA0;">Speicher</div>
+            </div>
+            <div style="flex: 1; text-align: center;">
+              <div style="height: 17px; background: rgba(245,158,11,0.5); border-radius: 4px 4px 0 0; margin-bottom: 2px;"></div>
+              <div style="font-size: 6px; color: #8B8BA0;">Chung</div>
+            </div>
+            <div style="flex: 1; text-align: center;">
+              <div style="height: 8px; background: rgba(239,68,68,0.5); border-radius: 4px 4px 0 0; margin-bottom: 2px;"></div>
+              <div style="font-size: 6px; color: #8B8BA0;">Moss</div>
+            </div>
+            <div style="flex: 1; text-align: center;">
+              <div style="height: 4px; background: rgba(239,68,68,0.5); border-radius: 4px 4px 0 0; margin-bottom: 2px;"></div>
+              <div style="font-size: 6px; color: #8B8BA0;">AMR</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- More takeaways (collapsed by default, shown here expanded) -->
+        <div style="font-size: 9px; color: #44403C; line-height: 1.6; margin-bottom: 12px; padding-left: 10px; border-left: 2px solid rgba(99,102,241,0.2);">
+          <strong>AMERICAS 92319976</strong> is the most critical risk — $572K DX quota, only $296K in pipe (0.52x), 80% below Green benchmark.
+        </div>
+
+        <!-- Progressive disclosure pills -->
+        <div style="display: flex; gap: 6px; flex-wrap: wrap; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.04);">
+          <span style="font-size: 8px; color: #6366F1; background: rgba(99,102,241,0.06); padding: 4px 10px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(99,102,241,0.1); transition: all 0.15s;">View table</span>
+          <span style="font-size: 8px; color: #6366F1; background: rgba(99,102,241,0.06); padding: 4px 10px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(99,102,241,0.1);">Full chart</span>
+          <span style="font-size: 8px; color: #8B8BA0; background: rgba(0,0,0,0.02); padding: 4px 10px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(0,0,0,0.04);">SQL</span>
+          <span style="font-size: 8px; color: #8B8BA0; background: rgba(0,0,0,0.02); padding: 4px 10px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(0,0,0,0.04);">Entities</span>
+          <span style="font-size: 8px; color: #8B8BA0; background: rgba(0,0,0,0.02); padding: 4px 10px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(0,0,0,0.04);">Copy</span>
+        </div>
+      </div>
+
+      <!-- Annotations -->
+      <div style="margin-top: 12px; font-size: 8px; color: #6366F1; line-height: 1.8;">
+        ✓ Headline insight is the first thing you read<br>
+        ✓ Mini chart inline — no tab switch needed<br>
+        ✓ Technical details (SQL, entities) are one click away, not in your face<br>
+        ✓ Confidence + row count as subtle indicators, not loud badges<br>
+        ✓ ~40% less vertical space than current layout
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top: 24px;">
+  <h3>Key Design Decisions</h3>
+  <ul style="font-size: 13px; color: #6B6B88; line-height: 1.8;">
+    <li><strong>Headline insight</strong> — the LLM-generated first takeaway becomes a bold title. Gives the card instant scanability.</li>
+    <li><strong>Inline mini-chart</strong> — a small, contextual chart sits inside the narrative. Clicking "Full chart" expands to full interactive recharts view.</li>
+    <li><strong>Classification badges removed</strong> — SQL_QUERY / MODERATE are internal pipeline info. Executives don't need them. Moved to the Entities pill for power users.</li>
+    <li><strong>Entity card removed from default view</strong> — accessible via "Entities" pill for those who want it.</li>
+    <li><strong>Confidence as a dot + text</strong> — green dot + "High confidence" is subtler and more glanceable than a colored badge.</li>
+    <li><strong>Progressive disclosure pills</strong> — table, full chart, SQL, entities, copy. Primary actions (table, chart) are accent-colored; secondary (SQL, entities) are muted.</li>
+  </ul>
+</div>

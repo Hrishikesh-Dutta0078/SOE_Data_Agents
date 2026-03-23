@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Soft Refined - Auto Agents UI Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --color-bg: #FAFAF9;
+    --color-surface: #FFFFFF;
+    --color-sidebar: #F5F5F4;
+    --color-text-primary: #1C1917;
+    --color-text-secondary: #78716C;
+    --color-text-muted: #A8A29E;
+    --color-border: #E7E5E4;
+    --color-border-light: #F5F5F4;
+    --color-accent: #6366F1;
+    --color-accent-hover: #4F46E5;
+    --color-accent-light: #EEF2FF;
+    --color-accent-subtle: #F5F3FF;
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+    --shadow-card-hover: 0 8px 24px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.03);
+    --shadow-elevated: 0 12px 32px rgba(0,0,0,0.08);
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-full: 9999px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .app { display: flex; height: 100vh; }
+
+  /* ===== SIDEBAR ===== */
+  .sidebar {
+    width: 260px;
+    background: var(--color-sidebar);
+    border-right: 1px solid var(--color-border);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar-brand {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .sidebar-subtitle {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+  }
+  .sidebar-version {
+    font-size: 11px;
+    color: #D6D3D1;
+    margin-bottom: 32px;
+  }
+  .sidebar-desc {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+  .sidebar-footer {
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+  }
+  .sidebar-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: 4px;
+  }
+  .sidebar-sublabel {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+  }
+  .sidebar-input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-primary);
+    outline: none;
+    transition: border-color 200ms, box-shadow 200ms;
+  }
+  .sidebar-input:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+  .sidebar-input::placeholder { color: var(--color-text-muted); }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  .toggle-track {
+    width: 40px;
+    height: 22px;
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+    position: relative;
+    cursor: pointer;
+    transition: background 200ms;
+  }
+  .toggle-track .thumb {
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    transition: left 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* ===== MAIN ===== */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+  .header-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+  }
+  .header-btn {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-accent);
+    background: transparent;
+    border: none;
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 200ms;
+  }
+  .header-btn:hover { background: var(--color-accent-light); }
+
+  /* Messages area */
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Empty state */
+  .empty-state {
+    margin: auto;
+    text-align: center;
+    animation: fadeInUp 0.5s ease both;
+  }
+  .empty-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--color-border-light);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .empty-icon svg { color: var(--color-text-muted); }
+  .empty-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .empty-subtitle {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+  }
+
+  /* Chat bubbles */
+  .bubble {
+    max-width: 70%;
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.6;
+    animation: fadeIn 0.25s ease both;
+  }
+  .bubble-user {
+    align-self: flex-end;
+    background: var(--color-accent);
+    color: white;
+    border-radius: var(--radius-xl) var(--radius-xl) var(--radius-sm) var(--radius-xl);
+    box-shadow: var(--shadow-card);
+  }
+  .bubble-assistant {
+    align-self: flex-start;
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl) var(--radius-sm);
+    box-shadow: var(--shadow-card);
+  }
+  .bubble-wide {
+    max-width: 88%;
+  }
+
+  /* Badge */
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    margin-right: 4px;
+    margin-bottom: 8px;
+  }
+  .badge-blue { background: #DBEAFE; color: #1D4ED8; }
+  .badge-green { background: #D1FAE5; color: #059669; }
+  .badge-amber { background: #FEF3C7; color: #D97706; }
+
+  /* Results card inside bubble */
+  .results-card {
+    margin-top: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-surface);
+  }
+  /* Segmented control tabs */
+  .seg-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: #F5F5F4;
+    border-radius: 10px;
+    margin: 12px;
+  }
+  .seg-tab {
+    flex: 1;
+    padding: 7px 12px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 200ms;
+    text-align: center;
+  }
+  .seg-tab.active {
+    background: var(--color-surface);
+    color: var(--color-text-primary);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    font-weight: 600;
+  }
+  .results-body { padding: 16px; }
+  .results-body p {
+    font-size: 14px;
+    color: var(--color-text-primary);
+    line-height: 1.7;
+  }
+
+  /* SQL toggle link */
+  .sql-toggle {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 10px;
+    display: inline-block;
+    transition: color 150ms;
+  }
+  .sql-toggle:hover { color: var(--color-accent-hover); }
+
+  /* Follow-up suggestions */
+  .followups { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--color-border-light); }
+  .followups-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+  }
+  .followup-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--color-text-primary);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all 200ms;
+    line-height: 1.5;
+  }
+  .followup-btn:hover {
+    background: var(--color-surface);
+    border-color: #D6D3D1;
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Agent trace link */
+  .trace-toggle {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 8px;
+    display: inline-block;
+  }
+
+  /* Usage footer */
+  .usage {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* ===== INPUT BAR ===== */
+  .input-bar {
+    padding: 16px 24px;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--color-border-light);
+  }
+  .input-wrapper {
+    display: flex;
+    align-items: flex-end;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 4px 4px 4px 16px;
+    transition: border-color 200ms, box-shadow 200ms;
+  }
+  .input-wrapper:focus-within {
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.08);
+  }
+  .input-textarea {
+    flex: 1;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    min-height: 40px;
+    max-height: 120px;
+    padding: 8px 0;
+    line-height: 1.5;
+  }
+  .input-textarea::placeholder { color: var(--color-text-muted); }
+  .send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 200ms, transform 200ms;
+  }
+  .send-btn:hover { background: var(--color-accent-hover); transform: scale(1.04); }
+  .send-btn:active { transform: scale(0.96); }
+  .send-btn.disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ===== THINKING PANEL ===== */
+  .thinking-panel {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .thinking-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border-light);
+    cursor: pointer;
+  }
+  .thinking-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    animation: subtlePulse 2s ease-in-out infinite;
+  }
+  .thinking-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+  .thinking-count {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .thinking-body { padding: 10px 14px; }
+  .thinking-entry {
+    display: flex;
+    gap: 10px;
+    padding: 6px 4px;
+    border-radius: var(--radius-sm);
+    transition: background 150ms;
+  }
+  .thinking-entry:hover { background: var(--color-bg); }
+  .thinking-elapsed {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    width: 44px;
+    text-align: right;
+    flex-shrink: 0;
+    padding-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .thinking-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .thinking-msg {
+    font-size: 13px;
+    color: var(--color-text-primary);
+    line-height: 1.5;
+  }
+
+  .badge-classify { background: #F3E8FF; color: #7C3AED; }
+  .badge-research { background: #DBEAFE; color: #2563EB; }
+  .badge-sql { background: #E0F2FE; color: #0284C7; }
+  .badge-validate { background: #CCFBF1; color: #0D9488; }
+  .badge-execute { background: #D1FAE5; color: #059669; }
+  .badge-present { background: #FCE7F3; color: #DB2777; }
+
+  /* ===== LOADING DOTS ===== */
+  .loading-dots {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0;
+  }
+  .loading-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #D6D3D1;
+    animation: bounceDot 1.4s ease-in-out infinite;
+  }
+  .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  /* ===== SECTION LABEL ===== */
+  .section-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    background: var(--color-accent-light);
+    padding: 6px 16px;
+    border-radius: var(--radius-full);
+    display: inline-block;
+    margin: 24px auto 12px;
+    align-self: center;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes subtlePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  @keyframes bounceDot {
+    0%, 80%, 100% { transform: scale(1); opacity: 0.5; }
+    40% { transform: scale(1.3); opacity: 1; }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #D6D3D1; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #A8A29E; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">Auto Agents</div>
+    <div class="sidebar-subtitle">Autonomous Text-to-SQL System</div>
+    <div class="sidebar-version">v0.0.5</div>
+    <div class="sidebar-desc">
+      Fully autonomous agent with 19 tools. Every query is researched, verified, and validated.
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-label">Impersonate</div>
+      <div class="sidebar-sublabel">Search by name to filter data</div>
+      <input class="sidebar-input" type="text" placeholder="Search by name..." />
+
+      <div class="toggle-row">
+        <div>
+          <div class="sidebar-label" style="margin-bottom:2px">Fast Model (Haiku)</div>
+          <div class="sidebar-sublabel" style="margin-bottom:0">Use faster LLM for agents</div>
+        </div>
+        <div class="toggle-track"><div class="thumb"></div></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- Header -->
+    <div class="header">
+      <span class="header-title">Auto Agents</span>
+      <button class="header-btn">New Chat</button>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages">
+
+      <div class="section-label">Empty State</div>
+
+      <!-- Empty State -->
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <div class="empty-title">What would you like to know?</div>
+        <div class="empty-subtitle">Ask a question about your data in plain English.</div>
+      </div>
+
+      <div class="section-label">Conversation Flow</div>
+
+      <!-- User message -->
+      <div class="bubble bubble-user">
+        What is the total pipeline by segment for Q1 2025?
+      </div>
+
+      <!-- Loading state -->
+      <div class="bubble bubble-assistant" style="max-width: 88%;">
+        <div class="thinking-panel">
+          <div class="thinking-header">
+            <div class="thinking-header-left">
+              <div class="status-dot"></div>
+              <span class="thinking-title">Agent Activity</span>
+              <span class="thinking-count">6 steps</span>
+            </div>
+            <span style="font-size:12px; color: var(--color-text-muted); font-weight: 500;">collapse</span>
+          </div>
+          <div class="thinking-body">
+            <div class="thinking-entry">
+              <span class="thinking-elapsed">0.2s</span>
+              <span class="thinking-badge badge-classify">Classify</span>
+              <span class="thinking-msg">Intent: SQL_QUERY, complexity: simple, match: none</span>
+            </div>
+            <div class="thinking-entry">
+              <span class="thinking-elapsed">2.1s</span>
+              <span class="thinking-badge badge-research">Research</span>
+              <span class="thinking-msg">Discovered OpportunityFact, DimSegment tables. Found 4 relevant columns.</span>
+            </div>
+            <div class="thinking-entry">
+              <span class="thinking-elapsed">4.3s</span>
+              <span class="thinking-badge badge-sql">SQL Write</span>
+              <span class="thinking-msg">Generated query with GROUP BY segment, filtered FiscalQuarter = 'Q1-2025'</span>
+            </div>
+            <div class="thinking-entry">
+              <span class="thinking-elapsed">5.1s</span>
+              <span class="thinking-badge badge-validate">Validate</span>
+              <span class="thinking-msg">Syntax valid, schema valid, semantic confidence 0.92</span>
+            </div>
+            <div class="thinking-entry">
+              <span class="thinking-elapsed">5.8s</span>
+              <span class="thinking-badge badge-execute">Execute</span>
+              <span class="thinking-msg">Query returned 5 rows in 340ms</span>
+            </div>
+            <div class="thinking-entry">
+              <span class="thinking-elapsed">7.2s</span>
+              <span class="thinking-badge badge-present">Present</span>
+              <span class="thinking-msg">Generated insights and bar chart visualization</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading dots -->
+      <div class="bubble bubble-assistant" style="padding: 12px 18px;">
+        <div class="loading-dots">
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+        </div>
+      </div>
+
+      <div class="section-label">Results Display</div>
+
+      <!-- Assistant result -->
+      <div class="bubble bubble-assistant bubble-wide">
+        <div style="margin-bottom: 8px;">
+          <span class="badge badge-blue">SQL_QUERY</span>
+          <span class="badge badge-amber">simple</span>
+          <span class="badge badge-green">5 rows</span>
+        </div>
+
+        <div class="results-card">
+          <div class="seg-tabs">
+            <button class="seg-tab active">Insights</button>
+            <button class="seg-tab">Charts</button>
+            <button class="seg-tab">Table</button>
+          </div>
+          <div class="results-body">
+            <p><strong>Q1 2025 Pipeline by Segment</strong></p>
+            <p style="margin-top: 8px;">
+              The total pipeline for Q1 2025 is <strong>$142.3M</strong> across 5 segments.
+              <strong>Enterprise</strong> leads with $58.2M (40.9%), followed by
+              <strong>Mid-Market</strong> at $38.7M (27.2%). The <strong>SMB</strong> segment
+              shows the strongest quarter-over-quarter growth at +23%.
+            </p>
+          </div>
+        </div>
+
+        <button class="sql-toggle">Show generated SQL</button>
+        <br />
+        <button class="trace-toggle">Show Agent Trace</button>
+
+        <div class="usage">
+          <span>0.045M tokens</span>
+          <span>&middot; 7.2s</span>
+          <span>&middot; claude-opus-4-20250514</span>
+        </div>
+
+        <div class="followups">
+          <div class="followups-label">Suggested Follow-Ups</div>
+          <button class="followup-btn">How does Q1 2025 pipeline compare to Q4 2024?</button>
+          <button class="followup-btn">Show me the top 10 deals in the Enterprise segment</button>
+          <button class="followup-btn">What's the win rate by segment this quarter?</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Input bar -->
+    <div class="input-bar">
+      <div class="input-wrapper">
+        <textarea class="input-textarea" placeholder="Ask a new question..." rows="1"></textarea>
+        <button class="send-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="19" x2="12" y2="5"></line>
+            <polyline points="5 12 12 5 19 12"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

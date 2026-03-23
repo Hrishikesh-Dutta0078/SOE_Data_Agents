@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const { URLSearchParams } = require('url');
 const router = express.Router();
 const { generatePkcePair } = require('../auth/pkce');
+const { isAuthDisabled } = require('../auth/requireAuth');
 const { logUserLogin } = require('../auth/logUserLogin');
 const { loginLimiter } = require('../middleware/rateLimiter');
 
@@ -17,6 +18,9 @@ const OKTA_CALLBACK_PATH = process.env.OKTA_CALLBACK_PATH || '/implicit/callback
 
 /** GET /login — start Okta OAuth flow (PKCE + state, redirect to authorize) */
 router.get('/login', loginLimiter, (req, res) => {
+  if (isAuthDisabled()) {
+    return res.redirect(302, '/');
+  }
   const { code_verifier, code_challenge } = generatePkcePair();
   const state = crypto.randomBytes(16).toString('base64url');
 
@@ -38,6 +42,9 @@ router.get('/login', loginLimiter, (req, res) => {
 
 /** GET /implicit/callback — handle Okta redirect, exchange code for tokens, fetch userinfo */
 router.get(OKTA_CALLBACK_PATH.startsWith('/') ? OKTA_CALLBACK_PATH : `/${OKTA_CALLBACK_PATH}`, async (req, res) => {
+  if (isAuthDisabled()) {
+    return res.redirect(302, '/');
+  }
   const code = req.query.code;
   const state = req.query.state;
 
@@ -101,6 +108,9 @@ router.get(OKTA_CALLBACK_PATH.startsWith('/') ? OKTA_CALLBACK_PATH : `/${OKTA_CA
 
 /** GET /logout — destroy session, redirect */
 router.get('/logout', (req, res) => {
+  if (isAuthDisabled()) {
+    return res.redirect(302, '/');
+  }
   req.session.destroy(() => {
     res.redirect('/login');
   });

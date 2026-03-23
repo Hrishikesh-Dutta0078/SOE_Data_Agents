@@ -1,0 +1,151 @@
+<h2>Which layout structure feels right?</h2>
+<p class="subtitle">Click the layout that best matches what you envision for the empty chat state</p>
+
+<div class="cards" style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px;">
+
+  <!-- Option A: Centered Hero -->
+  <div class="card" data-choice="centered-hero" onclick="toggleSelect(this)" style="cursor:pointer; border-radius:16px; overflow:hidden; border:2px solid transparent; transition: all 0.3s;">
+    <div class="card-image" style="height: 360px; background: #18181b; position:relative; padding: 16px;">
+      <!-- Wireframe mockup -->
+      <div style="height:100%; border-radius:10px; border:1px solid rgba(167,139,250,0.12); background:rgba(255,255,255,0.02); display:flex; flex-direction:column; overflow:hidden;">
+        <!-- Sidebar hint -->
+        <div style="display:flex; height:100%;">
+          <div style="width:52px; border-right:1px solid rgba(167,139,250,0.08); padding:10px 6px; display:flex; flex-direction:column; gap:6px; align-items:center;">
+            <div style="width:24px; height:24px; border-radius:6px; background:rgba(167,139,250,0.15);"></div>
+            <div style="width:20px; height:3px; border-radius:2px; background:rgba(255,255,255,0.06); margin-top:8px;"></div>
+            <div style="width:20px; height:3px; border-radius:2px; background:rgba(255,255,255,0.04);"></div>
+            <div style="width:20px; height:3px; border-radius:2px; background:rgba(255,255,255,0.04);"></div>
+          </div>
+          <!-- Main area centered -->
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:20px;">
+            <!-- Logo -->
+            <div style="width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg, #a78bfa, #8b5cf6);"></div>
+            <!-- Heading -->
+            <div style="width:140px; height:10px; border-radius:4px; background:rgba(255,255,255,0.3);"></div>
+            <!-- Subtitle -->
+            <div style="width:100px; height:6px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
+            <!-- Input bar -->
+            <div style="width:85%; height:32px; border-radius:10px; background:rgba(167,139,250,0.06); border:1px solid rgba(167,139,250,0.12); margin-top:6px;"></div>
+            <!-- Chips -->
+            <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:4px;">
+              <div style="width:60px; height:18px; border-radius:10px; background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.1);"></div>
+              <div style="width:50px; height:18px; border-radius:10px; background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.1);"></div>
+              <div style="width:70px; height:18px; border-radius:10px; background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.1);"></div>
+              <div style="width:55px; height:18px; border-radius:10px; background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.1);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:16px; background:#18181b;">
+      <h3 style="color:#e4e4e7; margin:0 0 6px 0; font-size:15px;">A. Centered Hero</h3>
+      <p style="color:rgba(255,255,255,0.45); margin:0; font-size:12px; line-height:1.5;">Clean, vertically centered. Logo, heading, input, chips. Simple and focused like ChatGPT/Claude.</p>
+    </div>
+  </div>
+
+  <!-- Option B: Split with Visual -->
+  <div class="card" data-choice="split-visual" onclick="toggleSelect(this)" style="cursor:pointer; border-radius:16px; overflow:hidden; border:2px solid transparent; transition: all 0.3s;">
+    <div class="card-image" style="height: 360px; background: #18181b; position:relative; padding: 16px;">
+      <div style="height:100%; border-radius:10px; border:1px solid rgba(167,139,250,0.12); background:rgba(255,255,255,0.02); display:flex; overflow:hidden;">
+        <!-- Sidebar -->
+        <div style="width:52px; border-right:1px solid rgba(167,139,250,0.08); padding:10px 6px; display:flex; flex-direction:column; gap:6px; align-items:center;">
+          <div style="width:24px; height:24px; border-radius:6px; background:rgba(167,139,250,0.15);"></div>
+          <div style="width:20px; height:3px; border-radius:2px; background:rgba(255,255,255,0.06); margin-top:8px;"></div>
+          <div style="width:20px; height:3px; border-radius:2px; background:rgba(255,255,255,0.04);"></div>
+        </div>
+        <!-- Left: content -->
+        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; padding:16px; gap:10px;">
+          <div style="width:100px; height:10px; border-radius:4px; background:rgba(255,255,255,0.3);"></div>
+          <div style="width:75px; height:6px; border-radius:3px; background:rgba(255,255,255,0.1);"></div>
+          <div style="width:90%; height:28px; border-radius:8px; background:rgba(167,139,250,0.06); border:1px solid rgba(167,139,250,0.12); margin-top:6px;"></div>
+          <div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:4px;">
+            <div style="width:48px; height:16px; border-radius:8px; background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.1);"></div>
+            <div style="width:40px; height:16px; border-radius:8px; background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.1);"></div>
+            <div style="width:55px; height:16px; border-radius:8px; background:rgba(167,139,250,0.08); border:1px solid rgba(167,139,250,0.1);"></div>
+          </div>
+        </div>
+        <!-- Right: visual element -->
+        <div style="width:42%; border-left:1px solid rgba(167,139,250,0.06); display:flex; align-items:center; justify-content:center; padding:12px; position:relative; overflow:hidden;">
+          <!-- Abstract data viz -->
+          <div style="position:absolute; inset:0; background:radial-gradient(circle at 60% 40%, rgba(139,92,246,0.12) 0%, transparent 60%);"></div>
+          <!-- Floating chart elements -->
+          <div style="position:relative; width:100%; height:80%;">
+            <div style="position:absolute; bottom:10%; left:10%; width:14%; height:40%; background:rgba(167,139,250,0.2); border-radius:4px 4px 0 0;"></div>
+            <div style="position:absolute; bottom:10%; left:30%; width:14%; height:65%; background:rgba(167,139,250,0.3); border-radius:4px 4px 0 0;"></div>
+            <div style="position:absolute; bottom:10%; left:50%; width:14%; height:50%; background:rgba(167,139,250,0.2); border-radius:4px 4px 0 0;"></div>
+            <div style="position:absolute; bottom:10%; left:70%; width:14%; height:75%; background:rgba(139,92,246,0.35); border-radius:4px 4px 0 0;"></div>
+            <!-- Floating dots -->
+            <div style="position:absolute; top:20%; right:20%; width:8px; height:8px; border-radius:50%; background:#a78bfa; opacity:0.5;"></div>
+            <div style="position:absolute; top:35%; right:40%; width:6px; height:6px; border-radius:50%; background:#c4b5fd; opacity:0.3;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:16px; background:#18181b;">
+      <h3 style="color:#e4e4e7; margin:0 0 6px 0; font-size:15px;">B. Split with Visual</h3>
+      <p style="color:rgba(255,255,255,0.45); margin:0; font-size:12px; line-height:1.5;">Content left, animated data visualization right. Shows the analytical power at a glance.</p>
+    </div>
+  </div>
+
+  <!-- Option C: Card-based Categories -->
+  <div class="card" data-choice="card-categories" onclick="toggleSelect(this)" style="cursor:pointer; border-radius:16px; overflow:hidden; border:2px solid transparent; transition: all 0.3s;">
+    <div class="card-image" style="height: 360px; background: #18181b; position:relative; padding: 16px;">
+      <div style="height:100%; border-radius:10px; border:1px solid rgba(167,139,250,0.12); background:rgba(255,255,255,0.02); display:flex; overflow:hidden;">
+        <!-- Sidebar -->
+        <div style="width:52px; border-right:1px solid rgba(167,139,250,0.08); padding:10px 6px; display:flex; flex-direction:column; gap:6px; align-items:center;">
+          <div style="width:24px; height:24px; border-radius:6px; background:rgba(167,139,250,0.15);"></div>
+          <div style="width:20px; height:3px; border-radius:2px; background:rgba(255,255,255,0.06); margin-top:8px;"></div>
+          <div style="width:20px; height:3px; border-radius:2px; background:rgba(255,255,255,0.04);"></div>
+        </div>
+        <!-- Main area -->
+        <div style="flex:1; display:flex; flex-direction:column; padding:14px; gap:10px; overflow:hidden;">
+          <!-- Top: heading + input -->
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; padding-bottom:8px;">
+            <div style="width:120px; height:9px; border-radius:4px; background:rgba(255,255,255,0.25);"></div>
+            <div style="width:85%; height:26px; border-radius:8px; background:rgba(167,139,250,0.06); border:1px solid rgba(167,139,250,0.12);"></div>
+          </div>
+          <!-- Category cards grid -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; flex:1;">
+            <div style="border-radius:8px; background:rgba(167,139,250,0.05); border:1px solid rgba(167,139,250,0.08); padding:10px; display:flex; flex-direction:column; gap:5px;">
+              <div style="display:flex; align-items:center; gap:5px;">
+                <div style="width:14px; height:14px; border-radius:4px; background:rgba(139,92,246,0.25);"></div>
+                <div style="width:45px; height:6px; border-radius:3px; background:rgba(255,255,255,0.15);"></div>
+              </div>
+              <div style="width:80%; height:4px; border-radius:2px; background:rgba(255,255,255,0.06);"></div>
+              <div style="width:65%; height:4px; border-radius:2px; background:rgba(255,255,255,0.04);"></div>
+            </div>
+            <div style="border-radius:8px; background:rgba(167,139,250,0.05); border:1px solid rgba(167,139,250,0.08); padding:10px; display:flex; flex-direction:column; gap:5px;">
+              <div style="display:flex; align-items:center; gap:5px;">
+                <div style="width:14px; height:14px; border-radius:4px; background:rgba(251,113,133,0.25);"></div>
+                <div style="width:35px; height:6px; border-radius:3px; background:rgba(255,255,255,0.15);"></div>
+              </div>
+              <div style="width:70%; height:4px; border-radius:2px; background:rgba(255,255,255,0.06);"></div>
+              <div style="width:55%; height:4px; border-radius:2px; background:rgba(255,255,255,0.04);"></div>
+            </div>
+            <div style="border-radius:8px; background:rgba(167,139,250,0.05); border:1px solid rgba(167,139,250,0.08); padding:10px; display:flex; flex-direction:column; gap:5px;">
+              <div style="display:flex; align-items:center; gap:5px;">
+                <div style="width:14px; height:14px; border-radius:4px; background:rgba(56,189,248,0.25);"></div>
+                <div style="width:30px; height:6px; border-radius:3px; background:rgba(255,255,255,0.15);"></div>
+              </div>
+              <div style="width:75%; height:4px; border-radius:2px; background:rgba(255,255,255,0.06);"></div>
+              <div style="width:60%; height:4px; border-radius:2px; background:rgba(255,255,255,0.04);"></div>
+            </div>
+            <div style="border-radius:8px; background:rgba(167,139,250,0.05); border:1px solid rgba(167,139,250,0.08); padding:10px; display:flex; flex-direction:column; gap:5px;">
+              <div style="display:flex; align-items:center; gap:5px;">
+                <div style="width:14px; height:14px; border-radius:4px; background:rgba(250,204,21,0.25);"></div>
+                <div style="width:50px; height:6px; border-radius:3px; background:rgba(255,255,255,0.15);"></div>
+              </div>
+              <div style="width:85%; height:4px; border-radius:2px; background:rgba(255,255,255,0.06);"></div>
+              <div style="width:50%; height:4px; border-radius:2px; background:rgba(255,255,255,0.04);"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body" style="padding:16px; background:#18181b;">
+      <h3 style="color:#e4e4e7; margin:0 0 6px 0; font-size:15px;">C. Card-based Categories</h3>
+      <p style="color:rgba(255,255,255,0.45); margin:0; font-size:12px; line-height:1.5;">Input at top, then categorized suggestion cards. Guides users by organizing queries into groups.</p>
+    </div>
+  </div>
+
+</div>
