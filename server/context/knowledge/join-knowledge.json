@@ -1190,6 +1190,33 @@
     },
     {
       "tables": [
+        "TD_EBI_REPORTING_HIERARCHY",
+        "vw_TF_EBI_P2S"
+      ],
+      "primaryKey": "vw_TF_EBI_P2S.REPORTING_HIERARCHY_ID = TD_EBI_REPORTING_HIERARCHY.REPORTING_HIERARCHY_ID",
+      "cardinality": "1:N",
+      "joinType": "INNER"
+    },
+    {
+      "tables": [
+        "TD_EBI_REPORTING_HIERARCHY",
+        "vw_TF_EBI_QUOTA"
+      ],
+      "primaryKey": "vw_TF_EBI_QUOTA.REPORTING_HIERARCHY_ID = TD_EBI_REPORTING_HIERARCHY.REPORTING_HIERARCHY_ID",
+      "cardinality": "1:N",
+      "joinType": "INNER"
+    },
+    {
+      "tables": [
+        "TD_EBI_REPORTING_HIERARCHY",
+        "vw_td_ebi_region_rpt"
+      ],
+      "primaryKey": "vw_td_ebi_region_rpt.REPORTING_HIERARCHY_ID = TD_EBI_REPORTING_HIERARCHY.REPORTING_HIERARCHY_ID",
+      "cardinality": "1:N",
+      "joinType": "INNER"
+    },
+    {
+      "tables": [
         "TD_EBI_COUNTRY",
         "vw_TF_EBI_P2S"
       ],

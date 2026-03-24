@@ -88,7 +88,7 @@ function fmt(meta) {
     if (v === null || v === undefined || v === '') continue;
     const s = stringifyValue(v);
     if (!s) continue;
-    parts.push(`${k}=${s.length > 2000 ? s.substring(0, 1997) + '...' : s}`);
+    parts.push(`${k}=${s.length > 8000 ? s.substring(0, 7997) + '...' : s}`);
   }
   return parts.length ? `  ${parts.join('  ')}` : '';
 }

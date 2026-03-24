@@ -272,6 +272,9 @@ async function sqlAgentNode(state) {
     cacheHits: cacheStats.hits,
     cacheMisses: cacheStats.misses,
   });
+  if (reasoning) {
+    logger.info('SqlAgent reasoning:\n' + reasoning);
+  }
 
   return {
     sql,
