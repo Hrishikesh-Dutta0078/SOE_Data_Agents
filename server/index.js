@@ -50,7 +50,7 @@ if (!fs.existsSync(dotenvPath)) {
   }
 }
 
-require('dotenv').config();
+require('./config/env');
 
 const express = require('express');
 const session = require('express-session');
@@ -99,6 +99,11 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json({ limit: '5mb' }));
+
+// Trust Azure App Service reverse proxy (required for secure cookies + correct req.protocol)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
 
 const useHttps = process.env.USE_HTTPS === 'true' || (
   fs.existsSync(path.join(__dirname, 'cert.pem')) && fs.existsSync(path.join(__dirname, 'key.pem'))
