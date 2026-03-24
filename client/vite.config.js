@@ -15,13 +15,13 @@ export default defineConfig({
     port: 5174,
     proxy: {
       '/api': {
-        target: 'https://localhost:5000',
+        target: 'https://localhost:5005',
         changeOrigin: true,
         secure: false,
       },
-      '/login': { target: 'https://localhost:5000', changeOrigin: true, secure: false },
-      '/logout': { target: 'https://localhost:5000', changeOrigin: true, secure: false },
-      '/implicit/callback': { target: 'https://localhost:5000', changeOrigin: true, secure: false },
+      '/login': { target: 'https://localhost:5005', changeOrigin: true, secure: false },
+      '/logout': { target: 'https://localhost:5005', changeOrigin: true, secure: false },
+      '/implicit/callback': { target: 'https://localhost:5005', changeOrigin: true, secure: false },
     },
   },
 });

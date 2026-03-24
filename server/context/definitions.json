@@ -24,8 +24,7 @@
   "activePipelineStages": ["S3", "S4", "S5", "S6", "S7"],
   "activePipelineStageIds": [2, 3, 4, 5, 6],
   "mandatoryFilters": [
-    { "id": "role_type", "sql": "r.ROLE_TYPE_DISPLAY = 'AE'", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true },
-    { "id": "bu_group", "sql": "rc.ROLE_COVERAGE_BU_GROUP = 'DMX'", "appliesTo": ["vw_TD_EBI_ROLE_Coverage"], "always": true },
+    { "id": "bu_group", "sql": "ROLE_COVERAGE_ID IN (1, 3)", "appliesTo": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_TF_EBI_PIPE_WALK"], "always": true, "note": "DMX business unit group — applies directly on fact tables, no dimension join needed" },
     { "id": "sales_team_bu", "sql": "r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW')", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true },
     { "id": "pay_measure", "sql": "PAY_MEASURE_ID = 0", "appliesTo": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA"], "always": true },
     { "id": "exclude_advertising", "sql": "o.MOPG1 <> 'ADVERTISING'", "appliesTo": ["vw_EBI_OPG"], "always": true },
@@ -33,9 +32,9 @@
     { "id": "exclude_dme_region", "sql": "(r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL)", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true },
     { "id": "exclude_teams", "sql": "r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST')", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true },
     { "id": "snapshot_week", "sql": "c.WEEK_SORT_ORDER_REVERSE = '0'", "appliesTo": ["vw_EBI_CALDATE"], "always": true, "note": "Join pipeline/quota facts to vw_EBI_CALDATE on SNAPSHOT_DATE_ID = DATE_KEY. WEEK_SORT_ORDER_REVERSE is VARCHAR — always compare as string." },
-    { "id": "global_region", "sql": "r.GLOBAL_REGION IN ('AMERICAS','EMEA','APAC','WW')", "appliesTo": ["vw_td_ebi_region_rpt"], "always": false, "note": "Only when filtering by GLOBAL_REGION" },
-    { "id": "rpt_hierarchy", "sql": "IS_CY_RPT_HIER = 1", "appliesTo": ["vw_td_ebi_region_rpt"], "always": false, "note": "When reporting hierarchy column is in scope" },
-    { "id": "dummy_terr", "sql": "r.TERR_ID NOT LIKE '%_%Dummy%'", "appliesTo": ["vw_td_ebi_region_rpt"], "always": false, "note": "For quota queries" }
+    { "id": "global_region", "sql": "r.GLOBAL_REGION IN ('AMERICAS','EMEA','APAC','WW')", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true },
+    { "id": "rpt_hierarchy", "sql": "rh.IS_CY_RPT_HIER = 1", "appliesTo": ["vw_td_ebi_region_rpt", "vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA"], "always": true, "note": "JOIN TD_EBI_REPORTING_HIERARCHY rh ON <table>.REPORTING_HIERARCHY_ID = rh.REPORTING_HIERARCHY_ID" },
+    { "id": "dummy_terr", "sql": "r.TERR_ID NOT LIKE '%_%Dummy%'", "appliesTo": ["vw_td_ebi_region_rpt"], "always": true }
   ],
   "abbreviations": {
     "W": "Won — maps to ADJ_COMMITMENT = 'Won'",

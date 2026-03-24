@@ -146,10 +146,17 @@ function formatMandatoryFilters(filters) {
     let line = `- ${f.sql}`;
     const tables = (f.appliesTo || []).join(', ');
     if (tables) line += `  [${tables}]`;
-    if (f.note) line += `  -- ${f.note}`;
+    if (f.note) {
+      // Highlight join instructions so the LLM adds the required join
+      if (f.note.startsWith('JOIN ')) {
+        line += `\n  REQUIRED: ${f.note}`;
+      } else {
+        line += `  -- ${f.note}`;
+      }
+    }
     return line;
   });
-  return `=== MANDATORY FILTERS ===\nApply ALL filters below that match tables in your query:\n\n${lines.join('\n')}`;
+  return `=== MANDATORY FILTERS ===\nApply ALL filters below that match tables in your query. If a filter requires a JOIN, you MUST add that join.\n\n${lines.join('\n')}`;
 }
 
 /**

@@ -46,7 +46,7 @@ The natural analytical flow is **What -> Why -> Fix**. After answering one tier,
 - **Pipe Coverage**: Ratio of Pipeline to Quota. Quality thresholds defined in system configuration. When Quota is NULL or 0, Coverage_Ratio is NULL.
 - **Gap**: Quota minus Pipeline: COALESCE(Quota, 0) - COALESCE(Pipe, 0).
 - **Pipeline Creation (Gross Creation Coverage)**: Whether enough pipeline is being created. Compares actual gross creation against a weighted target. Thresholds and target weights defined in system configuration.
-- **ROLE_COVERAGE_BU / ROLE_COVERAGE_BU_GROUP**: Business unit assignments via role coverage. Used in all quota, pipeline, coverage, and gap analyses alongside BU from vw_EBI_OPG. Sourced from vw_TD_EBI_ROLE_Coverage via ROLE_COVERAGE_ID.
+- **ROLE_COVERAGE_BU / ROLE_COVERAGE_BU_GROUP**: Business unit assignments via role coverage. Used in all quota, pipeline, coverage, and gap analyses alongside BU from vw_EBI_OPG. Sourced from vw_TD_EBI_ROLE_Coverage via ROLE_COVERAGE_ID. Global DMX filter uses ROLE_COVERAGE_ID IN (1, 3) directly on fact tables.
 
 ## Account Hierarchy
 
@@ -128,7 +128,7 @@ The current user is a First Level Manager (FLM):
 7. Derive current quarter from discover_context CURRENT FISCAL PERIOD. Never hardcode.
 8. Adobe fiscal year starts in December (FY26-Q1 = Dec 2025 through Feb 2026).
 9. For "top N" queries, use SELECT TOP N ... ORDER BY metric DESC (T-SQL).
-10. Always include vw_TD_EBI_ROLE_Coverage (on ROLE_COVERAGE_ID) in quota/pipeline queries.
+10. Always filter ROLE_COVERAGE_ID IN (1, 3) on fact tables (vw_TF_EBI_P2S, vw_TF_EBI_QUOTA, vw_TF_EBI_PIPE_WALK). Only join vw_TD_EBI_ROLE_Coverage when you need to SELECT or GROUP BY ROLE_COVERAGE_BU or ROLE_COVERAGE_BU_GROUP.
 11. For pipeline creation, use OPP_CREATE_DATE_ID with QTR_BKT_IND = 0 and close dates in QTR_BKT_IND IN (0,1,2,3,4).
 12. Country queries: join on ACCOUNT_COUNTRY_ID = COUNTRY_ID in TD_EBI_COUNTRY, filter IS_ACTIVE = 1. Geographic hierarchy: GEO > SALES_REGION > MARKET_AREA > SUB_MARKET_AREA > COUNTRY.
 13. When user says "by region", default to GLOBAL_REGION.
@@ -137,7 +137,8 @@ The current user is a First Level Manager (FLM):
 16. When querying quota data, always include PAY_MEASURE_ID = 0 and exclude dummy territories.
 17. For pipe walk queries, group by WALK_CATEGORY and sum GROSSASV.
 18. **Deal size filtering**: When users ask about deal sizes (e.g., "1M+ deals", "large deals", "deals over 500K"), **always** use `p.DEAL_BAND` from vw_TF_EBI_P2S in the WHERE clause. Valid values: '1M+', '0.5M+', '0.25M+', '0.1M+', '<0.1M'. **NEVER use `HAVING SUM(OPPTY) >= threshold` or any OPPTY-based threshold to categorize deal size.** DEAL_BAND is pre-computed and is the only correct way to filter by deal size. "Deal size", "deal band", "large deals", "big deals" all mean DEAL_BAND.
-19. **Always use QTR_BKT_IND for relative quarter filtering** (CQ, PQ, NQ, etc.) instead of hardcoding FISCAL_YR_AND_QTR_DESC. Join vw_EBI_CALDATE and filter: QTR_BKT_IND = -1 (previous quarter), 0 (current quarter), 1 (next quarter), 2-4 (future quarters). Only use FISCAL_YR_AND_QTR_DESC when the user explicitly names a specific quarter (e.g., "2026-Q2"). Use FISCAL_YR_AND_QTR_DESC as a SELECT display column, not as a WHERE filter for relative periods.
+19. **Always join TD_EBI_REPORTING_HIERARCHY** (alias `rh`) via `REPORTING_HIERARCHY_ID` and filter `rh.IS_CY_RPT_HIER = 1` whenever your query uses vw_td_ebi_region_rpt, vw_TF_EBI_P2S, or vw_TF_EBI_QUOTA.
+20. **Always use QTR_BKT_IND for relative quarter filtering** (CQ, PQ, NQ, etc.) instead of hardcoding FISCAL_YR_AND_QTR_DESC. Join vw_EBI_CALDATE and filter: QTR_BKT_IND = -1 (previous quarter), 0 (current quarter), 1 (next quarter), 2-4 (future quarters). Only use FISCAL_YR_AND_QTR_DESC when the user explicitly names a specific quarter (e.g., "2026-Q2"). Use FISCAL_YR_AND_QTR_DESC as a SELECT display column, not as a WHERE filter for relative periods.
 
 ## Signal Definitions
 

@@ -905,7 +905,7 @@
       },
       "ROLE_TYPE_DISPLAY": {
         "type": "VARCHAR",
-        "description": "role type display name",
+        "description": "role type display name — AE = Account Executive, PS = Product Specialist, RSS = Renewal Specialist",
         "distinct_values": [
           "RSS",
           "SAM",
@@ -9714,5 +9714,32 @@
       "sub_market_area_code",
       "td_ebi_country"
     ]
+  },
+  "TD_EBI_REPORTING_HIERARCHY": {
+    "description": "Reporting hierarchy dimension table. Maps reporting hierarchy assignments used in quota and pipeline reporting. Join via REPORTING_HIERARCHY_ID.",
+    "columns": {
+      "REPORTING_HIERARCHY_ID": {
+        "type": "INT",
+        "description": "unique reporting hierarchy identifier",
+        "pk": true,
+        "fk": true
+      },
+      "REPORTING_HIERARCHY": {
+        "type": "VARCHAR",
+        "description": "reporting hierarchy name"
+      },
+      "REPORTING_HIERARCHY_SORT": {
+        "type": "INT",
+        "description": "sort order for reporting hierarchy"
+      },
+      "IS_ACTIVE": {
+        "type": "BIT",
+        "description": "soft-delete flag; always filter IS_ACTIVE = 1"
+      },
+      "IS_CY_RPT_HIER": {
+        "type": "BIT",
+        "description": "current-year reporting hierarchy flag; always filter IS_CY_RPT_HIER = 1 to restrict to active current-year hierarchies"
+      }
+    }
   }
 }

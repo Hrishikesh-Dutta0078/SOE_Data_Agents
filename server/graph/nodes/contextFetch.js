@@ -153,7 +153,7 @@ async function contextFetchNode(state) {
   // Distinct values for WHERE clause filter hints
   const distinctValues = collectDistinctValues(tableNames);
 
-  // Mandatory filters (e.g., ROLE_TYPE_DISPLAY = 'AE') from definitions.json
+  // Mandatory filters (e.g., ROLE_COVERAGE_ID IN (1, 3)) from definitions.json
   const mandatoryFilters = getMandatoryFiltersForTables(tableNames);
 
   const duration = Date.now() - start;

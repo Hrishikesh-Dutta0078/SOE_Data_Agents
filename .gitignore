@@ -1,4 +1,6 @@
 server/.env
+server/.env.development
+server/.env.production
 reports/
 server/cert.pem
 server/key.pem

@@ -560,6 +560,9 @@ Return only what is explicitly stated in the user parameters.`;
 
   const decompLabel = needsDecomposition ? ' | MULTI-QUERY' : '';
   logger.info(`[Classify] ${result.intent} | ${result.complexity} | ${questionCategory}${matchType ? ` | match:${matchType}` : ''}${decompLabel} (${duration}ms)`);
+  if (result.reasoning) {
+    logger.info('Classify reasoning:\n' + result.reasoning);
+  }
 
   const output = {
     ...stateReset,
