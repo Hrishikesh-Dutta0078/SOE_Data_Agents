@@ -68,9 +68,14 @@ Question Sub-Category: {questionSubCategory}
 
 Columns: {columns}
 Total rows: {rowCount}
+
+Column Statistics (computed over ALL {rowCount} rows):
+{columnStats}
+
 Sample data ({sampleCount} rows):
 {sampleData}
 
+Use the column statistics to understand the full data distribution. The sample rows are for reference only — base your numerical claims on the statistics above, not the sample.
 Provide strategic insights and follow-up questions.`;
 
 const insightPrompt = ChatPromptTemplate.fromMessages([
@@ -101,6 +106,74 @@ const chartPrompt = ChatPromptTemplate.fromMessages([
   ['human', CHART_USER],
 ]);
 
+/**
+ * Compute per-column summary statistics from the full result set.
+ * Numeric columns get min/max/mean/median/sum; categorical columns get
+ * distinct count and top values by frequency.
+ */
+function computeColumnStats(rows, columns) {
+  if (!rows?.length || !columns?.length) return 'No data available.';
+
+  const MAX_DISTINCT_DISPLAY = 10;
+  const lines = [];
+
+  for (const col of columns) {
+    const values = rows.map((r) => r[col]);
+    const nonNull = values.filter((v) => v != null && v !== '');
+    const nullCount = values.length - nonNull.length;
+
+    // Detect numeric column: check first non-null values
+    const numericVals = nonNull
+      .map((v) => (typeof v === 'number' ? v : Number(v)))
+      .filter((n) => !isNaN(n));
+
+    if (numericVals.length > nonNull.length * 0.7 && numericVals.length > 0) {
+      // Numeric column
+      numericVals.sort((a, b) => a - b);
+      const sum = numericVals.reduce((s, v) => s + v, 0);
+      const mean = sum / numericVals.length;
+      const mid = Math.floor(numericVals.length / 2);
+      const median = numericVals.length % 2 === 0
+        ? (numericVals[mid - 1] + numericVals[mid]) / 2
+        : numericVals[mid];
+      const p25 = numericVals[Math.floor(numericVals.length * 0.25)];
+      const p75 = numericVals[Math.floor(numericVals.length * 0.75)];
+
+      const fmt = (n) => {
+        if (Math.abs(n) >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
+        if (Math.abs(n) >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
+        return Number.isInteger(n) ? String(n) : n.toFixed(2);
+      };
+
+      let line = `  ${col} (numeric): min=${fmt(numericVals[0])}, max=${fmt(numericVals[numericVals.length - 1])}, mean=${fmt(mean)}, median=${fmt(median)}, P25=${fmt(p25)}, P75=${fmt(p75)}, sum=${fmt(sum)}`;
+      if (nullCount > 0) line += `, nulls=${nullCount}`;
+      lines.push(line);
+    } else {
+      // Categorical column
+      const freq = {};
+      for (const v of nonNull) {
+        const key = String(v);
+        freq[key] = (freq[key] || 0) + 1;
+      }
+      const distinct = Object.keys(freq).length;
+      const sorted = Object.entries(freq).sort((a, b) => b[1] - a[1]);
+      const topEntries = sorted.slice(0, MAX_DISTINCT_DISPLAY);
+      const topStr = topEntries.map(([val, cnt]) => `${val} (${cnt})`).join(', ');
+
+      let line = `  ${col} (categorical): ${distinct} distinct`;
+      if (distinct <= MAX_DISTINCT_DISPLAY) {
+        line += ` [${topStr}]`;
+      } else {
+        line += `, top ${MAX_DISTINCT_DISPLAY}: [${topStr}]`;
+      }
+      if (nullCount > 0) line += `, nulls=${nullCount}`;
+      lines.push(line);
+    }
+  }
+
+  return lines.join('\n');
+}
+
 function buildInsightInputs(state, sample) {
   const exec = state.execution;
   const category = state.questionCategory || '';
@@ -114,6 +187,7 @@ function buildInsightInputs(state, sample) {
     categoryGuidance: guidance,
     columns: (exec?.columns || []).join(', '),
     rowCount: String(exec?.rowCount ?? 0),
+    columnStats: computeColumnStats(exec?.rows, exec?.columns),
     sampleCount: String(sample?.length ?? 0),
     sampleData: JSON.stringify(sample || [], null, 2),
   };

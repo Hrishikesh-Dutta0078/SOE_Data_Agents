@@ -27,7 +27,7 @@ const MODEL_PROFILES = Object.freeze({
 });
 
 module.exports = {
-  DEFAULT_PORT: 5005,
+  DEFAULT_PORT: 5175,
 
   // --- Database ---
   DB_REQUEST_TIMEOUT: 60000, // 1 minute query timeout
