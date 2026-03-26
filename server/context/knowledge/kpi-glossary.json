@@ -3,8 +3,16 @@
     {
       "id": "cy_projection_dollar",
       "name": "CY Projection $",
-      "aliases": ["current year projection", "FY projection", "projected amount"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "current year projection",
+        "FY projection",
+        "projected amount"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Current FY projected $ amount by taking YTD Outlook $ + (Future Pipe by Close Ratio) - PQ(Won) + CQ(W+F+UC) + FQ (open pipe * Proj. close ratio)",
       "formula": "YTD Outlook $ + (Future Pipe * Close Ratio) - PQ(Won) + CQ(W+F+UC) + FQ(open pipe * Proj. close ratio)",
@@ -17,92 +25,178 @@
         "FQ": "Future quarter open pipe * projected close ratio"
       },
       "timeVariants": [],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_EBI_CALDATE"]
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "cy_projection_pct",
       "name": "CY Projection %",
-      "aliases": ["current year projection percent", "FY projection attainment"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "current year projection percent",
+        "FY projection attainment"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Current FY projected attainment by taking YTD Outlook $ + (Future Pipe by Close Ratio) divided by Quota",
       "formula": "(PQ(Won) + CQ(W+F+UC) + FQ(open pipe * Proj. close ratio)) / Quota",
       "components": {},
       "timeVariants": [],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA"]
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA"
+      ]
     },
     {
       "id": "attrition_outlook_dollar",
       "name": "Attrition $ Outlook",
-      "aliases": ["attrition outlook", "CQ attrition", "attrition risk upside"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "attrition outlook",
+        "CQ attrition",
+        "attrition risk upside"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "CQ Attrition Outlook $ value, with Additional risk $ and upside $ as subtext. Updated by RSOM in Elixir.",
       "formula": "CQ Attrition Outlook $ (from Elixir); subtext: Additional risk $, upside $",
       "components": {},
-      "timeVariants": ["QTD", "YTD", "Q+1"],
+      "timeVariants": [
+        "QTD",
+        "YTD",
+        "Q+1"
+      ],
       "relatedColumns": [],
       "relatedTables": []
     },
     {
       "id": "attrition_ytd_outlook",
       "name": "Attrition YTD Outlook $",
-      "aliases": ["YTD attrition outlook", "attrition YTD"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "YTD attrition outlook",
+        "attrition YTD"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "YTD Attrition Outlook $ as updated by RSOM in Elixir",
       "formula": "Sum of attrition outlook for FY to date",
       "components": {},
-      "timeVariants": ["YTD"],
+      "timeVariants": [
+        "YTD"
+      ],
       "relatedColumns": [],
       "relatedTables": []
     },
     {
       "id": "attrition_outlook_pct",
       "name": "Attrition outlook %",
-      "aliases": ["attrition percent", "attrition vs plan"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "attrition percent",
+        "attrition vs plan"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "CQ Attrition Outlook as updated by RSOM in Elixir vs CQ Attrition Plan $",
       "formula": "Current Qtr Attrition Outlook $ / Current Qtr Attrition Plan $",
       "components": {},
-      "timeVariants": ["QTD", "YTD", "H1", "Q+1"],
+      "timeVariants": [
+        "QTD",
+        "YTD",
+        "H1",
+        "Q+1"
+      ],
       "relatedColumns": [],
       "relatedTables": []
     },
     {
       "id": "attrition_pct_plan",
       "name": "Attrition % (with Attrition Vs Plan as subtext)",
-      "aliases": ["attrition vs plan percent", "lost downsell vs plan"],
-      "personas": ["VP"],
+      "aliases": [
+        "attrition vs plan percent",
+        "lost downsell vs plan"
+      ],
+      "personas": [
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "% of Lost/downsell $ outlooked (by RSOM in Elixir) vs Plan/QRF for CQ, with $ values as subtext",
       "formula": "Current Qtr Attrition Outlook $ / Current Qtr Attrition Plan $",
       "components": {},
-      "timeVariants": ["QTD", "YTD", "H1"],
+      "timeVariants": [
+        "QTD",
+        "YTD",
+        "H1"
+      ],
       "relatedColumns": [],
       "relatedTables": []
     },
     {
       "id": "forecast",
       "name": "Forecast",
-      "aliases": ["adj commit", "adjusted commitment", "forecast amount"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "adj commit",
+        "adjusted commitment",
+        "forecast amount"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "For reps, Adj Commit = Forecast $ amount in Current Quarter. For Managers, Adj Manager Commit = Forecast $ amount in Current Quarter.",
       "formula": "Forecast $ in CQ (reps: Adj Commit; Managers: Adj Manager Commit)",
       "components": {},
       "timeVariants": [],
       "relatedColumns": [],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA"]
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA"
+      ]
     },
     {
       "id": "gnarr_pct",
       "name": "GNARR %",
-      "aliases": ["GNARR", "gross new arr", "bookings attainment", "GNARR vs Quota", "GNARR vs Plan", "GNARR vs QRF"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "GNARR",
+        "gross new arr",
+        "bookings attainment",
+        "GNARR vs Quota",
+        "GNARR vs Plan",
+        "GNARR vs QRF"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Actual bookings and Outlook for the current quarter expressed as % of Quota/Plan number, $ values as subtext. AE/Manager use Quota; VP uses Plan/QRF.",
       "formula": "Current Qtr (W+F+UC)$ / Plan$ (or Quota for AE/Manager)",
@@ -111,41 +205,97 @@
         "F": "Forecast (Adj Commit) $ amount in CQ",
         "UC": "Upside Committed $ amount in CQ"
       },
-      "timeVariants": ["QTD", "YTD", "H1"],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL", "SALES_STAGE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_ebi_sales_stage"]
+      "timeVariants": [
+        "QTD",
+        "YTD",
+        "H1"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL",
+        "SALES_STAGE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_ebi_sales_stage"
+      ]
     },
     {
       "id": "gnarr_h1_pct",
       "name": "GNARR H1 %",
-      "aliases": ["H1 GNARR", "first half attainment", "Q1 Q2 GNARR"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "H1 GNARR",
+        "first half attainment",
+        "Q1 Q2 GNARR"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Actual bookings and Outlook for Q1 and Q2 of the FY, expressed as % of Quota/Plan for (Q1+Q2)",
       "formula": "H1 Finish (or W+F+UC) / H1 Plan $",
       "components": {},
-      "timeVariants": ["H1"],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "H1"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "gnarr_ytd_pct",
       "name": "GNARR YTD %",
-      "aliases": ["YTD GNARR", "year to date attainment", "GNARR vs Quota YTD"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "YTD GNARR",
+        "year to date attainment",
+        "GNARR vs Quota YTD"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Actual bookings for prior quarters and Outlook for the current quarter, expressed as % of Quota/Plan for FY. CQ = W+F+UC, PQ = Won.",
       "formula": "Sum of GNARR$ (CQ = W+F+UC, PQ = Won) / Plan or Quota YTD",
       "components": {},
-      "timeVariants": ["YTD"],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "s3_fu_ltg_covx",
       "name": "S3+(F+U) LTG Covx",
-      "aliases": ["S3+ LTG coverage", "left to go coverage S3", "LTG covx"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "S3+ LTG coverage",
+        "left to go coverage S3",
+        "LTG covx"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Coverage of open pipe (F+UC) compared to LTG quota for CQ. S3+(F+U) = Sum of GNARR S3+ for deals where Adj commitment = Forecast AND Upside.",
       "formula": "S3+ (F+U) / TARGET LEFT TO GO $",
@@ -153,118 +303,256 @@
         "S3+ F+U": "Sum of GNARR S3+ where Adj commitment = Forecast AND Upside (Manager Adj for FLM, SLM, TLM)"
       },
       "timeVariants": [],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "s5_fu_ltg_covx",
       "name": "S5+(F+U) LTG Covx",
-      "aliases": ["S5+ LTG coverage", "mature LTG covx"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "S5+ LTG coverage",
+        "mature LTG covx"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Coverage of open S5+ pipe (F+UC) compared to LTG quota for CQ. S5+(F+U) = Sum of GNARR S5+ for deals where Adj commitment = Forecast AND Upside.",
       "formula": "S5+ (F+U) / TARGET LEFT TO GO $",
       "components": {},
       "timeVariants": [],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "upside",
       "name": "Upside",
-      "aliases": ["upside committed", "upside amount"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "upside committed",
+        "upside amount"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Adj Commit = Upside $ for Reps; Manager Adj Commit = Upside Committed $ for Managers in CQ",
       "formula": "Upside $ in CQ",
       "components": {},
       "timeVariants": [],
       "relatedColumns": [],
-      "relatedTables": ["vw_TF_EBI_P2S"]
+      "relatedTables": [
+        "vw_TF_EBI_P2S"
+      ]
     },
     {
       "id": "won",
       "name": "Won",
-      "aliases": ["won amount", "booked", "closed booked"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "won amount",
+        "booked",
+        "closed booked"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Won $ amount in CQ",
       "formula": "Sum of opportunity $ where deal closed won in CQ",
       "components": {},
       "timeVariants": [],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "flm_participation_qtd",
       "name": "% FLM Participation QTD",
-      "aliases": ["FLM participation", "first level manager participation QTD"],
-      "personas": ["Manager", "VP"],
+      "aliases": [
+        "FLM participation",
+        "first level manager participation QTD"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "% of Number of FLMs with >75% Attainment (Curr Qtr Projected Finish) vs Total FLMs. Base: FLM (W+F+UC) / FLM Quota QTD",
       "formula": "Count of FLMs with >=75% attainment / Total FLMs, where attainment = (W+F+UC) / Quota QTD for CQ",
       "components": {},
-      "timeVariants": ["QTD", "YTD"],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "QTD",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "slm_participation_qtd",
       "name": "% SLM Participation QTD",
-      "aliases": ["SLM participation", "second level manager participation"],
-      "personas": ["Manager"],
+      "aliases": [
+        "SLM participation",
+        "second level manager participation"
+      ],
+      "personas": [
+        "Manager"
+      ],
       "section": "Landing Page",
       "definition": "% of Number of SLMs with >75% Attainment (Curr Qtr Projected Finish) vs Total SLMs",
       "formula": "Count of SLMs with >=75% attainment / Total SLMs",
       "components": {},
-      "timeVariants": ["QTD", "YTD"],
+      "timeVariants": [
+        "QTD",
+        "YTD"
+      ],
       "relatedColumns": [],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt"]
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt"
+      ]
     },
     {
       "id": "participation_qtd_reps",
       "name": "% Participation QTD reps",
-      "aliases": ["participation rate", "reps participation", "AE participation QTD", "participation reps"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "participation rate",
+        "reps participation",
+        "AE participation QTD",
+        "participation reps"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "% of No. of Reps with >75% Attainment (Curr Qtr Projected Finish) vs Total Active In-place Reps. Base KPI: AE (W+F+UC) / AE Quota QTD for CQ",
       "formula": "Count of AEs with >=75% attainment / Total AE in Seats, where attainment = (W+F+UC) / Quota QTD, close quarter = CQ",
       "components": {},
-      "timeVariants": ["QTD", "YTD"],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "QTD",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "participation_team",
       "name": "% Participation Team",
-      "aliases": ["team participation", "teams at 75%", "participation teams"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "team participation",
+        "teams at 75%",
+        "participation teams"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "% of Teams that Participated vs Total Teams at FLM level. Team participation = more than 50% of reps in team have attainment (or Proj Finish) >75%",
       "formula": "Count of teams where >50% of reps have attainment >75% / Total teams",
       "components": {},
       "timeVariants": [],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt"]
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt"
+      ]
     },
     {
       "id": "my_participation_qtd",
       "name": "My Participation (QTD)",
-      "aliases": ["my attainment", "my participation", "individual attainment"],
-      "personas": ["Manager"],
+      "aliases": [
+        "my attainment",
+        "my participation",
+        "individual attainment"
+      ],
+      "personas": [
+        "Manager"
+      ],
       "section": "Landing Page",
       "definition": "Attainment (W+F+UC) for CQ for the individual logging in - Individual's Attainment (Curr Qtr Proj Finish) with $ subtext",
       "formula": "Individual (W+F+UC) / Individual Quota for CQ",
       "components": {},
-      "timeVariants": ["QTD"],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt"]
+      "timeVariants": [
+        "QTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt"
+      ]
     },
     {
       "id": "account_ryg_arr",
       "name": "Account R/Y/G by ARR",
-      "aliases": ["account health by ARR", "account red yellow green ARR"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "account health by ARR",
+        "account red yellow green ARR"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Shows % distribution of ARR of Accounts for each Account Health color in the Account patch. No. of Accounts shown in subtext",
       "formula": "Group accounts by Account Health (R/Y/G), show % of ARR and count",
@@ -276,8 +564,15 @@
     {
       "id": "account_ryg_count",
       "name": "Account R/Y/G by count",
-      "aliases": ["account health by count", "account red yellow green count"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "account health by count",
+        "account red yellow green count"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Shows % distribution of Count of Accounts for each Account Health color in the Account patch",
       "formula": "Group accounts by Account Health (R/Y/G), show % of count",
@@ -289,8 +584,15 @@
     {
       "id": "arravg_parent",
       "name": "ARRAVG (Total Parent Account count as subtext)",
-      "aliases": ["ARRAVG parents", "parent ARR average"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "ARRAVG parents",
+        "parent ARR average"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "ARRAVG for all Parents in the user's patch, with no. of Parents as subtext",
       "formula": "Sum of ARR / Count of Parent Accounts",
@@ -302,8 +604,15 @@
     {
       "id": "arravg_sub",
       "name": "ARRAVG (Total Sub Account count as subtext)",
-      "aliases": ["ARRAVG subs", "sub account ARR average"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "ARRAVG subs",
+        "sub account ARR average"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "ARRAVG for all Subs in the user's patch, with no. of Subs as subtext",
       "formula": "Sum of ARR / Count of Sub Accounts",
@@ -315,77 +624,182 @@
     {
       "id": "creation_gap_qtd",
       "name": "Creation Gap QTD %",
-      "aliases": ["creation gap", "gap to creation target QTD"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "creation gap",
+        "gap to creation target QTD"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "% of Gap to Creation Target QTD vs Creation Target QTD. Creation = total pipeline qualified to stage 3 and above",
       "formula": "(Creation Target QTD - Creation QTD) / Creation Target QTD",
       "components": {
         "Creation": "Pipeline qualified to stage 3 and above"
       },
-      "timeVariants": ["QTD", "YTD"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CREATE_DATE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "QTD",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CREATE_DATE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "creation_gap_ytd",
       "name": "Creation Gap YTD %",
-      "aliases": ["creation gap YTD", "gap to creation target YTD"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "creation gap YTD",
+        "gap to creation target YTD"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "% of Gap to Creation Target YTD vs Creation Target YTD. Creation = total pipeline qualified to stage 3 and above",
       "formula": "((Full Qtr Creation Target for prev Qtrs + Creation Target QTD) - Creation YTD) / (Full Qtr Creation Target for prev Qtrs + Creation Target QTD)",
       "components": {},
-      "timeVariants": ["YTD"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CREATE_DATE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CREATE_DATE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "gross_creation_qtd",
       "name": "Gross Creation QTD",
-      "aliases": ["gross creation", "creation QTD", "pipeline creation QTD"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "gross creation",
+        "creation QTD",
+        "pipeline creation QTD"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "% of Total pipeline qualified to stage 3 and above QTD vs Creation Target QTD. Oppty $ where Stage in 3,4,5,6,7, closed booked, clean up, lost; qualification quarter = CQ and close quarter in CQ..CQ+4",
       "formula": "Gross Creation $ / Gross Creation QTD Targets",
       "components": {
         "Gross Creation": "Oppty $ where Stage in 3,4,5,6,7, closed booked, clean up, lost; qualification quarter = CQ; close quarter in CQ, CQ+1, CQ+2, CQ+3, CQ+4"
       },
-      "timeVariants": ["QTD", "YTD"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CREATE_DATE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "QTD",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CREATE_DATE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "gross_creation_ytd",
       "name": "Gross Creation YTD",
-      "aliases": ["gross creation YTD", "creation YTD"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "gross creation YTD",
+        "creation YTD"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "% of Total pipeline qualified to stage 3 and above YTD vs Creation Target YTD. Same stage and quarter filters as Gross Creation QTD.",
       "formula": "Gross Creation $ YTD / Gross Creation YTD Targets",
       "components": {},
-      "timeVariants": ["YTD"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CREATE_DATE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CREATE_DATE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "mature_pipe_s5_q1",
       "name": "Mature Pipe SS5+ (Q+1)",
-      "aliases": ["mature pipeline Q+1", "S5+ coverage Q+1", "SS5+ Q+1"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "mature pipeline Q+1",
+        "S5+ coverage Q+1",
+        "SS5+ Q+1"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "Mature pipeline (S5+) $ w.r.t. total bookings target $ for CQ+1",
       "formula": "Sum of GNARR $ / Bookings Targets where Sales Stage = S5+ at CQ+1",
       "components": {},
-      "timeVariants": ["Q+1", "Q+2", "Q+3", "R4Q"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "Q+1",
+        "Q+2",
+        "Q+3",
+        "R4Q"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "rbob",
       "name": "RBOB",
-      "aliases": ["renewal base of business", "renewal baseline", "IC RBoB OOC RBoB"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "renewal base of business",
+        "renewal baseline",
+        "IC RBoB OOC RBoB"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Baseline ARRAVG of the account patch for CQ. Calc: IC RBoB$ + OOC RBoB$",
       "formula": "IC RBoB$ + OOC RBoB$",
@@ -400,47 +814,106 @@
     {
       "id": "renewal_rate_outlook",
       "name": "Renewal Rate Outlook",
-      "aliases": ["renewal rate", "renewal rate CQ"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "renewal rate",
+        "renewal rate CQ"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "(RBOB + Attrition Outlook updated by RSOM in Elixir) / RBOB, calculated for CQ",
       "formula": "(RBOB + Attrition Outlook) / RBOB",
       "components": {},
-      "timeVariants": ["Q+1", "YTD"],
+      "timeVariants": [
+        "Q+1",
+        "YTD"
+      ],
       "relatedColumns": [],
       "relatedTables": []
     },
     {
       "id": "s3_covx_q1",
       "name": "S3+ Q+1 Covx",
-      "aliases": ["S3+ coverage Q+1", "pipeline coverage Q+1", "S3+ covx"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "S3+ coverage Q+1",
+        "pipeline coverage Q+1",
+        "S3+ covx"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Current pipeline (S3+) $ w.r.t. total bookings target $ for CQ+1",
       "formula": "S3+ in CQ+1 / Quota for CQ+1",
       "components": {},
-      "timeVariants": ["Q+1", "Q+2", "R4Q"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "Q+1",
+        "Q+2",
+        "R4Q"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "s5_covx_q1",
       "name": "S5+ Q+1 Covx",
-      "aliases": ["S5+ coverage Q+1", "mature coverage Q+1", "S5+ covx"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "S5+ coverage Q+1",
+        "mature coverage Q+1",
+        "S5+ covx"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Mature pipeline (S5+) $ w.r.t. total bookings target $ for CQ+1",
       "formula": "S5+ in CQ+1 / Quota for CQ+1",
       "components": {},
-      "timeVariants": ["Q+1", "Q+2", "Q+3"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "Q+1",
+        "Q+2",
+        "Q+3"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "solution_ryg_arr",
       "name": "Solution R/Y/G by ARR",
-      "aliases": ["solution health by ARR", "solution red yellow green"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "solution health by ARR",
+        "solution red yellow green"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Shows % distribution of ARR of solutions for each Solution Health color in the Account patch",
       "formula": "Group solutions by Solution Health (R/Y/G), show % ARR and count",
@@ -452,8 +925,14 @@
     {
       "id": "solution_ryg_count",
       "name": "Solution R/Y/G by count",
-      "aliases": ["solution health by count"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "solution health by count"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Shows % distribution of Count of solutions for each Solution Health color in the Account patch",
       "formula": "Group solutions by Solution Health (R/Y/G), show % count",
@@ -465,8 +944,16 @@
     {
       "id": "tier1_account_completion",
       "name": "Tier 1 PRNT Account Completion %",
-      "aliases": ["tier 1 account planned", "tier 1 completion", "TIER 1 A/C PLANNED %"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "tier 1 account planned",
+        "tier 1 completion",
+        "TIER 1 A/C PLANNED %"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "% of Tier 1 Account Plans completed count vs Total Tier 1 Accounts. Counted at Parent Level. Tracked via Territory Account Planning Tool (TPT).",
       "formula": "Number of Accounts with Completed Plans × 100 / Total Number of Accounts",
@@ -478,8 +965,15 @@
     {
       "id": "tier1_sub_completion",
       "name": "Tier 1 Sub Account Completion %",
-      "aliases": ["tier 1 sub completion", "tier 1 sub account planned"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "tier 1 sub completion",
+        "tier 1 sub account planned"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "% of Tier 1 Account Plans completed count vs Total Tier 1 Accounts. Counted at Sub Level.",
       "formula": "Completed Tier 1 Sub Account Plans / Total Tier 1 Sub Accounts",
@@ -491,199 +985,4280 @@
     {
       "id": "upsell_attach_rate",
       "name": "Upsell attach Rate",
-      "aliases": ["upsell attach", "upsell rate", "upsell $/RBOB"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "upsell attach",
+        "upsell rate",
+        "upsell $/RBOB"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "Shows Count or $ of upsell deals attached S3+ with Renewal deals vs Total $ of renewal deals. Upsell = Sub ID+OPG+MA+Opp Close Qtr.",
       "formula": "QTD: Upsell deals S3+ with Renewal in CQ / Total renewal deals $. YTD: same for YTD.",
       "components": {},
-      "timeVariants": ["QTD", "YTD"],
+      "timeVariants": [
+        "QTD",
+        "YTD"
+      ],
       "relatedColumns": [],
       "relatedTables": []
     },
     {
       "id": "pipeline_l2_ytd_pct",
       "name": "Pipeline L2 YTD %",
-      "aliases": ["pipeline L2 YTD", "gross creation YTD percent"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "pipeline L2 YTD",
+        "gross creation YTD percent"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "YTD % of total gross creation w.r.t. total gross creation targets till date",
       "formula": "Total Gross Creation YTD × 100 / Total Gross Creation Target YTD",
       "components": {},
-      "timeVariants": ["YTD", "QTD"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CREATE_DATE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "YTD",
+        "QTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CREATE_DATE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "s4_prog_vs_s3_boq",
       "name": "S4+ PROG vs S3 BoQ %",
-      "aliases": ["S4 progression", "S4+ prog vs S3", "pipeline progression S4"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "S4 progression",
+        "S4+ prog vs S3",
+        "pipeline progression S4"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "% of total pipeline that moved from S3 to S4+ and booked, covering deals with close dates in current and next two qtrs, w.r.t. total S3 pipeline at start of qtr",
       "formula": "Sum of Pipeline $ progressed to Stage 4+ and booked (close qtr = CQ or next 2) / BOQ stage 3 pipeline",
       "components": {},
       "timeVariants": [],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_ebi_sales_stage", "vw_EBI_CALDATE", "vw_TF_EBI_PIPE_WALK"]
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE",
+        "vw_TF_EBI_PIPE_WALK"
+      ]
     },
     {
       "id": "s5_prog_vs_tgt",
       "name": "S5+ PROG vs TGT %",
-      "aliases": ["S5+ progression", "S5 progression vs target", "mature progression"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "S5+ progression",
+        "S5 progression vs target",
+        "mature progression"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "% of pipe $, deals moving from S3 or 4 to S5 or beyond including won, for current and next two qtrs, w.r.t. True progression targets",
       "formula": "Sum of Pipeline $ progressed to Stage 5+ or booked (close qtr = CQ or next 2) / True progression targets",
       "components": {},
       "timeVariants": [],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "pipe_covx",
       "name": "PIPE COV X",
-      "aliases": ["pipe coverage", "pipeline coverage", "PIPE COVX", "coverage ratio"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "pipe coverage",
+        "pipeline coverage",
+        "PIPE COVX",
+        "coverage ratio"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "Current pipeline $ w.r.t. total bookings target $. Applied for CQ+1, CQ+2, CQ+3.",
       "formula": "Total pipe $ / Bookings Target $ where close quarter = CQ+1 (or CQ+2, CQ+3)",
       "components": {},
-      "timeVariants": ["Q+1", "Q+2", "Q+3"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "Q+1",
+        "Q+2",
+        "Q+3"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "s5_covx",
       "name": "S5+ COV X",
-      "aliases": ["S5+ coverage", "mature pipeline coverage", "mature covx"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "S5+ coverage",
+        "mature pipeline coverage",
+        "mature covx"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "Mature pipeline $ w.r.t. total bookings target $. Total SS5+ pipe $ / Bookings Target $ where close quarter = CQ+1, CQ+2, or CQ+3",
       "formula": "Total SS5+ pipe $ / Bookings Target $ where close quarter = CQ+1 (or CQ+2, CQ+3)",
       "components": {},
-      "timeVariants": ["Q+1", "Q+2", "Q+3"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "Q+1",
+        "Q+2",
+        "Q+3"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "stalled_pct",
       "name": "STALLED %",
-      "aliases": ["stalled pipeline", "stalled percent", "stalled pipeline percent"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "stalled pipeline",
+        "stalled percent",
+        "stalled pipeline percent"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "% of stalled pipeline $ w.r.t. total pipeline $. Use STALLED_BUT_INACTIVE = 'Stalled & Inactive' flag on vw_TF_EBI_P2S to identify stalled deals. Active = Total Pipe - Stalled.",
       "formula": "SUM(CASE WHEN STALLED_BUT_INACTIVE = 'Stalled & Inactive' THEN OPPTY ELSE 0 END) / SUM(OPPTY) where IN_PIPELINE = 1",
       "components": {
         "STALLED_BUT_INACTIVE": "Stalled/inactive deal indicator flag on vw_TF_EBI_P2S"
       },
-      "timeVariants": ["Q+1", "Q+2", "Q+3"],
-      "relatedColumns": ["Oppty", "STALLED_BUT_INACTIVE", "IN_PIPELINE"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_td_ebi_region_rpt"]
+      "timeVariants": [
+        "Q+1",
+        "Q+2",
+        "Q+3"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "STALLED_BUT_INACTIVE",
+        "IN_PIPELINE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_td_ebi_region_rpt"
+      ]
     },
     {
       "id": "ae_12x_s5_pct",
       "name": "AE >1.2X S5+ %",
-      "aliases": ["AE 1.2x S5+", "AEs meeting mature coverage 1.2x"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "AE 1.2x S5+",
+        "AEs meeting mature coverage 1.2x"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "Count of AEs that met mature coverage 1.2x w.r.t. total In Place Active AEs. Close quarter = CQ+1",
       "formula": "Count of AEs with >= 1.2x Mature covx / Total AE in Seats where close quarter = CQ+1",
       "components": {},
-      "timeVariants": ["Q+1"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "Q+1"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "ae_2x_pct",
       "name": "AE >2X %",
-      "aliases": ["AE 2x", "AEs meeting pipe coverage 2x"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "AE 2x",
+        "AEs meeting pipe coverage 2x"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "Count of AEs that met total pipe coverage 2x w.r.t. total In Place Active AEs. Close quarter = CQ+2 or CQ+3",
       "formula": "Count of AEs with >= 2x Pipe covx / Total AE in Seats where close quarter = CQ+2 (or CQ+3)",
       "components": {},
-      "timeVariants": ["Q+2", "Q+3"],
-      "relatedColumns": ["Oppty", "SALES_STAGE_ID", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt", "vw_ebi_sales_stage", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "Q+2",
+        "Q+3"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "SALES_STAGE_ID",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "ae_part_75_qtd",
       "name": "AE PART @75% QTD %",
-      "aliases": ["AE participation 75 QTD", "reps at 75% QTD", "AE PART 75"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "AE participation 75 QTD",
+        "reps at 75% QTD",
+        "AE PART 75"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "Count of reps that attained 75% of their quota in the current quarter w.r.t. total In-Place Active reps",
       "formula": "Count of AEs with >= 75% attainment / Total AE in Seats where close quarter = CQ",
       "components": {},
-      "timeVariants": ["QTD", "YTD"],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "QTD",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "ae_part_75_ytd",
       "name": "AE PART @75% YTD %",
-      "aliases": ["AE participation 75 YTD", "reps at 75% YTD"],
-      "personas": ["AE", "Manager", "VP"],
+      "aliases": [
+        "AE participation 75 YTD",
+        "reps at 75% YTD"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "Count of reps that attained 75% of their quota in the year to date w.r.t. total In-Place Active reps",
       "formula": "Count of AEs with >= 75% attainment / Total AE in Seats where close quarter = CQ or Past Quarter in year",
       "components": {},
-      "timeVariants": ["YTD"],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "ae_in_seat_pct",
       "name": "AE IN SEAT %",
-      "aliases": ["AE in seat", "in place reps percent"],
-      "personas": ["Manager", "VP"],
+      "aliases": [
+        "AE in seat",
+        "in place reps percent"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "Count of total in-place active reps w.r.t. total Active reps",
       "formula": "Count of active in-place AEs / Total active AE",
       "components": {},
       "timeVariants": [],
       "relatedColumns": [],
-      "relatedTables": ["vw_td_ebi_region_rpt"]
+      "relatedTables": [
+        "vw_td_ebi_region_rpt"
+      ]
     },
     {
       "id": "flm_50_ae_75_ytd",
       "name": "FLM W/ >50% AE @75% YTD",
-      "aliases": ["FLMs with 50% reps at 75%", "FLM 50% AE 75"],
-      "personas": ["Manager", "VP"],
+      "aliases": [
+        "FLMs with 50% reps at 75%",
+        "FLM 50% AE 75"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "Count of FLMs whose more than 50% reps have attained more than 75% of their quota in the year to date w.r.t. total Active FLMs",
       "formula": "Count of FLMs with >= 50% of AEs attained quota >= 75% / Total FLMs in Seats where close quarter = CQ or Past Quarter in year",
       "components": {},
-      "timeVariants": ["YTD"],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "flm_part_75_ytd",
       "name": "FLM PART @75% YTD %",
-      "aliases": ["FLM participation 75 YTD", "FLM attainment 75"],
-      "personas": ["Manager", "VP"],
+      "aliases": [
+        "FLM participation 75 YTD",
+        "FLM attainment 75"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
       "section": "Pipeline L2",
       "definition": "Count of FLMs that attained 75% of their quota in the year to date w.r.t. total In-Place Active FLMs",
       "formula": "Count of FLMs with >= 75% attainment / Total FLMs in Seats where close quarter = CQ or Past Quarter in year",
       "components": {},
-      "timeVariants": ["YTD"],
-      "relatedColumns": ["Oppty", "QUOTA_ACTUAL", "OPP_CLOSE_DATE_ID"],
-      "relatedTables": ["vw_TF_EBI_P2S", "vw_TF_EBI_QUOTA", "vw_td_ebi_region_rpt", "vw_EBI_CALDATE"]
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "QUOTA_ACTUAL",
+        "OPP_CLOSE_DATE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE"
+      ]
     },
     {
       "id": "net_pct",
       "name": "Net %",
-      "aliases": ["net ARR percent", "net vs plan", "net vs QRF"],
-      "personas": ["VP"],
+      "aliases": [
+        "net ARR percent",
+        "net vs plan",
+        "net vs QRF"
+      ],
+      "personas": [
+        "VP"
+      ],
       "section": "Landing Page",
       "definition": "% of Net ARR (Difference of GNARR $ and Attrition $ outlooks) vs total Net ARR Plan/QRF $, with $ values as subtext",
       "formula": "Current Qtr Net Outlook $ / Current Qtr Net Plan $",
       "components": {},
-      "timeVariants": ["QTD", "YTD", "H1"],
+      "timeVariants": [
+        "QTD",
+        "YTD",
+        "H1"
+      ],
       "relatedColumns": [],
       "relatedTables": []
+    },
+    {
+      "id": "rbob_wo_pq_trail",
+      "name": "RBOB w/o PQ Trail",
+      "aliases": [
+        "RBOB without PQ Trail",
+        "Renewal Base of Business",
+        "RBOB ex PQ"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Renewal Base of Business excluding Prior Quarter Trailing renewals. Represents the total renewal obligation for the period, filtering out PQ trailing deals that were already booked in a prior quarter.",
+      "formula": "SUM(r.RBOB) from vw_TF_EBI_Retention r JOIN vw_TD_EBI_Retention_MetaData m ON r.Retention_MetaData_ID = m.Retention_MetaData_ID WHERE m.PIPELINE_RENEWAL <> 'PQ Trailing'",
+      "components": {
+        "base": "SUM(Retention.RBOB) — total renewal base",
+        "filter": "Exclude rows where Retention_MetaData.PIPELINE_RENEWAL = 'PQ Trailing'"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3",
+        "R4Q"
+      ],
+      "relatedColumns": [
+        "RBOB",
+        "PIPELINE_RENEWAL"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TD_EBI_Retention_MetaData"
+      ]
+    },
+    {
+      "id": "cq_renewal_rate",
+      "name": "CQ Renewal Rate",
+      "aliases": [
+        "Current Quarter Renewal Rate",
+        "Renewal Rate CQ",
+        "RBOB Attainment %"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Current quarter renewal rate, calculated as the ratio of actual renewals (RBOB + ARR Impact) to the renewal base (RBOB w/o PQ Trail). Shows what percentage of the renewal base has been retained.",
+      "formula": "(SUM(r.RBOB) + SUM(r.ARR_Impact)) / NULLIF(SUM(r.RBOB), 0) from vw_TF_EBI_Retention r WHERE PIPELINE_RENEWAL <> 'PQ Trailing' AND QTR_BKT_IND = 0",
+      "components": {
+        "numerator": "RBOB w/o PQ Trail + ARR Impact (actual retained amount)",
+        "denominator": "RBOB w/o PQ Trail (total renewal base)"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "RBOB",
+        "ARR_Impact",
+        "PIPELINE_RENEWAL",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TD_EBI_Retention_MetaData",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "cq_renewal_rate_outlook",
+      "name": "CQ Renewal Rate Outlook",
+      "aliases": [
+        "Renewal Rate Outlook",
+        "CQ RR Outlook"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Current quarter renewal rate outlook, same as Renewal Rate but computed for CQ with outlook adjustments (removes snapshot filters to show the latest view).",
+      "formula": "(SUM(r.RBOB) + SUM(r.ARR_Impact)) / NULLIF(SUM(r.RBOB), 0) from vw_TF_EBI_Retention r WHERE PIPELINE_RENEWAL <> 'PQ Trailing' AND QTR_BKT_IND = 0 -- uses latest snapshot removing IS_LATEST_SNAPSHOT filter",
+      "components": {
+        "numerator": "RBOB w/o PQ Trail + ARR Impact (OCC variant removes snapshot filters)",
+        "denominator": "RBOB w/o PQ Trail"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "RBOB",
+        "ARR_Impact",
+        "PIPELINE_RENEWAL",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TD_EBI_Retention_MetaData",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "arr_impact",
+      "name": "ARR IMPACT",
+      "aliases": [
+        "ARR Impact",
+        "Attrition Impact"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Sum of ARR impact from retention events. Negative values indicate attrition (lost renewals), positive values indicate upsells. Measures the net dollar effect of retention outcomes on Annual Recurring Revenue.",
+      "formula": "SUM(r.ARR_Impact) from vw_TF_EBI_Retention r",
+      "components": {
+        "value": "SUM(Retention.ARR_Impact) — net impact on ARR from all retention events"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3",
+        "FY",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "ARR_Impact"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention"
+      ]
+    },
+    {
+      "id": "renewals_attrition_dollar",
+      "name": "RENEWALS ATTRITION $",
+      "aliases": [
+        "Renewal Attrition Plan",
+        "Attrition Target $"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Planned/targeted attrition dollar amount from the renewals target table. Represents the expected attrition budget based on the selected target type (Quota, Plan, or QRF).",
+      "formula": "SUM(rt.ATTRITION) from vw_TF_EBI_RENEWALS_TARGET rt JOIN vw_TD_EBI_TARGET_TYPE tt ON rt.TARGET_TYPE_ID = tt.TARGET_TYPE_ID WHERE tt.TARGET_TYPE = @SelectedTargetType",
+      "components": {
+        "value": "SUM(RENEWALS_TARGET.ATTRITION) filtered by selected target type"
+      },
+      "timeVariants": [
+        "CQ",
+        "FY"
+      ],
+      "relatedColumns": [
+        "ATTRITION",
+        "TARGET_TYPE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_RENEWALS_TARGET",
+        "vw_TD_EBI_TARGET_TYPE"
+      ]
+    },
+    {
+      "id": "cq_attrition_dollar",
+      "name": "CQ Attrition $",
+      "aliases": [
+        "Current Quarter Attrition",
+        "CQ Attrition"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Current quarter attrition in dollars. The ARR Impact filtered to the current quarter, representing the dollar amount of renewals lost or reduced in CQ.",
+      "formula": "SUM(r.ARR_Impact) from vw_TF_EBI_Retention r JOIN vw_EBI_Caldate c ON ... WHERE c.QTR_BKT_IND = 0",
+      "components": {
+        "value": "ARR IMPACT filtered to current quarter (QTR_BKT_IND = 0)"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "ARR_Impact",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "fy_attrition_dollar",
+      "name": "FY Attrition $",
+      "aliases": [
+        "Full Year Attrition",
+        "FY Attrition",
+        "YTD Attrition"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Fiscal year attrition in dollars. ARR Impact summed across all quarters in the current fiscal year.",
+      "formula": "SUM(r.ARR_Impact) from vw_TF_EBI_Retention r JOIN vw_EBI_Caldate c ON ... WHERE c.CLOSE_YR_BKT_NUMBER = 0",
+      "components": {
+        "value": "ARR IMPACT filtered to current fiscal year (CLOSE_YR_BKT_NUMBER = 0)"
+      },
+      "timeVariants": [
+        "FY"
+      ],
+      "relatedColumns": [
+        "ARR_Impact",
+        "CLOSE_YR_BKT_NUMBER"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "savables",
+      "name": "Savables",
+      "aliases": [
+        "Savable Attrition",
+        "Upside Renewals"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Dollar amount of at-risk renewals that are considered savable (positive RISK_UPSIDE_AMOUNT). Represents potential attrition that could be recovered through proactive retention efforts.",
+      "formula": "SUM(r.RISK_UPSIDE_AMOUNT) from vw_TF_EBI_Retention r WHERE r.RISK_UPSIDE_AMOUNT > 0",
+      "components": {
+        "value": "SUM(Retention.RISK_UPSIDE_AMOUNT) where amount is positive (savable upside)"
+      },
+      "timeVariants": [
+        "CQ",
+        "FY"
+      ],
+      "relatedColumns": [
+        "RISK_UPSIDE_AMOUNT"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention"
+      ]
+    },
+    {
+      "id": "downsell_deal_count",
+      "name": "Downsell Deal #",
+      "aliases": [
+        "Downsell Deals",
+        "Downsell Count"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Count of distinct renewal deals classified as downsells. Counts deals where the customer renewed at a lower amount than the original base.",
+      "formula": "COUNT(DISTINCT r.Retention_MetaData_ID) from vw_TF_EBI_Retention r JOIN vw_TD_EBI_Retention_MetaData m ON ... WHERE m.RENEWAL_TYPE = 'Downsell' AND (m.LINE_CATEGORY = 'System Line' OR (m.LINE_CATEGORY = 'Customer Adjustment' AND m.INTERNAL_SEGMENT_NET_OFF IS NULL))",
+      "components": {
+        "value": "DISTINCT COUNT of Retention_MetaData_ID where RENEWAL_TYPE = 'Downsell'"
+      },
+      "timeVariants": [
+        "CQ",
+        "FY"
+      ],
+      "relatedColumns": [
+        "Retention_MetaData_ID",
+        "RENEWAL_TYPE",
+        "LINE_CATEGORY"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TD_EBI_Retention_MetaData"
+      ]
+    },
+    {
+      "id": "full_attrition_deal_count",
+      "name": "Full Attrition Deal #",
+      "aliases": [
+        "Lost Deals",
+        "Full Attrition Count",
+        "Lost Renewal Count"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Count of distinct renewal deals that were fully lost (complete attrition). The customer did not renew at all.",
+      "formula": "COUNT(DISTINCT r.Retention_MetaData_ID) from vw_TF_EBI_Retention r JOIN vw_TD_EBI_Retention_MetaData m ON ... WHERE m.RENEWAL_TYPE = 'Lost' AND (m.LINE_CATEGORY = 'System Line' OR (m.LINE_CATEGORY = 'Customer Adjustment' AND m.INTERNAL_SEGMENT_NET_OFF IS NULL))",
+      "components": {
+        "value": "DISTINCT COUNT of Retention_MetaData_ID where RENEWAL_TYPE = 'Lost'"
+      },
+      "timeVariants": [
+        "CQ",
+        "FY"
+      ],
+      "relatedColumns": [
+        "Retention_MetaData_ID",
+        "RENEWAL_TYPE",
+        "LINE_CATEGORY"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TD_EBI_Retention_MetaData"
+      ]
+    },
+    {
+      "id": "on_time_renewal_count",
+      "name": "ON TIME RENEWAL #",
+      "aliases": [
+        "On-Time Renewals",
+        "OTR Count"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Retention",
+      "definition": "Count of distinct renewals processed on time (before or by the service end date).",
+      "formula": "COUNT(DISTINCT r.Retention_MetaData_ID) from vw_TF_EBI_Retention r WHERE r.ON_TIME_RENEWAL = 'Yes'",
+      "components": {
+        "value": "DISTINCT COUNT of Retention_MetaData_ID where ON_TIME_RENEWAL = 'Yes'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "Retention_MetaData_ID",
+        "ON_TIME_RENEWAL"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention"
+      ]
+    },
+    {
+      "id": "ltg_overdue",
+      "name": "LTG OVERDUE",
+      "aliases": [
+        "Left To Go Overdue",
+        "Overdue Renewals"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Retention",
+      "definition": "Count of renewal deals that are left to go (not yet closed) and overdue (service end date is in the past). Indicates renewals that should have been completed but remain open.",
+      "formula": "COUNT(DISTINCT r.Retention_MetaData_ID) from vw_TF_EBI_Retention r JOIN vw_TD_EBI_Retention_MetaData m ON ... WHERE m.OUTLOOK_CATEGORY = 'Left To Go' AND m.SERVICE_END_DATE < GETDATE() AND (m.LINE_CATEGORY = 'System Line' OR (m.LINE_CATEGORY = 'Customer Adjustment' AND m.INTERNAL_SEGMENT_NET_OFF IS NULL))",
+      "components": {
+        "value": "DISTINCT COUNT of Retention_MetaData_ID where OUTLOOK_CATEGORY = 'Left To Go' and SERVICE_END_DATE < today"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "Retention_MetaData_ID",
+        "OUTLOOK_CATEGORY",
+        "SERVICE_END_DATE",
+        "LINE_CATEGORY"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TD_EBI_Retention_MetaData"
+      ]
+    },
+    {
+      "id": "retention_accounts_count",
+      "name": "Retention Accounts Count",
+      "aliases": [
+        "Renewal Account Count",
+        "Accounts with RBOB"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Count of distinct accounts that have renewal base of business (RBOB). Shows how many accounts have upcoming renewals.",
+      "formula": "SELECT COUNT(DISTINCT sub.ACCOUNT_ID) FROM (SELECT a.ACCOUNT_ID, SUM(r.RBOB) as rbob FROM vw_TF_EBI_Retention r JOIN Account a ON ... GROUP BY a.ACCOUNT_ID) sub",
+      "components": {
+        "value": "COUNT of distinct ACCOUNT_IDs that have non-null RBOB values"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "ACCOUNT_ID",
+        "RBOB"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention"
+      ]
+    },
+    {
+      "id": "cq_plus1_renewal_rate",
+      "name": "CQ+1 Renewal Rate",
+      "aliases": [
+        "Next Quarter Renewal Rate",
+        "Q+1 Renewal Rate"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Renewal rate for the next quarter (CQ+1). Shows the RBOB attainment percentage for Q+1 pipeline.",
+      "formula": "(SUM(r.RBOB) + SUM(r.ARR_Impact)) / NULLIF(SUM(r.RBOB), 0) from vw_TF_EBI_Retention r WHERE PIPELINE_RENEWAL <> 'PQ Trailing' AND QTR_BKT_IND = 1",
+      "components": {
+        "numerator": "RBOB w/o PQ Trail + ARR Impact for Q+1",
+        "denominator": "RBOB w/o PQ Trail for Q+1"
+      },
+      "timeVariants": [
+        "CQ+1"
+      ],
+      "relatedColumns": [
+        "RBOB",
+        "ARR_Impact",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TD_EBI_Retention_MetaData",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "cq_plus2_renewal_rate",
+      "name": "CQ+2 Renewal Rate",
+      "aliases": [
+        "Q+2 Renewal Rate"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Renewal rate for two quarters ahead (CQ+2).",
+      "formula": "(SUM(r.RBOB) + SUM(r.ARR_Impact)) / NULLIF(SUM(r.RBOB), 0) from vw_TF_EBI_Retention r WHERE PIPELINE_RENEWAL <> 'PQ Trailing' AND QTR_BKT_IND = 2",
+      "components": {
+        "numerator": "RBOB w/o PQ Trail + ARR Impact for Q+2",
+        "denominator": "RBOB w/o PQ Trail for Q+2"
+      },
+      "timeVariants": [
+        "CQ+2"
+      ],
+      "relatedColumns": [
+        "RBOB",
+        "ARR_Impact",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TD_EBI_Retention_MetaData",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "cq_plus3_renewal_rate",
+      "name": "CQ+3 Renewal Rate",
+      "aliases": [
+        "Q+3 Renewal Rate"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Renewal rate for three quarters ahead (CQ+3).",
+      "formula": "(SUM(r.RBOB) + SUM(r.ARR_Impact)) / NULLIF(SUM(r.RBOB), 0) from vw_TF_EBI_Retention r WHERE PIPELINE_RENEWAL <> 'PQ Trailing' AND QTR_BKT_IND = 3",
+      "components": {
+        "numerator": "RBOB w/o PQ Trail + ARR Impact for Q+3",
+        "denominator": "RBOB w/o PQ Trail for Q+3"
+      },
+      "timeVariants": [
+        "CQ+3"
+      ],
+      "relatedColumns": [
+        "RBOB",
+        "ARR_Impact",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TD_EBI_Retention_MetaData",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "cq_plus1_attrition",
+      "name": "CQ+1 Attrition $",
+      "aliases": [
+        "Next Quarter Attrition",
+        "Q+1 Attrition"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "ARR Impact for the next quarter (CQ+1), representing expected attrition one quarter out.",
+      "formula": "SUM(r.ARR_Impact) from vw_TF_EBI_Retention r JOIN vw_EBI_Caldate c ON ... WHERE c.QTR_BKT_IND = 1",
+      "components": {
+        "value": "ARR IMPACT filtered to QTR_BKT_IND = 1"
+      },
+      "timeVariants": [
+        "CQ+1"
+      ],
+      "relatedColumns": [
+        "ARR_Impact",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "cq_plus2_attrition",
+      "name": "CQ+2 Attrition $",
+      "aliases": [
+        "Q+2 Attrition"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "ARR Impact for two quarters ahead (CQ+2).",
+      "formula": "SUM(r.ARR_Impact) from vw_TF_EBI_Retention r JOIN vw_EBI_Caldate c ON ... WHERE c.QTR_BKT_IND = 2",
+      "components": {
+        "value": "ARR IMPACT filtered to QTR_BKT_IND = 2"
+      },
+      "timeVariants": [
+        "CQ+2"
+      ],
+      "relatedColumns": [
+        "ARR_Impact",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "cq_plus3_attrition",
+      "name": "CQ+3 Attrition $",
+      "aliases": [
+        "Q+3 Attrition"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "ARR Impact for three quarters ahead (CQ+3).",
+      "formula": "SUM(r.ARR_Impact) from vw_TF_EBI_Retention r JOIN vw_EBI_Caldate c ON ... WHERE c.QTR_BKT_IND = 3",
+      "components": {
+        "value": "ARR IMPACT filtered to QTR_BKT_IND = 3"
+      },
+      "timeVariants": [
+        "CQ+3"
+      ],
+      "relatedColumns": [
+        "ARR_Impact",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "cq_upsell_dollar_attach_rate",
+      "name": "CQ Upsell $ Attach Rate",
+      "aliases": [
+        "Upsell Dollar Attach Rate",
+        "Upsell $ Attach %"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Dollar-based upsell attach rate for the current quarter. Ratio of Renewal Upsell pipeline dollars to the RBOB for CQ. Shows how much upsell revenue is being generated relative to the renewal base.",
+      "formula": "SUM(p.OPPTY) / NULLIF(SUM(r.RBOB), 0) WHERE p.UPSELL_TYPE = 'Renewal Upsell' AND c.QTR_BKT_IND = 0 AND c.IS_LATEST_SNAPSHOT = 1 — numerator from vw_TF_EBI_P2S, denominator RBOB w/o PQ Trail from vw_TF_EBI_Retention",
+      "components": {
+        "numerator": "OPPTY $ where UPSELL_TYPE = 'Renewal Upsell' for CQ (latest snapshot)",
+        "denominator": "RBOB w/o PQ Trail for CQ"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3",
+        "FY"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "UPSELL_TYPE",
+        "RBOB",
+        "QTR_BKT_IND",
+        "IS_LATEST_SNAPSHOT"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_Retention",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "cq_upsell_count_attach_pct",
+      "name": "CQ Upsell # Attach %",
+      "aliases": [
+        "Upsell Count Attach Rate",
+        "Upsell # Attach Percentage"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "Count-based upsell attach percentage for the current quarter. Ratio of distinct Renewal Upsell deals to distinct renewal accounts in CQ. Shows the percentage of renewing accounts that also have upsell activity.",
+      "formula": "COUNT(DISTINCT p.Upsell_Attach_Key_Pipeline) / NULLIF(COUNT(DISTINCT r.Upsell_Attach_Key_Ren), 0) WHERE p.UPSELL_TYPE = 'Renewal Upsell' AND p.DEAL_TYPE = 'Upsell' AND c.QTR_BKT_IND = 0",
+      "components": {
+        "numerator": "DISTINCT COUNT of Upsell deals (Renewal Upsell type, Upsell deal type) for CQ",
+        "denominator": "DISTINCT COUNT of renewal keys for CQ"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "Upsell_Attach_Key_Pipeline",
+        "Upsell_Attach_Key_Ren",
+        "UPSELL_TYPE",
+        "CROSS_UPSELL_DISPLAY",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_Retention",
+        "vw_EBI_Caldate",
+        "vw_EBI_DEAL_TYPE"
+      ]
+    },
+    {
+      "id": "cq_attrition_pct",
+      "name": "CQ Attrition %",
+      "aliases": [
+        "Current Quarter Attrition Percent",
+        "Attrition % to Plan"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Retention",
+      "definition": "CQ attrition as a percentage of plan. Compares actual attrition to the attrition target — result of 1 minus the normalized gap. Values above 100% mean attrition is better than plan; below 100% means worse.",
+      "formula": "1 - ((actual_attrition - target_attrition) / NULLIF(target_attrition, 0)) where actual = SUM(ARR_Impact) for CQ, target = SUM(RENEWALS_TARGET.ATTRITION) for CQ",
+      "components": {
+        "numerator": "CQ ARR IMPACT (actual) minus CQ attrition target",
+        "denominator": "CQ attrition target from vw_TF_EBI_RENEWALS_TARGET"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "ARR_Impact",
+        "ATTRITION",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TF_EBI_RENEWALS_TARGET",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "coverage_pipe_bookings_target",
+      "name": "COVERAGE PIPE / BOOKINGS TARGET X",
+      "aliases": [
+        "Pipeline Coverage",
+        "Pipe Coverage Ratio",
+        "Pipe/Target X"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Total pipeline coverage ratio — total pipeline dollars divided by bookings target. Expressed as a multiplier (e.g., 3.2x means pipeline is 3.2 times the target).",
+      "formula": "SUM(p.OPPTY) / NULLIF(SUM(q.QUOTA_ACTUAL), 0) WHERE p.IN_PIPELINE = 1 — PIPE $ from vw_TF_EBI_P2S, BOOKINGS TARGET from vw_TF_EBI_QUOTA",
+      "components": {
+        "numerator": "PIPE $ — SUM(OPPTY) where IN_PIPELINE = 1",
+        "denominator": "BOOKINGS TARGET — SUM(QUOTA_ACTUAL) or QUOTA_PLAN based on target type"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "IN_PIPELINE",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA"
+      ]
+    },
+    {
+      "id": "s5_plus_pipeline_cov",
+      "name": "S5+ Pipeline Cov.",
+      "aliases": [
+        "Mature Pipeline Coverage",
+        "S5+ Coverage",
+        "SS5+ CovX"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Mature pipeline coverage — SS5+ (Stage 5 and above) pipeline dollars divided by bookings target. Measures how much late-stage, high-probability pipeline covers the target.",
+      "formula": "SUM(p.OPPTY) / NULLIF(SUM(q.QUOTA_ACTUAL), 0) WHERE p.IN_PIPELINE = 1 AND ss.SalesStageGrp_Sort = 2 — SS5+ from vw_TF_EBI_P2S, BOOKINGS TARGET from vw_TF_EBI_QUOTA",
+      "components": {
+        "numerator": "SS5+ $ — PIPE $ filtered to SalesStageGrp_Sort = 2 (S5+)",
+        "denominator": "BOOKINGS TARGET"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "IN_PIPELINE",
+        "SalesStageGrp_Sort",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_SALES_STAGE",
+        "vw_TF_EBI_QUOTA"
+      ]
+    },
+    {
+      "id": "total_pipe_cov",
+      "name": "Total Pipe Cov.",
+      "aliases": [
+        "Total Pipeline Coverage",
+        "Pipe to Go Coverage",
+        "Coverage to Target LTG"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Total pipeline coverage relative to the remaining target (left to go). PIPE $ divided by TARGET LEFT TO GO $ (bookings target minus won). More meaningful than raw coverage as it accounts for deals already closed.",
+      "formula": "SUM(p.OPPTY) / NULLIF(GREATEST(SUM(q.QUOTA_ACTUAL) - SUM(won.OPPTY), 0), 0) WHERE p.IN_PIPELINE = 1",
+      "components": {
+        "numerator": "PIPE $ — total active pipeline",
+        "denominator": "TARGET LEFT TO GO $ = BOOKINGS TARGET - WON $, floored at 0"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "IN_PIPELINE",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA"
+      ]
+    },
+    {
+      "id": "pipe_target",
+      "name": "PIPE TARGET",
+      "aliases": [
+        "Pipeline Target",
+        "Required Pipeline"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Pipeline requirement target — the amount of pipeline needed to achieve the bookings goal. Derived from quota pipeline requirement (QUOTA_REQ) or Plan/QRF pipeline requirement.",
+      "formula": "SUM(q.QUOTA_REQ) from vw_TF_EBI_QUOTA q — or SUM(pq.PIPELINE_REQ) from vw_TF_EBI_PLAN_RPT based on selected target type",
+      "components": {
+        "value": "QUOTA_REQ (Quota target type) or PIPELINE_REQ (Plan/QRF target type)"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "QUOTA_REQ",
+        "PIPELINE_REQ",
+        "TARGET_TYPE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_QUOTA",
+        "vw_TF_EBI_PLAN_RPT",
+        "vw_TD_EBI_TARGET_TYPE"
+      ]
+    },
+    {
+      "id": "pipe_target_ss5",
+      "name": "PIPE TARGET SS5",
+      "aliases": [
+        "Mature Pipeline Target",
+        "S5+ Pipeline Target"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Pipeline requirement target for mature (S5+) pipeline specifically. The required S5+ pipeline amount to hit bookings goals.",
+      "formula": "SUM(q.QUOTA_REQ_SS5) from vw_TF_EBI_QUOTA q — or SUM(pq.PIPELINE_REQ_SS5) from vw_TF_EBI_PLAN_RPT based on target type",
+      "components": {
+        "value": "QUOTA_REQ_SS5 (Quota) or PIPELINE_REQ_SS5 (Plan/QRF)"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "QUOTA_REQ_SS5",
+        "PIPELINE_REQ_SS5",
+        "TARGET_TYPE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_QUOTA",
+        "vw_TF_EBI_PLAN_RPT",
+        "vw_TD_EBI_TARGET_TYPE"
+      ]
+    },
+    {
+      "id": "bookings_target",
+      "name": "BOOKINGS TARGET",
+      "aliases": [
+        "Quota",
+        "Target",
+        "Bookings Goal"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Bookings target amount for the period. Defaults to quota (QUOTA_ACTUAL) but can switch to Plan or QRF targets. At rep/manager level always uses Quota.",
+      "formula": "SUM(q.QUOTA_ACTUAL) from vw_TF_EBI_QUOTA q — or SUM(pq.QUOTA_PLAN) from vw_TF_EBI_PLAN_RPT based on target type",
+      "components": {
+        "value": "QUOTA_ACTUAL (Quota target type) or QUOTA_PLAN (Plan/QRF target type)"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3",
+        "H1",
+        "FY"
+      ],
+      "relatedColumns": [
+        "QUOTA_ACTUAL",
+        "QUOTA_PLAN",
+        "TARGET_TYPE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_QUOTA",
+        "vw_TF_EBI_PLAN_RPT",
+        "vw_TD_EBI_TARGET_TYPE"
+      ]
+    },
+    {
+      "id": "target_left_to_go",
+      "name": "TARGET LEFT TO GO $",
+      "aliases": [
+        "Left to Go",
+        "Remaining Target",
+        "LTG Target"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Remaining bookings target after subtracting won deals. Shows how much more needs to be closed to hit the target. Floored at zero (if won exceeds target, LTG = 0).",
+      "formula": "GREATEST(SUM(q.QUOTA_ACTUAL) - SUM(CASE WHEN p.ADJ_COMMITMENT = 'Won' THEN p.OPPTY END), 0) — BOOKINGS TARGET minus WON $, minimum 0",
+      "components": {
+        "numerator": "BOOKINGS TARGET",
+        "subtracted": "WON $ — already closed deals"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "QUOTA_ACTUAL",
+        "OPPTY",
+        "ADJ_COMMITMENT"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_QUOTA",
+        "vw_TF_EBI_P2S"
+      ]
+    },
+    {
+      "id": "boq_pipe_dollar",
+      "name": "BOQ PIPE $",
+      "aliases": [
+        "Beginning of Quarter Pipeline",
+        "BOQ Pipeline"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Total pipeline dollars at the beginning of the quarter. Snapshot of PIPE $ where IS_BOQ flag is TRUE.",
+      "formula": "SUM(p.OPPTY) from vw_TF_EBI_P2S p WHERE p.IN_PIPELINE = 1 AND p.IS_BOQ = 'TRUE'",
+      "components": {
+        "value": "PIPE $ at BOQ snapshot (IS_BOQ = TRUE)"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "IN_PIPELINE",
+        "IS_BOQ"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S"
+      ]
+    },
+    {
+      "id": "boq_mature_pipe_dollar",
+      "name": "BOQ MATURE PIPE $",
+      "aliases": [
+        "BOQ S5+ Pipeline",
+        "Beginning of Quarter Mature Pipeline"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Mature (S5+) pipeline dollars at the beginning of the quarter. SS5+ $ where IS_BOQ flag is TRUE.",
+      "formula": "SUM(p.OPPTY) from vw_TF_EBI_P2S p JOIN vw_EBI_SALES_STAGE ss ON ... WHERE p.IN_PIPELINE = 1 AND ss.SalesStageGrp_Sort = 2 AND p.IS_BOQ = 'TRUE'",
+      "components": {
+        "value": "SS5+ $ at BOQ snapshot"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "IN_PIPELINE",
+        "IS_BOQ",
+        "SalesStageGrp_Sort"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_SALES_STAGE"
+      ]
+    },
+    {
+      "id": "s3_dollar",
+      "name": "S3 $",
+      "aliases": [
+        "Stage 3 Pipeline",
+        "S3 Pipeline"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Pipeline dollars at Stage 3. S3 deals are in early pipeline — qualified but not yet in advanced stages.",
+      "formula": "SUM(p.OPPTY) from vw_TF_EBI_P2S p JOIN vw_EBI_SALES_STAGE ss ON ... WHERE p.IN_PIPELINE = 1 AND ss.SalesStageGrp = 'S3'",
+      "components": {
+        "value": "PIPE $ filtered to SalesStageGrp = 'S3'"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "IN_PIPELINE",
+        "SalesStageGrp"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_SALES_STAGE"
+      ]
+    },
+    {
+      "id": "s4_dollar",
+      "name": "S4 $",
+      "aliases": [
+        "Stage 4 Pipeline",
+        "S4 Pipeline"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Pipeline dollars at Stage 4. S4 deals are in mid-pipeline with higher close probability than S3.",
+      "formula": "SUM(p.OPPTY) from vw_TF_EBI_P2S p JOIN vw_EBI_SALES_STAGE ss ON ... WHERE p.IN_PIPELINE = 1 AND ss.SalesStageGrp = 'S4'",
+      "components": {
+        "value": "PIPE $ filtered to SalesStageGrp = 'S4'"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "IN_PIPELINE",
+        "SalesStageGrp"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_SALES_STAGE"
+      ]
+    },
+    {
+      "id": "ss5_plus_dollar",
+      "name": "SS5+ $",
+      "aliases": [
+        "Stage 5+ Pipeline",
+        "Mature Pipeline",
+        "S5+ $"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Pipeline dollars at Stage 5 and above (mature pipeline). These deals have the highest close probability.",
+      "formula": "SUM(p.OPPTY) from vw_TF_EBI_P2S p JOIN vw_EBI_SALES_STAGE ss ON ... WHERE p.IN_PIPELINE = 1 AND ss.SalesStageGrp_Sort = 2",
+      "components": {
+        "value": "PIPE $ filtered to SalesStageGrp_Sort = 2 (S5+)"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "IN_PIPELINE",
+        "SalesStageGrp_Sort"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_SALES_STAGE"
+      ]
+    },
+    {
+      "id": "pipe_dollar",
+      "name": "PIPE $",
+      "aliases": [
+        "Total Pipeline",
+        "Pipeline Amount",
+        "Active Pipeline"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Total active pipeline dollars. Sum of opportunity amounts where IN_PIPELINE = 1 (S3+ stages, excluding won/lost/cleanup).",
+      "formula": "SUM(p.OPPTY) from vw_TF_EBI_P2S p WHERE p.IN_PIPELINE = 1",
+      "components": {
+        "value": "SUM(Pipeline.OPPTY) where IN_PIPELINE = 1"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "IN_PIPELINE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S"
+      ]
+    },
+    {
+      "id": "active_updated_pct",
+      "name": "ACTIVE & UPDATED %",
+      "aliases": [
+        "Active Pipeline Pct",
+        "Active & Updated Percentage"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Percentage of total pipeline that is actively being worked (not stalled or inactive). Active pipeline dollars divided by total pipeline dollars.",
+      "formula": "SUM(CASE WHEN p.STALLED_BUT_INACTIVE = 'Active' THEN p.OPPTY END) / NULLIF(SUM(CASE WHEN p.IN_PIPELINE = 1 THEN p.OPPTY END), 0)",
+      "components": {
+        "numerator": "ACTIVE & UPDATED $ — PIPE $ where STALLED_BUT_INACTIVE = 'Active'",
+        "denominator": "PIPE $ — total active pipeline"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "STALLED_BUT_INACTIVE",
+        "IN_PIPELINE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S"
+      ]
+    },
+    {
+      "id": "stalled_inactive_pct",
+      "name": "Stalled & Inactive %",
+      "aliases": [
+        "Stalled Pipeline Pct",
+        "Inactive Pipeline Percentage"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Pipeline Coverage",
+      "definition": "Percentage of total pipeline that is stalled or inactive. Stalled/inactive pipeline dollars divided by total pipeline dollars. High values indicate pipeline health concerns.",
+      "formula": "SUM(CASE WHEN p.STALLED_BUT_INACTIVE = 'Stalled & Inactive' THEN p.OPPTY END) / NULLIF(SUM(CASE WHEN p.IN_PIPELINE = 1 THEN p.OPPTY END), 0)",
+      "components": {
+        "numerator": "Stalled & Inactive $ — PIPE $ where STALLED_BUT_INACTIVE = 'Stalled & Inactive'",
+        "denominator": "PIPE $ — total active pipeline"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "STALLED_BUT_INACTIVE",
+        "IN_PIPELINE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S"
+      ]
+    },
+    {
+      "id": "gross_created_qtd_dollar",
+      "name": "GROSS CREATED QTD $",
+      "aliases": [
+        "Gross Pipeline Created QTD",
+        "Gross Created QTD"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Creation",
+      "definition": "Gross pipeline created quarter-to-date in dollars. Sum of opportunity amounts qualified in the current quarter, excluding S1/S2 and closed/lost stages. Measures new pipeline generation.",
+      "formula": "SUM(p.OPPTY) from vw_TF_EBI_P2S p JOIN vw_EBI_Caldate c ON ... WHERE c.QUALIFICATION_QTR_BKT = 0 AND c.QTR_BKT_IND IN (0,1,2,3,4) AND ss.SALES_STAGE NOT IN ('S1','S2','Closed CleanUp from Non Pipe','Closed Lost from Non Pipe')",
+      "components": {
+        "value": "OPPTY $ for deals qualified in CQ, in pipeline stages S3+, closing in CQ through CQ+4"
+      },
+      "timeVariants": [
+        "QTD",
+        "WTD",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "QUALIFICATION_QTR_BKT",
+        "QTR_BKT_IND",
+        "SALES_STAGE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_Caldate",
+        "vw_EBI_SALES_STAGE"
+      ]
+    },
+    {
+      "id": "gross_creation_qtd_pct",
+      "name": "GROSS CREATION QTD %",
+      "aliases": [
+        "Gross Creation Percentage QTD",
+        "Creation Attainment QTD"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Creation",
+      "definition": "Gross pipeline creation attainment QTD — actual gross created divided by the gross creation target for the quarter. Shows progress toward the pipeline generation goal.",
+      "formula": "GROSS_CREATED_QTD_$ / NULLIF(GROSS_CREATION_QTD_TARGET, 0) — target is an Value from TF_EBI_GENERATION_TARGET",
+      "components": {
+        "numerator": "GROSS CREATED QTD $ — actual pipeline created",
+        "denominator": "GROSS CREATION QTD — target for pipeline creation (from generation targets)"
+      },
+      "timeVariants": [
+        "QTD"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "QUALIFICATION_QTR_BKT"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "gross_creation_ytd_pct",
+      "name": "GROSS CREATION YTD %",
+      "aliases": [
+        "Gross Creation Percentage YTD",
+        "Creation Attainment YTD"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Creation",
+      "definition": "Gross pipeline creation attainment year-to-date. Actual gross created YTD divided by the YTD creation target.",
+      "formula": "GROSS_CREATED_YTD_$ / NULLIF(GROSS_CREATION_YTD_TARGET, 0)",
+      "components": {
+        "numerator": "GROSS CREATED YTD $ — actual pipeline created YTD",
+        "denominator": "GROSS CREATION YTD — YTD creation target"
+      },
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "QUALIFICATION_QTR_BKT",
+        "QUALIFICATION_YR"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "full_quarter_gross_creation",
+      "name": "FULL QUARTER GROSS CREATION",
+      "aliases": [
+        "FQ Gross Creation",
+        "Full Quarter Creation Target"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Creation",
+      "definition": "Full quarter gross creation target — the total pipeline creation expected for the full quarter. Used as the denominator when calculating creation attainment. Sourced from generation target tables.",
+      "formula": "represents the full-quarter pipeline generation target",
+      "components": {
+        "value": "Full quarter generation target from TF_EBI_GENERATION_TARGET"
+      },
+      "timeVariants": [
+        "CQ",
+        "CQ+1",
+        "CQ+2",
+        "CQ+3"
+      ],
+      "relatedColumns": [
+        "GENERATION_TARGET"
+      ],
+      "relatedTables": [
+        "TF_EBI_GENERATION_TARGET"
+      ]
+    },
+    {
+      "id": "net_pipe_creation_qtd",
+      "name": "NET PIPE CREATION QTD",
+      "aliases": [
+        "Net Creation QTD",
+        "Net Pipeline Generation QTD"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Creation",
+      "definition": "Net pipeline creation target QTD — the target for net new pipeline (gross creation minus losses) for the quarter to date. Sourced from generation target tables.",
+      "formula": "net creation target QTD from TF_EBI_GENERATION_TARGET",
+      "components": {
+        "value": "Net pipeline creation target QTD"
+      },
+      "timeVariants": [
+        "QTD",
+        "WTD",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "GENERATION_TARGET"
+      ],
+      "relatedTables": [
+        "TF_EBI_GENERATION_TARGET"
+      ]
+    },
+    {
+      "id": "pct_weekly_gross_creation_qtd",
+      "name": "% Weekly Gross Creation QTD",
+      "aliases": [
+        "Weekly Creation Pace",
+        "WoW Gross Creation"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Pipeline Creation",
+      "definition": "Week-over-week change in gross pipeline creation QTD. Compares current week's gross created QTD to prior week's value to show the weekly creation pace as a percentage change.",
+      "formula": "(CW_Gross_Created_QTD - PW_Gross_Created_QTD) / NULLIF(PW_Gross_Created_QTD, 0) — CW uses WEEK_SORT_ORDER_REVERSE = 0, PW uses -1",
+      "components": {
+        "numerator": "Current week Gross Created QTD minus prior week Gross Created QTD",
+        "denominator": "Prior week Gross Created QTD"
+      },
+      "timeVariants": [
+        "QTD"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "WEEK_SORT_ORDER_REVERSE",
+        "QUALIFICATION_QTR_BKT"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "s1_s2_dollar",
+      "name": "S1/S2 $",
+      "aliases": [
+        "Early Stage Pipeline",
+        "S1-S2 Pipeline"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Pipeline Creation",
+      "definition": "Pipeline dollars at Stage 1 and Stage 2 (early stage, pre-qualified). These opportunities are not yet in the active pipeline but represent future pipeline potential.",
+      "formula": "SUM(p.OPPTY) from vw_TF_EBI_P2S p JOIN vw_EBI_SALES_STAGE ss ON ... WHERE ss.SalesStageGrp = 'S1-S2'",
+      "components": {
+        "value": "OPPTY $ filtered to SalesStageGrp = 'S1-S2'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "SalesStageGrp"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_SALES_STAGE"
+      ]
+    },
+    {
+      "id": "oppty_wtd_dollar",
+      "name": "OPPTY WTD $",
+      "aliases": [
+        "Opportunity Week-to-Date",
+        "WTD Pipeline"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Pipeline Creation",
+      "definition": "Opportunity amount created in the current week to date. Shows the most recent week's pipeline generation activity.",
+      "formula": "SUM(p.OPPTY) from vw_TF_EBI_P2S p JOIN vw_EBI_Caldate c ON ... WHERE c.WEEK_NUMBER_SORT = current_week_sort — uses QUALIFICATION_WEEK_BKT = 0 to identify current week",
+      "components": {
+        "value": "OPPTY $ for the current week based on WEEK_NUMBER_SORT"
+      },
+      "timeVariants": [
+        "WTD"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "WEEK_NUMBER_SORT",
+        "QUALIFICATION_WEEK_BKT"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "oppty_trend_dollar",
+      "name": "OPPTY TREND $",
+      "aliases": [
+        "Opportunity Trend",
+        "Pipeline Creation Trend"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Pipeline Creation",
+      "definition": "Running cumulative gross pipeline created QTD up to the selected week. Used in trend charts to show the pace of pipeline creation across weeks within the quarter.",
+      "formula": "GROSS_CREATED_QTD_$ accumulated up to the selected qualification week — uses ISONORAFTER to build running total by WEEK_NUMBER_SORT",
+      "components": {
+        "value": "Cumulative GROSS CREATED QTD $ through the selected week"
+      },
+      "timeVariants": [
+        "QTD"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "WEEK_NUMBER_SORT",
+        "QUALIFICATION_WEEK_NUMBER"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "growth_pipe_attainment_pct",
+      "name": "GROWTH PIPE ATTAINMENT %",
+      "aliases": [
+        "Net Growth Attainment",
+        "Growth Pipeline Attainment"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Pipeline Creation",
+      "definition": "Growth pipeline attainment percentage — net pipeline growth QTD divided by the full quarter net pipe creation target. Measures progress toward the net pipeline growth goal.",
+      "formula": "GROWTH_PIPE_QTD / NULLIF(FULL_QUARTER_NET_PIPE_CREATION, 0) — GROWTH_PIPE_QTD = net change in pipeline QTD",
+      "components": {
+        "numerator": "GROWTH PIPE QTD $ — net change in pipeline (new minus lost) QTD",
+        "denominator": "FULL QUARTER NET PIPE CREATION — full quarter net creation target"
+      },
+      "timeVariants": [
+        "QTD"
+      ],
+      "relatedColumns": [
+        "OPPTY",
+        "GENERATION_TARGET"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "TF_EBI_GENERATION_TARGET"
+      ]
+    },
+    {
+      "id": "ss4_progression_target",
+      "name": "SS4 PROGRESSION TARGET $",
+      "aliases": [
+        "S4+ Progression Target",
+        "SS4 Progression Goal"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Pipeline Creation",
+      "definition": "Target for deals progressing to Stage 4 or above. Calculated using generation targets multiplied by SS4 progression multipliers for each future quarter. Indicates how much pipeline should advance to S4+.",
+      "formula": "SUMX over qualification quarters: IN_QTR_GC_TARGET_SS4 for CQ + (GENERATION_TARGET_SS4 * SS4_PROGRESSION_MULTIPLIER) for CQ+1/+2/+3 — from TF_EBI_GENERATION_TARGET",
+      "components": {
+        "cq": "IN_QTR_GC_TARGET_SS4 — in-quarter generation target for S4",
+        "future_quarters": "GENERATION_TARGET_SS4 * SS4_PROGRESSION_MULTIPLIER for CQ+1, +2, +3"
+      },
+      "timeVariants": [
+        "QTD"
+      ],
+      "relatedColumns": [
+        "SS4_PROGRESSION_MULTIPLIER",
+        "CLOSED_QTR_DESC",
+        "GENERATION_TARGET"
+      ],
+      "relatedTables": [
+        "TF_EBI_GENERATION_TARGET"
+      ]
+    },
+    {
+      "id": "wfuc_dollar",
+      "name": "W+F+UC $",
+      "aliases": [
+        "Won Forecast Upside Committed",
+        "WF+UC",
+        "outlook dollar",
+        "W+F+UC dollar"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Total bookings outlook: Won + Forecast + Upside Committed pipeline dollars for the current quarter. This is the primary forecast metric representing committed deal value at various commitment stages.",
+      "formula": "SUM(CASE WHEN ADJ_COMMITMENT = 'Won' THEN Oppty ELSE 0 END) + SUM(CASE WHEN ADJ_COMMITMENT = 'Forecast' THEN p.Oppty ELSE 0 END) + SUM(CASE WHEN ADJ_COMMITMENT = 'Upside - Committed' THEN p.Oppty ELSE 0 END) WHERE IN_PIPELINE = 1 and QTR_BKT_IND = 0",
+      "components": {
+        "WON $": "Pipeline $ where ADJ_COMMITMENT = 'Won'",
+        "FORECAST $": "Pipeline $ where ADJ_COMMITMENT = 'Forecast'",
+        "UPSIDE COMMITTED $": "Pipeline $ where ADJ_COMMITMENT = 'Upside - Committed'"
+      },
+      "timeVariants": [
+        "CQ",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "IN_PIPELINE",
+        "MGR_ADJ_COMMIT",
+        "GEO_ADJ_COMMIT"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_CALDATE",
+        "vw_TF_EBI_QUOTA"
+      ]
+    },
+    {
+      "id": "wfuc_pct",
+      "name": "W+F+UC %",
+      "aliases": [
+        "WF+UC percent",
+        "forecast attainment",
+        "outlook percent",
+        "pipeline attainment"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Won + Forecast + Upside Committed as a percentage of bookings target (quota). Measures how close the outlook is to achieving quota for the quarter.",
+      "formula": "(SUM(Won Oppty) + SUM(Forecast Oppty) + SUM(Upside Committed Oppty)) / NULLIF(SUM(QUOTA_ACTUAL), 0) WHERE QTR_BKT_IND = 0",
+      "components": {
+        "numerator": "W+F+UC $ (Won + Forecast + Upside Committed pipeline $)",
+        "denominator": "BOOKINGS TARGET (SUM of QUOTA_ACTUAL)"
+      },
+      "timeVariants": [
+        "CQ",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "IN_PIPELINE",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "won_dollar",
+      "name": "WON $",
+      "aliases": [
+        "won bookings",
+        "won amount",
+        "booked amount",
+        "won deals dollar"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Total dollar amount of deals with commitment status 'Won'. Uses the active commit type (ADJ_COMMITMENT by default, or MGR_ADJ_COMMIT / GEO_ADJ_COMMIT depending on role).",
+      "formula": "SUM(p.Oppty) WHERE p.ADJ_COMMITMENT = 'Won' AND p.IN_PIPELINE = 1",
+      "components": {
+        "Oppty": "Pipeline dollar amount from vw_TF_EBI_P2S",
+        "ADJ_COMMITMENT": "Commitment type filter = 'Won'"
+      },
+      "timeVariants": [
+        "CQ",
+        "PQ",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "MGR_ADJ_COMMIT",
+        "GEO_ADJ_COMMIT",
+        "IN_PIPELINE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "forecast_dollar",
+      "name": "FORECAST $",
+      "aliases": [
+        "forecast amount",
+        "forecast bookings",
+        "forecasted deals"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Total dollar amount of deals with commitment status 'Forecast'. These are deals the rep/manager commits will close this quarter.",
+      "formula": "SUM(p.Oppty) WHERE p.ADJ_COMMITMENT = 'Forecast' AND p.IN_PIPELINE = 1",
+      "components": {
+        "Oppty": "Pipeline dollar amount from vw_TF_EBI_P2S",
+        "ADJ_COMMITMENT": "Commitment type filter = 'Forecast'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "MGR_ADJ_COMMIT",
+        "GEO_ADJ_COMMIT",
+        "IN_PIPELINE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "upside_committed_dollar",
+      "name": "UPSIDE COMMITTED $",
+      "aliases": [
+        "upside committed",
+        "UC dollar",
+        "upside committed amount"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Dollar amount of deals with commitment status 'Upside - Committed'. These are stretch deals that have a reasonable probability of closing this quarter.",
+      "formula": "SUM(p.Oppty) WHERE p.ADJ_COMMITMENT = 'Upside - Committed' AND p.IN_PIPELINE = 1",
+      "components": {
+        "Oppty": "Pipeline dollar amount from vw_TF_EBI_P2S",
+        "ADJ_COMMITMENT": "Commitment type filter = 'Upside - Committed'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "MGR_ADJ_COMMIT",
+        "GEO_ADJ_COMMIT",
+        "IN_PIPELINE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "gap_to_plan_dollar",
+      "name": "Gap to Plan $",
+      "aliases": [
+        "gap to plan",
+        "gap to target",
+        "plan gap",
+        "quota gap"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Dollar gap between bookings target (quota) and current W+F+UC outlook. Positive = still below target; negative = exceeding target.",
+      "formula": "SUM(q.QUOTA_ACTUAL) - (SUM(Won Oppty) + SUM(Forecast Oppty) + SUM(Upside Committed Oppty)) WHERE QTR_BKT_IND = 0",
+      "components": {
+        "BOOKINGS TARGET": "SUM of QUOTA_ACTUAL from vw_TF_EBI_QUOTA",
+        "W+F+UC $": "Won + Forecast + Upside Committed pipeline $"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "QUOTA_ACTUAL",
+        "IN_PIPELINE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "linearity_gap_dollar",
+      "name": "LINEARITY GAP $",
+      "aliases": [
+        "linearity gap",
+        "pacing gap",
+        "booking linearity gap"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Gap between actual won bookings and the linearity target for the current week within the quarter. Shows whether bookings are on pace with the expected weekly trajectory.",
+      "formula": "WON $ - LINEARITY TARGET $ (where LINEARITY TARGET = SUM(vw_EBI_PACING_TARGET.PACING_LINEARITY) * BOOKINGS TARGET)",
+      "components": {
+        "WON $": "Actual won bookings",
+        "LINEARITY TARGET $": "Expected cumulative won bookings by this week = PACING_LINEARITY * BOOKINGS TARGET"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "QUOTA_ACTUAL",
+        "PACING_LINEARITY"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_PACING_TARGET",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "linearity_target_dollar",
+      "name": "LINEARITY TARGET $",
+      "aliases": [
+        "linearity target",
+        "pacing target",
+        "weekly target"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Expected cumulative bookings by the current week in the quarter, based on pacing targets. Calculated as pacing linearity percentage times the bookings target.",
+      "formula": "SUM(vw_EBI_PACING_TARGET.PACING_LINEARITY) * SUM(q.QUOTA_ACTUAL)",
+      "components": {
+        "PACING_LINEARITY": "Week-level linearity percentage from vw_EBI_PACING_TARGET",
+        "BOOKINGS TARGET": "SUM of QUOTA_ACTUAL"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "PACING_LINEARITY",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_EBI_PACING_TARGET",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "pulled_in_dollar",
+      "name": "PULLED IN $",
+      "aliases": [
+        "pulled in",
+        "pulled in deals",
+        "deals pulled forward"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Dollar amount of deals pulled into the current quarter from future quarters, sourced from pipe walk data. Indicates pipeline acceleration.",
+      "formula": "SUM(pw.GROSSASV) WHERE pw.WALK_GROUP = 'Pulled In' AND pw.PIPE_FLAG = 'Pipe'",
+      "components": {
+        "GROSSASV": "Dollar amount from pipe walk",
+        "WALK_GROUP": "Filter = 'Pulled In'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "GROSSASV",
+        "WALK_GROUP",
+        "PIPE_FLAG"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_PIPE_WALK",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "pushed_out_dollar",
+      "name": "PUSHED OUT $",
+      "aliases": [
+        "pushed out",
+        "pushed out deals",
+        "deals pushed to next quarter",
+        "slipped deals"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Dollar amount of deals pushed out from the current quarter to future quarters, from pipe walk data. Indicates pipeline slippage risk.",
+      "formula": "SUM(pw.GROSSASV) WHERE pw.WALK_GROUP = 'Pushed' AND pw.PIPE_FLAG = 'Pipe'",
+      "components": {
+        "GROSSASV": "Dollar amount from pipe walk",
+        "WALK_GROUP": "Filter = 'Pushed'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "GROSSASV",
+        "WALK_GROUP",
+        "PIPE_FLAG"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_PIPE_WALK",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "net_change_dollar",
+      "name": "NET CHANGE $",
+      "aliases": [
+        "net change",
+        "net pipeline change",
+        "pipe net change"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Net change in pipeline dollar value since beginning of quarter. Current pipe minus BOQ pipe. Positive = pipeline grew; negative = pipeline shrank.",
+      "formula": "SUM(p.Oppty WHERE IN_PIPELINE = 1) - SUM(p.Oppty WHERE IS_BOQ = 'TRUE' AND IN_PIPELINE = 1)",
+      "components": {
+        "PIPE $": "Current pipeline = SUM(Oppty) WHERE IN_PIPELINE = 1",
+        "BOQ PIPE $": "Beginning-of-quarter pipeline"
+      },
+      "timeVariants": [
+        "CQ",
+        "WTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "IN_PIPELINE",
+        "IS_BOQ"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "wfuc_stalled_pct",
+      "name": "W+F+UC Stalled %",
+      "aliases": [
+        "stalled forecast percent",
+        "stalled outlook",
+        "open stalled pipe"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Percentage of forecast pipeline (S3/S4/S5+) that is stalled and inactive. High values indicate risk in the outlook as stalled deals may not close on time.",
+      "formula": "SUM(Oppty WHERE STALLED_BUT_INACTIVE = 'Stalled & Inactive' AND SalesStageGrp IN ('S3','S4','S5+')) / NULLIF(SUM(Oppty WHERE SalesStageGrp IN ('S3','S4','S5+')), 0)",
+      "components": {
+        "numerator": "Stalled pipeline $ in S3/S4/S5+ stages",
+        "denominator": "Total pipeline $ in S3/S4/S5+ stages"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "STALLED_BUT_INACTIVE",
+        "IN_PIPELINE",
+        "SALES_STAGE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "manager_forecast_cq_pct",
+      "name": "MANAGER FORECAST CQ %",
+      "aliases": [
+        "manager forecast CQ",
+        "mgr forecast CQ",
+        "manager CQ attainment"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Manager-level forecast attainment for the current quarter. Calculated as W+F+UC % filtered to close quarter = CQ and latest snapshot week.",
+      "formula": "(SUM(Won + Forecast + Upside Committed Oppty) / NULLIF(SUM(QUOTA_ACTUAL), 0)) WHERE QTR_BKT_IND = 0 AND WEEK_SORT_ORDER_REVERSE = 0",
+      "components": {
+        "numerator": "W+F+UC $ for CQ at latest snapshot",
+        "denominator": "BOOKINGS TARGET (quota) for CQ"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "QUOTA_ACTUAL",
+        "WEEK_SORT_ORDER_REVERSE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "manager_forecast_ytd_pct",
+      "name": "MANAGER FORECAST YTD %",
+      "aliases": [
+        "manager forecast YTD",
+        "mgr forecast YTD",
+        "YTD manager attainment"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Manager-level forecast attainment year-to-date. Alias for W+F+UC YTD %, which is (W+F+UC PIPE YTD $) / (BOOKINGS TARGET YTD).",
+      "formula": "(PQ Won $ + CQ Won $ + CQ Forecast $ + CQ Upside Committed $) / NULLIF(SUM(QUOTA_ACTUAL WHERE FISCAL_YR = current AND QTR_BKT_IND <= 0), 0)",
+      "components": {
+        "numerator": "W+F+UC PIPE YTD $ = PQ won (at EOQ) + CQ won + CQ forecast + CQ upside committed",
+        "denominator": "BOOKINGS TARGET YTD = SUM(QUOTA_ACTUAL) for all quarters in current fiscal year up to CQ"
+      },
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "QUOTA_ACTUAL",
+        "IS_EOQ",
+        "FISCAL_YR"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "won_attainment_pct",
+      "name": "WON ATTAINMENT %",
+      "aliases": [
+        "won attainment",
+        "booking attainment",
+        "won vs target"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Won bookings as a percentage of the bookings target (quota). Measures actual closed deal performance against target.",
+      "formula": "SUM(Oppty WHERE ADJ_COMMITMENT = 'Won') / NULLIF(SUM(QUOTA_ACTUAL), 0)",
+      "components": {
+        "numerator": "WON $ (won deal pipeline amount)",
+        "denominator": "BOOKINGS TARGET (quota)"
+      },
+      "timeVariants": [
+        "CQ",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "performance_ytd_pct",
+      "name": "PERFORMANCE YTD %",
+      "aliases": [
+        "YTD performance",
+        "YTD attainment",
+        "year to date performance"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Forecast & Bookings",
+      "definition": "Year-to-date W+F+UC pipeline as a percentage of YTD bookings target. Measures how the outlook tracks against the annual plan so far.",
+      "formula": "W+F+UC PIPE YTD $ / NULLIF(BOOKINGS TARGET YTD, 0)",
+      "components": {
+        "numerator": "W+F+UC PIPE YTD $ (PQ won at EOQ + CQ won + CQ forecast + CQ upside committed)",
+        "denominator": "BOOKINGS TARGET YTD (quota summed for current fiscal year through CQ)"
+      },
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "QUOTA_ACTUAL",
+        "IS_EOQ",
+        "FISCAL_YR"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "account_ry_pct",
+      "name": "Account Red & Yellow %",
+      "aliases": [
+        "account R&Y percent",
+        "red yellow account percent",
+        "unhealthy account percent"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Percentage of child accounts with ARR > 0 that have Red or Yellow customer health status. Indicates the proportion of the account base at risk.",
+      "formula": "(COUNT(DISTINCT ACCOUNT_ID WHERE CUSTOMER_HEALTH IN ('Red','Yellow') AND BOQ_ARR > 0) / NULLIF(COUNT(DISTINCT ACCOUNT_ID WHERE BOQ_ARR > 0), 0)) for QTR_BKT_IND = 0",
+      "components": {
+        "numerator": "Count of Red + Yellow health accounts with ARR > 0",
+        "denominator": "Total child accounts with ARR > 0"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "ACCOUNT_ID",
+        "CUSTOMER_HEALTH",
+        "BOQ_ARR",
+        "CUSTOMER_HEALTH_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "account_ry_count",
+      "name": "Account Red & Yellow #",
+      "aliases": [
+        "account R&Y count",
+        "red yellow account count",
+        "unhealthy account count"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Count of account-solution combinations with Red or Yellow customer health status. Represents the number of at-risk account solutions.",
+      "formula": "COUNT(Red health accounts) + COUNT(Yellow health accounts) WHERE BOQ_ARR > 0 for QTR_BKT_IND = 0",
+      "components": {
+        "Red #": "Count of accounts with CUSTOMER_HEALTH = 'Red'",
+        "Yellow #": "Count of accounts with CUSTOMER_HEALTH = 'Yellow'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "ACCOUNT_ID",
+        "CUSTOMER_HEALTH",
+        "BOQ_ARR",
+        "CUSTOMER_HEALTH_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "cq_acc_arr_red",
+      "name": "CQ Acc ARR Red",
+      "aliases": [
+        "CQ account ARR red",
+        "red account ARR",
+        "at-risk account ARR"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Beginning-of-quarter ARR for accounts with Red customer health status in the current quarter.",
+      "formula": "SUM(BOQ_ARR) WHERE CUSTOMER_HEALTH = 'Red' AND QTR_BKT_IND = 0",
+      "components": {
+        "BOQ_ARR": "Beginning-of-quarter ARR from retention/ARR data",
+        "CUSTOMER_HEALTH": "Filter = 'Red'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "BOQ_ARR",
+        "CUSTOMER_HEALTH",
+        "CUSTOMER_HEALTH_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "cq_acc_arr_yellow",
+      "name": "CQ Acc ARR Yellow",
+      "aliases": [
+        "CQ account ARR yellow",
+        "yellow account ARR",
+        "warning account ARR"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Beginning-of-quarter ARR for accounts with Yellow customer health status in the current quarter.",
+      "formula": "SUM(BOQ_ARR) WHERE CUSTOMER_HEALTH = 'Yellow' AND QTR_BKT_IND = 0",
+      "components": {
+        "BOQ_ARR": "Beginning-of-quarter ARR",
+        "CUSTOMER_HEALTH": "Filter = 'Yellow'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "BOQ_ARR",
+        "CUSTOMER_HEALTH",
+        "CUSTOMER_HEALTH_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "cq_acc_arr_green",
+      "name": "CQ Acc ARR Green",
+      "aliases": [
+        "CQ account ARR green",
+        "healthy account ARR",
+        "green account ARR"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Beginning-of-quarter ARR for accounts with Green customer health status in the current quarter.",
+      "formula": "SUM(BOQ_ARR) WHERE CUSTOMER_HEALTH = 'Green' AND QTR_BKT_IND = 0",
+      "components": {
+        "BOQ_ARR": "Beginning-of-quarter ARR",
+        "CUSTOMER_HEALTH": "Filter = 'Green'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "BOQ_ARR",
+        "CUSTOMER_HEALTH",
+        "CUSTOMER_HEALTH_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "cq_sol_arr_red",
+      "name": "CQ Sol ARR Red",
+      "aliases": [
+        "CQ solution ARR red",
+        "red solution ARR"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Beginning-of-quarter ARR for solutions with Red customer solution health status in the current quarter.",
+      "formula": "SUM(BOQ_ARR) WHERE CUSTOMER_SOLUTION_HEALTH = 'Red' AND QTR_BKT_IND = 0",
+      "components": {
+        "BOQ_ARR": "Beginning-of-quarter ARR",
+        "CUSTOMER_SOLUTION_HEALTH": "Filter = 'Red'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "BOQ_ARR",
+        "CUSTOMER_SOLUTION_HEALTH",
+        "SOLUTION_HEALTH_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "cq_sol_arr_yellow",
+      "name": "CQ Sol ARR Yellow",
+      "aliases": [
+        "CQ solution ARR yellow",
+        "yellow solution ARR"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Beginning-of-quarter ARR for solutions with Yellow customer solution health status in the current quarter.",
+      "formula": "SUM(BOQ_ARR) WHERE CUSTOMER_SOLUTION_HEALTH = 'Yellow' AND QTR_BKT_IND = 0",
+      "components": {
+        "BOQ_ARR": "Beginning-of-quarter ARR",
+        "CUSTOMER_SOLUTION_HEALTH": "Filter = 'Yellow'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "BOQ_ARR",
+        "CUSTOMER_SOLUTION_HEALTH",
+        "SOLUTION_HEALTH_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "cq_sol_arr_green",
+      "name": "CQ Sol ARR Green",
+      "aliases": [
+        "CQ solution ARR green",
+        "healthy solution ARR"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Beginning-of-quarter ARR for solutions with Green customer solution health status in the current quarter.",
+      "formula": "SUM(BOQ_ARR) WHERE CUSTOMER_SOLUTION_HEALTH = 'Green' AND QTR_BKT_IND = 0",
+      "components": {
+        "BOQ_ARR": "Beginning-of-quarter ARR",
+        "CUSTOMER_SOLUTION_HEALTH": "Filter = 'Green'"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "BOQ_ARR",
+        "CUSTOMER_SOLUTION_HEALTH",
+        "SOLUTION_HEALTH_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "accnt_movement_up",
+      "name": "Accnt Movement Up",
+      "aliases": [
+        "account health improved",
+        "accounts moved up",
+        "account trending up"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Count of distinct accounts whose health status improved (moved up) in the current month. Uses Customer Health Movement data filtered to Trending Up.",
+      "formula": "COUNT(DISTINCT chm.ACCOUNT_ID) WHERE chm.SNAPSHOT_MONTH_ID = current_month AND hm.HEALTH_MOVEMENT_TYPE = 'Trending Up' AND HAVE_ACTIVE_PQ_EOQ_ARR = 1",
+      "components": {
+        "ACCOUNT_ID": "Distinct account count from Customer Health Movement",
+        "HEALTH_MOVEMENT_TYPE": "Filter = 'Trending Up'"
+      },
+      "timeVariants": [
+        "Monthly"
+      ],
+      "relatedColumns": [
+        "ACCOUNT_ID",
+        "SNAPSHOT_MONTH_ID",
+        "HEALTH_MOVEMENT_TYPE",
+        "HAVE_ACTIVE_PQ_EOQ_ARR"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_CUSTOMER_HEALTH_MOVEMENT",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "accnt_movement_down",
+      "name": "Accnt Movement Down",
+      "aliases": [
+        "account health declined",
+        "accounts moved down",
+        "account trending down"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Count of distinct accounts whose health status declined (moved down) in the current month. Uses Customer Health Movement data filtered to Trending Down.",
+      "formula": "COUNT(DISTINCT chm.ACCOUNT_ID) WHERE chm.SNAPSHOT_MONTH_ID = current_month AND hm.HEALTH_MOVEMENT_TYPE = 'Trending Down' AND HAVE_ACTIVE_PQ_EOQ_ARR = 1",
+      "components": {
+        "ACCOUNT_ID": "Distinct account count from Customer Health Movement",
+        "HEALTH_MOVEMENT_TYPE": "Filter = 'Trending Down'"
+      },
+      "timeVariants": [
+        "Monthly"
+      ],
+      "relatedColumns": [
+        "ACCOUNT_ID",
+        "SNAPSHOT_MONTH_ID",
+        "HEALTH_MOVEMENT_TYPE",
+        "HAVE_ACTIVE_PQ_EOQ_ARR"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_CUSTOMER_HEALTH_MOVEMENT",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "sol_movement_up",
+      "name": "Sol Movement Up",
+      "aliases": [
+        "solution health improved",
+        "solutions moved up",
+        "solution trending up"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Count of distinct account-solution combinations whose solution health status improved in the current month.",
+      "formula": "COUNT(DISTINCT cshm.acc_sol_key) WHERE cshm.SNAPSHOT_MONTH_ID = current_month AND hm.HEALTH_MOVEMENT_TYPE = 'Trending Up' AND HAVE_ACTIVE_PQ_EOQ_ARR = 1",
+      "components": {
+        "acc_sol_key": "Account-solution composite key from Customer Solution Health Movement",
+        "HEALTH_MOVEMENT_TYPE": "Filter = 'Trending Up'"
+      },
+      "timeVariants": [
+        "Monthly"
+      ],
+      "relatedColumns": [
+        "acc_sol_key",
+        "SNAPSHOT_MONTH_ID",
+        "HEALTH_MOVEMENT_TYPE",
+        "HAVE_ACTIVE_PQ_EOQ_ARR"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "sol_movement_down",
+      "name": "Sol Movement Down",
+      "aliases": [
+        "solution health declined",
+        "solutions moved down",
+        "solution trending down"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Count of distinct account-solution combinations whose solution health status declined in the current month.",
+      "formula": "COUNT(DISTINCT cshm.acc_sol_key) WHERE cshm.SNAPSHOT_MONTH_ID = current_month AND hm.HEALTH_MOVEMENT_TYPE = 'Trending Down' AND HAVE_ACTIVE_PQ_EOQ_ARR = 1",
+      "components": {
+        "acc_sol_key": "Account-solution composite key",
+        "HEALTH_MOVEMENT_TYPE": "Filter = 'Trending Down'"
+      },
+      "timeVariants": [
+        "Monthly"
+      ],
+      "relatedColumns": [
+        "acc_sol_key",
+        "SNAPSHOT_MONTH_ID",
+        "HEALTH_MOVEMENT_TYPE",
+        "HAVE_ACTIVE_PQ_EOQ_ARR"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_CUSTOMER_SOLUTION_HEALTH_MOVEMENT",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "fp_risk_cq",
+      "name": "FP Risk CQ",
+      "aliases": [
+        "focal point risk",
+        "FP risk current quarter",
+        "retention risk CQ"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Focal point additional risk amount for the current quarter. Represents incremental risk to retention beyond normal attrition, excluding deal-type and creator-type breakdowns.",
+      "formula": "SUM(RISK_UPSIDE_AMOUNT) WHERE QTR_BKT_IND = 0 AND risk_type = 'Additional Risks' (aggregate level only, blanked when sliced by Creator Type or Deal Type)",
+      "components": {
+        "Additional Risks": "Risk amount from retention/focal point data",
+        "QTR_BKT_IND": "Filter = 0 (current quarter)"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "RISK_UPSIDE_AMOUNT",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "fp_upside_savables_cq",
+      "name": "FP Upside Savables CQ",
+      "aliases": [
+        "focal point savables",
+        "FP savables CQ",
+        "upside savables"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Focal point savable amount for the current quarter. Represents potential retention upside from at-risk accounts that could be saved, excluding deal-type and creator-type breakdowns.",
+      "formula": "SUM(Savables amount) WHERE QTR_BKT_IND = 0 (aggregate level only, blanked when sliced by Creator Type or Deal Type)",
+      "components": {
+        "Savables": "Savable retention amount from focal point data",
+        "QTR_BKT_IND": "Filter = 0 (current quarter)"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "RISK_UPSIDE_AMOUNT",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "noncompliant_acc_count",
+      "name": "Non-Compliant Account Count",
+      "aliases": [
+        "non-compliant accounts",
+        "stale health accounts",
+        "overdue health update accounts"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Count of accounts where customer health has not been updated within the compliance window. Red accounts: >14 days since update, Yellow: >30 days, Green: >90 days. Based on DAYS_SINCE_ACCNT_HEALTH_MODIFED column.",
+      "formula": "COUNT(DISTINCT ACCOUNT_ID WHERE (CUSTOMER_HEALTH='Red' AND DAYS_SINCE_ACCNT_HEALTH_MODIFED > 14) OR (CUSTOMER_HEALTH='Yellow' AND DAYS_SINCE_ACCNT_HEALTH_MODIFED > 30) OR (CUSTOMER_HEALTH='Green' AND DAYS_SINCE_ACCNT_HEALTH_MODIFED > 90)) WHERE ARR > 0 AND QTR_BKT_IND = -1",
+      "components": {
+        "Red non-compliant": "DAYS_SINCE_ACCNT_HEALTH_MODIFED > 14 for Red accounts",
+        "Yellow non-compliant": "DAYS_SINCE_ACCNT_HEALTH_MODIFED > 30 for Yellow accounts",
+        "Green non-compliant": "DAYS_SINCE_ACCNT_HEALTH_MODIFED > 90 for Green accounts"
+      },
+      "timeVariants": [
+        "PQ"
+      ],
+      "relatedColumns": [
+        "ACCOUNT_ID",
+        "CUSTOMER_HEALTH",
+        "DAYS_SINCE_ACCNT_HEALTH_MODIFED",
+        "BOQ_ARR"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "noncompliant_sol_count",
+      "name": "Non-Compliant Solution Count",
+      "aliases": [
+        "non-compliant solutions",
+        "stale solution health",
+        "overdue solution health update"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Account Health",
+      "definition": "Count of account-solution combinations where solution health has not been updated within the compliance window. Red: >14 days, Yellow: >30 days, Green: >90 days. Based on DAYS_SINCE_SOL_HEALTH_MODIFED column.",
+      "formula": "COUNT(DISTINCT acc_sol_key WHERE (CUSTOMER_SOLUTION_HEALTH='Red' AND DAYS_SINCE_SOL_HEALTH_MODIFED > 14) OR (CUSTOMER_SOLUTION_HEALTH='Yellow' AND DAYS_SINCE_SOL_HEALTH_MODIFED > 30) OR (CUSTOMER_SOLUTION_HEALTH='Green' AND DAYS_SINCE_SOL_HEALTH_MODIFED > 90)) WHERE ARR > 0 AND QTR_BKT_IND = -1",
+      "components": {
+        "Red non-compliant": "DAYS_SINCE_SOL_HEALTH_MODIFED > 14 for Red solutions",
+        "Yellow non-compliant": "DAYS_SINCE_SOL_HEALTH_MODIFED > 30 for Yellow solutions",
+        "Green non-compliant": "DAYS_SINCE_SOL_HEALTH_MODIFED > 90 for Green solutions"
+      },
+      "timeVariants": [
+        "PQ"
+      ],
+      "relatedColumns": [
+        "acc_sol_key",
+        "CUSTOMER_SOLUTION_HEALTH",
+        "DAYS_SINCE_SOL_HEALTH_MODIFED",
+        "BOQ_ARR"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "ae_part_75_qtd_pct",
+      "name": "AE PART @75% QTD %",
+      "aliases": [
+        "AE participation QTD",
+        "AE at 75 QTD",
+        "AE QTD participation rate"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Percentage of AEs in seat achieving >= 75% of their CQ manager forecast target QTD. Measures team-level booking participation across the AE population.",
+      "formula": "COUNT(DISTINCT REP_LDAP WHERE MANAGER_FORECAST_CQ_PCT >= 0.75 AND IS_TRUE_REP = 1 AND REP_IN_PLACE = 'In Place' AND AT_EMP_STATUS = 'Active') / NULLIF(COUNT(AE IN SEAT), 0)",
+      "components": {
+        "numerator": "AEs with CQ manager forecast >= 75%",
+        "denominator": "AE IN SEAT (active, in-place, true reps with quota)"
+      },
+      "timeVariants": [
+        "QTD"
+      ],
+      "relatedColumns": [
+        "REP_LDAP",
+        "IS_TRUE_REP",
+        "REP_IN_PLACE",
+        "AT_EMP_STATUS",
+        "IS_CYQUOTA_AVAILABLE",
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt",
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "ae_part_75_ytd_pct",
+      "name": "AE PART @75% YTD %",
+      "aliases": [
+        "AE participation YTD",
+        "AE at 75 YTD",
+        "AE YTD participation rate"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Percentage of AEs in seat achieving >= 75% of their YTD projection target. Measures year-level booking participation across the AE population.",
+      "formula": "COUNT(DISTINCT REP_LDAP WHERE YTD_PROJECTION_PCT >= 0.75 AND IS_TRUE_REP = 1 AND REP_IN_PLACE = 'In Place' AND AT_EMP_STATUS = 'Active') / NULLIF(COUNT(AE IN SEAT), 0)",
+      "components": {
+        "numerator": "AEs with YTD projection >= 75%",
+        "denominator": "AE IN SEAT (active, in-place, true reps with quota)"
+      },
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "REP_LDAP",
+        "IS_TRUE_REP",
+        "REP_IN_PLACE",
+        "AT_EMP_STATUS",
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt",
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "rep_participation_cq_75_pct",
+      "name": "REP PARTICIPATION CQ >75 %",
+      "aliases": [
+        "rep participation CQ",
+        "rep CQ at 75",
+        "rep CQ participation rate"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Percentage of reps achieving >= 75% of CQ manager forecast. Counts reps at REP_LDAP level with MANAGER FORECAST CQ % >= 0.75, divided by total reps.",
+      "formula": "COUNT(DISTINCT REP_LDAP WHERE MANAGER_FORECAST_CQ_PCT >= 0.75 AND IS_TRUE_REP = 1) / NULLIF(COUNT(DISTINCT REP_LDAP WHERE IS_TRUE_REP = 1), 0)",
+      "components": {
+        "numerator": "Reps with CQ manager forecast >= 75%",
+        "denominator": "Total true reps"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "REP_LDAP",
+        "FLM_LDAP",
+        "IS_TRUE_REP",
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt",
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "rep_participation_ytd_75_pct",
+      "name": "REP PARTICIPATION YTD >75 %",
+      "aliases": [
+        "rep participation YTD",
+        "rep YTD at 75",
+        "rep YTD participation rate"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Percentage of reps achieving >= 75% of YTD manager forecast. Counts reps with MANAGER FORECAST YTD % >= 0.75, divided by total reps.",
+      "formula": "COUNT(DISTINCT REP_LDAP WHERE MANAGER_FORECAST_YTD_PCT >= 0.75 AND IS_TRUE_REP = 1) / NULLIF(COUNT(DISTINCT REP_LDAP WHERE IS_TRUE_REP = 1), 0)",
+      "components": {
+        "numerator": "Reps with YTD manager forecast >= 75%",
+        "denominator": "Total true reps"
+      },
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "REP_LDAP",
+        "FLM_LDAP",
+        "IS_TRUE_REP",
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt",
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "flm_participation_cq_75_pct",
+      "name": "FLM PARTICIPATION CQ >75 %",
+      "aliases": [
+        "FLM participation CQ",
+        "FLM CQ at 75",
+        "FLM CQ participation rate"
+      ],
+      "personas": [
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Percentage of FLMs achieving >= 75% of CQ manager forecast. Counts FLMs at FLM_LDAP level with MANAGER FORECAST CQ % >= 0.75, divided by total FLMs.",
+      "formula": "COUNT(DISTINCT FLM_LDAP WHERE MANAGER_FORECAST_CQ_PCT >= 0.75 AND IS_TRUE_FLM = 1) / NULLIF(COUNT(DISTINCT FLM_LDAP WHERE IS_TRUE_FLM = 1), 0)",
+      "components": {
+        "numerator": "FLMs with CQ manager forecast >= 75%",
+        "denominator": "Total true FLMs"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "FLM_LDAP",
+        "SLM_LDAP",
+        "IS_TRUE_FLM",
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt",
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "flm_participation_ytd_75_pct",
+      "name": "FLM PARTICIPATION YTD >75 %",
+      "aliases": [
+        "FLM participation YTD",
+        "FLM YTD at 75",
+        "FLM YTD participation rate"
+      ],
+      "personas": [
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Percentage of FLMs achieving >= 75% of YTD manager forecast. Counts FLMs with MANAGER FORECAST YTD % >= 0.75, divided by total FLMs.",
+      "formula": "COUNT(DISTINCT FLM_LDAP WHERE MANAGER_FORECAST_YTD_PCT >= 0.75 AND IS_TRUE_FLM = 1) / NULLIF(COUNT(DISTINCT FLM_LDAP WHERE IS_TRUE_FLM = 1), 0)",
+      "components": {
+        "numerator": "FLMs with YTD manager forecast >= 75%",
+        "denominator": "Total true FLMs"
+      },
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "FLM_LDAP",
+        "SLM_LDAP",
+        "IS_TRUE_FLM",
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt",
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "flm_50_ae_75_qtd_pct",
+      "name": "FLM WITH >50% AE @75% QTD %",
+      "aliases": [
+        "FLM with majority AE participation QTD",
+        "FLM 50 AE 75 QTD"
+      ],
+      "personas": [
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Percentage of FLMs where >50% of their AEs achieve >= 75% CQ manager forecast QTD. Measures whether FLM teams have broad-based participation rather than reliance on a few top performers.",
+      "formula": "COUNT(DISTINCT FLM_LDAP WHERE (AEs_at_75pct / Total_AEs) >= 0.5 AND IS_TRUE_FLM = 1) / NULLIF(COUNT(DISTINCT FLM_LDAP WHERE IS_TRUE_FLM = 1), 0)",
+      "components": {
+        "numerator": "FLMs where FLM COUNT > 75 CQ CW % >= 50%",
+        "denominator": "Total true FLMs"
+      },
+      "timeVariants": [
+        "QTD"
+      ],
+      "relatedColumns": [
+        "FLM_LDAP",
+        "REP_LDAP",
+        "IS_TRUE_FLM",
+        "IS_TRUE_REP",
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt",
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "ae_in_seat",
+      "name": "AE IN SEAT",
+      "aliases": [
+        "AEs in seat",
+        "active AE count",
+        "AE headcount in place"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Count of active AEs currently in seat with quota. Filters: IS_TRUE_REP = 1, REP_IN_PLACE = 'In Place', AT_EMP_STATUS = 'Active', IS_CYQUOTA_AVAILABLE = TRUE, AREA IN ('DX','DX/DME').",
+      "formula": "COUNT(DISTINCT REP_LDAP) WHERE IS_TRUE_REP = 1 AND REP_IN_PLACE = 'In Place' AND AT_EMP_STATUS = 'Active' AND IS_CYQUOTA_AVAILABLE = 1 AND AREA IN ('DX','DX/DME')",
+      "components": {
+        "IS_TRUE_REP": "True rep flag = 1",
+        "REP_IN_PLACE": "Filter = 'In Place'",
+        "AT_EMP_STATUS": "Filter = 'Active'"
+      },
+      "timeVariants": [],
+      "relatedColumns": [
+        "REP_LDAP",
+        "IS_TRUE_REP",
+        "REP_IN_PLACE",
+        "AT_EMP_STATUS",
+        "IS_CYQUOTA_AVAILABLE",
+        "AREA"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt"
+      ]
+    },
+    {
+      "id": "ae_total",
+      "name": "AE TOTAL",
+      "aliases": [
+        "total AE count",
+        "AE headcount",
+        "total active AEs"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Total count of active true reps with quota availability. Filters: IS_TRUE_REP = 1, AT_EMP_STATUS = 'Active', IS_CYQUOTA_AVAILABLE = TRUE, AREA IN ('DX','DX/DME'). Includes both in-place and not-in-place.",
+      "formula": "COUNT(DISTINCT REP_LDAP) WHERE IS_TRUE_REP = 1 AND AT_EMP_STATUS = 'Active' AND IS_CYQUOTA_AVAILABLE = 1 AND AREA IN ('DX','DX/DME')",
+      "components": {
+        "IS_TRUE_REP": "True rep flag = 1",
+        "AT_EMP_STATUS": "Filter = 'Active'"
+      },
+      "timeVariants": [],
+      "relatedColumns": [
+        "REP_LDAP",
+        "IS_TRUE_REP",
+        "AT_EMP_STATUS",
+        "IS_CYQUOTA_AVAILABLE",
+        "AREA"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt"
+      ]
+    },
+    {
+      "id": "fp_ae_total",
+      "name": "FP AE Total",
+      "aliases": [
+        "focal point AE total",
+        "FP total AE count"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Total AE count filtered to only reps with quota (REGION_ID in Quota table). Focal point view of AE headcount that only includes reps assigned to quota territories.",
+      "formula": "COUNT(DISTINCT REP_LDAP) WHERE IS_TRUE_REP = 1 AND AT_EMP_STATUS = 'Active' AND IS_CYQUOTA_AVAILABLE = 1 AND AREA IN ('DX','DX/DME') AND REGION_ID IN (SELECT REGION_ID FROM vw_TF_EBI_QUOTA)",
+      "components": {
+        "AE TOTAL": "Base total AE count",
+        "Quota filter": "Only reps whose REGION_ID appears in the Quota table"
+      },
+      "timeVariants": [],
+      "relatedColumns": [
+        "REP_LDAP",
+        "REGION_ID",
+        "IS_TRUE_REP",
+        "AT_EMP_STATUS"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt",
+        "vw_TF_EBI_QUOTA"
+      ]
+    },
+    {
+      "id": "fp_ae_in_seat",
+      "name": "FP AE in seat",
+      "aliases": [
+        "focal point AE in seat",
+        "FP in-seat AE count"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "AEs in seat filtered to only reps with quota (REGION_ID in Quota table). Focal point view of in-place AE headcount.",
+      "formula": "COUNT(DISTINCT REP_LDAP) WHERE IS_TRUE_REP = 1 AND REP_IN_PLACE = 'In Place' AND AT_EMP_STATUS = 'Active' AND IS_CYQUOTA_AVAILABLE = 1 AND AREA IN ('DX','DX/DME') AND REGION_ID IN (SELECT REGION_ID FROM vw_TF_EBI_QUOTA)",
+      "components": {
+        "AE IN SEAT": "Base in-seat AE count",
+        "Quota filter": "Only reps whose REGION_ID appears in the Quota table"
+      },
+      "timeVariants": [],
+      "relatedColumns": [
+        "REP_LDAP",
+        "REGION_ID",
+        "IS_TRUE_REP",
+        "REP_IN_PLACE",
+        "AT_EMP_STATUS"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt",
+        "vw_TF_EBI_QUOTA"
+      ]
+    },
+    {
+      "id": "flm_count",
+      "name": "FLM PARTICIPATION TOTAL FLM #",
+      "aliases": [
+        "FLM count",
+        "total FLM count",
+        "number of FLMs"
+      ],
+      "personas": [
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Total count of distinct FLMs (First Level Managers) with IS_TRUE_FLM = 1. Used as denominator for FLM participation calculations.",
+      "formula": "COUNT(DISTINCT FLM_LDAP) WHERE IS_TRUE_FLM = 1",
+      "components": {
+        "FLM_LDAP": "First level manager identifier",
+        "IS_TRUE_FLM": "True FLM flag = 1"
+      },
+      "timeVariants": [],
+      "relatedColumns": [
+        "FLM_LDAP",
+        "IS_TRUE_FLM"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt"
+      ]
+    },
+    {
+      "id": "flm_count_75_cq_pct",
+      "name": "FLM COUNT > 75 CQ CW %",
+      "aliases": [
+        "FLM AE at 75 CQ",
+        "FLM percent AEs at 75 CQ"
+      ],
+      "personas": [
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Per-FLM metric: percentage of a specific FLM's reps achieving >= 75% CQ manager forecast. Used to assess whether a manager's team has broad participation.",
+      "formula": "COUNT(DISTINCT REP_LDAP WHERE MANAGER_FORECAST_CQ_PCT >= 0.75 AND IS_TRUE_REP = 1 under FLM) / NULLIF(COUNT(DISTINCT REP_LDAP WHERE IS_TRUE_REP = 1 under FLM), 0)",
+      "components": {
+        "numerator": "Reps under FLM with CQ manager forecast >= 75%",
+        "denominator": "Total true reps under the FLM"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "REP_LDAP",
+        "FLM_LDAP",
+        "IS_TRUE_REP",
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt",
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "flm_count_75_ytd_pct",
+      "name": "FLM COUNT > 75 YTD CW %",
+      "aliases": [
+        "FLM AE at 75 YTD",
+        "FLM percent AEs at 75 YTD"
+      ],
+      "personas": [
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Per-FLM metric: percentage of a specific FLM's reps achieving >= 75% YTD projection. Used to assess year-level participation breadth within a manager's team.",
+      "formula": "COUNT(DISTINCT REP_LDAP WHERE YTD_PROJECTION_PCT >= 0.75 AND IS_TRUE_REP = 1 under FLM) / NULLIF(COUNT(DISTINCT REP_LDAP WHERE IS_TRUE_REP = 1 under FLM), 0)",
+      "components": {
+        "numerator": "Reps under FLM with YTD projection >= 75%",
+        "denominator": "Total true reps under the FLM"
+      },
+      "timeVariants": [
+        "YTD"
+      ],
+      "relatedColumns": [
+        "REP_LDAP",
+        "FLM_LDAP",
+        "IS_TRUE_REP",
+        "Oppty",
+        "QUOTA_ACTUAL"
+      ],
+      "relatedTables": [
+        "vw_td_ebi_region_rpt",
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "asv_win_rate_pct",
+      "name": "ASV WIN RATE %",
+      "aliases": [
+        "ASV win rate",
+        "win rate",
+        "close rate",
+        "deal win rate"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "ASV (Annual Subscription Value) win rate: won dollar amount divided by total resolved (won + lost) dollar amount. Measures deal conversion effectiveness.",
+      "formula": "SUM(Oppty WHERE ADJ_COMMITMENT = 'Won') / NULLIF(SUM(Oppty WHERE ADJ_COMMITMENT = 'Won') + SUM(Oppty WHERE ADJ_COMMITMENT = 'Lost'), 0)",
+      "components": {
+        "numerator": "WON $ (won pipeline amount)",
+        "denominator": "WON $ + LOST $ (total resolved pipeline)"
+      },
+      "timeVariants": [
+        "CQ",
+        "PQ",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "IN_PIPELINE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "forecast_accuracy_pq_pct",
+      "name": "FORECAST ACCURACY PQ %",
+      "aliases": [
+        "forecast accuracy",
+        "PQ forecast accuracy",
+        "last quarter forecast accuracy"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Performance & Participation",
+      "definition": "Forecast accuracy for the previous quarter. BOQ forecast (S3/S4/S5+/Booked) divided by actual EOQ won (S3/S4/S5+/Booked) for PQ. Measures how well the team predicted outcomes.",
+      "formula": "SUM(Oppty WHERE ADJ_COMMITMENT = 'Forecast' AND IS_BOQ = 'TRUE' AND SalesStageGrp IN ('S3','S4','S5+','Booked') AND QTR_BKT_IND = -1) / NULLIF(SUM(Oppty WHERE ADJ_COMMITMENT = 'Won' AND IS_EOQ = 'TRUE' AND SalesStageGrp IN ('S3','S4','S5+','Booked') AND QTR_BKT_IND = -1), 0)",
+      "components": {
+        "numerator": "PQ BOQ Forecast $ in S3/S4/S5+/Booked stages",
+        "denominator": "PQ EOQ Won $ in S3/S4/S5+/Booked stages"
+      },
+      "timeVariants": [
+        "PQ"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "IS_BOQ",
+        "IS_EOQ",
+        "SALES_STAGE_ID"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_ebi_sales_stage",
+        "vw_EBI_CALDATE"
+      ]
+    },
+    {
+      "id": "boq_arr_dollar",
+      "name": "BOQ ARR $",
+      "aliases": [
+        "BOQ ARR",
+        "beginning of quarter ARR",
+        "starting ARR"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "ARR & Revenue",
+      "definition": "Beginning-of-quarter ARR. For the current quarter (QTR_BKT_IND=0), it is the raw BOQ_ARR. For future quarters, it projects forward by adding W+F+UC $ and ARR IMPACT from prior quarter buckets.",
+      "formula": "For CQ: SUM(arr.BOQ_ARR) WHERE cal.QTR_BKT_IND = 0. For Q+1: BOQ_ARR_Q0 + (W+F+UC $ + ARR_IMPACT) for Q0. Fallback: SUM(arr.BOQ_ARR)",
+      "components": {
+        "base": "BOQ_ARR from retention/ARR data",
+        "adjustments": "W+F+UC $ + ARR IMPACT per quarter bucket"
+      },
+      "timeVariants": [
+        "CQ",
+        "Q+1",
+        "Q+2"
+      ],
+      "relatedColumns": [
+        "BOQ_ARR",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "eoq_arr_dollar",
+      "name": "EOQ ARR $",
+      "aliases": [
+        "EOQ ARR",
+        "end of quarter ARR",
+        "ending ARR"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "ARR & Revenue",
+      "definition": "End-of-quarter ARR. Computed by adding cumulative W+F+UC $ and ARR IMPACT to BOQ_ARR across selected quarter buckets. Falls back to EOQ_ARR column if the computed value is blank/zero.",
+      "formula": "BOQ_ARR_Q0 + SUM(W+F+UC $ + ARR_IMPACT) across selected QTR_BKT_IND buckets. Fallback: SUM(arr.EOQ_ARR)",
+      "components": {
+        "base": "BOQ_ARR from retention/ARR data",
+        "cumulative_impact": "W+F+UC $ + ARR IMPACT summed across quarter buckets 0..N"
+      },
+      "timeVariants": [
+        "CQ",
+        "Q+1",
+        "Q+2"
+      ],
+      "relatedColumns": [
+        "BOQ_ARR",
+        "EOQ_ARR",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "arravg_qoq",
+      "name": "ARRAVG QoQ",
+      "aliases": [
+        "ARR average QoQ",
+        "ARR quarter over quarter",
+        "ARR QoQ trend"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "ARR & Revenue",
+      "definition": "ARR average quarter-over-quarter trend. Shows BOQ ARR $ with reporting hierarchy filter removed to allow cross-hierarchy comparison.",
+      "formula": "CALCULATE(BOQ ARR $, removing IS_CY_RPT_HIER filter from VW_TD_EBI_REPORTING_HIERARCHY)",
+      "components": {
+        "value": "BOQ ARR $ across all reporting hierarchies"
+      },
+      "timeVariants": [
+        "QoQ"
+      ],
+      "relatedColumns": [
+        "BOQ_ARR",
+        "IS_CY_RPT_HIER"
+      ],
+      "relatedTables": [
+        "VW_TD_EBI_REPORTING_HIERARCHY"
+      ]
+    },
+    {
+      "id": "sub_ma_arr",
+      "name": "Sub MA ARR",
+      "aliases": [
+        "Sub account MA ARR",
+        "sub-MA level ARR"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "ARR & Revenue",
+      "definition": "Sub-account and MA-level ARR. Computes the account-level ARRAVG (Accnts CQ ARRAVG) with the MOPG1 product filter removed, giving total ARR irrespective of product grouping.",
+      "formula": "CALCULATE(SUM(arr.EOQ_ARR) WHERE cal.QTR_BKT_IND = -1, ALL(OPG.MOPG1))",
+      "components": {
+        "value": "Accnts CQ ARRAVG with MOPG1 filter removed"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "EOQ_ARR",
+        "QTR_BKT_IND",
+        "MOPG1"
+      ],
+      "relatedTables": [
+        "vw_EBI_Caldate",
+        "vw_EBI_OPG"
+      ]
+    },
+    {
+      "id": "r4q_rbob_wo_pq_trail",
+      "name": "R4Q RBOB w/o PQ Trail",
+      "aliases": [
+        "rolling 4 quarter RBOB",
+        "R4Q RBOB",
+        "4-quarter RBOB without PQ trailing"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "ARR & Revenue",
+      "definition": "Rolling 4-quarter Renewals Base of Business (RBOB) excluding PQ Trailing renewals. Sums RBOB across 4 consecutive quarter buckets (CQ through Q+3).",
+      "formula": "SUM(ret.RBOB) WHERE ret_md.PIPELINE_RENEWAL <> 'PQ Trailing' AND cal.QTR_BKT_IND IN (0,1,2,3), removing IS_LATEST_SNAPSHOT and WEEK_SORT_ORDER_REVERSE filters",
+      "components": {
+        "value": "RBOB across 4 quarter buckets excluding PQ Trailing renewals"
+      },
+      "timeVariants": [
+        "R4Q"
+      ],
+      "relatedColumns": [
+        "RBOB",
+        "PIPELINE_RENEWAL",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TD_EBI_Retention_MetaData",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "cw_pw_rbob_wo_pq_trail",
+      "name": "CW/PW RBOB w/o PQ Trail",
+      "aliases": [
+        "current week RBOB",
+        "prior week RBOB",
+        "CW RBOB",
+        "PW RBOB",
+        "RBOB week-over-week"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "ARR & Revenue",
+      "definition": "Current Week (CW) and Prior Week (PW) RBOB without PQ Trailing renewals. CW uses WEEK_SORT_ORDER_REVERSE=0 and PW uses WEEK_SORT_ORDER_REVERSE=-1, both filtered to CQ (QTR_BKT_IND=0). Used for week-over-week RBOB comparison.",
+      "formula": "CW: SUM(ret.RBOB) WHERE ret_md.PIPELINE_RENEWAL <> 'PQ Trailing' AND cal.QTR_BKT_IND = 0 AND cal.WEEK_SORT_ORDER_REVERSE = '0'. PW: same but WEEK_SORT_ORDER_REVERSE = '-1' with SNAPSHOT_TYPE = 'Locked'.",
+      "components": {
+        "current_week": "RBOB w/o PQ Trail at WEEK_SORT_ORDER_REVERSE=0, QTR_BKT_IND=0",
+        "prior_week": "RBOB w/o PQ Trail at WEEK_SORT_ORDER_REVERSE=-1, QTR_BKT_IND=0, SNAPSHOT_TYPE=Locked"
+      },
+      "timeVariants": [
+        "CW",
+        "PW",
+        "WoW"
+      ],
+      "relatedColumns": [
+        "RBOB",
+        "PIPELINE_RENEWAL",
+        "QTR_BKT_IND",
+        "WEEK_SORT_ORDER_REVERSE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_Retention",
+        "vw_TD_EBI_Retention_MetaData",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "asv_dollar",
+      "name": "ASV $",
+      "aliases": [
+        "ASV",
+        "annual subscription value",
+        "ASV amount"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "ARR & Revenue",
+      "definition": "Annual Subscription Value — the pipeline opportunity amount filtered to the ASV pay measure. Represents the total ASV across pipeline deals.",
+      "formula": "SUM(p.Oppty) WHERE pm.PAY_MEASURE_DISPLAY = 'ASV'",
+      "components": {
+        "value": "Pipeline Oppty filtered to ASV pay measure"
+      },
+      "timeVariants": [
+        "CQ",
+        "QTD",
+        "YTD"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "PAY_MEASURE_DISPLAY"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_PAY_MEASURE"
+      ]
+    },
+    {
+      "id": "occ_deal_count",
+      "name": "OCC Deal Count",
+      "aliases": [
+        "deal count",
+        "number of deals",
+        "opportunity count"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Deal Intelligence",
+      "definition": "Count of deals/opportunities in OCC. For past quarters (QTR_BKT_IND < 0), uses TM1 booked deal count. For current/future quarters, counts distinct DEAL_REG_IDs that have non-blank GNARR.",
+      "formula": "IF QTR_BKT_IND < 0: COUNT(DISTINCT tm1.OPP_ID) WHERE TM1_Bookings > 0. ELSE: COUNT(DISTINCT opp.DEAL_REG_ID) WHERE GNARR is not null",
+      "components": {
+        "historical": "Distinct TM1 booked OPP_IDs with positive bookings",
+        "current": "Distinct DEAL_REG_IDs with non-blank GNARR"
+      },
+      "timeVariants": [
+        "CQ",
+        "PQ"
+      ],
+      "relatedColumns": [
+        "DEAL_REG_ID",
+        "OPP_ID",
+        "QTR_BKT_IND"
+      ],
+      "relatedTables": [
+        "vw_TD_EBI_OPP",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "deal_sensei_score",
+      "name": "Deal Sensei Score",
+      "aliases": [
+        "deal health score",
+        "DS score",
+        "deal intelligence score"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Deal Intelligence",
+      "definition": "Deal health/intelligence score from the Deal Sensei model. A numeric score (DS_SCORE) assigned to each opportunity indicating deal health. Returns blank if no score exists.",
+      "formula": "SUM(opp.DS_SCORE) — returns BLANK if null",
+      "components": {
+        "value": "DS_SCORE from Opportunity dimension"
+      },
+      "timeVariants": [],
+      "relatedColumns": [
+        "DS_SCORE",
+        "Deal_Sensei_Score"
+      ],
+      "relatedTables": [
+        "vw_TD_EBI_OPP"
+      ]
+    },
+    {
+      "id": "stage_duration",
+      "name": "Stage Duration",
+      "aliases": [
+        "days in stage",
+        "stage age",
+        "sales stage duration"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Deal Intelligence",
+      "definition": "Average number of days an opportunity has spent in its current sales stage. Used with CQ Risk Category to flag deals stalled too long (>=60 days = red flag for High/Low risk).",
+      "formula": "AVG(p.STAGE_AGE)",
+      "components": {
+        "value": "STAGE_AGE from pipeline fact"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "STAGE_AGE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S"
+      ]
+    },
+    {
+      "id": "opp_age",
+      "name": "Opp Age",
+      "aliases": [
+        "opportunity age",
+        "deal age",
+        "OCC_Opp Age"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Deal Intelligence",
+      "definition": "Average total age of opportunities in days. Measures how long deals have been open from creation.",
+      "formula": "AVG(p.DEAL_AGE)",
+      "components": {
+        "value": "DEAL_AGE from pipeline fact"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "DEAL_AGE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S"
+      ]
+    },
+    {
+      "id": "stage_progression_asv",
+      "name": "Stage Progression ASV",
+      "aliases": [
+        "stage progression",
+        "progression ASV",
+        "stage movement ASV"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Deal Intelligence & Walk",
+      "definition": "ASV value of deals progressing through sales stages. Measures the gross ASV movement captured in the pipe walk table as deals advance or move between stages.",
+      "formula": "SUM(pw.STAGEPROGRESSIONASV) from vw_TF_EBI_PIPE_WALK",
+      "components": {
+        "value": "STAGEPROGRESSIONASV from pipe walk fact"
+      },
+      "timeVariants": [
+        "QTD",
+        "WTD"
+      ],
+      "relatedColumns": [
+        "STAGEPROGRESSIONASV"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_PIPE_WALK"
+      ]
+    },
+    {
+      "id": "abs_walk_value",
+      "name": "ABS Walk Value",
+      "aliases": [
+        "absolute walk value",
+        "ABS WALK VALUE",
+        "walk magnitude"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Deal Intelligence & Walk",
+      "definition": "Absolute value of pipeline walk. Measures the magnitude of pipeline change regardless of direction (positive or negative).",
+      "formula": "ABS(SUM(pw.GROSSASV)) — absolute value of WALK VALUE",
+      "components": {
+        "value": "Absolute value of GROSSASV from pipe walk"
+      },
+      "timeVariants": [
+        "QTD",
+        "WTD"
+      ],
+      "relatedColumns": [
+        "GROSSASV"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_PIPE_WALK"
+      ]
+    },
+    {
+      "id": "cq_s3_to_s4_plus_progression_pct",
+      "name": "CQ S3 to S4+ Progression %",
+      "aliases": [
+        "S3 to S4+ progression",
+        "CQ S3 progression rate",
+        "S3->S4+ %"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Deal Intelligence & Walk",
+      "definition": "Percentage of S3 pipeline deals that have progressed to S4 or beyond in the current quarter. Measures stage advancement effectiveness for early-stage pipeline.",
+      "formula": "SUM(pw.STAGEPROGRESSIONASV WHERE pw.DAY_FLAG='QTD' AND pw.PREV_SALES_STAGE_DERIVED IN ('S3','In Qtr') AND pw.CURR_SALES_STAGE IN ('S4','S5','S6','S7','Booked')) / NULLIF(SUM(pw.STAGEPROGRESSIONASV WHERE pw.DAY_FLAG='QTD' AND pw.PREV_SALES_STAGE_DERIVED IN ('S3','In Qtr')), 0)",
+      "components": {
+        "numerator": "Stage Progression ASV where prev stage is S3/In Qtr and current stage is S4+",
+        "denominator": "Total Stage Progression ASV where prev stage is S3/In Qtr (QTD)"
+      },
+      "timeVariants": [
+        "CQ",
+        "QTD"
+      ],
+      "relatedColumns": [
+        "STAGEPROGRESSIONASV",
+        "PREV_SALES_STAGE_DERIVED",
+        "CURR_SALES_STAGE",
+        "DAY_FLAG"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_PIPE_WALK"
+      ]
+    },
+    {
+      "id": "cq_s3_s4_to_s5_plus_progression_pct",
+      "name": "CQ S3/4 to S5+ Progression %",
+      "aliases": [
+        "S3/4 to S5+ progression",
+        "mature pipeline progression",
+        "S3/S4->S5+ %"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Deal Intelligence & Walk",
+      "definition": "Percentage of S3/S4 pipeline deals that have progressed to S5+ in the current quarter. Measures the maturation rate of mid-stage pipeline into commitment-ready deals.",
+      "formula": "CQ + N2Q S3/4 TO S5+ PROGRESSION $ / NULLIF(TRUE PROGRESSION QTD, 0)",
+      "components": {
+        "numerator": "S3/4 to S5+ progression dollar value",
+        "denominator": "Total true progression QTD"
+      },
+      "timeVariants": [
+        "CQ",
+        "QTD"
+      ],
+      "relatedColumns": [
+        "STAGEPROGRESSIONASV",
+        "PREV_SALES_STAGE_DERIVED",
+        "CURR_SALES_STAGE",
+        "DAY_FLAG"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_PIPE_WALK"
+      ]
+    },
+    {
+      "id": "close_rate",
+      "name": "Close Rate",
+      "aliases": [
+        "close rate",
+        "pipeline close rate",
+        "win rate"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Deal Intelligence & Walk",
+      "definition": "Pipeline close rate — ratio of won deals (from BOQ S3+ flag deals) to beginning-of-quarter pipeline. Measures how effectively the pipeline converts to wins.",
+      "formula": "SUM(p.Oppty WHERE p.BOQ_S3_Flag=1 AND p.ADJ_COMMITMENT='Won' AND cal.QTR_BKT_IND=0) / NULLIF(SUM(p.Oppty WHERE p.IN_PIPELINE=1 AND cal.WEEKNUMBER='W1'), 0)",
+      "components": {
+        "numerator": "Won $ from BOQ S3+ deals in current quarter snapshot",
+        "denominator": "BOQ pipeline (PIPE $ at Week 1)"
+      },
+      "timeVariants": [
+        "CQ",
+        "PQ"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "BOQ S3+ Flag",
+        "ADJ_COMMITMENT",
+        "IN_PIPELINE",
+        "WEEKNUMBER"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_Caldate"
+      ]
+    },
+    {
+      "id": "close_ratio",
+      "name": "Close Ratio",
+      "aliases": [
+        "close ratio",
+        "win ratio",
+        "CLOSE RATIO"
+      ],
+      "personas": [
+        "AE",
+        "Manager",
+        "VP"
+      ],
+      "section": "Deal Intelligence & Walk",
+      "definition": "Pipeline close ratio — ratio of won deals at end-of-quarter to beginning-of-quarter pipeline. Similar to close rate but uses EOQ won vs BOQ pipe snapshots.",
+      "formula": "SUM(p.Oppty WHERE p.ADJ_COMMITMENT='Won' AND p.IS_EOQ='TRUE') / NULLIF(SUM(p.Oppty WHERE p.IN_PIPELINE=1 AND p.IS_BOQ='TRUE'), 0)",
+      "components": {
+        "numerator": "WON $ at EOQ",
+        "denominator": "PIPE $ at BOQ"
+      },
+      "timeVariants": [
+        "CQ",
+        "PQ"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "ADJ_COMMITMENT",
+        "IS_EOQ",
+        "IS_BOQ",
+        "IN_PIPELINE"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S"
+      ]
+    },
+    {
+      "id": "idle_oppty_pct",
+      "name": "Idle Oppty %",
+      "aliases": [
+        "idle opportunity percentage",
+        "stale deals %",
+        "IDLE OPPTY %"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Deal Intelligence & Walk",
+      "definition": "Percentage of open opportunities that are idle (30+ days since next steps were modified). Flags pipeline hygiene issues.",
+      "formula": "For $: SUM(p.Oppty WHERE p.ADJ_COMMITMENT_GROUP='Open' AND p.DAYS_SINCE_NEXT_STEPS_MODIFIED_BAND='30+ days') / NULLIF(SUM(p.Oppty WHERE p.ADJ_COMMITMENT_GROUP='Open'), 0). For #: same logic but with COUNT(DISTINCT p.OPP_ID).",
+      "components": {
+        "numerator": "Open oppty $ or # where DAYS_SINCE_NEXT_STEPS_MODIFIED_BAND = '30+ days'",
+        "denominator": "Total open oppty $ or #"
+      },
+      "timeVariants": [
+        "CQ"
+      ],
+      "relatedColumns": [
+        "Oppty",
+        "OPP_ID",
+        "ADJ_COMMITMENT_GROUP",
+        "DAYS_SINCE_NEXT_STEPS_MODIFIED_BAND"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S"
+      ]
+    },
+    {
+      "id": "open_oppty_count",
+      "name": "Open Oppty #",
+      "aliases": [
+        "open opportunities",
+        "open deal count",
+        "OPEN OPPTY #"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Deal Intelligence & Walk",
+      "definition": "Count of open (non-closed) opportunities. Filtered to ADJ_COMMITMENT_GROUP = 'Open'.",
+      "formula": "COUNT(DISTINCT p.OPP_ID) WHERE p.ADJ_COMMITMENT_GROUP = 'Open'",
+      "components": {
+        "value": "Distinct open opportunity IDs"
+      },
+      "timeVariants": [
+        "CQ",
+        "WoW"
+      ],
+      "relatedColumns": [
+        "OPP_ID",
+        "ADJ_COMMITMENT_GROUP"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S"
+      ]
+    },
+    {
+      "id": "tier1_prnt_gnarr_dollar",
+      "name": "Tier 1 Parent GNARR $",
+      "aliases": [
+        "tier 1 GNARR",
+        "T1 parent GNARR",
+        "TIER 1 PRNT GNARR $"
+      ],
+      "personas": [
+        "AE",
+        "Manager"
+      ],
+      "section": "Territory Planning (TPT)",
+      "definition": "GNARR (Gross Net ARR / pipeline opportunity $) for Tier 1 parent accounts. The total pipeline Oppty $ filtered to Tier 1 parent accounts.",
+      "formula": "SUM(p.Oppty) WHERE tpt_md.PARENT_TIER = 'Tier 1'",
+      "components": {
+        "value": "OPPTY $ filtered to Tier 1 parent tier"
+      },
+      "timeVariants": [],
+      "relatedColumns": [
+        "Oppty",
+        "PARENT_TIER"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S"
+      ]
+    },
+    {
+      "id": "tier1_prnt_without_gnarr_count",
+      "name": "Tier 1 Parent Without GNARR #",
+      "aliases": [
+        "T1 parents no pipeline",
+        "tier 1 no GNARR",
+        "TIER 1 PRNT WITHOUT GNARR #"
+      ],
+      "personas": [
+        "Manager",
+        "VP"
+      ],
+      "section": "Territory Planning (TPT)",
+      "definition": "Count of Tier 1 parent accounts that have no pipeline (GNARR). Computed by finding all Tier 1 TPT parent-country combinations and subtracting those that have non-blank Oppty in the pipeline.",
+      "formula": "COUNT(Tier 1 TPT parents) - COUNT(Tier 1 parents with Oppty IS NOT NULL in Pipeline, filtered to latest snapshot, ASV, DX). Uses EXCEPT set operation.",
+      "components": {
+        "all_tier1_parents": "Distinct PRNT_CNTRY where PARENT_TIER = 'Tier 1'",
+        "parents_with_pipe": "Distinct ACCOUNT_PARENT_ID with non-null Oppty, PARENT_TIER='Tier 1', latest snapshot, ASV, DX"
+      },
+      "timeVariants": [],
+      "relatedColumns": [
+        "PRNT_CNTRY",
+        "ACCOUNT_PARENT_ID",
+        "PARENT_TIER",
+        "Oppty",
+        "WEEK_SORT_ORDER_REVERSE",
+        "PAY_MEASURE_DISPLAY"
+      ],
+      "relatedTables": [
+        "vw_TF_EBI_P2S",
+        "vw_EBI_Caldate",
+        "vw_EBI_PAY_MEASURE"
+      ]
     }
   ]
 }

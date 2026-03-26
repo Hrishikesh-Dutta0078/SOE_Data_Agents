@@ -1,8 +1,9 @@
 /**
- * SQL Server connection pool using Windows Authentication (msnodesqlv8 driver).
+ * SQL Server connection pool.
+ * - Production (DB_USER + DB_PASSWORD set): SQL Server authentication via standard mssql driver.
+ * - Development (no DB_USER): Windows Authentication via msnodesqlv8 driver.
  */
 
-const sql = require('mssql/msnodesqlv8');
 const logger = require('../utils/logger');
 const {
   DB_REQUEST_TIMEOUT,
@@ -12,22 +13,46 @@ const {
   DB_POOL_IDLE_TIMEOUT,
 } = require('./constants');
 
+const useSqlAuth = !!(process.env.DB_USER && process.env.DB_PASSWORD);
+const sql = useSqlAuth ? require('mssql') : require('mssql/msnodesqlv8');
+
 let pool = null;
 
 const server = process.env.DB_SERVER;
 const port = parseInt(process.env.DB_PORT, 10) || 1433;
 const database = process.env.DB_DATABASE;
 
-const config = {
-  connectionString: `Driver={ODBC Driver 17 for SQL Server};Server=${server},${port};Database=${database};Trusted_Connection=Yes;`,
-  pool: {
-    min: DB_POOL_MIN,
-    max: DB_POOL_MAX,
-    idleTimeoutMillis: DB_POOL_IDLE_TIMEOUT,
-  },
-  requestTimeout: DB_REQUEST_TIMEOUT,
-  connectionTimeout: DB_CONNECTION_TIMEOUT,
+const poolSettings = {
+  min: DB_POOL_MIN,
+  max: DB_POOL_MAX,
+  idleTimeoutMillis: DB_POOL_IDLE_TIMEOUT,
 };
+
+let config;
+
+if (useSqlAuth) {
+  config = {
+    server,
+    port,
+    database,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    pool: poolSettings,
+    requestTimeout: DB_REQUEST_TIMEOUT,
+    connectionTimeout: DB_CONNECTION_TIMEOUT,
+    options: {
+      encrypt: true,
+      trustServerCertificate: process.env.DB_TRUST_SERVER_CERT === 'true',
+    },
+  };
+} else {
+  config = {
+    connectionString: `Driver={ODBC Driver 17 for SQL Server};Server=${server},${port};Database=${database};Trusted_Connection=Yes;`,
+    pool: poolSettings,
+    requestTimeout: DB_REQUEST_TIMEOUT,
+    connectionTimeout: DB_CONNECTION_TIMEOUT,
+  };
+}
 
 function getEnv() {
   return {
@@ -47,7 +72,7 @@ async function getPool() {
       logger.error('SQL Server pool error', { error: err.message });
       pool = null;
     });
-    logger.info('DB connected', { server });
+    logger.info('DB connected', { server, auth: useSqlAuth ? 'sql' : 'windows' });
     return pool;
   } catch (err) {
     logger.error('SQL Server connection failed', { error: err.message });
@@ -80,17 +105,33 @@ module.exports = {
         database: e.database,
         options: {
           trustServerCertificate: e.trustServerCert,
-          trustedConnection: true,
+          ...(useSqlAuth
+            ? { encrypt: true }
+            : { trustedConnection: true }),
         },
+        ...(useSqlAuth && {
+          user: process.env.DB_USER,
+          password: process.env.DB_PASSWORD,
+        }),
       },
     };
   },
   buildConnectionString() {
     const e = getEnv();
+    if (useSqlAuth) {
+      return [
+        `Server=${e.server},${e.port}`,
+        `Database=${e.database}`,
+        `User Id=${process.env.DB_USER}`,
+        `Password=${process.env.DB_PASSWORD}`,
+        `TrustServerCertificate=${e.trustServerCert}`,
+        `Encrypt=true`,
+      ].join(';');
+    }
     return [
       `Server=${e.server},${e.port}`,
       `Database=${e.database}`,
-      `Trusted_Connection=Yes`,
+      `Trusted_Connection=Yes`, 
       `TrustServerCertificate=${e.trustServerCert}`,
     ].join(';');
   },

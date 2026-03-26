@@ -112,8 +112,13 @@ function formatKpis(kpis) {
   if (!Array.isArray(kpis) || kpis.length === 0) return '';
   let text = '**KPI DEFINITIONS:**\n';
   for (const k of kpis) {
-    const kpiText = typeof k === 'string' ? k : k.text || k.definition || JSON.stringify(k);
-    text += `- ${kpiText}\n`;
+    if (typeof k === 'string') { text += `- ${k}\n`; continue; }
+    text += `- **${k.name || 'KPI'}**`;
+    if (k.definition) text += `: ${k.definition}`;
+    if (k.formula) text += ` | Formula: ${k.formula}`;
+    if (k.relatedTables?.length) text += ` | Tables: ${k.relatedTables.join(', ')}`;
+    if (k.relatedColumns?.length) text += ` | Columns: ${k.relatedColumns.join(', ')}`;
+    text += '\n';
   }
   return text;
 }

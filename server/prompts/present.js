@@ -209,6 +209,7 @@ module.exports = {
   chartPrompt,
   buildInsightInputs,
   buildChartInputs,
+  computeColumnStats,
   CATEGORY_INSIGHT_GUIDANCE,
   DEFAULT_INSIGHT_GUIDANCE,
 };

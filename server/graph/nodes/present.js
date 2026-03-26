@@ -6,7 +6,7 @@
 const { z } = require('zod');
 const EventEmitter = require('events');
 const { getModel, getModelMeta } = require('../../config/llm');
-const { insightPrompt, chartPrompt, buildInsightInputs, buildChartInputs, CATEGORY_INSIGHT_GUIDANCE, DEFAULT_INSIGHT_GUIDANCE } = require('../../prompts/present');
+const { insightPrompt, chartPrompt, buildInsightInputs, buildChartInputs, computeColumnStats, CATEGORY_INSIGHT_GUIDANCE, DEFAULT_INSIGHT_GUIDANCE } = require('../../prompts/present');
 const {
   INSIGHT_MAX_TOKENS,
   INSIGHT_TEMPERATURE,
@@ -175,6 +175,7 @@ function buildMultiQueryInsightInputs(state, allQueries) {
   const { note: partialResultsNote, summary: _partialSummary } = buildPartialResultsNote(allQueries);
 
   let dataSection = '';
+  const allColumnStats = [];
   for (const q of allQueries) {
     const exec = q.execution;
     if (!exec?.success || !exec.rows?.length) continue;
@@ -183,6 +184,7 @@ function buildMultiQueryInsightInputs(state, allQueries) {
     dataSection += `Columns: ${(exec.columns || []).join(', ')}\n`;
     dataSection += `Total rows: ${exec.rowCount}\n`;
     dataSection += `Sample (${sample.length} rows):\n${JSON.stringify(sample, null, 2)}\n`;
+    allColumnStats.push(`[${q.id}] ${q.subQuestion}:\n${computeColumnStats(exec.rows, exec.columns)}`);
   }
 
   return {
@@ -193,6 +195,7 @@ function buildMultiQueryInsightInputs(state, allQueries) {
     categoryGuidance: guidance,
     columns: 'See sub-query results below',
     rowCount: String(allQueries.reduce((sum, q) => sum + (q.execution?.rowCount || 0), 0)),
+    columnStats: allColumnStats.length > 0 ? allColumnStats.join('\n\n') : 'No data available.',
     sampleCount: 'multiple',
     sampleData: dataSection,
   };
