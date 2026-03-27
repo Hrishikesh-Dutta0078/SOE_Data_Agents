@@ -732,91 +732,176 @@ function inferFromPattern(kpiName) {
   return null;
 }
 
-// ─── MAIN ──────────────────────────────────────────────────────────────
+// ─── MAIN — 4-Pass Pipeline ────────────────────────────────────────
 function main() {
-  // 1. Read original
   const raw = fs.readFileSync(GLOSSARY_PATH, 'utf-8');
   const glossary = JSON.parse(raw);
   const kpis = glossary.kpis;
-  console.log(`Read ${kpis.length} KPIs from ${GLOSSARY_PATH}`);
+  console.log(`Read ${kpis.length} KPIs from ${GLOSSARY_PATH}\n`);
 
-  // 2. Excel log rows
-  const logRows = [];
+  const stats = { excelMerged: 0, regexExtracted: 0, inferred: 0, pbixOnly: 0, mapped: 0, approximated: 0 };
 
-  // 3. Transform each KPI
+  // ── Pass 1: Excel Merge ───────────────────────────────────────────
+  console.log('Pass 1: Excel Merge...');
+  const excelMap = loadExcelMappings();
+
   for (const kpi of kpis) {
-    // Preserve original formula as formulaPbix
-    kpi.formulaPbix = kpi.formula;
+    if (!kpi.formulaPbix) {
+      kpi.formulaPbix = kpi.formula;
+    }
 
-    // Apply formula override or keep existing (many already have DB formulas from Batch 2/3)
+    // Priority 1: FORMULA_OVERRIDES (hand-verified)
     if (FORMULA_OVERRIDES[kpi.id]) {
       kpi.formula = FORMULA_OVERRIDES[kpi.id];
     }
-    // else: keep the existing formula (many Retention/Pipeline KPIs already have SQL-style formulas)
+    // Priority 2: Excel DB_Formula (if still EXTERNALMEASURE)
+    else if (kpi.formula && kpi.formula.includes('EXTERNALMEASURE') && excelMap.has(kpi.id)) {
+      const excel = excelMap.get(kpi.id);
+      kpi.formula = excel.formula;
+      if (excel.relatedColumns.length > 0) {
+        kpi.relatedColumns = excel.relatedColumns;
+      }
+      stats.excelMerged++;
+    }
 
-    // Map relatedColumns to table.column format
+    // Map relatedColumns through COL_MAP + RELATED_COLS_OVERRIDES
     kpi.relatedColumns = mapRelatedColumns(kpi);
 
-    // Add notes if applicable
     if (NOTES[kpi.id]) {
       kpi.notes = NOTES[kpi.id];
     }
+  }
+  console.log(`  Excel merged: ${stats.excelMerged}\n`);
 
-    // Determine status
-    let status = 'mapped';
-    if (APPROXIMATED_IDS.has(kpi.id)) {
-      status = 'approximated';
+  // ── Pass 2: Regex Extract relatedColumns ──────────────────────────
+  console.log('Pass 2: Regex Extract relatedColumns...');
+  for (const kpi of kpis) {
+    if ((!kpi.relatedColumns || kpi.relatedColumns.length === 0) &&
+        kpi.formula && !kpi.formula.includes('EXTERNALMEASURE')) {
+      const extracted = extractRelatedColumnsFromFormula(kpi.formula);
+      if (extracted.length > 0) {
+        kpi.relatedColumns = extracted;
+        stats.regexExtracted++;
+      }
+    }
+  }
+  console.log(`  Regex extracted: ${stats.regexExtracted}\n`);
+
+  // ── Pass 3: Pattern-Based Inference ───────────────────────────────
+  console.log('Pass 3: Pattern-Based Inference...');
+  for (const kpi of kpis) {
+    if (kpi.formula && kpi.formula.includes('EXTERNALMEASURE')) {
+      const result = inferFromPattern(kpi.name);
+      if (result) {
+        kpi.formula = result.formula;
+        kpi.relatedColumns = result.relatedColumns;
+        if (result.pbixOnly) {
+          kpi.pbix_only = true;
+          kpi.confidence = 'pbix_only';
+          stats.pbixOnly++;
+        } else {
+          kpi.confidence = 'inferred';
+          stats.inferred++;
+        }
+      }
+    }
+  }
+  console.log(`  Inferred: ${stats.inferred}`);
+  console.log(`  PBIX-only (pattern): ${stats.pbixOnly}\n`);
+
+  // ── Pass 4: Mark Remaining Unmappable ─────────────────────────────
+  console.log('Pass 4: Mark Remaining Unmappable...');
+  let pass4count = 0;
+  for (const kpi of kpis) {
+    if (kpi.formula && kpi.formula.includes('EXTERNALMEASURE')) {
+      kpi.formula = PBIX_ONLY_FORMULA;
+      kpi.pbix_only = true;
+      kpi.confidence = 'pbix_only';
+      kpi.relatedColumns = [];
+      pass4count++;
+    }
+  }
+  stats.pbixOnly += pass4count;
+  console.log(`  Remaining marked pbix_only: ${pass4count}\n`);
+
+  // ── Finalize: Set confidence + relatedTables ──────────────────────
+  console.log('Finalizing...');
+  for (const kpi of kpis) {
+    if (!kpi.confidence) {
+      if (APPROXIMATED_IDS.has(kpi.id)) {
+        kpi.confidence = 'approximated';
+        stats.approximated++;
+      } else {
+        kpi.confidence = 'mapped';
+        stats.mapped++;
+      }
     }
 
-    // Build log row
-    logRows.push({
-      KPI_ID: kpi.id,
-      KPI_Name: kpi.name,
-      Section: kpi.section,
-      PBIX_Formula: kpi.formulaPbix,
-      DB_Formula: kpi.formula,
-      Related_Columns_DB: kpi.relatedColumns.join(', '),
-      Status: status,
-      Discrepancy_Notes: kpi.notes || '',
-    });
+    kpi.relatedTables = deriveRelatedTables(kpi.relatedColumns || []);
+
+    if (!kpi.pbix_only) {
+      delete kpi.pbix_only;
+    }
   }
 
-  // 4. Write updated JSON
+  // ── Write updated JSON ────────────────────────────────────────────
   const output = JSON.stringify(glossary, null, 2);
   fs.writeFileSync(GLOSSARY_PATH, output, 'utf-8');
   console.log(`Wrote updated glossary to ${GLOSSARY_PATH}`);
 
-  // 5. Write Excel log
+  // ── Write Excel log ───────────────────────────────────────────────
   if (!fs.existsSync(DOCS_DIR)) {
     fs.mkdirSync(DOCS_DIR, { recursive: true });
   }
 
+  const logRows = kpis.map(kpi => ({
+    KPI_ID: kpi.id,
+    KPI_Name: kpi.name,
+    Section: kpi.section,
+    PBIX_Formula: kpi.formulaPbix || '',
+    DB_Formula: kpi.formula,
+    Related_Columns_DB: (kpi.relatedColumns || []).join(', '),
+    Related_Tables: (kpi.relatedTables || []).join(', '),
+    Status: kpi.confidence || 'mapped',
+    PBIX_Only: kpi.pbix_only ? 'YES' : '',
+    Discrepancy_Notes: kpi.notes || '',
+  }));
+
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.json_to_sheet(logRows);
-
-  // Set column widths
   ws['!cols'] = [
     { wch: 35 },  // KPI_ID
-    { wch: 40 },  // KPI_Name
+    { wch: 45 },  // KPI_Name
     { wch: 28 },  // Section
     { wch: 80 },  // PBIX_Formula
     { wch: 100 }, // DB_Formula
     { wch: 80 },  // Related_Columns_DB
+    { wch: 50 },  // Related_Tables
     { wch: 15 },  // Status
+    { wch: 10 },  // PBIX_Only
     { wch: 80 },  // Discrepancy_Notes
   ];
-
   XLSX.utils.book_append_sheet(wb, ws, 'KPI Mapping Log');
   XLSX.writeFile(wb, EXCEL_PATH);
   console.log(`Wrote Excel log to ${EXCEL_PATH}`);
 
-  // 6. Summary stats
-  const mapped = logRows.filter(r => r.Status === 'mapped').length;
-  const approximated = logRows.filter(r => r.Status === 'approximated').length;
-  console.log(`\nSummary: ${kpis.length} KPIs total`);
-  console.log(`  mapped:       ${mapped}`);
-  console.log(`  approximated: ${approximated}`);
-  console.log(`  with notes:   ${logRows.filter(r => r.Discrepancy_Notes).length}`);
+  // ── Summary ───────────────────────────────────────────────────────
+  const total = kpis.length;
+  const byConfidence = {};
+  for (const kpi of kpis) {
+    byConfidence[kpi.confidence] = (byConfidence[kpi.confidence] || 0) + 1;
+  }
+  const withRelCols = kpis.filter(k => k.relatedColumns && k.relatedColumns.length > 0).length;
+  const extRemaining = kpis.filter(k => k.formula && k.formula.includes('EXTERNALMEASURE')).length;
+
+  console.log(`\n${'='.repeat(50)}`);
+  console.log(`Summary: ${total} KPIs total`);
+  for (const [conf, count] of Object.entries(byConfidence).sort()) {
+    console.log(`  ${conf.padEnd(15)} ${count}`);
+  }
+  console.log(`  with relatedColumns: ${withRelCols}`);
+  console.log(`  EXTERNALMEASURE remaining: ${extRemaining}`);
+  console.log(`${'='.repeat(50)}`);
 }
 
 main();
