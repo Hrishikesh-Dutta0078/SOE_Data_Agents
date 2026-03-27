@@ -144,7 +144,7 @@ function searchKpis(query, k = 5) {
 }
 
 function formatKpiForOutput(kpi) {
-  return {
+  const out = {
     id: kpi.id,
     name: kpi.name,
     definition: kpi.definition,
@@ -155,6 +155,10 @@ function formatKpiForOutput(kpi) {
     personas: kpi.personas || [],
     timeVariants: kpi.timeVariants || [],
   };
+  if (kpi.confidence) out.confidence = kpi.confidence;
+  if (kpi.pbix_only) out.pbix_only = true;
+  if (kpi.notes) out.notes = kpi.notes;
+  return out;
 }
 
 function reloadKpiGlossary() {
