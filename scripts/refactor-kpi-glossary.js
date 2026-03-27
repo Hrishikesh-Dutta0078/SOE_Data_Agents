@@ -458,31 +458,53 @@ function mapRelatedColumns(kpi) {
   return mapped;
 }
 
+// ─── DAX Detection ──────────────────────────────────────────────────
+// Detects raw Power BI DAX formulas that need DB translation
+const DAX_KEYWORDS = [
+  /\bEXTERNALMEASURE\b/i, /\bCALCULATE\s*\(/i, /\bSUMX\s*\(/i,
+  /\bFILTER\s*\(/i, /\bVAR\s+\w/i, /\bRETURN\b/i, /\bCOALESCE\s*\(/i,
+  /\bALL\s*\(/i, /\bRELATED\s*\(/i, /\bCOUNTROWS\s*\(/i,
+  /\bAVERAGEX\s*\(/i, /\bMAXX\s*\(/i, /\bMINX\s*\(/i,
+  /\bDIVIDE\s*\(/i, /\bSWITCH\s*\(/i, /\bISBLANK\s*\(/i,
+  /\bUSERELATIONSHIP\s*\(/i, /\bREMOVEFILTERS\s*\(/i,
+  /\bALLSELECTED\s*\(/i, /\bSELECTEDVALUE\s*\(/i,
+  /\bIFERROR\s*\(/i, /\bVALUES\s*\(/i, /\bBLANK\s*\(/i,
+  /\bDISTINCTCOUNT\s*\(/i, /\bCONTAINS\s*\(/i,
+];
+
+function isRawDaxFormula(formula) {
+  if (!formula || typeof formula !== 'string') return false;
+  return DAX_KEYWORDS.some(p => p.test(formula));
+}
+
 // ─── Pass 1: Excel Merge ────────────────────────────────────────────
 function loadExcelMappings() {
   if (!fs.existsSync(EXCEL_PATH)) {
     console.log('  Excel mapping log not found, skipping Pass 1');
-    return new Map();
+    return { formulaMap: new Map(), colsOnlyMap: new Map() };
   }
   const wb = XLSX.readFile(EXCEL_PATH);
   const ws = wb.Sheets[wb.SheetNames[0]];
   const rows = XLSX.utils.sheet_to_json(ws);
-  const map = new Map();
+  const formulaMap = new Map();  // Clean DB formula + relatedColumns
+  const colsOnlyMap = new Map(); // Only relatedColumns (formula is DAX)
   for (const row of rows) {
     const id = row.KPI_ID;
     if (!id) continue;
     const dbFormula = (row.DB_Formula || '').trim();
     const relCols = (row.Related_Columns_DB || '').trim();
-    if (!dbFormula || dbFormula.includes('EXTERNALMEASURE')) continue;
-    map.set(id, {
-      formula: dbFormula,
-      relatedColumns: relCols
-        ? relCols.split(/,\s*/).filter(c => c.length > 0)
-        : [],
-    });
+    const parsedCols = relCols
+      ? relCols.split(/,\s*/).filter(c => c.length > 0 && !c.startsWith('dataset:'))
+      : [];
+    if (dbFormula && !isRawDaxFormula(dbFormula)) {
+      formulaMap.set(id, { formula: dbFormula, relatedColumns: parsedCols });
+    } else if (parsedCols.length > 0) {
+      // Formula is DAX but we have usable DB column references
+      colsOnlyMap.set(id, parsedCols);
+    }
   }
-  console.log(`  Pass 1: loaded ${map.size} DB mappings from Excel`);
-  return map;
+  console.log(`  Pass 1: loaded ${formulaMap.size} full DB mappings, ${colsOnlyMap.size} cols-only from Excel`);
+  return { formulaMap, colsOnlyMap };
 }
 
 // ─── Pass 2: Regex Extract relatedColumns from formula text ─────────
@@ -741,9 +763,20 @@ function main() {
 
   const stats = { excelMerged: 0, regexExtracted: 0, inferred: 0, pbixOnly: 0, mapped: 0, approximated: 0 };
 
+  // ── Reset: restore original formula from formulaPbix for idempotency ─
+  for (const kpi of kpis) {
+    if (kpi.formulaPbix) {
+      kpi.formula = kpi.formulaPbix;
+    }
+    // Clear derived fields so they get re-computed
+    delete kpi.confidence;
+    delete kpi.pbix_only;
+    kpi.relatedTables = [];
+  }
+
   // ── Pass 1: Excel Merge ───────────────────────────────────────────
   console.log('Pass 1: Excel Merge...');
-  const excelMap = loadExcelMappings();
+  const { formulaMap, colsOnlyMap } = loadExcelMappings();
 
   for (const kpi of kpis) {
     if (!kpi.formulaPbix) {
@@ -754,14 +787,19 @@ function main() {
     if (FORMULA_OVERRIDES[kpi.id]) {
       kpi.formula = FORMULA_OVERRIDES[kpi.id];
     }
-    // Priority 2: Excel DB_Formula (if still EXTERNALMEASURE)
-    else if (kpi.formula && kpi.formula.includes('EXTERNALMEASURE') && excelMap.has(kpi.id)) {
-      const excel = excelMap.get(kpi.id);
+    // Priority 2: Excel full DB_Formula
+    else if (kpi.formula && isRawDaxFormula(kpi.formula) && formulaMap.has(kpi.id)) {
+      const excel = formulaMap.get(kpi.id);
       kpi.formula = excel.formula;
       if (excel.relatedColumns.length > 0) {
         kpi.relatedColumns = excel.relatedColumns;
       }
       stats.excelMerged++;
+    }
+
+    // Priority 3: Excel cols-only (formula still DAX, but we have DB column refs)
+    if (isRawDaxFormula(kpi.formula) && colsOnlyMap.has(kpi.id)) {
+      kpi.relatedColumns = colsOnlyMap.get(kpi.id);
     }
 
     // Map relatedColumns through COL_MAP + RELATED_COLS_OVERRIDES
@@ -777,7 +815,7 @@ function main() {
   console.log('Pass 2: Regex Extract relatedColumns...');
   for (const kpi of kpis) {
     if ((!kpi.relatedColumns || kpi.relatedColumns.length === 0) &&
-        kpi.formula && !kpi.formula.includes('EXTERNALMEASURE')) {
+        kpi.formula && !isRawDaxFormula(kpi.formula)) {
       const extracted = extractRelatedColumnsFromFormula(kpi.formula);
       if (extracted.length > 0) {
         kpi.relatedColumns = extracted;
@@ -790,11 +828,18 @@ function main() {
   // ── Pass 3: Pattern-Based Inference ───────────────────────────────
   console.log('Pass 3: Pattern-Based Inference...');
   for (const kpi of kpis) {
-    if (kpi.formula && kpi.formula.includes('EXTERNALMEASURE')) {
+    if (kpi.formula && isRawDaxFormula(kpi.formula)) {
       const result = inferFromPattern(kpi.name);
       if (result) {
         kpi.formula = result.formula;
-        kpi.relatedColumns = result.relatedColumns;
+        // Merge inferred relatedColumns with any Excel-sourced ones
+        const existingCols = kpi.relatedColumns || [];
+        const merged = [...result.relatedColumns];
+        const seen = new Set(merged.map(c => c.toLowerCase()));
+        for (const c of existingCols) {
+          if (!seen.has(c.toLowerCase())) { merged.push(c); seen.add(c.toLowerCase()); }
+        }
+        kpi.relatedColumns = merged;
         if (result.pbixOnly) {
           kpi.pbix_only = true;
           kpi.confidence = 'pbix_only';
@@ -811,18 +856,28 @@ function main() {
 
   // ── Pass 4: Mark Remaining Unmappable ─────────────────────────────
   console.log('Pass 4: Mark Remaining Unmappable...');
-  let pass4count = 0;
+  let pass4pbix = 0, pass4partial = 0;
   for (const kpi of kpis) {
-    if (kpi.formula && kpi.formula.includes('EXTERNALMEASURE')) {
-      kpi.formula = PBIX_ONLY_FORMULA;
-      kpi.pbix_only = true;
-      kpi.confidence = 'pbix_only';
-      kpi.relatedColumns = [];
-      pass4count++;
+    if (kpi.formula && isRawDaxFormula(kpi.formula)) {
+      const hasDbCols = kpi.relatedColumns && kpi.relatedColumns.length > 0;
+      if (hasDbCols) {
+        // Has DB column refs from Excel but no clean formula — LLM can use columns
+        kpi.formula = `Composite PBIX measure — use relatedColumns for SQL: ${kpi.relatedColumns.join(', ')}`;
+        kpi.confidence = 'inferred';
+        stats.inferred++;
+        pass4partial++;
+      } else {
+        kpi.formula = PBIX_ONLY_FORMULA;
+        kpi.pbix_only = true;
+        kpi.confidence = 'pbix_only';
+        kpi.relatedColumns = [];
+        stats.pbixOnly++;
+        pass4pbix++;
+      }
     }
   }
-  stats.pbixOnly += pass4count;
-  console.log(`  Remaining marked pbix_only: ${pass4count}\n`);
+  console.log(`  Partial (has DB cols, no formula): ${pass4partial}`);
+  console.log(`  Remaining marked pbix_only: ${pass4pbix}\n`);
 
   // ── Finalize: Set confidence + relatedTables ──────────────────────
   console.log('Finalizing...');
@@ -892,7 +947,7 @@ function main() {
     byConfidence[kpi.confidence] = (byConfidence[kpi.confidence] || 0) + 1;
   }
   const withRelCols = kpis.filter(k => k.relatedColumns && k.relatedColumns.length > 0).length;
-  const extRemaining = kpis.filter(k => k.formula && k.formula.includes('EXTERNALMEASURE')).length;
+  const extRemaining = kpis.filter(k => k.formula && isRawDaxFormula(k.formula)).length;
 
   console.log(`\n${'='.repeat(50)}`);
   console.log(`Summary: ${total} KPIs total`);
