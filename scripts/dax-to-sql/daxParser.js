@@ -15,14 +15,25 @@
 function stripDaxComments(expr) {
   const lines = expr.split('\n');
   const cleaned = lines.map(line => {
-    // Remove --- comments (entire line)
+    // Remove --- comments (entire line) — only if not inside a string
     if (line.trim().startsWith('---')) {
       return '';
     }
-    // Remove -- comments (rest of line)
-    const dashIndex = line.indexOf('--');
-    if (dashIndex !== -1) {
-      return line.substring(0, dashIndex);
+    // Find -- outside of string literals
+    let inString = false;
+    let stringChar = null;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (inString) {
+        if (ch === stringChar) inString = false;
+      } else {
+        if (ch === '"' || ch === "'") {
+          inString = true;
+          stringChar = ch;
+        } else if (ch === '-' && i + 1 < line.length && line[i + 1] === '-') {
+          return line.substring(0, i);
+        }
+      }
     }
     return line;
   });
@@ -36,7 +47,7 @@ function stripDaxComments(expr) {
  */
 function extractFunctionCall(expr) {
   const trimmed = expr.trim();
-  const match = /^([A-Z_][A-Z0-9_.]*)\s*\(/i.exec(trimmed);
+  const match = /^([A-Z_][A-Z0-9_]*)\s*\(/i.exec(trimmed);
   if (!match) {
     return null;
   }
