@@ -101,8 +101,9 @@ function detectDifferences(before, after) {
 
   diffs.sort((a, b) => {
     if (a.Changed !== b.Changed) return b.Changed.localeCompare(a.Changed);
-    if (a.Section !== b.Section) return a.Section.localeCompare(b.Section);
-    return a.KPI_Name.localeCompare(b.KPI_Name);
+    const secA = a.Section || '', secB = b.Section || '';
+    if (secA !== secB) return secA.localeCompare(secB);
+    return (a.KPI_Name || '').localeCompare(b.KPI_Name || '');
   });
 
   return diffs;
