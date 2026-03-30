@@ -69,6 +69,8 @@ function translateMeasure(rawExpr, ctx) {
   ctx.relatedColumns = new Set();
   ctx.confidence = 'mapped';
   ctx.warnings = [];
+  ctx._depth = 0;
+  ctx._depthWarned = false;
 
   const sql = translateExpr(rawExpr, ctx);
 
@@ -81,10 +83,33 @@ function translateMeasure(rawExpr, ctx) {
   };
 }
 
+const MAX_DEPTH = 50;
+
 /**
  * Recursively translate a DAX expression to SQL.
  */
 function translateExpr(rawExpr, ctx) {
+  ctx._depth = (ctx._depth || 0) + 1;
+  if (ctx._depth > MAX_DEPTH) {
+    ctx.confidence = downgrade(ctx.confidence, 'pbix_only');
+    if (!ctx._depthWarned) {
+      ctx.warnings.push('Max recursion depth exceeded');
+      ctx._depthWarned = true;
+    }
+    ctx._depth--;
+    return `/* depth limit: ${rawExpr.substring(0, 60)}... */`;
+  }
+
+  const result = _translateExprInner(rawExpr, ctx);
+  ctx._depth--;
+  return result;
+}
+
+/**
+ * Inner translation logic (called by translateExpr with depth tracking).
+ */
+function _translateExprInner(rawExpr, ctx) {
+  if (rawExpr == null || typeof rawExpr !== 'string') return 'NULL';
   const expr = stripDaxComments(rawExpr).trim();
   if (!expr) return 'NULL';
 
