@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Dependency Graph and Topological Sort for DAX Measures
  *
