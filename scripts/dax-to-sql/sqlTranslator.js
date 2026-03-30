@@ -276,13 +276,14 @@ function translateCalculate(parsed, ctx) {
   // Translate the measure expression
   const measureSql = translateExpr(measureExpr, ctx);
 
-  // If measureSql is a scalar subquery (SELECT ...), inject WHERE clauses
-  // Otherwise wrap it
+  // Extract the base table info from the measure SQL for JOIN resolution
+  const baseInfo = extractBaseFromSql(measureSql);
+
   const filterClauses = [];
   const joinClauses = [];
 
   filterExprs.forEach(f => {
-    const filterResult = translateFilterArg(f.trim(), ctx);
+    const filterResult = translateFilterArg(f.trim(), ctx, baseInfo);
     if (filterResult.where) filterClauses.push(filterResult.where);
     if (filterResult.join) joinClauses.push(filterResult.join);
   });
@@ -312,9 +313,41 @@ function translateCalculate(parsed, ctx) {
 }
 
 /**
- * Translate a CALCULATE filter argument to { where, join }.
+ * Extract base table info from a SQL subquery for JOIN resolution.
+ * Returns { pbixTable, view, alias } or null.
  */
-function translateFilterArg(filterExpr, ctx) {
+function extractBaseFromSql(sql) {
+  const match = sql.match(/FROM\s+(\S+)\s+(\w+)/i);
+  if (!match) return null;
+  const view = match[1];
+  const alias = match[2];
+  // Reverse lookup: SQL view → PBIX table name
+  const pbixTable = Object.entries(TABLE_MAP).find(([, v]) => v === view)?.[0];
+  return { pbixTable, view, alias };
+}
+
+/**
+ * Find JOIN clause between base table and filter table using joinMap.
+ */
+function buildJoinClause(basePbix, filterPbix, filterView, filterAlias, baseAlias, ctx) {
+  if (!basePbix || !ctx.joinMap[basePbix]) return null;
+  const rel = ctx.joinMap[basePbix][filterPbix];
+  if (!rel) return null;
+  return `JOIN ${filterView} ${filterAlias} ON ${baseAlias}.${rel.fromCol} = ${filterAlias}.${rel.toCol}`;
+}
+
+/**
+ * Escape a SQL string value (double single quotes inside).
+ */
+function escapeSqlString(val) {
+  return val.replace(/"/g, "'").replace(/'([^']*)'/g, (m, inner) => `'${inner.replace(/'/g, "''")}'`);
+}
+
+/**
+ * Translate a CALCULATE filter argument to { where, join }.
+ * baseInfo: { pbixTable, view, alias } from the measure's FROM clause.
+ */
+function translateFilterArg(filterExpr, ctx, baseInfo) {
   const trimmed = filterExpr.trim();
 
   // ALL('Table') — removes filters, ignore
@@ -322,61 +355,72 @@ function translateFilterArg(filterExpr, ctx) {
     return {};
   }
 
+  // Helper: build join if filter table differs from base table
+  function maybeJoin(pbixTable, view, alias) {
+    if (!baseInfo || view === baseInfo.view) return null;
+    return buildJoinClause(baseInfo.pbixTable, pbixTable, view, alias, baseInfo.alias, ctx);
+  }
+
   // NOT 'Table'[Col] IN {...}
   const notInMatch = trimmed.match(/^NOT\s+'([^']+)'\[([^\]]+)\]\s+IN\s+\{(.+)\}$/is);
   if (notInMatch) {
-    const view = resolveTable(notInMatch[1], ctx);
+    const pbixTable = notInMatch[1];
+    const view = resolveTable(pbixTable, ctx);
     const alias = getAlias(view, ctx);
-    const values = notInMatch[3].split(',').map(v => v.trim().replace(/"/g, "'"));
+    const values = notInMatch[3].split(',').map(v => escapeSqlString(v.trim()));
     ctx.relatedTables.add(view);
     ctx.relatedColumns.add(`${view}.${notInMatch[2]}`);
-    return { where: `${alias}.${notInMatch[2]} NOT IN (${values.join(', ')})` };
+    return { where: `${alias}.${notInMatch[2]} NOT IN (${values.join(', ')})`, join: maybeJoin(pbixTable, view, alias) };
   }
 
   // 'Table'[Col] IN {"val1", "val2"}
   const inMatch = trimmed.match(/^'([^']+)'\[([^\]]+)\]\s+IN\s+\{(.+)\}$/is);
   if (inMatch) {
-    const view = resolveTable(inMatch[1], ctx);
+    const pbixTable = inMatch[1];
+    const view = resolveTable(pbixTable, ctx);
     const alias = getAlias(view, ctx);
-    const values = inMatch[3].split(',').map(v => v.trim().replace(/"/g, "'"));
+    const values = inMatch[3].split(',').map(v => escapeSqlString(v.trim()));
     ctx.relatedTables.add(view);
     ctx.relatedColumns.add(`${view}.${inMatch[2]}`);
-    return { where: `${alias}.${inMatch[2]} IN (${values.join(', ')})` };
+    return { where: `${alias}.${inMatch[2]} IN (${values.join(', ')})`, join: maybeJoin(pbixTable, view, alias) };
   }
 
   // Unquoted Table[Col] IN {values}
   const inMatchUnquoted = trimmed.match(/^([A-Za-z_][\w\s]*)\[([^\]]+)\]\s+IN\s+\{(.+)\}$/is);
   if (inMatchUnquoted) {
-    const view = resolveTable(inMatchUnquoted[1].trim(), ctx);
+    const pbixTable = inMatchUnquoted[1].trim();
+    const view = resolveTable(pbixTable, ctx);
     const alias = getAlias(view, ctx);
-    const values = inMatchUnquoted[3].split(',').map(v => v.trim().replace(/"/g, "'"));
+    const values = inMatchUnquoted[3].split(',').map(v => escapeSqlString(v.trim()));
     ctx.relatedTables.add(view);
     ctx.relatedColumns.add(`${view}.${inMatchUnquoted[2]}`);
-    return { where: `${alias}.${inMatchUnquoted[2]} IN (${values.join(', ')})` };
+    return { where: `${alias}.${inMatchUnquoted[2]} IN (${values.join(', ')})`, join: maybeJoin(pbixTable, view, alias) };
   }
 
   // 'Table'[Col] = value or 'Table'[Col] <> value etc.
   const eqMatch = trimmed.match(/^'([^']+)'\[([^\]]+)\]\s*(=|<>|!=|<=|>=|<|>)\s*(.+)$/is);
   if (eqMatch) {
-    const view = resolveTable(eqMatch[1], ctx);
+    const pbixTable = eqMatch[1];
+    const view = resolveTable(pbixTable, ctx);
     const alias = getAlias(view, ctx);
-    let value = eqMatch[4].trim().replace(/"/g, "'");
+    let value = escapeSqlString(eqMatch[4].trim());
     if (/^TRUE\(\)$/i.test(value)) value = '1';
     if (/^FALSE\(\)$/i.test(value)) value = '0';
     ctx.relatedTables.add(view);
     ctx.relatedColumns.add(`${view}.${eqMatch[2]}`);
-    return { where: `${alias}.${eqMatch[2]} ${eqMatch[3]} ${value}` };
+    return { where: `${alias}.${eqMatch[2]} ${eqMatch[3]} ${value}`, join: maybeJoin(pbixTable, view, alias) };
   }
 
   // Unquoted Table[Col] = value
   const eqMatchUnquoted = trimmed.match(/^([A-Za-z_][\w\s]*)\[([^\]]+)\]\s*(=|<>|!=|<=|>=|<|>)\s*(.+)$/is);
   if (eqMatchUnquoted) {
-    const view = resolveTable(eqMatchUnquoted[1].trim(), ctx);
+    const pbixTable = eqMatchUnquoted[1].trim();
+    const view = resolveTable(pbixTable, ctx);
     const alias = getAlias(view, ctx);
-    let value = eqMatchUnquoted[4].trim().replace(/"/g, "'");
+    let value = escapeSqlString(eqMatchUnquoted[4].trim());
     ctx.relatedTables.add(view);
     ctx.relatedColumns.add(`${view}.${eqMatchUnquoted[2]}`);
-    return { where: `${alias}.${eqMatchUnquoted[2]} ${eqMatchUnquoted[3]} ${value}` };
+    return { where: `${alias}.${eqMatchUnquoted[2]} ${eqMatchUnquoted[3]} ${value}`, join: maybeJoin(pbixTable, view, alias) };
   }
 
   // FILTER() as a filter arg — translate inline
