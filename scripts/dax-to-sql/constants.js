@@ -187,7 +187,7 @@ const ABBREVIATIONS = {
   'S3': 'sales stage 3',
   'S4': 'sales stage 4',
   'S5+': 'sales stage 5 plus',
-  'S1\\S2': 'sales stage 1 and 2',
+  'S1/S2': 'sales stage 1 and 2',
   'ASV': 'annual subscription value',
   'ARR': 'annual recurring revenue',
   'GNARR': 'gross net annual recurring revenue',
