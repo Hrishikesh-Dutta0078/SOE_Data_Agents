@@ -10,7 +10,7 @@ const { createTranslationContext, translateMeasure } = require('../sqlTranslator
 const { EXCLUDED_MEASURES, TABLE_ALIAS } = require('../constants');
 
 const EXCEL_PATH = path.resolve(__dirname, '../../../RTB Dataverse Technical Document 3.xlsx');
-const OUTPUT_PATH = path.resolve(__dirname, '../../../server/context/knowledge/kpi-glossary-rtb.json');
+const OUTPUT_PATH = path.resolve(__dirname, '../../../server/context/knowledge/kpi-glossary.json');
 
 describe('DAX-to-SQL integration', () => {
   let measures;
