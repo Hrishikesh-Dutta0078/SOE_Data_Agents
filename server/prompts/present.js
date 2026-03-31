@@ -204,12 +204,39 @@ function buildChartInputs(state, sample) {
   };
 }
 
+function buildThresholdContext() {
+  const lines = ['KPI Thresholds for Status Assessment:'];
+
+  const cov = getThreshold('coverage');
+  if (cov.green) {
+    lines.push(`- Coverage: On Track >= ${cov.green}x, At Risk >= ${cov.yellow}x, Behind < ${cov.yellow}x`);
+  }
+
+  const creation = getThreshold('creation');
+  if (creation.green) {
+    lines.push(`- Creation Coverage: On Track >= ${creation.green}x, At Risk >= ${creation.yellow}x, Behind < ${creation.yellow}x`);
+  }
+
+  const ds = getThreshold('dsScore');
+  if (ds.high) {
+    lines.push(`- Deal Sensei Score: High >= ${ds.high}, Medium >= ${ds.medium}, Low < ${ds.medium}`);
+  }
+
+  const prop = getThreshold('propensity');
+  if (prop.high) {
+    lines.push(`- Propensity to Buy: High >= ${prop.high}`);
+  }
+
+  return lines.length > 1 ? lines.join('\n') : '';
+}
+
 module.exports = {
   insightPrompt,
   chartPrompt,
   buildInsightInputs,
   buildChartInputs,
   computeColumnStats,
+  buildThresholdContext,
   CATEGORY_INSIGHT_GUIDANCE,
   DEFAULT_INSIGHT_GUIDANCE,
 };
