@@ -64,18 +64,7 @@ export default function App() {
     const stored = localStorage.getItem('autoagents_sessionId');
     return stored || generateSessionId();
   });
-  const [nodeModelOverrides, setNodeModelOverrides] = useState(() => {
-    try {
-      const stored = localStorage.getItem('autoagents_nodeModelOverrides');
-      return stored ? JSON.parse(stored) : {};
-    } catch { return {}; }
-  });
-  const [savedPresets, setSavedPresets] = useState(() => {
-    try {
-      const stored = localStorage.getItem('autoagents_devPresets');
-      return stored ? JSON.parse(stored) : {};
-    } catch { return {}; }
-  });
+  const [globalModel, setGlobalModel] = useState('opus');
   const [lastRunMetrics, setLastRunMetrics] = useState(null);
   const toolToggles = useEnabledTools();
 
@@ -267,23 +256,15 @@ export default function App() {
 
           {/* Main content */}
           <main className="flex-1 flex flex-col min-w-0">
-            <ChatPanel onMenuClick={() => setSidebarOpen((v) => !v)} impersonateContext={impersonateContext} validationEnabled={validationEnabled} sessionId={sessionId} onNewChat={handleNewChat} enabledTools={toolToggles.enabledTools} nodeModelOverrides={nodeModelOverrides} userName={userName} onMetricsUpdate={setLastRunMetrics} />
+            <ChatPanel onMenuClick={() => setSidebarOpen((v) => !v)} impersonateContext={impersonateContext} validationEnabled={validationEnabled} sessionId={sessionId} onNewChat={handleNewChat} enabledTools={toolToggles.enabledTools} globalModel={globalModel} userName={userName} onMetricsUpdate={setLastRunMetrics} />
           </main>
 
         </div>
       </div>
 
       <DevPanel
-        nodeModelOverrides={nodeModelOverrides}
-        setNodeModelOverrides={(v) => {
-          setNodeModelOverrides(v);
-          localStorage.setItem('autoagents_nodeModelOverrides', JSON.stringify(v));
-        }}
-        savedPresets={savedPresets}
-        setSavedPresets={(v) => {
-          setSavedPresets(v);
-          localStorage.setItem('autoagents_devPresets', JSON.stringify(v));
-        }}
+        globalModel={globalModel}
+        setGlobalModel={setGlobalModel}
         lastRunMetrics={lastRunMetrics}
       />
     </div>
