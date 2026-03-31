@@ -135,10 +135,10 @@ function postProcessInsights(text) {
     if (!line.includes('|')) return line;
     // Skip header separator rows (|---|---|)
     if (/^\|[\s-|]+$/.test(line)) return line;
-    // Add emoji if status text exists without emoji prefix
-    line = line.replace(/(?<![✅⚠️🔴]\s?)On Track/g, '✅ On Track');
-    line = line.replace(/(?<![✅⚠️🔴]\s?)At Risk/g, '⚠️ At Risk');
-    line = line.replace(/(?<![✅⚠️🔴]\s?)Behind/g, '🔴 Behind');
+    // Add emoji if status text exists without emoji prefix (word boundaries prevent substring matches)
+    line = line.replace(/(?<![✅⚠️🔴]\s?)\bOn Track\b/g, '✅ On Track');
+    line = line.replace(/(?<![✅⚠️🔴]\s?)\bAt Risk\b/g, '⚠️ At Risk');
+    line = line.replace(/(?<![✅⚠️🔴]\s?)\bBehind\b/g, '🔴 Behind');
     return line;
   }).join('\n');
 
