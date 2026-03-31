@@ -86,7 +86,7 @@ function loadMessages(sessionId) {
   } catch { return []; }
 }
 
-export default function ChatPanel({ onMenuClick, impersonateContext = null, validationEnabled = true, sessionId, onNewChat, enabledTools: enabledToolsProp = null, nodeModelOverrides = {}, userName = '', onMetricsUpdate }) {
+export default function ChatPanel({ onMenuClick, impersonateContext = null, validationEnabled = true, sessionId, onNewChat, enabledTools: enabledToolsProp = null, globalModel, userName = '', onMetricsUpdate }) {
   const [messages, setMessages] = useState(() => loadMessages(sessionId));
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -499,7 +499,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     setQuerySummary('');
     setConfidence(null);
 
-    const opts = { impersonateContext: impersonateContext ? { type: impersonateContext.type, id: impersonateContext.id } : null, validationEnabled, sessionId, isFollowUp, nodeModelOverrides, enabledTools: enabledToolsProp ?? null };
+    const opts = { impersonateContext: impersonateContext ? { type: impersonateContext.type, id: impersonateContext.id } : null, validationEnabled, sessionId, isFollowUp, globalModel, enabledTools: enabledToolsProp ?? null };
     const result = await analyzeQuestionStream(
       question,
       history,
@@ -575,7 +575,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       ...(dashboardData.profileCacheKey
         ? { profileCacheKey: dashboardData.profileCacheKey }
         : { dashboardDataSources: serializedSources }),
-      nodeModelOverrides,
+      globalModel,
       enabledTools: enabledToolsProp ?? null,
     };
     const result = await analyzeQuestionStream(
