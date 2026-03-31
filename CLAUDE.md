@@ -118,7 +118,7 @@ npm run build        # Production build (output goes to server/public/)
 Scripts referenced by server npm commands live at the repo root, not in `server/`:
 - `generateSchemaKnowledge.js`, `harvestDistinctValues.js` — knowledge harvesting
 - `validate-examples.js` — gold example validation
-- `prepare-deploy.js` — deployment packaging
+- `prepare-deploy.js` — runs `client` production build (Vite writes to `server/public/`; does not copy stale `client/dist`)
 - `secretScan.js`, `security-scan.sh`, `stormbreaker-scan.sh` — security scanning
 
 ### Running Tests

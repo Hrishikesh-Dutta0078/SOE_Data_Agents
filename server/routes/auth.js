@@ -16,6 +16,34 @@ const OKTA_CLIENT_ID = process.env.OKTA_CLIENT_ID || '';
 const OKTA_REDIRECT_URI = process.env.OKTA_REDIRECT_URI || '';
 const OKTA_CALLBACK_PATH = process.env.OKTA_CALLBACK_PATH || '/implicit/callback';
 
+/**
+ * After Okta, the browser hits Express (e.g. https://localhost:5175/implicit/callback).
+ * Redirecting to "/" stays on Express and serves server/public — a stale build vs Vite on :5176.
+ * In non-production, send users to the Vite dev URL unless POST_LOGIN_REDIRECT_URL overrides.
+ */
+function getPostLoginRedirectUrl() {
+  if (process.env.NODE_ENV === 'production') {
+    return '/';
+  }
+  const raw = (process.env.POST_LOGIN_REDIRECT_URL || '').trim();
+  const fallback = 'http://localhost:5176/';
+  const urlString = raw || fallback;
+  let u;
+  try {
+    u = new URL(urlString);
+  } catch {
+    return '/';
+  }
+  const host = u.hostname;
+  if (host !== 'localhost' && host !== '127.0.0.1') {
+    return '/';
+  }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') {
+    return '/';
+  }
+  return u.href;
+}
+
 /** GET /login — start Okta OAuth flow (PKCE + state, redirect to authorize) */
 router.get('/login', loginLimiter, (req, res) => {
   if (isAuthDisabled()) {
@@ -103,7 +131,7 @@ router.get(OKTA_CALLBACK_PATH.startsWith('/') ? OKTA_CALLBACK_PATH : `/${OKTA_CA
 
   req.session.okta_user = userInfo;
   logUserLogin(userInfo);
-  res.redirect('/');
+  res.redirect(302, getPostLoginRedirectUrl());
 });
 
 /** GET /logout — destroy session, redirect */

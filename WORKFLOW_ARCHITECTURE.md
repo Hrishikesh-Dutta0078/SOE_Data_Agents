@@ -595,7 +595,7 @@ sequenceDiagram
 
     Note over B,E: Subsequent API calls
     B->>E: POST /api/text-to-sql/analyze-stream<br/>credentials: include (session cookie)
-    E->>E: requireAuth: session.okta_user exists<br/>+ check LDAP vs allowedUsers.json
+    E->>E: requireAuth: session.okta_user exists
     E-->>B: 200 OK + SSE stream
 ```
 

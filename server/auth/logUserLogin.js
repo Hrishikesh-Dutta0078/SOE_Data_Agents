@@ -1,9 +1,9 @@
 /**
- * Log user login event (Okta callback). Includes username, userldap, UTC/local time, status.
+ * Log user login event (Okta callback). Includes username, userldap, UTC/local time.
  */
 
 const logger = require('../utils/logger');
-const { getAllowedUsers, extractLdap } = require('./requireAuth');
+const { extractLdap } = require('./requireAuth');
 
 /**
  * Log a user login event. Call after setting req.session.okta_user in the callback.
@@ -15,10 +15,6 @@ function logUserLogin(sessionUser) {
   const userName = sessionUser.name ?? '';
   const userEmail = sessionUser.email ?? '';
   const userLdap = extractLdap(userEmail);
-  const allowed = getAllowedUsers();
-  const status = allowed.length > 0 && !allowed.includes(userLdap)
-    ? 'Failed - Unauthorized'
-    : 'Success';
 
   const utcNow = new Date();
   const localStr = utcNow.toLocaleString('en-GB', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
@@ -30,7 +26,7 @@ function logUserLogin(sessionUser) {
     userldap: userLdap,
     utc_time: utcStr,
     local_time: localStr,
-    status,
+    status: 'Success',
   };
 
   logger.info('User login event', payload);

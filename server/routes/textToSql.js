@@ -292,6 +292,15 @@ function extractNodeSummary(nodeName, update) {
       const t = (update.trace || []).find((s) => s.node === 'accumulateResult');
       return t ? `saved query ${t.queryIndex + 1}/${t.totalQueries}` : 'accumulating';
     }
+    case 'contextFetch': {
+      const cb = update.contextBundle;
+      if (!cb) return 'fetching context';
+      const parts = [`${(cb.tableNames || []).length} tables`];
+      if (cb.kpis?.length) parts.push(`${cb.kpis.length} KPIs`);
+      if (cb.examples?.length) parts.push(`${cb.examples.length} examples`);
+      if (cb.rules?.length) parts.push(`${cb.rules.length} rules`);
+      return parts.join(', ');
+    }
     case 'diagnoseEmptyResults':
       return update.diagnostics?.action || 'diagnosing empty results';
     case 'present': {
@@ -327,6 +336,11 @@ function extractThinkingMessage(nodeName, update, fullState) {
       return `${multiPrefix}Research complete — ${(update.researchToolCalls || []).length} tool calls, brief ${update.researchBrief ? 'ready' : 'unavailable'}`;
     case 'sqlWriterAgent':
       return update.sql ? `${multiPrefix}SQL generated` : `${multiPrefix}SQL writer finished (no SQL produced)`;
+    case 'generateSql': {
+      if (!update.sql) return `${multiPrefix}SQL generation produced no output`;
+      const reasonSnippet = update.reasoning ? ` — ${update.reasoning.substring(0, 120)}` : '';
+      return `${multiPrefix}SQL generated${reasonSnippet}`;
+    }
     case 'validate': {
       const report = update.validationReport;
       if (!report) return `${multiPrefix}Validation skipped`;
@@ -352,6 +366,21 @@ function extractThinkingMessage(nodeName, update, fullState) {
       const t = (update.trace || []).find((s) => s.node === 'accumulateResult');
       if (t) return `Saved result for query ${t.queryIndex + 1}/${t.totalQueries}. Moving to next sub-query...`;
       return 'Accumulating results...';
+    }
+    case 'contextFetch': {
+      const cb = update.contextBundle;
+      if (!cb) return 'Fetching context...';
+      const lines = [];
+      if (cb.tableNames?.length) lines.push(`Selected tables: ${cb.tableNames.join(', ')}`);
+      if (cb.kpis?.length) {
+        const kpiNames = cb.kpis.map((k) => k.name || k.id).join(', ');
+        lines.push(`Matched KPIs: ${kpiNames}`);
+      }
+      if (cb.examples?.length) lines.push(`Found ${cb.examples.length} gold example(s) for reference`);
+      if (cb.rules?.length) lines.push(`Found ${cb.rules.length} business rule(s) to follow`);
+      if (cb.mandatoryFilters?.length) lines.push(`${cb.mandatoryFilters.length} mandatory filter(s) will be applied`);
+      if (cb.fiscalPeriod) lines.push(`Current fiscal period: ${cb.fiscalPeriod.FISCAL_YR_AND_QTR_DESC || 'resolved'}`);
+      return lines.join('\n');
     }
     case 'present': {
       const pt = (update.trace || []).find((s) => s.node === 'present');
@@ -412,6 +441,103 @@ function extractNodeModel(update) {
   return trace[trace.length - 1]?.llm || null;
 }
 
+function buildReasoningSummary(state) {
+  const cb = state.contextBundle || {};
+  const kpis = (cb.kpis || []).map((k) => ({ id: k.id, name: k.name, definition: k.definition }));
+  const examples = (cb.examples || []).map((e) => ({ question: e.question || e.userQuestion, sql: e.sql ? e.sql.substring(0, 120) : '' }));
+  const rules = (cb.rules || []).map((r) => r.rule || r.text || r.description || '').filter(Boolean);
+  const joins = (cb.joinRules || []).map((j) => j.rule || j.text || j.join || (typeof j === 'string' ? j : JSON.stringify(j)));
+  const mandatoryFilters = cb.mandatoryFilters || [];
+  const tablesSelected = cb.tableNames || [];
+  const dvTables = Object.keys(cb.distinctValues || {});
+
+  // Per-file breakdown: which context files contributed and what was selected
+  const contextFiles = [];
+  if (tablesSelected.length > 0) {
+    contextFiles.push({
+      file: 'knowledge/schema-knowledge.json',
+      label: 'Schema & Tables',
+      count: tablesSelected.length,
+      items: tablesSelected,
+    });
+  }
+  if (dvTables.length > 0) {
+    contextFiles.push({
+      file: 'knowledge/schema-knowledge.json',
+      label: 'Distinct Values',
+      count: dvTables.length,
+      items: dvTables.map((t) => `${t} (${(cb.distinctValues[t] || []).length} columns)`),
+    });
+  }
+  if (kpis.length > 0) {
+    contextFiles.push({
+      file: 'knowledge/kpi-glossary.json',
+      label: 'KPI Glossary',
+      count: kpis.length,
+      items: kpis.map((k) => k.name || k.id),
+    });
+  }
+  if (examples.length > 0) {
+    contextFiles.push({
+      file: 'goldExamples.json',
+      label: 'Gold Examples',
+      count: examples.length,
+      items: examples.map((e) => e.question),
+    });
+  }
+  if (rules.length > 0) {
+    contextFiles.push({
+      file: 'knowledge/business-rules.md',
+      label: 'Business Rules',
+      count: rules.length,
+      items: rules,
+    });
+  }
+  if (joins.length > 0) {
+    contextFiles.push({
+      file: 'knowledge/join-knowledge.json',
+      label: 'Join Rules',
+      count: joins.length,
+      items: joins,
+    });
+  }
+  if (mandatoryFilters.length > 0) {
+    contextFiles.push({
+      file: 'definitions.json',
+      label: 'Mandatory Filters',
+      count: mandatoryFilters.length,
+      items: mandatoryFilters.map((f) => typeof f === 'string' ? f : f.clause || JSON.stringify(f)),
+    });
+  }
+
+  const summary = {
+    matchType: state.matchType || null,
+    intent: state.intent || null,
+    complexity: state.complexity || null,
+    orchestrationReasoning: state.orchestrationReasoning || null,
+    sqlReasoning: state.reasoning || null,
+    tablesSelected,
+    kpisMatched: kpis,
+    examplesMatched: examples,
+    rulesMatched: rules,
+    joinsMatched: joins,
+    mandatoryFilters,
+    fiscalPeriod: cb.fiscalPeriod?.FISCAL_YR_AND_QTR_DESC || null,
+    validationPassed: state.validationReport?.overall_valid ?? null,
+    validationIssues: [],
+    correctionAttempts: state.attempts?.correction || 0,
+    contextFiles,
+  };
+  if (state.validationReport?.passes) {
+    for (const [pass, result] of Object.entries(state.validationReport.passes)) {
+      if (!result.passed && result.issues?.length) {
+        summary.validationIssues.push(...result.issues.map((i) => `${pass}: ${i.description}`));
+      }
+    }
+  }
+  return summary;
+}
+
 function buildFinalResponse(state, usage, runtimeMetrics = null, usageByNodeAndModel = null, { stripRows = false } = {}) {
   const queries = state.queries || [];
   const payload = {
@@ -450,6 +576,7 @@ function buildFinalResponse(state, usage, runtimeMetrics = null, usageByNodeAndM
       : null,
     trace: state.trace,
     warnings: state.warnings,
+    reasoning: buildReasoningSummary(state),
     runtimeMetrics,
     usage,
   };

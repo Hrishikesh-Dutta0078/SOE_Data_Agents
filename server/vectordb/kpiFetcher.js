@@ -48,8 +48,19 @@ let _loadPromise = null;
 function buildKpiStoreFromData(data) {
   const kpis = Array.isArray(data.kpis) ? data.kpis : [];
   const keywordIndex = new Map();
+  // Separate index for name+alias tokens — used to boost direct name matches
+  const nameTokenIndex = new Map();
   for (let idx = 0; idx < kpis.length; idx++) {
     const kpi = kpis[idx];
+
+    // Index name + aliases separately for boosted scoring
+    const nameText = [kpi.name || '', (kpi.aliases || []).join(' ')].join(' ');
+    const nameTokens = new Set(tokenize(nameText));
+    for (const kw of nameTokens) {
+      if (!nameTokenIndex.has(kw)) nameTokenIndex.set(kw, new Set());
+      nameTokenIndex.get(kw).add(idx);
+    }
+
     const parts = [
       kpi.name || '',
       (kpi.aliases || []).join(' '),
@@ -73,7 +84,7 @@ function buildKpiStoreFromData(data) {
       keywordIndex.get(kw).add(idx);
     }
   }
-  return { kpis, keywordIndex };
+  return { kpis, keywordIndex, nameTokenIndex };
 }
 
 async function loadKpiGlossaryAsync() {
@@ -106,7 +117,16 @@ function loadKpiGlossary() {
 }
 
 /**
- * Search KPIs by keyword matching.
+ * Search KPIs by keyword matching with phrase-aware scoring.
+ *
+ * Scoring (per KPI):
+ *   +1  per unique query token that matches any indexed keyword
+ *   +3  per unique query token that matches a name/alias token
+ *  +20  if the query contains the KPI name as a substring (phrase match)
+ *  +15  if the query contains a KPI alias as a substring
+ *
+ * Query tokens are deduplicated so entity-enriched queries don't inflate
+ * common terms (e.g., "target" or "quarter").
  *
  * @param {string} query - User question or search terms
  * @param {number} [k=5] - Max number of KPIs to return
@@ -116,19 +136,51 @@ function searchKpis(query, k = 5) {
   const store = loadKpiGlossary();
   if (store.kpis.length === 0) return [];
 
-  const queryTokens = tokenize(query || '');
+  // Deduplicate query tokens so enriched queries don't inflate common terms
+  const queryTokens = [...new Set(tokenize(query || ''))];
 
   if (queryTokens.length === 0) {
     return store.kpis.slice(0, k).map((kpi) => formatKpiForOutput(kpi));
   }
 
+  const NAME_TOKEN_BOOST = 3;
+  const NAME_PHRASE_BOOST = 20;
+  const ALIAS_PHRASE_BOOST = 15;
   const scores = new Map();
 
   for (const token of queryTokens) {
+    // Base score: +1 for keyword match anywhere in KPI
     const matchingIndices = store.keywordIndex.get(token);
     if (matchingIndices) {
       for (const idx of matchingIndices) {
         scores.set(idx, (scores.get(idx) || 0) + 1);
+      }
+    }
+    // Bonus: +NAME_TOKEN_BOOST for name/alias token match
+    const nameMatches = store.nameTokenIndex.get(token);
+    if (nameMatches) {
+      for (const idx of nameMatches) {
+        scores.set(idx, (scores.get(idx) || 0) + NAME_TOKEN_BOOST);
+      }
+    }
+  }
+
+  // Phrase match bonus: if the query contains a KPI's name or alias as a
+  // contiguous phrase, that KPI almost certainly is what the user meant.
+  const normalQuery = (query || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ');
+  for (const [idx] of scores) {
+    const kpi = store.kpis[idx];
+    if (!kpi) continue;
+    const normalName = (kpi.name || '').toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (normalName.length > 1 && normalQuery.includes(normalName)) {
+      scores.set(idx, scores.get(idx) + NAME_PHRASE_BOOST);
+      continue; // name match is strongest, skip alias check
+    }
+    for (const alias of (kpi.aliases || [])) {
+      const normalAlias = alias.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+      if (normalAlias.length > 1 && normalQuery.includes(normalAlias)) {
+        scores.set(idx, scores.get(idx) + ALIAS_PHRASE_BOOST);
+        break;
       }
     }
   }

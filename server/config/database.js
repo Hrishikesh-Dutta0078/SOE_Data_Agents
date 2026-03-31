@@ -1,7 +1,11 @@
 /**
  * SQL Server connection pool.
- * - Production (DB_USER + DB_PASSWORD set): SQL Server authentication via standard mssql driver.
- * - Development (no DB_USER): Windows Authentication via msnodesqlv8 driver.
+ * - Production (DB_USER + DB_PASSWORD set): SQL Server authentication via standard mssql (tedious).
+ * - Development on Windows (no DB_USER): Windows Integrated Auth via msnodesqlv8 + ODBC.
+ *
+ * msnodesqlv8 is a native addon: do not load it on Linux unless using SQL auth only (lazy load).
+ * Azure App Service Linux needs DB_USER + DB_PASSWORD; zipping Windows node_modules still works
+ * for mssql/tedious because we never require msnodesqlv8 when SQL auth is configured.
  */
 
 const logger = require('../utils/logger');
@@ -13,8 +17,27 @@ const {
   DB_POOL_IDLE_TIMEOUT,
 } = require('./constants');
 
-const useSqlAuth = !!(process.env.DB_USER && process.env.DB_PASSWORD);
-const sql = useSqlAuth ? require('mssql') : require('mssql/msnodesqlv8');
+function isSqlAuth() {
+  return !!(process.env.DB_USER && process.env.DB_PASSWORD);
+}
+
+let sqlDriver = null;
+function getSqlDriver() {
+  if (sqlDriver) return sqlDriver;
+  if (isSqlAuth()) {
+    sqlDriver = require('mssql');
+    return sqlDriver;
+  }
+  if (process.platform !== 'win32') {
+    throw new Error(
+      'SQL Server: set DB_USER and DB_PASSWORD (SQL authentication). ' +
+        'Windows Integrated Authentication is only supported on Windows. ' +
+        'On Azure App Service Linux, add those app settings and use a SQL login — do not zip node_modules built on Windows without setting them, or the app may try to load the wrong native driver.'
+    );
+  }
+  sqlDriver = require('mssql/msnodesqlv8');
+  return sqlDriver;
+}
 
 let pool = null;
 
@@ -30,7 +53,7 @@ const poolSettings = {
 
 let config;
 
-if (useSqlAuth) {
+if (isSqlAuth()) {
   config = {
     server,
     port,
@@ -67,12 +90,13 @@ async function getPool() {
   if (pool) return pool;
 
   try {
+    const sql = getSqlDriver();
     pool = await new sql.ConnectionPool(config).connect();
     pool.on('error', (err) => {
       logger.error('SQL Server pool error', { error: err.message });
       pool = null;
     });
-    logger.info('DB connected', { server, auth: useSqlAuth ? 'sql' : 'windows' });
+    logger.info('DB connected', { server, auth: isSqlAuth() ? 'sql' : 'windows' });
     return pool;
   } catch (err) {
     logger.error('SQL Server connection failed', { error: err.message });
@@ -89,13 +113,12 @@ async function closePool() {
   }
 }
 
-/** TYPES for parameterized queries (e.g. request.input('x', TYPES.NVarChar, val)) — from mssql */
-const TYPES = sql;
-
 module.exports = {
   getPool,
   closePool,
-  TYPES,
+  get TYPES() {
+    return getSqlDriver();
+  },
   getDbConfig() {
     const e = getEnv();
     return {
@@ -105,11 +128,11 @@ module.exports = {
         database: e.database,
         options: {
           trustServerCertificate: e.trustServerCert,
-          ...(useSqlAuth
+          ...(isSqlAuth()
             ? { encrypt: true }
             : { trustedConnection: true }),
         },
-        ...(useSqlAuth && {
+        ...(isSqlAuth() && {
           user: process.env.DB_USER,
           password: process.env.DB_PASSWORD,
         }),
@@ -118,7 +141,7 @@ module.exports = {
   },
   buildConnectionString() {
     const e = getEnv();
-    if (useSqlAuth) {
+    if (isSqlAuth()) {
       return [
         `Server=${e.server},${e.port}`,
         `Database=${e.database}`,

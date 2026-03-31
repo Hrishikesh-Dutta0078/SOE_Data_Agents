@@ -5,7 +5,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { extractLdap, requireAuthorization, getAllowedUsers } = require('../../auth/requireAuth');
+const { extractLdap, requireAuthorization } = require('../../auth/requireAuth');
 const { generatePkcePair } = require('../../auth/pkce');
 
 // --- extractLdap ---
@@ -118,16 +118,12 @@ test('requireAuthorization redirects for missing session (HTML)', () => {
   assert.equal(nextCalled, false);
 });
 
-test('requireAuthorization calls next for valid user', () => {
+test('requireAuthorization calls next for authenticated user', () => {
   const req = mockReq({ okta_user: { email: 'test@company.com' } }, 'application/json');
   const res = mockRes();
   let nextCalled = false;
   requireAuthorization(req, res, () => { nextCalled = true; });
-  // If allowedUsers is empty or contains the user, next should be called
-  // (depends on allowedUsers.json, but with empty list all authenticated users pass)
-  if (getAllowedUsers().length === 0) {
-    assert.equal(nextCalled, true, 'Empty allowed list should pass all authenticated users');
-  }
+  assert.equal(nextCalled, true);
 });
 
 // --- PUBLIC_PATHS config ---

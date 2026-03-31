@@ -209,8 +209,7 @@ Auto_Agents_Claude/
 │   ├── config/
 │   │   ├── database.js              # SQL Server connection pool (Windows Auth)
 │   │   ├── llm.js                   # Azure AI Foundry model routing + token tracking
-│   │   ├── constants.js             # Model profiles, timeouts, cost rates
-│   │   └── allowedUsers.json        # LDAP whitelist
+│   │   └── constants.js             # Model profiles, timeouts, cost rates
 │   │
 │   ├── graph/
 │   │   ├── workflow.js              # LangGraph StateGraph definition + routing
@@ -297,7 +296,7 @@ Auto_Agents_Claude/
 │   │   └── voice.js                 # Voice input endpoints
 │   │
 │   ├── auth/
-│   │   ├── requireAuth.js           # Okta session + LDAP whitelist
+│   │   ├── requireAuth.js           # Okta session gate
 │   │   ├── pkce.js                  # PKCE flow implementation
 │   │   └── logUserLogin.js          # Login event logging
 │   │
@@ -565,8 +564,7 @@ data: {"insights":"...","chart":{...},"suggestedFollowUps":[...],...}
 ### Authentication
 - **Okta OAuth 2.0** with PKCE flow for user authentication
 - **Server-side sessions** via `express-session` (HTTP-only cookies)
-- **LDAP whitelist** — only users in `server/config/allowedUsers.json` can access the application
-- Auth middleware in `server/auth/requireAuth.js` validates session + LDAP on every API request
+- Auth middleware in `server/auth/requireAuth.js` validates Okta session on every API request (any user who completes Okta login for the app may access the app; restrict access in Okta app assignment if needed)
 
 ### Security Measures
 - **Helmet** — HTTP security headers (HSTS, CSP, X-Frame-Options, etc.)

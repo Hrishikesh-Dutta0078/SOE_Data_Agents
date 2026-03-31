@@ -20,7 +20,7 @@ OKTA auth (PKCE + Authorization Code flow) is already fully implemented. This wo
 | Server Port | 5005 | Managed by Azure |
 | HTTPS | Self-signed certs | Azure TLS termination |
 | Auth | Enabled | Enabled |
-| Allowed Users | `["hrishikeshd"]` (whitelist) | Same |
+| App access | Controlled in Okta (app assignment), not in-repo allowlist | Same |
 
 ## Design
 
@@ -112,7 +112,7 @@ USE_HTTPS=false
 - `server/auth/pkce.js` — PKCE generation untouched
 - `server/auth/requireAuth.js` — Auth middleware untouched
 - `server/routes/auth.js` — Auth routes untouched (already read from `process.env`)
-- `server/config/allowedUsers.json` — Keep `["hrishikeshd"]`
+- ~~`server/config/allowedUsers.json`~~ — removed; use Okta app assignment for who may sign in
 - Client auth code (`App.jsx`, `api.js`) — Untouched
 
 ## Testing
