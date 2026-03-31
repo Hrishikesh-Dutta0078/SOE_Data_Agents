@@ -44,10 +44,10 @@ function normalizeEnabledTools(value) {
 }
 
 const VALID_NODE_KEYS = new Set([
-  'classify', 'decompose', 'researchAgent',
-  'sqlWriterAgent', 'subQueryMatch', 'correct',
+  'classify', 'decompose', 'generateSql', 'sqlAgent', 'sqlWriterAgent',
+  'researchAgent', 'subQueryMatch', 'correct', 'validate', 'execute',
+  'checkResults', 'presentInsights', 'presentChart', 'dashboardAgent',
   'semanticValidatorFast', 'semanticValidatorOpus',
-  'presentInsights', 'presentChart', 'dashboardAgent',
 ]);
 const VALID_PROFILES = new Set(Object.keys(require('../config/constants').MODEL_PROFILES));
 
@@ -60,6 +60,24 @@ function normalizeNodeModelOverrides(value) {
     }
   }
   return Object.keys(result).length > 0 ? result : null;
+}
+
+function expandGlobalModel(globalModel) {
+  if (!globalModel || typeof globalModel !== 'string') return null;
+  if (!['opus', 'sonnet', 'haiku', 'gpt'].includes(globalModel)) return null;
+
+  const allNodes = [
+    'classify', 'decompose', 'generateSql', 'sqlAgent', 'sqlWriterAgent',
+    'validate', 'correct', 'execute', 'checkResults', 'presentInsights',
+    'presentChart', 'dashboardAgent', 'subQueryMatch',
+  ];
+
+  const overrides = {};
+  allNodes.forEach(nodeKey => {
+    overrides[nodeKey] = globalModel;
+  });
+
+  return overrides;
 }
 
 function isModelMeta(value) {
@@ -680,6 +698,7 @@ router.post('/analyze-stream', async (req, res) => {
     profileCacheKey,
     enabledTools,
     nodeModelOverrides,
+    globalModel,
   } = req.body;
 
   if (!question || typeof question !== 'string' || question.trim().length === 0) {
@@ -724,7 +743,11 @@ router.post('/analyze-stream', async (req, res) => {
     dashboardDataSources: dashboardDataSources || [],
     ...(restoredProfiles?.length > 0 ? { dataProfiles: restoredProfiles } : {}),
     enabledTools: normalizeEnabledTools(enabledTools),
-    nodeModelOverrides: normalizeNodeModelOverrides(nodeModelOverrides),
+    nodeModelOverrides: normalizeNodeModelOverrides(
+      globalModel
+        ? { ...nodeModelOverrides, ...expandGlobalModel(globalModel) }
+        : nodeModelOverrides
+    ),
   };
 
   let onInsightToken = null;
@@ -1116,3 +1139,4 @@ router.get('/blueprints', (req, res) => {
 });
 
 module.exports = router;
+module.exports.__testables = { expandGlobalModel };

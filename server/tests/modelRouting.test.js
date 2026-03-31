@@ -18,6 +18,35 @@ test('GPT cost rates exist in COST_RATES', () => {
   assert.equal(typeof COST_RATES.gpt.output, 'number');
 });
 
+test('expandGlobalModel creates nodeModelOverrides for all nodes', () => {
+  const expandGlobalModel = require('../routes/textToSql').__testables?.expandGlobalModel;
+
+  assert.ok(expandGlobalModel, 'expandGlobalModel should be exported for testing');
+
+  const result = expandGlobalModel('gpt');
+
+  assert.ok(result, 'Should return an object');
+  assert.equal(result.classify, 'gpt');
+  assert.equal(result.decompose, 'gpt');
+  assert.equal(result.generateSql, 'gpt');
+  assert.equal(result.sqlAgent, 'gpt');
+  assert.equal(result.sqlWriterAgent, 'gpt');
+  assert.equal(result.validate, 'gpt');
+  assert.equal(result.correct, 'gpt');
+  assert.equal(result.execute, 'gpt');
+  assert.equal(result.checkResults, 'gpt');
+  assert.equal(result.presentInsights, 'gpt');
+  assert.equal(result.presentChart, 'gpt');
+  assert.equal(result.dashboardAgent, 'gpt');
+  assert.equal(result.subQueryMatch, 'gpt');
+
+  const nullResult = expandGlobalModel(null);
+  assert.equal(nullResult, null);
+
+  const invalidResult = expandGlobalModel('invalid');
+  assert.equal(invalidResult, null);
+});
+
 test('extractInstanceName extracts Azure instance from endpoint', () => {
   const llm = require('../config/llm');
   const extractInstanceName = llm.__testables?.extractInstanceName;
