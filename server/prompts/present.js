@@ -313,6 +313,7 @@ module.exports = {
   buildInsightInputs,
   buildChartInputs,
   buildMultiQueryInsightInputs,
+  buildPartialResultsNote,
   computeColumnStats,
   buildThresholdContext,
   CATEGORY_INSIGHT_GUIDANCE,

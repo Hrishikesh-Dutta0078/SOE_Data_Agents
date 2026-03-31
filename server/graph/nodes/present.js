@@ -6,7 +6,7 @@
 const { z } = require('zod');
 const EventEmitter = require('events');
 const { getModel, getModelMeta } = require('../../config/llm');
-const { insightPrompt, chartPrompt, buildInsightInputs, buildChartInputs, buildMultiQueryInsightInputs, computeColumnStats, CATEGORY_INSIGHT_GUIDANCE, DEFAULT_INSIGHT_GUIDANCE } = require('../../prompts/present');
+const { insightPrompt, chartPrompt, buildInsightInputs, buildChartInputs, buildMultiQueryInsightInputs, buildPartialResultsNote, computeColumnStats, CATEGORY_INSIGHT_GUIDANCE, DEFAULT_INSIGHT_GUIDANCE } = require('../../prompts/present');
 const {
   INSIGHT_MAX_TOKENS,
   INSIGHT_TEMPERATURE,
