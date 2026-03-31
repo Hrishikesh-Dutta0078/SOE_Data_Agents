@@ -17,3 +17,25 @@ test('GPT cost rates exist in COST_RATES', () => {
   assert.equal(typeof COST_RATES.gpt.cachedInput, 'number');
   assert.equal(typeof COST_RATES.gpt.output, 'number');
 });
+
+test('extractInstanceName extracts Azure instance from endpoint', () => {
+  const llm = require('../config/llm');
+  const extractInstanceName = llm.__testables?.extractInstanceName;
+
+  assert.ok(extractInstanceName, 'extractInstanceName should be exported for testing');
+
+  assert.equal(
+    extractInstanceName('https://hrish-m9gvbn6u-eastus2.cognitiveservices.azure.com/'),
+    'hrish-m9gvbn6u-eastus2'
+  );
+
+  assert.equal(
+    extractInstanceName('https://my-instance.openai.azure.com/'),
+    'my-instance'
+  );
+
+  assert.equal(
+    extractInstanceName('invalid-url'),
+    ''
+  );
+});

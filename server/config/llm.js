@@ -3,6 +3,7 @@
  */
 
 const { ChatAnthropic } = require('@langchain/anthropic');
+const { ChatOpenAI } = require('@langchain/openai');
 const { InMemoryCache } = require('@langchain/core/caches');
 const logger = require('../utils/logger');
 const {
@@ -101,7 +102,7 @@ function resolveRuntimeConfig(opts = {}) {
   const profile = MODEL_PROFILES[profileName];
   return {
     profileName,
-    provider: 'anthropic',
+    provider: profile.provider,
     modelName: opts.modelName || getEnvValue(profile.modelNameEnv, profile.defaultModelName),
     endpoint: opts.endpoint || getEnvValue(profile.endpointEnv),
     apiKey: opts.apiKey || getEnvValue(profile.apiKeyEnv),
@@ -258,6 +259,12 @@ function getModelMeta(model) {
   return model[MODEL_META_KEY] || null;
 }
 
+function extractInstanceName(endpoint) {
+  if (!endpoint || typeof endpoint !== 'string') return '';
+  const match = endpoint.match(/https?:\/\/([^.]+)/);
+  return match ? match[1] : '';
+}
+
 function getModel(opts = {}) {
   const maxTokens = opts.maxTokens ?? LLM_DEFAULT_MAX_TOKENS;
   const requestedTemp = opts.temperature ?? LLM_DEFAULT_TEMPERATURE;
@@ -268,26 +275,41 @@ function getModel(opts = {}) {
   const modelMeta = buildModelMeta(opts, runtime);
   const callbacks = usageCallbacks(opts.nodeKey, modelMeta.profile);
 
-  const modelOpts = {
-    anthropicApiKey: runtime.apiKey,
-    anthropicApiUrl: runtime.endpoint,
-    modelName: runtime.modelName,
-    temperature: requestedTemp,
-    maxTokens,
-    clientOptions: { timeout, maxRetries },
-    callbacks,
-  };
+  let model;
 
-  if (opts.cache) {
-    modelOpts.cache = _sharedCache;
+  if (runtime.provider === 'openai') {
+    // Azure OpenAI path
+    const modelOpts = {
+      azureOpenAIApiKey: runtime.apiKey,
+      azureOpenAIApiInstanceName: extractInstanceName(runtime.endpoint),
+      azureOpenAIApiDeploymentName: runtime.modelName,
+      azureOpenAIApiVersion: '2024-12-01-preview',
+      temperature: requestedTemp,
+      maxTokens,
+      timeout,
+      maxRetries,
+      callbacks,
+    };
+    if (opts.cache) modelOpts.cache = _sharedCache;
+    model = new ChatOpenAI(modelOpts);
+  } else {
+    // Anthropic path
+    const modelOpts = {
+      anthropicApiKey: runtime.apiKey,
+      anthropicApiUrl: runtime.endpoint,
+      modelName: runtime.modelName,
+      temperature: requestedTemp,
+      maxTokens,
+      clientOptions: { timeout, maxRetries },
+      callbacks,
+    };
+    if (opts.cache) modelOpts.cache = _sharedCache;
+    model = new ChatAnthropic(modelOpts);
+    model.topP = undefined;
+    model.topK = undefined;
   }
 
-  const model = attachModelMeta(new ChatAnthropic(modelOpts), modelMeta);
-
-  // Azure Foundry Anthropic rejects -1 sent by defaults.
-  model.topP = undefined;
-  model.topK = undefined;
-  return model;
+  return attachModelMeta(model, modelMeta);
 }
 
 /**
@@ -307,4 +329,5 @@ module.exports = {
   getUsageByNodeAndModel,
   recordUsage,
   pingLLM,
+  __testables: { extractInstanceName },
 };
