@@ -141,4 +141,96 @@ describe('presentFormat', () => {
       assert.ok(result.thresholdContext.includes('Coverage:'));
     });
   });
+
+  describe('postProcessInsights', () => {
+    let presentNode;
+
+    beforeEach(() => {
+      delete require.cache[require.resolve('../server/graph/nodes/present')];
+      presentNode = require('../server/graph/nodes/present');
+    });
+
+    describe('dollar normalization', () => {
+      it('converts $38,000,000 to $38M', () => {
+        const result = presentNode.__testables.postProcessInsights('Revenue is $38,000,000 total');
+        assert.ok(result.includes('$38M'), `Expected $38M, got: ${result}`);
+      });
+
+      it('converts $38000000 to $38M', () => {
+        const result = presentNode.__testables.postProcessInsights('Revenue is $38000000 total');
+        assert.ok(result.includes('$38M'), `Expected $38M, got: ${result}`);
+      });
+
+      it('converts $3,200,000 to $3.2M', () => {
+        const result = presentNode.__testables.postProcessInsights('Gap is $3,200,000');
+        assert.ok(result.includes('$3.2M'), `Expected $3.2M, got: ${result}`);
+      });
+
+      it('converts $150,000 to $150K', () => {
+        const result = presentNode.__testables.postProcessInsights('Deal is $150,000');
+        assert.ok(result.includes('$150K'), `Expected $150K, got: ${result}`);
+      });
+
+      it('leaves already-formatted $38M untouched', () => {
+        const input = 'Revenue is $38M total';
+        const result = presentNode.__testables.postProcessInsights(input);
+        assert.equal(result, input);
+      });
+
+      it('leaves already-formatted $3.2K untouched', () => {
+        const input = 'Deal is $3.2K';
+        const result = presentNode.__testables.postProcessInsights(input);
+        assert.equal(result, input);
+      });
+
+      it('leaves small amounts under $1,000 untouched', () => {
+        const input = 'Value is $500';
+        const result = presentNode.__testables.postProcessInsights(input);
+        assert.equal(result, input);
+      });
+    });
+
+    describe('status emoji normalization', () => {
+      it('adds checkmark emoji to On Track in table rows', () => {
+        const input = '| Coverage | 3.2x | On Track |';
+        const result = presentNode.__testables.postProcessInsights(input);
+        assert.ok(result.includes('✅ On Track'), `Expected emoji, got: ${result}`);
+      });
+
+      it('adds warning emoji to At Risk in table rows', () => {
+        const input = '| W+F+UC | $87M | At Risk |';
+        const result = presentNode.__testables.postProcessInsights(input);
+        assert.ok(result.includes('⚠️ At Risk'), `Expected emoji, got: ${result}`);
+      });
+
+      it('adds red circle emoji to Behind in table rows', () => {
+        const input = '| Creation | $62M | Behind |';
+        const result = presentNode.__testables.postProcessInsights(input);
+        assert.ok(result.includes('🔴 Behind'), `Expected emoji, got: ${result}`);
+      });
+
+      it('does not add emoji to status text outside tables', () => {
+        const input = 'Coverage is On Track based on the data.';
+        const result = presentNode.__testables.postProcessInsights(input);
+        assert.ok(!result.includes('✅'), `Should not add emoji outside table: ${result}`);
+      });
+
+      it('does not double-add emoji if already present', () => {
+        const input = '| Coverage | 3.2x | ✅ On Track |';
+        const result = presentNode.__testables.postProcessInsights(input);
+        const matches = result.match(/✅/g);
+        assert.equal(matches.length, 1, `Should have exactly one checkmark: ${result}`);
+      });
+    });
+
+    describe('passthrough', () => {
+      it('returns empty string for empty input', () => {
+        assert.equal(presentNode.__testables.postProcessInsights(''), '');
+      });
+
+      it('returns null/undefined as-is', () => {
+        assert.equal(presentNode.__testables.postProcessInsights(null), null);
+      });
+    });
+  });
 });

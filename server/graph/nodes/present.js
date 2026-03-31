@@ -112,6 +112,39 @@ function parseFollowUps(insightText) {
   return { cleanedInsights, followUps };
 }
 
+/**
+ * Post-process LLM insight output to enforce mechanical formatting guardrails.
+ * - Converts raw dollar amounts to millions/thousands shorthand
+ * - Normalizes status emoji in markdown table rows
+ */
+function postProcessInsights(text) {
+  if (!text) return text;
+
+  // Dollar normalization: convert raw amounts >= $1,000 to shorthand
+  let result = text.replace(/\$\s?([\d,]+(?:\.\d+)?)/g, (match, numStr) => {
+    const num = parseFloat(numStr.replace(/,/g, ''));
+    if (isNaN(num) || num < 1000) return match;
+    if (num >= 1e9) return `$${(num / 1e9).toFixed(num % 1e9 === 0 ? 0 : 1)}B`;
+    if (num >= 1e6) return `$${(num / 1e6).toFixed(num % 1e6 === 0 ? 0 : 1)}M`;
+    if (num >= 1e3) return `$${(num / 1e3).toFixed(num % 1e3 === 0 ? 0 : 1)}K`;
+    return match;
+  });
+
+  // Status emoji normalization: only in markdown table rows (lines with |)
+  result = result.split('\n').map((line) => {
+    if (!line.includes('|')) return line;
+    // Skip header separator rows (|---|---|)
+    if (/^\|[\s-|]+$/.test(line)) return line;
+    // Add emoji if status text exists without emoji prefix
+    line = line.replace(/(?<![✅⚠️🔴]\s?)On Track/g, '✅ On Track');
+    line = line.replace(/(?<![✅⚠️🔴]\s?)At Risk/g, '⚠️ At Risk');
+    line = line.replace(/(?<![✅⚠️🔴]\s?)Behind/g, '🔴 Behind');
+    return line;
+  }).join('\n');
+
+  return result;
+}
+
 function normalizeAxis(val) {
   if (typeof val === 'string') return { key: val, label: val };
   return val;
@@ -258,7 +291,8 @@ async function presentNode(state) {
     tail: insightsRaw.slice(-300),
   });
 
-  const { cleanedInsights, followUps } = parseFollowUps(insightsRaw);
+  const processed = postProcessInsights(insightsRaw);
+  const { cleanedInsights, followUps } = parseFollowUps(processed);
   const resolvedChartType = chart?.charts?.[0]?.chartType || null;
 
   const blueprintFollowUps = state.blueprintMeta?.suggestedFollowUps || [];
@@ -312,4 +346,4 @@ async function presentNode(state) {
   };
 }
 
-module.exports = { presentNode, presentEvents: _presentEvents };
+module.exports = { presentNode, presentEvents: _presentEvents, __testables: { postProcessInsights } };
