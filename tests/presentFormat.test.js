@@ -33,4 +33,51 @@ describe('presentFormat', () => {
       assert.ok(result.includes('Propensity to Buy:'));
     });
   });
+
+  describe('INSIGHT_SYSTEM prompt template', () => {
+    it('contains dual format instructions', async () => {
+      const inputs = {
+        partialResultsNote: '',
+        question: 'How is my pipeline?',
+        questionCategory: 'WHAT_HAPPENED',
+        questionSubCategory: 'overview',
+        categoryGuidance: 'Test guidance',
+        thresholdContext: 'Test thresholds',
+        columns: 'Coverage, Target',
+        rowCount: '5',
+        columnStats: 'Coverage (numeric): min=1.5, max=3.2',
+        sampleCount: '5',
+        sampleData: '[]',
+      };
+      const messages = await presentPrompts.insightPrompt.formatMessages(inputs);
+      const systemMsg = messages[0].content;
+      assert.ok(systemMsg.includes('Format A'), 'should contain Format A');
+      assert.ok(systemMsg.includes('Format B'), 'should contain Format B');
+      assert.ok(systemMsg.includes('Narrative + Table'), 'should mention Narrative + Table');
+      assert.ok(systemMsg.includes('Bullet'), 'should mention Bullet format');
+      assert.ok(systemMsg.includes('Status Key'), 'should include status key');
+      assert.ok(systemMsg.includes('On Track'), 'should define On Track');
+      assert.ok(systemMsg.includes('At Risk'), 'should define At Risk');
+      assert.ok(systemMsg.includes('Behind'), 'should define Behind');
+    });
+
+    it('injects thresholdContext into formatted messages', async () => {
+      const inputs = {
+        partialResultsNote: '',
+        question: 'test',
+        questionCategory: 'GENERAL',
+        questionSubCategory: 'general',
+        categoryGuidance: 'Test guidance',
+        thresholdContext: 'Coverage: On Track >= 2.5x',
+        columns: 'A',
+        rowCount: '1',
+        columnStats: '',
+        sampleCount: '1',
+        sampleData: '[]',
+      };
+      const messages = await presentPrompts.insightPrompt.formatMessages(inputs);
+      const systemMsg = messages[0].content;
+      assert.ok(systemMsg.includes('Coverage: On Track >= 2.5x'));
+    });
+  });
 });
