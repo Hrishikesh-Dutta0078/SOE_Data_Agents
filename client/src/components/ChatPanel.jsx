@@ -515,7 +515,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     // It gets overwritten at the start of the next stream call.
     setActiveTools([]);
     return result;
-  }, [streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, nodeModelOverrides]);
+  }, [streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, globalModel]);
 
   const handleSend = async (text, { isFollowUp = false } = {}) => {
     voiceStopRef.current?.();
@@ -605,7 +605,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     }
 
     return result;
-  }, [dashboardData, buildHistory, streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, nodeModelOverrides]);
+  }, [dashboardData, buildHistory, streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, globalModel]);
 
   const handleClarificationSubmit = async (questions) => {
     if (loading) return;
