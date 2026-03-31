@@ -99,6 +99,18 @@ The natural analytical flow is **What -> Why -> Fix**. After answering one tier,
 - **SNAPSHOT_DATE_ID**: Date key for point-in-time snapshots. Join to vw_EBI_CALDATE via SNAPSHOT_DATE_ID = DATE_KEY.
 - **CALENDAR_YR / CALENDAR_YR_AND_QTR**: Standard calendar year and quarter as INT keys; use _DESC variants for display.
 
+## Calendar Table Roles
+
+All calendar tables source from vw_EBI_CALDATE but serve different date keys:
+
+| Calendar Role | Join Key | Use When |
+|---|---|---|
+| Close Quarter | OPP_CLOSE_DATE_ID = DATE_KEY | Pipeline by close date, bookings |
+| Snapshot Quarter | SNAPSHOT_DATE_ID = DATE_KEY | Point-in-time views, WoW trends |
+| Qualification Quarter | OPP_CREATE_DATE_ID = DATE_KEY | Pipeline creation metrics |
+| Renewal Quarter | RENEWAL_DATE_ID = DATE_KEY | Retention metrics |
+| Create Quarter | ORIGINAL_CREATE_DATE_ID = DATE_KEY | Original opp creation date |
+
 ## Current User Context
 
 The current user is a First Level Manager (FLM):

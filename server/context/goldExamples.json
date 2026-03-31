@@ -548,6 +548,362 @@
         "EMEA deals missing deal review",
         "Show 1M+ deals where review is overdue"
       ]
+    },
+    {
+      "id": "exact__gross_created_qtd",
+      "question": "How much pipeline was created this quarter?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "SELECT\n    r.TERR_ID,\n    r.REP_NAME,\n    c_qual.FISCAL_YR_AND_QTR_DESC AS Qualification_Qtr,\n    o.BU,\n    rc.ROLE_COVERAGE_BU,\n    rc.ROLE_COVERAGE_BU_GROUP,\n    SUM(p.OPPTY) AS [Gross Created QTD $]\nFROM vw_TF_EBI_P2S p\nJOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\nJOIN vw_EBI_CALDATE c_qual ON p.OPP_CREATE_DATE_ID = c_qual.DATE_KEY\nJOIN vw_EBI_CALDATE c_close ON p.OPP_CLOSE_DATE_ID = c_close.DATE_KEY\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE c_qual.QTR_BKT_IND = 0\n  AND c_close.QTR_BKT_IND IN (0, 1, 2, 3, 4)\n  AND s.SALES_STAGE NOT IN ('S1', 'S2', 'Closed CleanUp from Non Pipe', 'Closed Lost from Non Pipe')\n  AND p.PAY_MEASURE_ID = 0 AND p.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\nGROUP BY\n    r.TERR_ID,\n    r.REP_NAME,\n    c_qual.FISCAL_YR_AND_QTR_DESC,\n    o.BU,\n    rc.ROLE_COVERAGE_BU,\n    rc.ROLE_COVERAGE_BU_GROUP\nORDER BY r.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_P2S",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_ebi_sales_stage",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Gross created QTD",
+        "What is the gross created pipeline this quarter?",
+        "Show gross pipeline creation QTD",
+        "Pipeline created quarter to date",
+        "How much new pipeline was created this quarter?",
+        "Gross created pipeline for current quarter"
+      ]
+    },
+    {
+      "id": "exact__gross_created_ytd",
+      "question": "How much pipeline was created year to date?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH YTDQuarters AS (\n    SELECT DISTINCT cal.QTR_BKT_IND AS QUAL_QTR_BKT\n    FROM vw_EBI_CALDATE cal\n    WHERE cal.FISCAL_YR = (SELECT TOP 1 c2.FISCAL_YR FROM vw_EBI_CALDATE c2 WHERE c2.QTR_BKT_IND = 0)\n      AND cal.QTR_BKT_IND <= 0\n),\nEOQSnapshotDates AS (\n    SELECT yq.QUAL_QTR_BKT,\n        MAX(cal.CALENDAR_DATE) AS EOQ_SNAPSHOT_DATE\n    FROM YTDQuarters yq\n    JOIN vw_EBI_CALDATE cal\n        ON cal.QTR_BKT_IND = yq.QUAL_QTR_BKT + 1\n        AND cal.WeekNumberName = 'W01'\n    WHERE yq.QUAL_QTR_BKT < 0\n    GROUP BY yq.QUAL_QTR_BKT\n)\nSELECT\n    r.TERR_ID,\n    r.REP_NAME,\n    o.BU,\n    rc.ROLE_COVERAGE_BU,\n    rc.ROLE_COVERAGE_BU_GROUP,\n    SUM(p.OPPTY) AS [Gross Created YTD $]\nFROM YTDQuarters yq\nJOIN vw_TF_EBI_P2S p ON 1 = 1\nJOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\nJOIN vw_EBI_CALDATE c_qual ON p.OPP_CREATE_DATE_ID = c_qual.DATE_KEY\n    AND c_qual.QTR_BKT_IND = yq.QUAL_QTR_BKT\nJOIN vw_EBI_CALDATE c_close ON p.OPP_CLOSE_DATE_ID = c_close.DATE_KEY\n    AND c_close.QTR_BKT_IND IN (yq.QUAL_QTR_BKT, yq.QUAL_QTR_BKT + 1, yq.QUAL_QTR_BKT + 2, yq.QUAL_QTR_BKT + 3, yq.QUAL_QTR_BKT + 4)\nJOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\n    AND s.SALES_STAGE NOT IN ('S1', 'S2', 'Closed CleanUp from Non Pipe', 'Closed Lost from Non Pipe')\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nLEFT JOIN EOQSnapshotDates eoq ON yq.QUAL_QTR_BKT = eoq.QUAL_QTR_BKT\nLEFT JOIN vw_EBI_CALDATE snap_cal ON p.SNAPSHOT_DATE_ID = snap_cal.DATE_KEY\nWHERE (yq.QUAL_QTR_BKT >= 0 OR (yq.QUAL_QTR_BKT < 0 AND snap_cal.CALENDAR_DATE = eoq.EOQ_SNAPSHOT_DATE))\n  AND p.PAY_MEASURE_ID = 0 AND p.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\nGROUP BY\n    r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\nORDER BY r.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_P2S",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_ebi_sales_stage",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Gross created YTD",
+        "Show gross created pipeline year to date",
+        "Pipeline created YTD",
+        "How much new pipeline year to date?",
+        "Year to date pipeline creation"
+      ]
+    },
+    {
+      "id": "exact__generation_target",
+      "question": "What is our generation target this quarter?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "SELECT\n    r.TERR_ID,\n    r.REP_NAME,\n    o.BU,\n    rc.ROLE_COVERAGE_BU,\n    rc.ROLE_COVERAGE_BU_GROUP,\n    SUM(q.IN_QTR_GC_TARGET) +\n    SUM(CASE WHEN c_fq.QTR_BKT_IND = 1 THEN q2.PIPE_TARGET_SURVIVAL_RATE ELSE 0 END) +\n    SUM(CASE WHEN c_fq.QTR_BKT_IND = 2 THEN q2.PIPE_TARGET_SURVIVAL_RATE ELSE 0 END) +\n    SUM(CASE WHEN c_fq.QTR_BKT_IND = 3 THEN q2.PIPE_TARGET_SURVIVAL_RATE ELSE 0 END) +\n    SUM(CASE WHEN c_fq.QTR_BKT_IND = 4 THEN q2.PIPE_TARGET_SURVIVAL_RATE ELSE 0 END)\n    AS [Full Quarter Gross Creation]\nFROM vw_TF_EBI_QUOTA q\nJOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\nJOIN vw_EBI_CALDATE c ON q.QUOTA_FISCAL_Quarter_ID = c.DATE_KEY\nJOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nLEFT JOIN vw_TF_EBI_QUOTA q2 ON q2.Region_Id = q.Region_Id AND q2.OPG_ID = q.OPG_ID AND q2.ROLE_COVERAGE_ID = q.ROLE_COVERAGE_ID\nLEFT JOIN vw_EBI_CALDATE c_fq ON q2.QUOTA_FISCAL_Quarter_ID = c_fq.DATE_KEY AND c_fq.QTR_BKT_IND IN (1, 2, 3, 4)\nWHERE c.QTR_BKT_IND = 0\n  AND q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\nGROUP BY\n    r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\nORDER BY r.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Generation target",
+        "Full quarter gross creation",
+        "What is the generation target?",
+        "Show generation target for this quarter",
+        "What's our gross creation target?",
+        "Pipeline generation target"
+      ]
+    },
+    {
+      "id": "exact__gross_created_vs_target_gap",
+      "question": "Are we on track for pipeline creation target?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nGrossCreated AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        o.BU,\n        rc.ROLE_COVERAGE_BU,\n        rc.ROLE_COVERAGE_BU_GROUP,\n        SUM(p.OPPTY) AS [Gross Created QTD $]\n    FROM vw_TF_EBI_P2S p\n    JOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\n    JOIN vw_EBI_CALDATE c_qual ON p.OPP_CREATE_DATE_ID = c_qual.DATE_KEY\n    JOIN vw_EBI_CALDATE c_close ON p.OPP_CLOSE_DATE_ID = c_close.DATE_KEY\n    JOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\n    JOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    WHERE c_qual.QTR_BKT_IND = 0\n      AND c_close.QTR_BKT_IND IN (0, 1, 2, 3, 4)\n      AND s.SALES_STAGE NOT IN ('S1', 'S2', 'Closed CleanUp from Non Pipe', 'Closed Lost from Non Pipe')\n      AND p.PAY_MEASURE_ID = 0 AND p.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\n),\nGenTarget AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        o.BU,\n        rc.ROLE_COVERAGE_BU,\n        rc.ROLE_COVERAGE_BU_GROUP,\n        SUM(q.IN_QTR_GC_TARGET) AS [Generation Target]\n    FROM vw_TF_EBI_QUOTA q\n    JOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\n    JOIN vw_EBI_CALDATE c ON q.QUOTA_FISCAL_Quarter_ID = c.DATE_KEY\n    JOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    WHERE c.QTR_BKT_IND = 0\n      AND q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\n)\nSELECT\n    COALESCE(gc.TERR_ID, gt.TERR_ID) AS TERR_ID,\n    COALESCE(gc.REP_NAME, gt.REP_NAME) AS REP_NAME,\n    COALESCE(gc.BU, gt.BU) AS BU,\n    COALESCE(gc.ROLE_COVERAGE_BU, gt.ROLE_COVERAGE_BU) AS ROLE_COVERAGE_BU,\n    gc.[Gross Created QTD $],\n    gt.[Generation Target],\n    gc.[Gross Created QTD $] - gt.[Generation Target] AS [Gap $],\n    CASE\n        WHEN gc.[Gross Created QTD $] - gt.[Generation Target] > 0 THEN 0\n        ELSE gc.[Gross Created QTD $] - gt.[Generation Target]\n    END AS [Gap -ve $]\nFROM GrossCreated gc\nFULL OUTER JOIN GenTarget gt\n    ON gc.TERR_ID = gt.TERR_ID\n    AND gc.BU = gt.BU\n    AND gc.ROLE_COVERAGE_BU = gt.ROLE_COVERAGE_BU\nORDER BY COALESCE(gc.TERR_ID, gt.TERR_ID)",
+      "tables_used": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_ebi_sales_stage",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Gap vs generation target",
+        "Am I on track for pipeline creation?",
+        "Gross created vs target gap",
+        "Pipeline creation gap",
+        "How far behind are we on pipeline creation?",
+        "Show the gap between created pipeline and target",
+        "Are we meeting our pipeline creation target?"
+      ]
+    },
+    {
+      "id": "exact__gross_creation_qtd_pct",
+      "question": "What is our gross creation percentage?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nGrossCreated AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        o.BU,\n        rc.ROLE_COVERAGE_BU,\n        rc.ROLE_COVERAGE_BU_GROUP,\n        SUM(p.OPPTY) AS Val\n    FROM vw_TF_EBI_P2S p\n    JOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\n    JOIN vw_EBI_CALDATE c_qual ON p.OPP_CREATE_DATE_ID = c_qual.DATE_KEY\n    JOIN vw_EBI_CALDATE c_close ON p.OPP_CLOSE_DATE_ID = c_close.DATE_KEY\n    JOIN vw_ebi_sales_stage s ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\n    JOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    WHERE c_qual.QTR_BKT_IND = 0\n      AND c_close.QTR_BKT_IND IN (0, 1, 2, 3, 4)\n      AND s.SALES_STAGE NOT IN ('S1', 'S2', 'Closed CleanUp from Non Pipe', 'Closed Lost from Non Pipe')\n      AND p.PAY_MEASURE_ID = 0 AND p.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\n),\nGenTarget AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        o.BU,\n        rc.ROLE_COVERAGE_BU,\n        rc.ROLE_COVERAGE_BU_GROUP,\n        SUM(q.IN_QTR_GC_TARGET) AS Val\n    FROM vw_TF_EBI_QUOTA q\n    JOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\n    JOIN vw_EBI_CALDATE c ON q.QUOTA_FISCAL_Quarter_ID = c.DATE_KEY\n    JOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    WHERE c.QTR_BKT_IND = 0\n      AND q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\n)\nSELECT\n    COALESCE(gc.TERR_ID, gt.TERR_ID) AS TERR_ID,\n    COALESCE(gc.REP_NAME, gt.REP_NAME) AS REP_NAME,\n    COALESCE(gc.BU, gt.BU) AS BU,\n    COALESCE(gc.ROLE_COVERAGE_BU, gt.ROLE_COVERAGE_BU) AS ROLE_COVERAGE_BU,\n    gc.Val AS [Gross Created QTD $],\n    gt.Val AS [Generation Target],\n    CASE\n        WHEN gt.Val < 1 THEN 0\n        ELSE ROUND(gc.Val / gt.Val, 4)\n    END AS [Gross Creation QTD %]\nFROM GrossCreated gc\nFULL OUTER JOIN GenTarget gt\n    ON gc.TERR_ID = gt.TERR_ID\n    AND gc.BU = gt.BU\n    AND gc.ROLE_COVERAGE_BU = gt.ROLE_COVERAGE_BU\nORDER BY COALESCE(gc.TERR_ID, gt.TERR_ID)",
+      "tables_used": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_ebi_sales_stage",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Gross creation QTD %",
+        "Pipeline creation percentage",
+        "What's the gross creation ratio?",
+        "How are we tracking on pipeline creation %?",
+        "Show gross creation QTD percentage",
+        "What % of generation target have we hit?"
+      ]
+    },
+    {
+      "id": "exact__gross_created_wtd",
+      "question": "How much pipeline was created this week?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH QtrParams AS (\n    SELECT 0 AS SelectedQtrBkt\n),\nWeekParams AS (\n    SELECT\n        CASE\n            WHEN (SELECT MAX(snap.QTR_BKT_IND) FROM vw_EBI_CALDATE snap\n                  WHERE snap.WEEK_SORT_ORDER_REVERSE = '0') = 1\n            THEN (SELECT MAX(snap.FISCAL_WEEK_NUMBER_BY_QTR)\n                  FROM vw_EBI_CALDATE snap WHERE snap.QTR_BKT_IND = 0)\n            ELSE (SELECT MIN(qual.FISCAL_WEEK_NUMBER_BY_QTR)\n                  FROM vw_EBI_CALDATE qual WHERE qual.WEEK_BKT_NUMBER = 0)\n        END AS TargetWeekNo\n)\nSELECT\n    r.TERR_ID,\n    r.REP_NAME,\n    o.BU,\n    rc.ROLE_COVERAGE_BU,\n    rc.ROLE_COVERAGE_BU_GROUP,\n    SUM(p.OPPTY) AS [Gross Created WTD $]\nFROM vw_TF_EBI_P2S p\nCROSS JOIN QtrParams qp\nJOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\nJOIN vw_EBI_CALDATE qual_cal\n    ON p.OPP_CREATE_DATE_ID = qual_cal.DATE_KEY\n    AND qual_cal.QTR_BKT_IND = qp.SelectedQtrBkt\n    AND qual_cal.FISCAL_WEEK_NUMBER_BY_QTR = (SELECT wp.TargetWeekNo FROM WeekParams wp)\nJOIN vw_EBI_CALDATE close_cal\n    ON p.OPP_CLOSE_DATE_ID = close_cal.DATE_KEY\n    AND close_cal.QTR_BKT_IND IN (\n        qp.SelectedQtrBkt, qp.SelectedQtrBkt + 1, qp.SelectedQtrBkt + 2,\n        qp.SelectedQtrBkt + 3, qp.SelectedQtrBkt + 4\n    )\nJOIN vw_ebi_sales_stage s\n    ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\n    AND s.SALES_STAGE NOT IN ('S1', 'S2', 'Closed CleanUp from Non Pipe', 'Closed Lost from Non Pipe')\nJOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE p.PAY_MEASURE_ID = 0 AND p.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\nGROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\nORDER BY r.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_P2S",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_ebi_sales_stage",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Gross created WTD",
+        "Pipeline created this week",
+        "Show gross created pipeline week to date",
+        "How much new pipeline this week?",
+        "Week to date pipeline creation",
+        "What was created this week?"
+      ]
+    },
+    {
+      "id": "exact__gross_creation_qtd_target",
+      "question": "What is our phased generation target QTD?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nReconWeek AS (\n    SELECT\n        CASE\n            WHEN (SELECT MIN(cal.QTR_BKT_IND) FROM vw_EBI_CALDATE cal\n                  WHERE cal.CALENDAR_DATE = (\n                      SELECT MIN(c2.CALENDAR_DATE) FROM vw_EBI_CALDATE c2\n                      WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n                  )) = 1\n            THEN (SELECT MAX(CAST(cal.FISCAL_WEEK_NUMBER_BY_QTR AS INT))\n                  FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0)\n            ELSE (SELECT MAX(CAST(cal.FISCAL_WEEK_NUMBER_BY_QTR AS INT))\n                  FROM vw_EBI_CALDATE cal\n                  WHERE cal.CALENDAR_DATE = (\n                      SELECT MIN(c2.CALENDAR_DATE) FROM vw_EBI_CALDATE c2\n                      WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n                  ))\n        END AS CurrentWeek\n),\nFullQtr AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        o.BU,\n        rc.ROLE_COVERAGE_BU,\n        rc.ROLE_COVERAGE_BU_GROUP,\n        c.FISCAL_YR_AND_QTR_DESC AS QUALIFICATION_QTR,\n        SUM(q.IN_QTR_GC_TARGET) AS Qt\n    FROM vw_TF_EBI_QUOTA q\n    JOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\n    JOIN vw_EBI_CALDATE c ON q.QUOTA_FISCAL_Quarter_ID = c.DATE_KEY\n    JOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    WHERE c.QTR_BKT_IND = 0\n      AND q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP, c.FISCAL_YR_AND_QTR_DESC\n)\nSELECT\n    fq.TERR_ID,\n    fq.REP_NAME,\n    fq.BU,\n    fq.ROLE_COVERAGE_BU,\n    fq.ROLE_COVERAGE_BU_GROUP,\n    fq.Qt AS [Full Qtr Target],\n    CASE\n        WHEN RIGHT(fq.QUALIFICATION_QTR, 2) = 'Q1' THEN\n            CASE\n                WHEN rw.CurrentWeek <= 6 THEN (fq.Qt * 0.1 * rw.CurrentWeek) / 6.0\n                ELSE (fq.Qt * 0.1) + (fq.Qt * 0.9 * (rw.CurrentWeek - 6)) / 7.0\n            END\n        ELSE (fq.Qt * rw.CurrentWeek) / 13.0\n    END AS [Gross Creation QTD]\nFROM FullQtr fq\nCROSS JOIN ReconWeek rw\nORDER BY fq.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Gross creation QTD",
+        "Phased generation target",
+        "What's the QTD generation target?",
+        "Show phased target quarter to date",
+        "What should we have created by now?",
+        "Generation target prorated to this week"
+      ]
+    },
+    {
+      "id": "exact__gross_creation_ytd_target",
+      "question": "What is the generation target year to date?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nReconWeek AS (\n    SELECT\n        CASE\n            WHEN (SELECT MIN(cal.QTR_BKT_IND) FROM vw_EBI_CALDATE cal\n                  WHERE cal.CALENDAR_DATE = (\n                      SELECT MIN(c2.CALENDAR_DATE) FROM vw_EBI_CALDATE c2\n                      WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n                  )) = 1\n            THEN (SELECT MAX(CAST(cal.FISCAL_WEEK_NUMBER_BY_QTR AS INT))\n                  FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0)\n            ELSE (SELECT MAX(CAST(cal.FISCAL_WEEK_NUMBER_BY_QTR AS INT))\n                  FROM vw_EBI_CALDATE cal\n                  WHERE cal.CALENDAR_DATE = (\n                      SELECT MIN(c2.CALENDAR_DATE) FROM vw_EBI_CALDATE c2\n                      WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n                  ))\n        END AS CurrentWeek\n),\nYTDQuarters AS (\n    SELECT DISTINCT\n        cal.FISCAL_YR_AND_QTR_DESC AS QUALIFICATION_QTR,\n        cal.QTR_BKT_IND           AS BASE_QTR_BKT\n    FROM vw_EBI_CALDATE cal\n    WHERE cal.FISCAL_YR = (SELECT TOP 1 c2.FISCAL_YR FROM vw_EBI_CALDATE c2 WHERE c2.QTR_BKT_IND = 0)\n      AND cal.QTR_BKT_IND <= 0\n),\nFullQtr AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        o.BU,\n        rc.ROLE_COVERAGE_BU,\n        rc.ROLE_COVERAGE_BU_GROUP,\n        yq.QUALIFICATION_QTR,\n        yq.BASE_QTR_BKT,\n        SUM(q.IN_QTR_GC_TARGET) AS Qt\n    FROM YTDQuarters yq\n    JOIN vw_EBI_CALDATE cal ON cal.QTR_BKT_IND = yq.BASE_QTR_BKT\n    JOIN vw_TF_EBI_QUOTA q ON q.QUOTA_FISCAL_Quarter_ID = cal.DATE_KEY\n    JOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\n    JOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    WHERE q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP,\n             yq.QUALIFICATION_QTR, yq.BASE_QTR_BKT\n)\nSELECT\n    fq.TERR_ID,\n    fq.REP_NAME,\n    fq.BU,\n    fq.ROLE_COVERAGE_BU,\n    fq.ROLE_COVERAGE_BU_GROUP,\n    SUM(\n        CASE\n            WHEN fq.BASE_QTR_BKT < 0 THEN fq.Qt\n            WHEN fq.BASE_QTR_BKT = 0 THEN\n                CASE\n                    WHEN RIGHT(fq.QUALIFICATION_QTR, 2) = 'Q1' THEN\n                        CASE\n                            WHEN rw.CurrentWeek <= 6 THEN (fq.Qt * 0.1 * rw.CurrentWeek) / 6.0\n                            ELSE (fq.Qt * 0.1) + (fq.Qt * 0.9 * (rw.CurrentWeek - 6)) / 7.0\n                        END\n                    ELSE (fq.Qt * rw.CurrentWeek) / 13.0\n                END\n            ELSE NULL\n        END\n    ) AS [Gross Creation YTD]\nFROM FullQtr fq\nCROSS JOIN ReconWeek rw\nGROUP BY fq.TERR_ID, fq.REP_NAME, fq.BU, fq.ROLE_COVERAGE_BU, fq.ROLE_COVERAGE_BU_GROUP\nORDER BY fq.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Gross creation YTD",
+        "YTD generation target",
+        "Show generation target year to date",
+        "What's the phased target YTD?",
+        "Year to date generation target",
+        "How much should we have created YTD?"
+      ]
+    },
+    {
+      "id": "exact__gross_creation_wtd_target",
+      "question": "What is the weekly generation target?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nReconWeek AS (\n    SELECT\n        CASE\n            WHEN (SELECT MIN(cal.QTR_BKT_IND) FROM vw_EBI_CALDATE cal\n                  WHERE cal.CALENDAR_DATE = (\n                      SELECT MIN(c2.CALENDAR_DATE) FROM vw_EBI_CALDATE c2\n                      WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n                  )) = 1\n            THEN (SELECT MAX(CAST(cal.FISCAL_WEEK_NUMBER_BY_QTR AS INT))\n                  FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0)\n            ELSE (SELECT MAX(CAST(cal.FISCAL_WEEK_NUMBER_BY_QTR AS INT))\n                  FROM vw_EBI_CALDATE cal\n                  WHERE cal.CALENDAR_DATE = (\n                      SELECT MIN(c2.CALENDAR_DATE) FROM vw_EBI_CALDATE c2\n                      WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n                  ))\n        END AS CurrentWeek\n),\nCurrentQtrInfo AS (\n    SELECT TOP 1 RIGHT(cal.FISCAL_YR_AND_QTR_DESC, 2) AS GenericQtr\n    FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0\n),\nFullQtr AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        o.BU,\n        rc.ROLE_COVERAGE_BU,\n        rc.ROLE_COVERAGE_BU_GROUP,\n        SUM(q.IN_QTR_GC_TARGET) AS Qt\n    FROM vw_TF_EBI_QUOTA q\n    JOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\n    JOIN vw_EBI_CALDATE c ON q.QUOTA_FISCAL_Quarter_ID = c.DATE_KEY\n    JOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    WHERE c.QTR_BKT_IND = 0\n      AND q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\n)\nSELECT\n    fq.TERR_ID,\n    fq.REP_NAME,\n    fq.BU,\n    fq.ROLE_COVERAGE_BU,\n    fq.ROLE_COVERAGE_BU_GROUP,\n    CASE\n        WHEN cqi.GenericQtr = 'Q1' THEN\n            CASE\n                WHEN rw.CurrentWeek <= 6 THEN (fq.Qt * 0.1) / 6.0\n                ELSE (fq.Qt * 0.9) / 7.0\n            END\n        ELSE fq.Qt / 13.0\n    END AS [Gross Creation WTD]\nFROM FullQtr fq\nCROSS JOIN ReconWeek rw\nCROSS JOIN CurrentQtrInfo cqi\nORDER BY fq.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Gross creation WTD",
+        "Weekly generation target",
+        "What should we create per week?",
+        "Show the per-week generation target",
+        "What's this week's creation target?",
+        "Week to date generation target"
+      ]
+    },
+    {
+      "id": "exact__fqgc_q1",
+      "question": "What is the Q1 generation target?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nParams AS (\n    SELECT TOP 1 cal.FISCAL_YR AS TargetYr FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0\n),\nQ1Bkt AS (\n    SELECT MIN(cal.QTR_BKT_IND) AS BKT\n    FROM vw_EBI_CALDATE cal\n    CROSS JOIN Params pm\n    WHERE RIGHT(cal.FISCAL_YR_AND_QTR_DESC, 2) = 'Q1'\n      AND cal.FISCAL_YR = pm.TargetYr\n)\nSELECT\n    r.TERR_ID,\n    r.REP_NAME,\n    o.BU,\n    rc.ROLE_COVERAGE_BU,\n    rc.ROLE_COVERAGE_BU_GROUP,\n    SUM(q.IN_QTR_GC_TARGET) AS [Full Quarter Gross Creation Q1]\nFROM Q1Bkt b\nJOIN vw_EBI_CALDATE cal ON cal.QTR_BKT_IND = b.BKT\nJOIN vw_TF_EBI_QUOTA q ON q.QUOTA_FISCAL_Quarter_ID = cal.DATE_KEY\nJOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\nJOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\nGROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\nORDER BY r.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Full quarter gross creation Q1",
+        "Q1 generation target",
+        "Show Q1 generation target",
+        "What was the Q1 pipeline creation target?",
+        "Generation target for Q1"
+      ]
+    },
+    {
+      "id": "exact__fqgc_q2",
+      "question": "What is the Q2 generation target?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nParams AS (\n    SELECT TOP 1 cal.FISCAL_YR AS TargetYr FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0\n),\nQ2Bkt AS (\n    SELECT MIN(cal.QTR_BKT_IND) AS BKT\n    FROM vw_EBI_CALDATE cal\n    CROSS JOIN Params pm\n    WHERE RIGHT(cal.FISCAL_YR_AND_QTR_DESC, 2) = 'Q2'\n      AND cal.FISCAL_YR = pm.TargetYr\n)\nSELECT\n    r.TERR_ID,\n    r.REP_NAME,\n    o.BU,\n    rc.ROLE_COVERAGE_BU,\n    rc.ROLE_COVERAGE_BU_GROUP,\n    SUM(q.IN_QTR_GC_TARGET) AS [Full Quarter Gross Creation Q2]\nFROM Q2Bkt b\nJOIN vw_EBI_CALDATE cal ON cal.QTR_BKT_IND = b.BKT\nJOIN vw_TF_EBI_QUOTA q ON q.QUOTA_FISCAL_Quarter_ID = cal.DATE_KEY\nJOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\nJOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\nGROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\nORDER BY r.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Full quarter gross creation Q2",
+        "Q2 generation target",
+        "Show Q2 generation target",
+        "What is the Q2 pipeline creation target?",
+        "Generation target for Q2"
+      ]
+    },
+    {
+      "id": "exact__fqgc_q3",
+      "question": "What is the Q3 generation target?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nParams AS (\n    SELECT TOP 1 cal.FISCAL_YR AS TargetYr FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0\n),\nQ3Bkt AS (\n    SELECT MIN(cal.QTR_BKT_IND) AS BKT\n    FROM vw_EBI_CALDATE cal\n    CROSS JOIN Params pm\n    WHERE RIGHT(cal.FISCAL_YR_AND_QTR_DESC, 2) = 'Q3'\n      AND cal.FISCAL_YR = pm.TargetYr\n)\nSELECT\n    r.TERR_ID,\n    r.REP_NAME,\n    o.BU,\n    rc.ROLE_COVERAGE_BU,\n    rc.ROLE_COVERAGE_BU_GROUP,\n    SUM(q.IN_QTR_GC_TARGET) AS [Full Quarter Gross Creation Q3]\nFROM Q3Bkt b\nJOIN vw_EBI_CALDATE cal ON cal.QTR_BKT_IND = b.BKT\nJOIN vw_TF_EBI_QUOTA q ON q.QUOTA_FISCAL_Quarter_ID = cal.DATE_KEY\nJOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\nJOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\nGROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\nORDER BY r.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Full quarter gross creation Q3",
+        "Q3 generation target",
+        "Show Q3 generation target",
+        "What is the Q3 pipeline creation target?",
+        "Generation target for Q3"
+      ]
+    },
+    {
+      "id": "exact__fqgc_q4",
+      "question": "What is the Q4 generation target?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nParams AS (\n    SELECT TOP 1 cal.FISCAL_YR AS TargetYr FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0\n),\nQ4Bkt AS (\n    SELECT MIN(cal.QTR_BKT_IND) AS BKT\n    FROM vw_EBI_CALDATE cal\n    CROSS JOIN Params pm\n    WHERE RIGHT(cal.FISCAL_YR_AND_QTR_DESC, 2) = 'Q4'\n      AND cal.FISCAL_YR = pm.TargetYr\n)\nSELECT\n    r.TERR_ID,\n    r.REP_NAME,\n    o.BU,\n    rc.ROLE_COVERAGE_BU,\n    rc.ROLE_COVERAGE_BU_GROUP,\n    SUM(q.IN_QTR_GC_TARGET) AS [Full Quarter Gross Creation Q4]\nFROM Q4Bkt b\nJOIN vw_EBI_CALDATE cal ON cal.QTR_BKT_IND = b.BKT\nJOIN vw_TF_EBI_QUOTA q ON q.QUOTA_FISCAL_Quarter_ID = cal.DATE_KEY\nJOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\nJOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\nJOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\nWHERE q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\nGROUP BY r.TERR_ID, r.REP_NAME, o.BU, rc.ROLE_COVERAGE_BU, rc.ROLE_COVERAGE_BU_GROUP\nORDER BY r.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Full quarter gross creation Q4",
+        "Q4 generation target",
+        "Show Q4 generation target",
+        "What is the Q4 pipeline creation target?",
+        "Generation target for Q4"
+      ]
+    },
+    {
+      "id": "exact__gross_creation_qtd_trend",
+      "question": "Show the generation target trend by week",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nWeeks AS (\n    SELECT n AS WeekNum FROM (VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13)) w(n)\n),\nFullQtr AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        c.FISCAL_YR_AND_QTR_DESC AS QUALIFICATION_QTR,\n        SUM(q.IN_QTR_GC_TARGET) AS Qt\n    FROM vw_TF_EBI_QUOTA q\n    JOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\n    JOIN vw_EBI_CALDATE c ON q.QUOTA_FISCAL_Quarter_ID = c.DATE_KEY\n    JOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    WHERE c.QTR_BKT_IND = 0\n      AND q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME, c.FISCAL_YR_AND_QTR_DESC\n),\nMaxWeek AS (\n    SELECT MAX(CAST(cal.FISCAL_WEEK_NUMBER_BY_QTR AS INT)) AS Val\n    FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0\n),\nGenericQtr AS (\n    SELECT TOP 1 RIGHT(cal.FISCAL_YR_AND_QTR_DESC, 2) AS Val\n    FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0\n)\nSELECT\n    fq.TERR_ID,\n    fq.REP_NAME,\n    w.WeekNum,\n    CASE\n        WHEN gq.Val = 'Q1' THEN\n            CASE\n                WHEN w.WeekNum <= 6 THEN (fq.Qt * 0.1 * w.WeekNum) / 6.0\n                ELSE (fq.Qt * 0.1) + (fq.Qt * 0.9 * (w.WeekNum - 6)) / 7.0\n            END\n        ELSE (fq.Qt * w.WeekNum) / mw.Val\n    END AS [Gross Creation QTD Trend]\nFROM FullQtr fq\nCROSS JOIN Weeks w\nCROSS JOIN MaxWeek mw\nCROSS JOIN GenericQtr gq\nWHERE w.WeekNum <= mw.Val\nORDER BY fq.TERR_ID, w.WeekNum",
+      "tables_used": [
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Gross creation QTD trend",
+        "Generation target trend",
+        "Weekly generation target curve",
+        "Show generation target by week",
+        "Pipeline creation target trend line",
+        "Target phasing week by week"
+      ]
+    },
+    {
+      "id": "exact__gross_creation_pct",
+      "question": "What is the overall gross creation percentage?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nReconWeek AS (\n    SELECT\n        CASE\n            WHEN (SELECT MIN(cal.QTR_BKT_IND) FROM vw_EBI_CALDATE cal\n                  WHERE cal.CALENDAR_DATE = (\n                      SELECT MIN(c2.CALENDAR_DATE) FROM vw_EBI_CALDATE c2\n                      WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n                  )) = 1\n            THEN (SELECT MAX(CAST(cal.FISCAL_WEEK_NUMBER_BY_QTR AS INT))\n                  FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0)\n            ELSE (SELECT MAX(CAST(cal.FISCAL_WEEK_NUMBER_BY_QTR AS INT))\n                  FROM vw_EBI_CALDATE cal\n                  WHERE cal.CALENDAR_DATE = (\n                      SELECT MIN(c2.CALENDAR_DATE) FROM vw_EBI_CALDATE c2\n                      WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n                  ))\n        END AS CurrentWeek\n),\nOpptyTotal AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        SUM(p.OPPTY) AS Val\n    FROM vw_TF_EBI_P2S p\n    JOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\n    JOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    WHERE p.PAY_MEASURE_ID = 0 AND p.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME\n),\nGenTarget AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        c.FISCAL_YR_AND_QTR_DESC AS QUALIFICATION_QTR,\n        SUM(q.IN_QTR_GC_TARGET) AS Qt\n    FROM vw_TF_EBI_QUOTA q\n    JOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\n    JOIN vw_EBI_CALDATE c ON q.QUOTA_FISCAL_Quarter_ID = c.DATE_KEY\n    JOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    WHERE c.QTR_BKT_IND = 0\n      AND q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME, c.FISCAL_YR_AND_QTR_DESC\n)\nSELECT\n    ot.TERR_ID,\n    ot.REP_NAME,\n    ot.Val AS [OPPTY $],\n    CASE\n        WHEN RIGHT(gt.QUALIFICATION_QTR, 2) = 'Q1' THEN\n            CASE\n                WHEN rw.CurrentWeek <= 6 THEN (gt.Qt * 0.1 * rw.CurrentWeek) / 6.0\n                ELSE (gt.Qt * 0.1) + (gt.Qt * 0.9 * (rw.CurrentWeek - 6)) / 7.0\n            END\n        ELSE (gt.Qt * rw.CurrentWeek) / 13.0\n    END AS [Gross Creation QTD],\n    ot.Val / NULLIF(\n        CASE\n            WHEN RIGHT(gt.QUALIFICATION_QTR, 2) = 'Q1' THEN\n                CASE\n                    WHEN rw.CurrentWeek <= 6 THEN (gt.Qt * 0.1 * rw.CurrentWeek) / 6.0\n                    ELSE (gt.Qt * 0.1) + (gt.Qt * 0.9 * (rw.CurrentWeek - 6)) / 7.0\n                END\n            ELSE (gt.Qt * rw.CurrentWeek) / 13.0\n        END, 0\n    ) AS [Gross Creation %]\nFROM OpptyTotal ot\nJOIN GenTarget gt ON ot.TERR_ID = gt.TERR_ID\nCROSS JOIN ReconWeek rw\nORDER BY ot.TERR_ID",
+      "tables_used": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Gross creation %",
+        "Pipeline to generation target ratio",
+        "What multiple of the generation target have we created?",
+        "Show gross creation ratio",
+        "Overall creation percentage vs target"
+      ]
+    },
+    {
+      "id": "exact__gross_creation_wtd_pct",
+      "question": "What is the gross creation WTD percentage?",
+      "questionCategory": "WHAT_HAPPENED",
+      "questionSubCategory": "pipeline_creation",
+      "sql": "WITH\nQtrParams AS (\n    SELECT 0 AS SelectedQtrBkt\n),\nWeekParams AS (\n    SELECT\n        CASE\n            WHEN (SELECT MAX(snap.QTR_BKT_IND) FROM vw_EBI_CALDATE snap\n                  WHERE snap.WEEK_SORT_ORDER_REVERSE = '0') = 1\n            THEN (SELECT MAX(snap.FISCAL_WEEK_NUMBER_BY_QTR)\n                  FROM vw_EBI_CALDATE snap WHERE snap.QTR_BKT_IND = 0)\n            ELSE (SELECT MIN(qual.FISCAL_WEEK_NUMBER_BY_QTR)\n                  FROM vw_EBI_CALDATE qual WHERE qual.WEEK_BKT_NUMBER = 0)\n        END AS TargetWeekNo\n),\nReconWeek AS (\n    SELECT\n        CASE\n            WHEN (SELECT MIN(cal.QTR_BKT_IND) FROM vw_EBI_CALDATE cal\n                  WHERE cal.CALENDAR_DATE = (\n                      SELECT MIN(c2.CALENDAR_DATE) FROM vw_EBI_CALDATE c2\n                      WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n                  )) = 1\n            THEN (SELECT MAX(CAST(cal.FISCAL_WEEK_NUMBER_BY_QTR AS INT))\n                  FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0)\n            ELSE (SELECT MAX(CAST(cal.FISCAL_WEEK_NUMBER_BY_QTR AS INT))\n                  FROM vw_EBI_CALDATE cal\n                  WHERE cal.CALENDAR_DATE = (\n                      SELECT MIN(c2.CALENDAR_DATE) FROM vw_EBI_CALDATE c2\n                      WHERE c2.WEEK_SORT_ORDER_REVERSE = '0'\n                  ))\n        END AS CurrentWeek\n),\nCurrentQtrInfo AS (\n    SELECT TOP 1 RIGHT(cal.FISCAL_YR_AND_QTR_DESC, 2) AS GenericQtr\n    FROM vw_EBI_CALDATE cal WHERE cal.QTR_BKT_IND = 0\n),\nCreatedWTD AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        SUM(p.OPPTY) AS Val\n    FROM vw_TF_EBI_P2S p\n    CROSS JOIN QtrParams qp\n    JOIN vw_td_ebi_region_rpt r ON p.Region_Id = r.Region_Id\n    JOIN vw_EBI_CALDATE qual_cal\n        ON p.OPP_CREATE_DATE_ID = qual_cal.DATE_KEY\n        AND qual_cal.QTR_BKT_IND = qp.SelectedQtrBkt\n        AND qual_cal.FISCAL_WEEK_NUMBER_BY_QTR = (SELECT wp.TargetWeekNo FROM WeekParams wp)\n    JOIN vw_EBI_CALDATE close_cal\n        ON p.OPP_CLOSE_DATE_ID = close_cal.DATE_KEY\n        AND close_cal.QTR_BKT_IND IN (\n            qp.SelectedQtrBkt, qp.SelectedQtrBkt + 1, qp.SelectedQtrBkt + 2,\n            qp.SelectedQtrBkt + 3, qp.SelectedQtrBkt + 4\n        )\n    JOIN vw_ebi_sales_stage s\n        ON p.SALES_STAGE_ID = s.SALES_STAGE_ID\n        AND s.SALES_STAGE NOT IN ('S1', 'S2', 'Closed CleanUp from Non Pipe', 'Closed Lost from Non Pipe')\n    JOIN vw_EBI_OPG o ON p.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON p.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    WHERE p.PAY_MEASURE_ID = 0 AND p.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME\n),\nTargetWTD AS (\n    SELECT\n        r.TERR_ID,\n        r.REP_NAME,\n        CASE\n            WHEN cqi.GenericQtr = 'Q1' THEN\n                CASE\n                    WHEN rw.CurrentWeek <= 6 THEN (SUM(q.IN_QTR_GC_TARGET) * 0.1) / 6.0\n                    ELSE (SUM(q.IN_QTR_GC_TARGET) * 0.9) / 7.0\n                END\n            ELSE SUM(q.IN_QTR_GC_TARGET) / 13.0\n        END AS Val\n    FROM vw_TF_EBI_QUOTA q\n    JOIN vw_td_ebi_region_rpt r ON q.Region_Id = r.Region_Id\n    JOIN vw_EBI_CALDATE c ON q.QUOTA_FISCAL_Quarter_ID = c.DATE_KEY\n    JOIN vw_EBI_OPG o ON q.OPG_ID = o.OPG_KEY\n    JOIN vw_TD_EBI_ROLE_Coverage rc ON q.ROLE_COVERAGE_ID = rc.ROLE_COVERAGE_ID\n    CROSS JOIN ReconWeek rw\n    CROSS JOIN CurrentQtrInfo cqi\n    WHERE c.QTR_BKT_IND = 0\n      AND q.PAY_MEASURE_ID = 0 AND r.TERR_ID NOT LIKE '%_%Dummy%' AND q.ROLE_COVERAGE_ID IN (1, 3) AND r.SALES_TEAM_BU IN ('#NA','DX','DX/DME','WW') AND (r.SALES_REGION NOT LIKE '%DME%' OR r.SALES_REGION IS NULL) AND r.SALES_TEAM NOT IN ('AMER IND PS DX','AMER LATAM PS','AMER ENT PS DX','AMER PUB SEC SPECIALIST') AND o.MOPG1 <> 'ADVERTISING' AND o.DMX_SOLUTION_GROUP <> 'PPBU'\n    GROUP BY r.TERR_ID, r.REP_NAME, cqi.GenericQtr, rw.CurrentWeek\n)\nSELECT\n    COALESCE(cw.TERR_ID, tw.TERR_ID) AS TERR_ID,\n    COALESCE(cw.REP_NAME, tw.REP_NAME) AS REP_NAME,\n    cw.Val AS [Gross Created WTD $],\n    tw.Val AS [Gross Creation WTD],\n    cw.Val / NULLIF(tw.Val, 0) AS [Gross Creation WTD %]\nFROM CreatedWTD cw\nFULL OUTER JOIN TargetWTD tw ON cw.TERR_ID = tw.TERR_ID\nORDER BY COALESCE(cw.TERR_ID, tw.TERR_ID)",
+      "tables_used": [
+        "vw_TF_EBI_P2S",
+        "vw_TF_EBI_QUOTA",
+        "vw_td_ebi_region_rpt",
+        "vw_EBI_CALDATE",
+        "vw_ebi_sales_stage",
+        "vw_EBI_OPG",
+        "vw_TD_EBI_ROLE_Coverage"
+      ],
+      "variants": [
+        "Gross creation WTD %",
+        "Weekly pipeline creation percentage",
+        "What % of this week's target have we created?",
+        "Show WTD creation vs target %",
+        "Week to date creation ratio"
+      ]
     }
   ]
 }

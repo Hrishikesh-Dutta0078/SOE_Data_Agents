@@ -82,8 +82,18 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", "blob:"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      imgSrc: ["'self'", "data:", "blob:"],
-      connectSrc: ["'self'", "wss://*.stt.speech.microsoft.com", "wss://*.tts.speech.microsoft.com", "https://*.stt.speech.microsoft.com", "https://*.tts.speech.microsoft.com", "https://*.api.cognitive.microsoft.com"],
+      // Okta: markdown or widgets may reference *.okta.com; authorize URLs must not trip img-src.
+      imgSrc: ["'self'", "data:", "blob:", 'https://*.okta.com'],
+      connectSrc: [
+        "'self'",
+        'https://*.okta.com',
+        'wss://*.stt.speech.microsoft.com',
+        'wss://*.tts.speech.microsoft.com',
+        'https://*.stt.speech.microsoft.com',
+        'https://*.tts.speech.microsoft.com',
+        'https://*.api.cognitive.microsoft.com',
+      ],
+      frameSrc: ["'self'", 'https://*.okta.com'],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       workerSrc: ["'self'", "blob:"],
       objectSrc: ["'none'"],
@@ -105,9 +115,21 @@ if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
 
-const useHttps = process.env.USE_HTTPS === 'true' || (
-  fs.existsSync(path.join(__dirname, 'cert.pem')) && fs.existsSync(path.join(__dirname, 'key.pem'))
+const sslCertPath = path.join(__dirname, process.env.SSL_CERT_PATH || 'cert.pem');
+const sslKeyPath = path.join(__dirname, process.env.SSL_KEY_PATH || 'key.pem');
+const sslCertsPresent = fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath);
+const isAzureAppService = Boolean(
+  process.env.WEBSITE_SITE_NAME ||
+    process.env.WEBSITE_INSTANCE_ID ||
+    process.env.APPSETTING_WEBSITE_SITE_NAME
 );
+// PaaS (e.g. Azure Linux) terminates TLS; the process must listen for plain HTTP on PORT.
+// Do not auto-enable HTTPS in production just because dev certs were deployed with the zip.
+// On Azure, never bind HTTPS in-node unless explicitly forced (NODE_ENV can be wrong if unset).
+const useHttps =
+  !isAzureAppService &&
+  (process.env.USE_HTTPS === 'true' ||
+    (process.env.NODE_ENV !== 'production' && sslCertsPresent));
 if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
   throw new Error('SESSION_SECRET environment variable must be set in production');
 }
@@ -141,12 +163,45 @@ app.use('/api/text-to-sql', analysisLimiter, require('./routes/textToSql'));
 app.use('/api/voice', voiceRateLimiter, require('./routes/voice'));
 app.use('/api/feedback', require('./routes/feedback'));
 
-app.use(express.static(path.join(__dirname, 'public')));
+const publicDir = path.join(__dirname, 'public');
+// index: false so GET / reaches the SPA handler below — avoids serving index.html without cache headers.
+// Okta redirects to / after login; a cached shell would load stale hashed JS/CSS from an older deploy.
+app.use(
+  express.static(publicDir, {
+    index: false,
+    setHeaders(res, filePath) {
+      if (filePath.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        return;
+      }
+      if (process.env.NODE_ENV === 'production') {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      }
+    },
+  })
+);
 app.get('*', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.sendFile(path.join(publicDir, 'index.html'));
 });
 
-const PORT = process.env.PORT || DEFAULT_PORT;
+function resolveListenPort() {
+  const n = parseInt(process.env.PORT, 10);
+  if (Number.isFinite(n) && n > 0) return n;
+  if (process.env.NODE_ENV === 'production') {
+    return 8080;
+  }
+  return DEFAULT_PORT;
+}
+
+const PORT = resolveListenPort();
+if (process.env.NODE_ENV === 'production' && !process.env.PORT) {
+  logger.warn(
+    'PORT env not set; listening on 8080 (typical Azure App Service). ' +
+      'Set PORT in Application Settings if your host requires a different value.'
+  );
+}
 /** Bind address: default 0.0.0.0 for LAN access; set BIND_HOST=127.0.0.1 for localhost-only. */
 const BIND_HOST = process.env.BIND_HOST || '0.0.0.0';
 
@@ -186,12 +241,10 @@ async function start() {
   }
 
   if (useHttps) {
-    const certPath = path.join(__dirname, process.env.SSL_CERT_PATH || 'cert.pem');
-    const keyPath = path.join(__dirname, process.env.SSL_KEY_PATH || 'key.pem');
     const server = https.createServer(
       {
-        key: fs.readFileSync(keyPath),
-        cert: fs.readFileSync(certPath),
+        key: fs.readFileSync(sslKeyPath),
+        cert: fs.readFileSync(sslCertPath),
       },
       app
     );

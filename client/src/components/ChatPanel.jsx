@@ -121,6 +121,10 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
   const saveTimerRef = useRef(null);
   const voiceStopRef = useRef(null);
   const progressTimeoutRef = useRef(null);
+  const thinkingEntriesRef = useRef([]);
+
+  // Keep ref in sync so handleResponse can snapshot thinkingEntries
+  useEffect(() => { thinkingEntriesRef.current = thinkingEntries; }, [thinkingEntries]);
 
   // Scroll messages to bottom so the latest question sits just above the ThinkingBubble
   useEffect(() => {
@@ -309,6 +313,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
           usageByNodeAndModel: data.usageByNodeAndModel || null,
           warnings: data.warnings || null,
           entities: data.entities || null,
+          reasoning: data.reasoning || null,
+          thinkingLog: [...thinkingEntriesRef.current],
           confidence: data.confidence || null,
         },
       ]);
@@ -713,12 +719,8 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         chart={msg.chart}
         confidence={msg.confidence}
         sql={msg.content}
-        entities={{
-          intent: msg.orchestration?.intent,
-          complexity: msg.orchestration?.complexity,
-          metrics: msg.entities?.metrics,
-          dimensions: msg.entities?.dimensions,
-        }}
+        reasoning={msg.reasoning}
+        thinkingLog={msg.thinkingLog}
         onFollowUp={() => setFollowUpMode(true)}
         queries={msg.queries}
         isPartial={false}

@@ -13,7 +13,8 @@ import ResultsPanel from './ResultsPanel';
  *   chart       — { charts: [], reasoning }
  *   confidence  — { level, reason }
  *   sql         — generated SQL string
- *   entities    — { intent, complexity, metrics, dimensions, ... }
+ *   reasoning   — { matchType, intent, complexity, tablesSelected, kpisMatched, ... }
+ *   thinkingLog — [{ message, category, elapsed }] chronological decision log
  *   onFollowUp  — callback to enter follow-up mode
  *   queries     — sub-query array for multi-query
  *   isPartial   — boolean, still streaming
@@ -155,7 +156,8 @@ export default function NarrativeCard({
   chart,
   confidence,
   sql,
-  entities,
+  reasoning,
+  thinkingLog,
   onFollowUp,
   queries,
   isPartial,
@@ -166,7 +168,8 @@ export default function NarrativeCard({
   question,
   animate = false,
 }) {
-  const [expandedPill, setExpandedPill] = useState(null); // 'table' | 'chart' | 'sql' | 'entities' | null
+  const [expandedPill, setExpandedPill] = useState(null); // 'table' | 'sql' | 'reasoning' | null
+  const hasReasoning = reasoning || (thinkingLog && thinkingLog.length > 0);
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
@@ -308,9 +311,9 @@ export default function NarrativeCard({
             SQL
           </button>
         )}
-        {entities && (
-          <button onClick={() => togglePill('entities')} className="text-[11px] px-3 py-1.5 rounded-lg border cursor-pointer" style={{ color: 'var(--color-text-muted)', background: expandedPill === 'entities' ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.02)', borderColor: 'rgba(0,0,0,0.04)' }}>
-            Entities
+        {hasReasoning && (
+          <button onClick={() => togglePill('reasoning')} className="text-[11px] px-3 py-1.5 rounded-lg border cursor-pointer" style={{ color: 'var(--color-text-muted)', background: expandedPill === 'reasoning' ? 'rgba(0,0,0,0.05)' : 'rgba(0,0,0,0.02)', borderColor: 'rgba(0,0,0,0.04)' }}>
+            Reasoning
           </button>
         )}
         <button onClick={handleCopyInsights} className="text-[11px] px-3 py-1.5 rounded-lg border cursor-pointer flex items-center gap-1 ml-auto" style={{ color: 'var(--color-text-muted)', background: 'rgba(0,0,0,0.02)', borderColor: 'rgba(0,0,0,0.04)' }}>
@@ -345,27 +348,77 @@ export default function NarrativeCard({
         </div>
       )}
 
-      {expandedPill === 'entities' && entities && (
+      {expandedPill === 'reasoning' && hasReasoning && (
         <div className="mt-3 rounded-xl p-3 border" style={{ borderColor: 'rgba(200,195,220,0.2)', background: 'rgba(0,0,0,0.01)', animation: 'reveal-section 0.3s ease forwards' }}>
-          {entities.intent && (
-            <div className="flex gap-2 mb-2">
-              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ background: 'rgba(99,102,241,0.1)', color: '#6366F1' }}>{entities.intent}</span>
-              {entities.complexity && <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.1)', color: '#F59E0B' }}>{entities.complexity}</span>}
+          {/* Header badges */}
+          {reasoning && (
+            <div className="flex gap-2 mb-3 flex-wrap">
+              {reasoning.intent && <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ background: 'rgba(99,102,241,0.1)', color: '#6366F1' }}>{reasoning.intent}</span>}
+              {reasoning.complexity && <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ background: 'rgba(245,158,11,0.1)', color: '#F59E0B' }}>{reasoning.complexity}</span>}
+              {reasoning.matchType && <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ background: 'rgba(16,185,129,0.1)', color: '#059669' }}>{reasoning.matchType}</span>}
+              {reasoning.validationPassed != null && (
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ background: reasoning.validationPassed ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)', color: reasoning.validationPassed ? '#059669' : '#DC2626' }}>
+                  {reasoning.validationPassed ? 'validation passed' : 'validation failed'}
+                </span>
+              )}
+              {reasoning.correctionAttempts > 0 && (
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full" style={{ background: 'rgba(239,68,68,0.1)', color: '#DC2626' }}>{reasoning.correctionAttempts} correction(s)</span>
+              )}
             </div>
           )}
-          {entities.metrics?.length > 0 && (
-            <div className="text-[11px] mb-1.5" style={{ color: 'var(--color-text-secondary)' }}>
-              <span className="font-semibold">metrics:</span>{' '}
-              {entities.metrics.map((m, i) => (
-                <span key={i} className="inline-block px-1.5 py-0.5 rounded mr-1 mb-0.5" style={{ background: 'rgba(0,0,0,0.04)', fontSize: 10 }}>{m}</span>
-              ))}
+
+          {/* Thinking log timeline */}
+          {thinkingLog && thinkingLog.length > 0 && (
+            <div className="mb-3">
+              <div className="text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Decision Log</div>
+              <div className="space-y-1">
+                {thinkingLog.map((entry, i) => (
+                  <div key={i} className="flex gap-2 text-[11px] leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+                    <span className="shrink-0 text-[9px] font-mono mt-0.5 px-1.5 py-0.5 rounded" style={{ background: 'rgba(99,102,241,0.06)', color: '#6366F1' }}>
+                      {entry.category || 'info'}
+                    </span>
+                    <span style={{ whiteSpace: 'pre-wrap' }}>{entry.message}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
-          {entities.dimensions?.length > 0 && (
-            <div className="text-[11px]" style={{ color: 'var(--color-text-secondary)' }}>
-              <span className="font-semibold">dimensions:</span>{' '}
-              {entities.dimensions.map((d, i) => (
-                <span key={i} className="inline-block px-1.5 py-0.5 rounded mr-1 mb-0.5" style={{ background: 'rgba(0,0,0,0.04)', fontSize: 10 }}>{d}</span>
+
+          {/* Per-file context breakdown */}
+          {reasoning?.contextFiles?.length > 0 && (
+            <div className="mb-3">
+              <div className="text-[10px] font-semibold mb-1.5 uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Context Files Used</div>
+              <div className="space-y-2">
+                {reasoning.contextFiles.map((cf, i) => (
+                  <div key={i} className="rounded-lg p-2" style={{ background: 'rgba(0,0,0,0.02)', border: '1px solid rgba(0,0,0,0.04)' }}>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10px] font-mono px-1.5 py-0.5 rounded" style={{ background: 'rgba(99,102,241,0.08)', color: '#6366F1' }}>{cf.file}</span>
+                      <span className="text-[10px] font-medium" style={{ color: 'var(--color-text-muted)' }}>{cf.label}</span>
+                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full ml-auto" style={{ background: 'rgba(16,185,129,0.1)', color: '#059669' }}>{cf.count} selected</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {cf.items.map((item, j) => (
+                        <span key={j} className="text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(0,0,0,0.04)', color: 'var(--color-text-secondary)' }}>{item}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {reasoning?.sqlReasoning && (
+            <div className="text-[11px] mt-2 pt-2" style={{ color: 'var(--color-text-secondary)', borderTop: '1px solid rgba(0,0,0,0.04)' }}>
+              <span className="font-semibold">SQL reasoning:</span>{' '}
+              <span style={{ color: 'var(--color-text-muted)' }}>{reasoning.sqlReasoning}</span>
+            </div>
+          )}
+
+          {reasoning?.validationIssues?.length > 0 && (
+            <div className="text-[11px] mt-1.5" style={{ color: '#DC2626' }}>
+              <span className="font-semibold">Validation issues:</span>{' '}
+              {reasoning.validationIssues.map((issue, i) => (
+                <span key={i} className="block ml-2 text-[10px] py-0.5">{issue}</span>
               ))}
             </div>
           )}
