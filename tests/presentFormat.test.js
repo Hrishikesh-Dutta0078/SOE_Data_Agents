@@ -99,4 +99,46 @@ describe('presentFormat', () => {
       assert.ok(!guidance.WHAT_HAPPENED.includes('Call-to-Action'));
     });
   });
+
+  describe('buildInsightInputs thresholdContext', () => {
+    it('single-query inputs include thresholdContext', () => {
+      const state = {
+        question: 'How is coverage?',
+        questionCategory: 'WHAT_HAPPENED',
+        questionSubCategory: 'overview',
+        execution: {
+          columns: ['Coverage'],
+          rows: [{ Coverage: 2.5 }],
+          rowCount: 1,
+        },
+      };
+      const result = presentPrompts.buildInsightInputs(state, [{ Coverage: 2.5 }]);
+      assert.ok(result.thresholdContext, 'should have thresholdContext');
+      assert.ok(result.thresholdContext.includes('Coverage:'));
+    });
+  });
+
+  describe('buildMultiQueryInsightInputs thresholdContext', () => {
+    it('multi-query inputs include thresholdContext', () => {
+      const state = {
+        question: 'How is my pipeline?',
+        questionCategory: 'WHAT_HAPPENED',
+        questionSubCategory: 'overview',
+      };
+      const allQueries = [{
+        id: 'q1',
+        subQuestion: 'Coverage?',
+        purpose: 'check coverage',
+        execution: {
+          success: true,
+          columns: ['Coverage'],
+          rows: [{ Coverage: 2.5 }],
+          rowCount: 1,
+        },
+      }];
+      const result = presentPrompts.buildMultiQueryInsightInputs(state, allQueries);
+      assert.ok(result.thresholdContext, 'should have thresholdContext');
+      assert.ok(result.thresholdContext.includes('Coverage:'));
+    });
+  });
 });

@@ -207,6 +207,7 @@ function buildInsightInputs(state, sample) {
     questionCategory: category || 'GENERAL',
     questionSubCategory: state.questionSubCategory || 'general',
     categoryGuidance: guidance,
+    thresholdContext: buildThresholdContext(),
     columns: (exec?.columns || []).join(', '),
     rowCount: String(exec?.rowCount ?? 0),
     columnStats: computeColumnStats(exec?.rows, exec?.columns),
@@ -223,6 +224,60 @@ function buildChartInputs(state, sample) {
     rowCount: String(exec?.rowCount ?? 0),
     sampleCount: String(sample?.length ?? 0),
     sampleData: JSON.stringify(sample || [], null, 2),
+  };
+}
+
+function buildPartialResultsNote(allQueries) {
+  const failedOrEmpty = allQueries.filter(
+    (q) => !q.execution?.success || (q.execution?.rowCount ?? 0) === 0,
+  );
+  if (failedOrEmpty.length === 0) return { note: '', summary: null };
+  const succeeded = allQueries.length - failedOrEmpty.length;
+  const parts = failedOrEmpty.map((q) => {
+    const err = q.execution?.error || '';
+    const reason = err
+      ? `${q.id}: ${(err.length > 80 ? err.substring(0, 80) + '...' : err)}`
+      : `${q.id}: no data returned`;
+    return reason;
+  });
+  const summary = `${succeeded} of ${allQueries.length} sub-queries returned data. ${failedOrEmpty.length} failed or empty: ${parts.join('; ')}`;
+  const note = `Note: ${summary}\n\nInsights below are based only on the sub-queries that returned data. Interpret and caveat accordingly.\n\n`;
+  return { note, summary };
+}
+
+function buildMultiQueryInsightInputs(state, allQueries, sampleLimit = 50) {
+  const category = state.questionCategory || '';
+  const blueprintHint = state.blueprintMeta?.presentationHint || '';
+  const guidance = blueprintHint || CATEGORY_INSIGHT_GUIDANCE[category] || DEFAULT_INSIGHT_GUIDANCE;
+
+  const { note: partialResultsNote, summary: _partialSummary } = buildPartialResultsNote(allQueries);
+
+  let dataSection = '';
+  const allColumnStats = [];
+  for (const q of allQueries) {
+    const exec = q.execution;
+    if (!exec?.success || !exec.rows?.length) continue;
+    const sampleSize = Math.max(5, Math.floor(sampleLimit / allQueries.length));
+    const sample = exec.rows.slice(0, sampleSize);
+    dataSection += `\n--- Sub-query [${q.id}]: "${q.subQuestion}" (${q.purpose}) ---\n`;
+    dataSection += `Columns: ${(exec.columns || []).join(', ')}\n`;
+    dataSection += `Total rows: ${exec.rowCount}\n`;
+    dataSection += `Sample (${sample.length} rows):\n${JSON.stringify(sample, null, 2)}\n`;
+    allColumnStats.push(`[${q.id}] ${q.subQuestion}:\n${computeColumnStats(exec.rows, exec.columns)}`);
+  }
+
+  return {
+    partialResultsNote: partialResultsNote || '',
+    question: state.question,
+    questionCategory: category || 'GENERAL',
+    questionSubCategory: state.questionSubCategory || 'general',
+    categoryGuidance: guidance,
+    thresholdContext: buildThresholdContext(),
+    columns: 'See sub-query results below',
+    rowCount: String(allQueries.reduce((sum, q) => sum + (q.execution?.rowCount || 0), 0)),
+    columnStats: allColumnStats.length > 0 ? allColumnStats.join('\n\n') : 'No data available.',
+    sampleCount: 'multiple',
+    sampleData: dataSection,
   };
 }
 
@@ -257,6 +312,7 @@ module.exports = {
   chartPrompt,
   buildInsightInputs,
   buildChartInputs,
+  buildMultiQueryInsightInputs,
   computeColumnStats,
   buildThresholdContext,
   CATEGORY_INSIGHT_GUIDANCE,

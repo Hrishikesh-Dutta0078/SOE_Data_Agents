@@ -6,7 +6,7 @@
 const { z } = require('zod');
 const EventEmitter = require('events');
 const { getModel, getModelMeta } = require('../../config/llm');
-const { insightPrompt, chartPrompt, buildInsightInputs, buildChartInputs, computeColumnStats, CATEGORY_INSIGHT_GUIDANCE, DEFAULT_INSIGHT_GUIDANCE } = require('../../prompts/present');
+const { insightPrompt, chartPrompt, buildInsightInputs, buildChartInputs, buildMultiQueryInsightInputs, computeColumnStats, CATEGORY_INSIGHT_GUIDANCE, DEFAULT_INSIGHT_GUIDANCE } = require('../../prompts/present');
 const {
   INSIGHT_MAX_TOKENS,
   INSIGHT_TEMPERATURE,
@@ -149,58 +149,6 @@ function buildChartOutput(raw) {
   };
 }
 
-function buildPartialResultsNote(allQueries) {
-  const failedOrEmpty = allQueries.filter(
-    (q) => !q.execution?.success || (q.execution?.rowCount ?? 0) === 0,
-  );
-  if (failedOrEmpty.length === 0) return { note: '', summary: null };
-  const succeeded = allQueries.length - failedOrEmpty.length;
-  const parts = failedOrEmpty.map((q) => {
-    const err = q.execution?.error || '';
-    const reason = err
-      ? `${q.id}: ${(err.length > 80 ? err.substring(0, 80) + '...' : err)}`
-      : `${q.id}: no data returned`;
-    return reason;
-  });
-  const summary = `${succeeded} of ${allQueries.length} sub-queries returned data. ${failedOrEmpty.length} failed or empty: ${parts.join('; ')}`;
-  const note = `Note: ${summary}\n\nInsights below are based only on the sub-queries that returned data. Interpret and caveat accordingly.\n\n`;
-  return { note, summary };
-}
-
-function buildMultiQueryInsightInputs(state, allQueries) {
-  const category = state.questionCategory || '';
-  const blueprintHint = state.blueprintMeta?.presentationHint || '';
-  const guidance = blueprintHint || CATEGORY_INSIGHT_GUIDANCE[category] || DEFAULT_INSIGHT_GUIDANCE;
-
-  const { note: partialResultsNote, summary: _partialSummary } = buildPartialResultsNote(allQueries);
-
-  let dataSection = '';
-  const allColumnStats = [];
-  for (const q of allQueries) {
-    const exec = q.execution;
-    if (!exec?.success || !exec.rows?.length) continue;
-    const sample = sampleRows(exec.rows, Math.max(5, Math.floor(INSIGHT_SAMPLE_ROWS / allQueries.length)));
-    dataSection += `\n--- Sub-query [${q.id}]: "${q.subQuestion}" (${q.purpose}) ---\n`;
-    dataSection += `Columns: ${(exec.columns || []).join(', ')}\n`;
-    dataSection += `Total rows: ${exec.rowCount}\n`;
-    dataSection += `Sample (${sample.length} rows):\n${JSON.stringify(sample, null, 2)}\n`;
-    allColumnStats.push(`[${q.id}] ${q.subQuestion}:\n${computeColumnStats(exec.rows, exec.columns)}`);
-  }
-
-  return {
-    partialResultsNote: partialResultsNote || '',
-    question: state.question,
-    questionCategory: category || 'GENERAL',
-    questionSubCategory: state.questionSubCategory || 'general',
-    categoryGuidance: guidance,
-    columns: 'See sub-query results below',
-    rowCount: String(allQueries.reduce((sum, q) => sum + (q.execution?.rowCount || 0), 0)),
-    columnStats: allColumnStats.length > 0 ? allColumnStats.join('\n\n') : 'No data available.',
-    sampleCount: 'multiple',
-    sampleData: dataSection,
-  };
-}
-
 async function presentNode(state) {
   const presentStart = Date.now();
   const exec = state.execution;
@@ -255,7 +203,7 @@ async function presentNode(state) {
   const insightPromise = wantInsights
     ? (async () => {
         const inputs = isMultiQuery
-          ? buildMultiQueryInsightInputs(state, allQueries)
+          ? buildMultiQueryInsightInputs(state, allQueries, INSIGHT_SAMPLE_ROWS)
           : buildInsightInputs(state, insightSample);
         const messages = await insightPrompt.formatMessages(inputs);
         const model = getModel({
