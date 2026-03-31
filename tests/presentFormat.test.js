@@ -80,4 +80,23 @@ describe('presentFormat', () => {
       assert.ok(systemMsg.includes('Coverage: On Track >= 2.5x'));
     });
   });
+
+  describe('CATEGORY_INSIGHT_GUIDANCE call-to-action', () => {
+    it('WHAT_TO_DO guidance includes call-to-action instruction', () => {
+      const guidance = presentPrompts.CATEGORY_INSIGHT_GUIDANCE;
+      assert.ok(guidance.WHAT_TO_DO.includes('Call-to-Action'));
+      assert.ok(guidance.WHAT_TO_DO.includes('2-3 specific'));
+      assert.ok(guidance.WHAT_TO_DO.includes('data-backed'));
+    });
+
+    it('WHY guidance includes lighter action instruction', () => {
+      const guidance = presentPrompts.CATEGORY_INSIGHT_GUIDANCE;
+      assert.ok(guidance.WHY.includes('1-2 specific actions'));
+    });
+
+    it('WHAT_HAPPENED guidance does NOT include call-to-action', () => {
+      const guidance = presentPrompts.CATEGORY_INSIGHT_GUIDANCE;
+      assert.ok(!guidance.WHAT_HAPPENED.includes('Call-to-Action'));
+    });
+  });
 });

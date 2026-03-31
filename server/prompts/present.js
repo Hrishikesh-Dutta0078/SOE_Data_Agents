@@ -29,7 +29,8 @@ const CATEGORY_INSIGHT_GUIDANCE = {
 - Quantify the contribution of each driver to the overall gap or issue.
 - Flag correlations: do stalled deals correlate with missing BANT, mutual plan, or access to power?
 - Highlight Deal Sensei Score patterns: DS Score >= 65 = higher booking likelihood; < 40 = high risk.
-- End with 2-3 specific follow-up questions that ask "What to do" — e.g., "For each stall reason, what's the standard intervention?" or "Which deals to prioritize for progression?"`,
+- End with 2-3 specific follow-up questions that ask "What to do" — e.g., "For each stall reason, what's the standard intervention?" or "Which deals to prioritize for progression?"
+- If the data reveals clear improvement opportunities, end with 1-2 specific actions the user could take.`,
 
   WHAT_TO_DO: `ANALYTICAL LENS — "What To Do About It" (Actions & Next Steps):
 - Prioritize actionable items — rank by impact (ARR, strategic value, likelihood of success).
@@ -37,7 +38,9 @@ const CATEGORY_INSIGHT_GUIDANCE = {
 - For progression candidates: specify the missing prerequisite (mutual plan, power access, BANT) and the next best action.
 - For creation plays: identify accounts by whitespace/install base signal, recent engagement, partner potential.
 - For Deal Sensei-based focus: flag high-ARR deals with high DS Score but low momentum for leadership inspection; flag mid-ARR deals with high momentum as pull-in candidates.
-- End with 2-3 validation questions — e.g., "Track resolution rate over next 4 weeks" or "What is the creation trend after implementing these plays?"`,
+- End with 2-3 validation questions — e.g., "Track resolution rate over next 4 weeks" or "What is the creation trend after implementing these plays?"
+
+**Call-to-Action:** End your response with a Call-to-Action section: 2-3 specific, data-backed actions grounded in actual metric gaps. Never give generic advice. Format as a numbered list.`,
 };
 
 const DEFAULT_INSIGHT_GUIDANCE = `ANALYTICAL LENS — General:
