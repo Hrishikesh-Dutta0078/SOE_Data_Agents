@@ -115,7 +115,7 @@ async function contextFetchNode(state) {
   // selectTablesAndColumnsByLLM and fetchFiscalPeriod are async;
   // searchExamples, searchRules, searchKpis are synchronous but harmless in Promise.all.
   const [tableSelection, examples, rules, kpis, fiscalPeriod] = await Promise.all([
-    selectTablesAndColumnsByLLM(question, entities || null),
+    selectTablesAndColumnsByLLM(question, entities || null, { profile: state.nodeModelOverrides?.contextFetch }),
     Promise.resolve(searchExamples(enrichedQuery, 5)),
     Promise.resolve(searchRules(enrichedQuery, 8)),
     Promise.resolve(searchKpis(enrichedQuery, 5)),

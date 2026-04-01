@@ -44,7 +44,7 @@ function normalizeEnabledTools(value) {
 }
 
 const VALID_NODE_KEYS = new Set([
-  'classify', 'decompose', 'generateSql', 'sqlAgent', 'sqlWriterAgent',
+  'classify', 'decompose', 'contextFetch', 'generateSql', 'sqlAgent', 'sqlWriterAgent',
   'researchAgent', 'subQueryMatch', 'correct', 'validate', 'execute',
   'checkResults', 'presentInsights', 'presentChart', 'dashboardAgent',
   'semanticValidatorFast', 'semanticValidatorOpus',
@@ -67,7 +67,7 @@ function expandGlobalModel(globalModel) {
   if (!['opus', 'sonnet', 'haiku', 'gpt'].includes(globalModel)) return null;
 
   const allNodes = [
-    'classify', 'decompose', 'generateSql', 'sqlAgent', 'sqlWriterAgent',
+    'classify', 'decompose', 'contextFetch', 'generateSql', 'sqlAgent', 'sqlWriterAgent',
     'validate', 'correct', 'execute', 'checkResults', 'presentInsights',
     'presentChart', 'dashboardAgent', 'subQueryMatch',
   ];
