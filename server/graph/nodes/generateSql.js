@@ -587,8 +587,8 @@ async function generateSqlNode(state) {
   const model = getModel({
     temperature: 0,
     maxTokens: GENERATE_SQL_MAX_TOKENS,
-    nodeKey: 'generateSql', // Not in FAST_NODE_KEYS or SONNET_NODE_KEYS → resolves to opus
-    profile: state.nodeModelOverrides?.generateSql,
+    nodeKey: 'generateSql', // TEMP: hardcoded to haiku for UI demo — revert this
+    profile: 'haiku',
   });
   const llmMeta = getModelMeta(model);
 

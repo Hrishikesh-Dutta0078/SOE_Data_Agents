@@ -3,7 +3,7 @@
  */
 
 const { ChatAnthropic } = require('@langchain/anthropic');
-const { ChatOpenAI } = require('@langchain/openai');
+const { AzureChatOpenAI } = require('@langchain/openai');
 const { InMemoryCache } = require('@langchain/core/caches');
 const logger = require('../utils/logger');
 const {
@@ -285,13 +285,13 @@ function getModel(opts = {}) {
       azureOpenAIApiDeploymentName: runtime.modelName,
       azureOpenAIApiVersion: '2024-12-01-preview',
       temperature: requestedTemp,
-      maxTokens,
+      modelKwargs: { max_completion_tokens: maxTokens },
       timeout,
       maxRetries,
       callbacks,
     };
     if (opts.cache) modelOpts.cache = _sharedCache;
-    model = new ChatOpenAI(modelOpts);
+    model = new AzureChatOpenAI(modelOpts);
   } else {
     // Anthropic path
     const modelOpts = {
