@@ -5,6 +5,25 @@ const MODEL_OPTIONS = [
   { value: 'gpt', label: 'GPT 5.4', color: '#059669' },
 ];
 
+const PHASE_CONFIG = [
+  { key: 'contextFetch', label: 'Schema Research' },
+  { key: 'generateSql', label: 'SQL Generation' },
+];
+
+const MODEL_COLORS = {
+  opus:   { label: 'Opus 4.6',   color: '#7C3AED' },
+  sonnet: { label: 'Sonnet 4.6', color: '#4F46E5' },
+  haiku:  { label: 'Haiku 4.5',  color: '#059669' },
+  gpt:    { label: 'GPT 5.4',    color: '#059669' },
+};
+
+function formatTokenCount(n) {
+  if (n == null || !Number.isFinite(n) || n <= 0) return '0';
+  if (n < 1000) return String(n);
+  if (n < 1_000_000) return `${(n / 1000).toFixed(1)}k`;
+  return `${(n / 1_000_000).toFixed(1)}M`;
+}
+
 const GearIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 16, height: 16 }}>
     <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
@@ -23,6 +42,18 @@ export default function DevPanel({ globalModel, setGlobalModel, lastRunMetrics }
     if (!lastRunMetrics?.nodeDurations) return null;
     const totalMs = Object.values(lastRunMetrics.nodeDurations).reduce((sum, ms) => sum + (ms || 0), 0);
     return (totalMs / 1000).toFixed(2);
+  }, [lastRunMetrics]);
+
+  const tokensByPhase = useMemo(() => {
+    const raw = lastRunMetrics?.usageByNodeAndModel;
+    if (!raw) return null;
+    return PHASE_CONFIG.map(({ key, label }) => {
+      const byModel = raw[key] || {};
+      const entries = Object.entries(byModel)
+        .filter(([, u]) => u && u.totalTokens > 0)
+        .map(([model, u]) => ({ model, inputTokens: u.inputTokens || 0, outputTokens: u.outputTokens || 0 }));
+      return { key, label, entries };
+    });
   }, [lastRunMetrics]);
 
   return (
@@ -164,6 +195,66 @@ export default function DevPanel({ globalModel, setGlobalModel, lastRunMetrics }
             ))}
           </div>
         </div>
+
+        {/* Token Usage */}
+        {tokensByPhase && (
+          <div>
+            <div style={{
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.8px',
+              color: 'var(--color-text-faint)',
+              marginBottom: 12,
+            }}>
+              Token Usage
+            </div>
+            <div style={{
+              padding: 16,
+              background: 'rgba(255,255,255,0.3)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--color-border-light)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 12,
+            }}>
+              {tokensByPhase.map(({ key, label, entries }) => (
+                <div key={key}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+                    {label}
+                  </div>
+                  {entries.length === 0 ? (
+                    <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>—</div>
+                  ) : (
+                    entries.map(({ model, inputTokens, outputTokens }) => {
+                      const mc = MODEL_COLORS[model];
+                      return (
+                        <div key={model} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 11, color: 'var(--color-text-muted)' }}>
+                          <span style={{
+                            fontSize: 9,
+                            fontWeight: 700,
+                            padding: '2px 6px',
+                            borderRadius: 999,
+                            color: mc?.color || '#6B7280',
+                            background: mc ? `${mc.color}15` : 'rgba(107,114,128,0.1)',
+                          }}>
+                            {mc?.label || model}
+                          </span>
+                          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                            In: {formatTokenCount(inputTokens)}
+                          </span>
+                          <span style={{ fontVariantNumeric: 'tabular-nums' }}>
+                            Out: {formatTokenCount(outputTokens)}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Metrics */}
         <div style={{
