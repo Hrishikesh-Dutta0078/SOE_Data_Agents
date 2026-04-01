@@ -734,14 +734,17 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       />
       {msg.usageByNodeAndModel && (() => {
         const phases = ['contextFetch', 'generateSql'];
+        let totalCost = 0;
         const rows = phases.map(key => {
           const byModel = msg.usageByNodeAndModel[key] || {};
           const active = Object.entries(byModel).filter(([, u]) => u && u.totalTokens > 0);
+          active.forEach(([, u]) => { totalCost += u.estimatedCostUsd || 0; });
           return { key, label: NODE_LABELS[key] || key, active };
         }).filter(r => r.active.length > 0);
         if (rows.length === 0) return null;
+        const costStr = totalCost >= 0.01 ? `$${totalCost.toFixed(4)}` : totalCost > 0 ? `$${totalCost.toFixed(6)}` : null;
         return (
-          <div style={{ padding: '6px 14px 10px', display: 'flex', flexWrap: 'wrap', gap: '4px 14px' }}>
+          <div style={{ padding: '6px 14px 10px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 14px' }}>
             {rows.map(({ key, label, active }) =>
               active.map(([model, u]) => {
                 const badge = MODEL_BADGE[model];
@@ -755,6 +758,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
                 );
               })
             )}
+            {costStr && <span style={{ fontSize: 10, fontWeight: 600, color: '#78716C', fontVariantNumeric: 'tabular-nums' }}>Cost: {costStr}</span>}
           </div>
         );
       })()}

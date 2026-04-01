@@ -47,13 +47,18 @@ export default function DevPanel({ globalModel, setGlobalModel, lastRunMetrics }
   const tokensByPhase = useMemo(() => {
     const raw = lastRunMetrics?.usageByNodeAndModel;
     if (!raw) return null;
-    return PHASE_CONFIG.map(({ key, label }) => {
+    let totalCost = 0;
+    const phases = PHASE_CONFIG.map(({ key, label }) => {
       const byModel = raw[key] || {};
       const entries = Object.entries(byModel)
         .filter(([, u]) => u && u.totalTokens > 0)
-        .map(([model, u]) => ({ model, inputTokens: u.inputTokens || 0, outputTokens: u.outputTokens || 0 }));
+        .map(([model, u]) => {
+          totalCost += u.estimatedCostUsd || 0;
+          return { model, inputTokens: u.inputTokens || 0, outputTokens: u.outputTokens || 0 };
+        });
       return { key, label, entries };
     });
+    return { phases, totalCost };
   }, [lastRunMetrics]);
 
   return (
@@ -218,7 +223,7 @@ export default function DevPanel({ globalModel, setGlobalModel, lastRunMetrics }
               flexDirection: 'column',
               gap: 12,
             }}>
-              {tokensByPhase.map(({ key, label, entries }) => (
+              {tokensByPhase.phases.map(({ key, label, entries }) => (
                 <div key={key}>
                   <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: 4 }}>
                     {label}
@@ -252,6 +257,11 @@ export default function DevPanel({ globalModel, setGlobalModel, lastRunMetrics }
                   )}
                 </div>
               ))}
+              {tokensByPhase.totalCost > 0 && (
+                <div style={{ borderTop: '1px solid var(--color-border-light)', paddingTop: 8, marginTop: 2, fontSize: 12, fontWeight: 700, color: 'var(--color-text-secondary)', fontVariantNumeric: 'tabular-nums' }}>
+                  Est. Cost: {tokensByPhase.totalCost >= 0.01 ? `$${tokensByPhase.totalCost.toFixed(4)}` : `$${tokensByPhase.totalCost.toFixed(6)}`}
+                </div>
+              )}
             </div>
           </div>
         )}
