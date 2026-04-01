@@ -37,8 +37,8 @@ function formatDurationMs(ms) {
 }
 
 const NODE_LABELS = {
-  classify: 'Classify', decompose: 'Decompose', contextFetch: 'Context Fetch',
-  generateSql: 'Generate SQL', presentInsights: 'Insights', presentChart: 'Chart',
+  classify: 'Classify', decompose: 'Decompose',   contextFetch: 'Schema Research',
+  generateSql: 'SQL Generation', presentInsights: 'Insights', presentChart: 'Chart',
   dashboardAgent: 'Dashboard', correct: 'Correct', researchAgent: 'Research',
   sqlWriterAgent: 'SQL Writer',
 };
@@ -732,6 +732,32 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         question={messages[messages.indexOf(msg) - 1]?.content}
         animate={messages.indexOf(msg) === messages.length - 1}
       />
+      {msg.usageByNodeAndModel && (() => {
+        const phases = ['contextFetch', 'generateSql'];
+        const rows = phases.map(key => {
+          const byModel = msg.usageByNodeAndModel[key] || {};
+          const active = Object.entries(byModel).filter(([, u]) => u && u.totalTokens > 0);
+          return { key, label: NODE_LABELS[key] || key, active };
+        }).filter(r => r.active.length > 0);
+        if (rows.length === 0) return null;
+        return (
+          <div style={{ padding: '6px 14px 10px', display: 'flex', flexWrap: 'wrap', gap: '4px 14px' }}>
+            {rows.map(({ key, label, active }) =>
+              active.map(([model, u]) => {
+                const badge = MODEL_BADGE[model];
+                return (
+                  <span key={`${key}-${model}`} style={{ fontSize: 10, color: '#9CA3AF', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ color: '#78716C', fontWeight: 600 }}>{label}</span>
+                    {badge && <span style={{ fontSize: 8, fontWeight: 700, padding: '1px 5px', borderRadius: 999, color: badge.color, background: badge.bg }}>{model.charAt(0).toUpperCase() + model.slice(1)}</span>}
+                    <span style={{ fontVariantNumeric: 'tabular-nums' }}>In:{formatTokensInMillions(u.inputTokens) || '0'}</span>
+                    <span style={{ fontVariantNumeric: 'tabular-nums' }}>Out:{formatTokensInMillions(u.outputTokens) || '0'}</span>
+                  </span>
+                );
+              })
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 
