@@ -164,6 +164,7 @@ async function selectTablesAndColumnsByLLM(query, entities = null) {
   const model = getModel({
     maxTokens: 2048,
     temperature: 0,
+    nodeKey: 'contextFetch',
   }).withStructuredOutput(SchemaSelectionSchema);
 
   let parsed;
