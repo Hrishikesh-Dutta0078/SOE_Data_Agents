@@ -6,8 +6,8 @@ const MODEL_OPTIONS = [
 ];
 
 const PHASE_CONFIG = [
-  { key: 'contextFetch', label: 'Schema Research' },
-  { key: 'generateSql', label: 'SQL Generation' },
+  { key: 'contextFetch', label: 'Research' },
+  { key: 'generateSql', label: 'Writer' },
 ];
 
 const MODEL_COLORS = {

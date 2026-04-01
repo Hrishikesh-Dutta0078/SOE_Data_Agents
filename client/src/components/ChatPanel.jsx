@@ -37,8 +37,8 @@ function formatDurationMs(ms) {
 }
 
 const NODE_LABELS = {
-  classify: 'Classify', decompose: 'Decompose',   contextFetch: 'Schema Research',
-  generateSql: 'SQL Generation', presentInsights: 'Insights', presentChart: 'Chart',
+  classify: 'Classify', decompose: 'Decompose',   contextFetch: 'Research',
+  generateSql: 'Writer', presentInsights: 'Insights', presentChart: 'Chart',
   dashboardAgent: 'Dashboard', correct: 'Correct', researchAgent: 'Research',
   sqlWriterAgent: 'SQL Writer',
 };
