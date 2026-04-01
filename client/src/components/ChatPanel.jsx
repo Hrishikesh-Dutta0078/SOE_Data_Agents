@@ -37,8 +37,8 @@ function formatDurationMs(ms) {
 }
 
 const NODE_LABELS = {
-  classify: 'Classify', decompose: 'Decompose', contextFetch: 'Context Fetch',
-  generateSql: 'Generate SQL', presentInsights: 'Insights', presentChart: 'Chart',
+  classify: 'Classify', decompose: 'Decompose',   contextFetch: 'Research',
+  generateSql: 'Writer', presentInsights: 'Insights', presentChart: 'Chart',
   dashboardAgent: 'Dashboard', correct: 'Correct', researchAgent: 'Research',
   sqlWriterAgent: 'SQL Writer',
 };
@@ -47,6 +47,7 @@ const MODEL_BADGE = {
   opus:   { color: '#7C3AED', bg: 'rgba(139,92,246,0.1)' },
   sonnet: { color: '#4F46E5', bg: 'rgba(99,102,241,0.1)' },
   haiku:  { color: '#059669', bg: 'rgba(16,185,129,0.12)' },
+  gpt:    { color: '#2563EB', bg: 'rgba(37,99,235,0.1)' },
 };
 
 function getModelsFromTrace(trace) {
@@ -86,7 +87,7 @@ function loadMessages(sessionId) {
   } catch { return []; }
 }
 
-export default function ChatPanel({ onMenuClick, impersonateContext = null, validationEnabled = true, sessionId, onNewChat, enabledTools: enabledToolsProp = null, nodeModelOverrides = {}, userName = '', onMetricsUpdate }) {
+export default function ChatPanel({ onMenuClick, impersonateContext = null, validationEnabled = true, sessionId, onNewChat, enabledTools: enabledToolsProp = null, globalModel, userName = '', onMetricsUpdate }) {
   const [messages, setMessages] = useState(() => loadMessages(sessionId));
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -499,7 +500,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     setQuerySummary('');
     setConfidence(null);
 
-    const opts = { impersonateContext: impersonateContext ? { type: impersonateContext.type, id: impersonateContext.id } : null, validationEnabled, sessionId, isFollowUp, nodeModelOverrides, enabledTools: enabledToolsProp ?? null };
+    const opts = { impersonateContext: impersonateContext ? { type: impersonateContext.type, id: impersonateContext.id } : null, validationEnabled, sessionId, isFollowUp, globalModel, enabledTools: enabledToolsProp ?? null };
     const result = await analyzeQuestionStream(
       question,
       history,
@@ -515,7 +516,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     // It gets overwritten at the start of the next stream call.
     setActiveTools([]);
     return result;
-  }, [streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, nodeModelOverrides]);
+  }, [streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, globalModel]);
 
   const handleSend = async (text, { isFollowUp = false } = {}) => {
     voiceStopRef.current?.();
@@ -575,7 +576,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
       ...(dashboardData.profileCacheKey
         ? { profileCacheKey: dashboardData.profileCacheKey }
         : { dashboardDataSources: serializedSources }),
-      nodeModelOverrides,
+      globalModel,
       enabledTools: enabledToolsProp ?? null,
     };
     const result = await analyzeQuestionStream(
@@ -605,7 +606,7 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
     }
 
     return result;
-  }, [dashboardData, buildHistory, streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, nodeModelOverrides]);
+  }, [dashboardData, buildHistory, streamOnEvent, impersonateContext, validationEnabled, sessionId, enabledToolsProp, globalModel]);
 
   const handleClarificationSubmit = async (questions) => {
     if (loading) return;
@@ -713,6 +714,36 @@ export default function ChatPanel({ onMenuClick, impersonateContext = null, vali
         maxWidth: '88%',
       }}
     >
+      {msg.usageByNodeAndModel && (() => {
+        const phases = ['contextFetch', 'generateSql'];
+        let totalCost = 0;
+        const rows = phases.map(key => {
+          const byModel = msg.usageByNodeAndModel[key] || {};
+          const active = Object.entries(byModel).filter(([, u]) => u && u.totalTokens > 0);
+          active.forEach(([, u]) => { totalCost += u.estimatedCostUsd || 0; });
+          return { key, label: NODE_LABELS[key] || key, active };
+        }).filter(r => r.active.length > 0);
+        if (rows.length === 0) return null;
+        const costStr = totalCost >= 0.01 ? `$${totalCost.toFixed(4)}` : totalCost > 0 ? `$${totalCost.toFixed(6)}` : null;
+        return (
+          <div style={{ padding: '10px 14px 6px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 14px' }}>
+            {rows.map(({ key, label, active }) =>
+              active.map(([model, u]) => {
+                const badge = MODEL_BADGE[model];
+                return (
+                  <span key={`${key}-${model}`} style={{ fontSize: 10, color: '#9CA3AF', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <span style={{ color: '#78716C', fontWeight: 600 }}>{label}</span>
+                    {badge && <span style={{ fontSize: 8, fontWeight: 700, padding: '1px 5px', borderRadius: 999, color: badge.color, background: badge.bg }}>{model.charAt(0).toUpperCase() + model.slice(1)}</span>}
+                    <span style={{ fontVariantNumeric: 'tabular-nums' }}>In:{formatTokensInMillions(u.inputTokens) || '0'}</span>
+                    <span style={{ fontVariantNumeric: 'tabular-nums' }}>Out:{formatTokensInMillions(u.outputTokens) || '0'}</span>
+                  </span>
+                );
+              })
+            )}
+            {costStr && <span style={{ fontSize: 10, fontWeight: 600, color: '#78716C', fontVariantNumeric: 'tabular-nums' }}>Cost: {costStr}</span>}
+          </div>
+        );
+      })()}
       <NarrativeCard
         execution={msg.execution}
         insights={msg.insights}

@@ -2,6 +2,7 @@ const {
   COST_PER_1M_INPUT_TOKENS,
   COST_PER_1M_CACHED_INPUT_TOKENS,
   COST_PER_1M_OUTPUT_TOKENS,
+  COST_RATES,
 } = require('../config/constants');
 
 const TOKENS_PER_MILLION = 1000000;
@@ -48,10 +49,10 @@ function buildUsageSnapshot(rawUsage = {}, opts = {}) {
   return usage;
 }
 
-/** Normalize per-node, per-model usage for the client. Ensures researchAgent and sqlWriterAgent have opus/haiku keys. */
+/** Normalize per-node, per-model usage for the client. Ensures contextFetch and generateSql have all model profile keys. Includes per-entry estimatedCostUsd. */
 function buildUsageBreakdown(rawByNodeAndModel = {}) {
-  const nodes = ['researchAgent', 'sqlWriterAgent'];
-  const models = ['opus', 'haiku'];
+  const nodes = ['contextFetch', 'generateSql'];
+  const models = ['opus', 'sonnet', 'haiku', 'gpt'];
   const out = {};
   for (const nodeKey of nodes) {
     out[nodeKey] = {};
@@ -60,8 +61,16 @@ function buildUsageBreakdown(rawByNodeAndModel = {}) {
       const u = byModel[model];
       const inputTokens = u?.inputTokens ?? 0;
       const outputTokens = u?.outputTokens ?? 0;
+      const cachedInputTokens = u?.cachedInputTokens ?? 0;
       const totalTokens = u?.totalTokens ?? inputTokens + outputTokens;
-      out[nodeKey][model] = { inputTokens, outputTokens, totalTokens };
+      const rates = COST_RATES[model] || COST_RATES.opus;
+      const billable = Math.max(inputTokens - cachedInputTokens, 0);
+      const estimatedCostUsd = Number((
+        (billable / TOKENS_PER_MILLION) * rates.input +
+        (cachedInputTokens / TOKENS_PER_MILLION) * rates.cachedInput +
+        (outputTokens / TOKENS_PER_MILLION) * rates.output
+      ).toFixed(6));
+      out[nodeKey][model] = { inputTokens, outputTokens, totalTokens, estimatedCostUsd };
     }
   }
   return out;

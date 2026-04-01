@@ -125,11 +125,12 @@ function validateAndResolve(tableNames, columnsByTable, knowledge) {
  *
  * @param {string} query - User question
  * @param {{ metrics?: string[], dimensions?: string[], filters?: string[], operations?: string[] }|null} [entities]
+ * @param {{ profile?: string }|null} [opts]
  * @returns {Promise<{ tableNames: string[], columnsByTable: Record<string, string[]> }>}
  */
 let _fullSchemaMarkdownCache = null;
 
-async function selectTablesAndColumnsByLLM(query, entities = null) {
+async function selectTablesAndColumnsByLLM(query, entities = null, opts = null) {
   const knowledge = await loadSchemaKnowledgeAsync();
   const rawSchema = knowledge.tables || {};
   if (Object.keys(rawSchema).length === 0) {
@@ -164,6 +165,8 @@ async function selectTablesAndColumnsByLLM(query, entities = null) {
   const model = getModel({
     maxTokens: 2048,
     temperature: 0,
+    nodeKey: 'contextFetch',
+    profile: opts?.profile || undefined,
   }).withStructuredOutput(SchemaSelectionSchema);
 
   let parsed;

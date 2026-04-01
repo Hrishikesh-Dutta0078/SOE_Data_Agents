@@ -29,7 +29,8 @@ const CATEGORY_INSIGHT_GUIDANCE = {
 - Quantify the contribution of each driver to the overall gap or issue.
 - Flag correlations: do stalled deals correlate with missing BANT, mutual plan, or access to power?
 - Highlight Deal Sensei Score patterns: DS Score >= 65 = higher booking likelihood; < 40 = high risk.
-- End with 2-3 specific follow-up questions that ask "What to do" — e.g., "For each stall reason, what's the standard intervention?" or "Which deals to prioritize for progression?"`,
+- End with 2-3 specific follow-up questions that ask "What to do" — e.g., "For each stall reason, what's the standard intervention?" or "Which deals to prioritize for progression?"
+- If the data reveals clear improvement opportunities, end with 1-2 specific actions the user could take.`,
 
   WHAT_TO_DO: `ANALYTICAL LENS — "What To Do About It" (Actions & Next Steps):
 - Prioritize actionable items — rank by impact (ARR, strategic value, likelihood of success).
@@ -37,7 +38,9 @@ const CATEGORY_INSIGHT_GUIDANCE = {
 - For progression candidates: specify the missing prerequisite (mutual plan, power access, BANT) and the next best action.
 - For creation plays: identify accounts by whitespace/install base signal, recent engagement, partner potential.
 - For Deal Sensei-based focus: flag high-ARR deals with high DS Score but low momentum for leadership inspection; flag mid-ARR deals with high momentum as pull-in candidates.
-- End with 2-3 validation questions — e.g., "Track resolution rate over next 4 weeks" or "What is the creation trend after implementing these plays?"`,
+- End with 2-3 validation questions — e.g., "Track resolution rate over next 4 weeks" or "What is the creation trend after implementing these plays?"
+
+**Call-to-Action:** End your response with a Call-to-Action section: 2-3 specific, data-backed actions grounded in actual metric gaps. Never give generic advice. Format as a numbered list.`,
 };
 
 const DEFAULT_INSIGHT_GUIDANCE = `ANALYTICAL LENS — General:
@@ -47,16 +50,35 @@ const DEFAULT_INSIGHT_GUIDANCE = `ANALYTICAL LENS — General:
 
 const INSIGHT_SYSTEM = `You are a senior sales analytics advisor. Given query results, produce concise insights.
 
-STRICT LIMIT: Your ENTIRE response must be under 300 words. No exceptions.
-
 {categoryGuidance}
 
-FORMAT — You MUST use these exact headings:
+{thresholdContext}
 
-## Key Takeaways
-- 3-5 crisp bullets, each 1 sentence with specific numbers
-- Lead with the most important finding
-- Compare against benchmarks when applicable (${coverageThresholdText()})
+RESPONSE FORMAT — Choose the format that best fits the data:
+
+**Format A — Narrative + Table** (use when results contain multiple KPIs, dimensions, or comparisons):
+- Write a 2-paragraph summary (60 words max total, ~30 words each).
+  - Para 1 (Strengths): Open with "Your [Metric] is at..." or "You are at..." — highlight what is on track.
+  - Para 2 (Gaps): Open with "your numbers show [Metric]..." — highlight shortfalls.
+- Bold **metric names only** — plain text for everything else.
+- After the summary, present a markdown table with columns relevant to the data. Always include a Status column.
+- Status Key:
+  - ✅ On Track — at or above target
+  - ⚠️ At Risk — 10–20% below target
+  - 🔴 Behind — more than 20% below target
+- The summary MUST appear BEFORE any table.
+
+**Format B — Bullet** (use for single-value lookups or simple answers where a narrative does not fit):
+- 3–5 crisp bullets, each 1 sentence with specific numbers.
+- Lead with the most important finding.
+- Compare against benchmarks when applicable (${coverageThresholdText()}).
+
+RULES (apply to both formats):
+- Never skip the opening summary/narrative.
+- Bold only metric names — never bold other text.
+- Show dollar values in millions (e.g., $38M) or thousands (e.g., $3.2K). Never show raw numbers like $38,000,000.
+- Never open with robotic phrases like "Here are your metrics:" — use a natural, analytical, manager-like tone.
+- Narrative word limit is 60 words. Tables, call-to-action, and follow-up sections are exempt from the word limit.
 
 ## Suggested Follow-Up Questions
 - 2-3 questions progressing What -> Why -> Fix`;
@@ -185,6 +207,7 @@ function buildInsightInputs(state, sample) {
     questionCategory: category || 'GENERAL',
     questionSubCategory: state.questionSubCategory || 'general',
     categoryGuidance: guidance,
+    thresholdContext: buildThresholdContext(),
     columns: (exec?.columns || []).join(', '),
     rowCount: String(exec?.rowCount ?? 0),
     columnStats: computeColumnStats(exec?.rows, exec?.columns),
@@ -204,12 +227,95 @@ function buildChartInputs(state, sample) {
   };
 }
 
+function buildPartialResultsNote(allQueries) {
+  const failedOrEmpty = allQueries.filter(
+    (q) => !q.execution?.success || (q.execution?.rowCount ?? 0) === 0,
+  );
+  if (failedOrEmpty.length === 0) return { note: '', summary: null };
+  const succeeded = allQueries.length - failedOrEmpty.length;
+  const parts = failedOrEmpty.map((q) => {
+    const err = q.execution?.error || '';
+    const reason = err
+      ? `${q.id}: ${(err.length > 80 ? err.substring(0, 80) + '...' : err)}`
+      : `${q.id}: no data returned`;
+    return reason;
+  });
+  const summary = `${succeeded} of ${allQueries.length} sub-queries returned data. ${failedOrEmpty.length} failed or empty: ${parts.join('; ')}`;
+  const note = `Note: ${summary}\n\nInsights below are based only on the sub-queries that returned data. Interpret and caveat accordingly.\n\n`;
+  return { note, summary };
+}
+
+function buildMultiQueryInsightInputs(state, allQueries, sampleLimit = 50) {
+  const category = state.questionCategory || '';
+  const blueprintHint = state.blueprintMeta?.presentationHint || '';
+  const guidance = blueprintHint || CATEGORY_INSIGHT_GUIDANCE[category] || DEFAULT_INSIGHT_GUIDANCE;
+
+  const { note: partialResultsNote, summary: _partialSummary } = buildPartialResultsNote(allQueries);
+
+  let dataSection = '';
+  const allColumnStats = [];
+  for (const q of allQueries) {
+    const exec = q.execution;
+    if (!exec?.success || !exec.rows?.length) continue;
+    const sampleSize = Math.max(5, Math.floor(sampleLimit / allQueries.length));
+    const sample = exec.rows.slice(0, sampleSize);
+    dataSection += `\n--- Sub-query [${q.id}]: "${q.subQuestion}" (${q.purpose}) ---\n`;
+    dataSection += `Columns: ${(exec.columns || []).join(', ')}\n`;
+    dataSection += `Total rows: ${exec.rowCount}\n`;
+    dataSection += `Sample (${sample.length} rows):\n${JSON.stringify(sample, null, 2)}\n`;
+    allColumnStats.push(`[${q.id}] ${q.subQuestion}:\n${computeColumnStats(exec.rows, exec.columns)}`);
+  }
+
+  return {
+    partialResultsNote: partialResultsNote || '',
+    question: state.question,
+    questionCategory: category || 'GENERAL',
+    questionSubCategory: state.questionSubCategory || 'general',
+    categoryGuidance: guidance,
+    thresholdContext: buildThresholdContext(),
+    columns: 'See sub-query results below',
+    rowCount: String(allQueries.reduce((sum, q) => sum + (q.execution?.rowCount || 0), 0)),
+    columnStats: allColumnStats.length > 0 ? allColumnStats.join('\n\n') : 'No data available.',
+    sampleCount: 'multiple',
+    sampleData: dataSection,
+  };
+}
+
+function buildThresholdContext() {
+  const lines = ['KPI Thresholds for Status Assessment:'];
+
+  const cov = getThreshold('coverage');
+  if (cov.green) {
+    lines.push(`- Coverage: On Track >= ${cov.green}x, At Risk >= ${cov.yellow}x, Behind < ${cov.yellow}x`);
+  }
+
+  const creation = getThreshold('creation');
+  if (creation.green) {
+    lines.push(`- Creation Coverage: On Track >= ${creation.green}x, At Risk >= ${creation.yellow}x, Behind < ${creation.yellow}x`);
+  }
+
+  const ds = getThreshold('dsScore');
+  if (ds.high) {
+    lines.push(`- Deal Sensei Score: High >= ${ds.high}, Medium >= ${ds.medium}, Low < ${ds.medium}`);
+  }
+
+  const prop = getThreshold('propensity');
+  if (prop.high) {
+    lines.push(`- Propensity to Buy: High >= ${prop.high}`);
+  }
+
+  return lines.length > 1 ? lines.join('\n') : '';
+}
+
 module.exports = {
   insightPrompt,
   chartPrompt,
   buildInsightInputs,
   buildChartInputs,
+  buildMultiQueryInsightInputs,
+  buildPartialResultsNote,
   computeColumnStats,
+  buildThresholdContext,
   CATEGORY_INSIGHT_GUIDANCE,
   DEFAULT_INSIGHT_GUIDANCE,
 };

@@ -24,6 +24,13 @@ const MODEL_PROFILES = Object.freeze({
     endpointEnv: 'AZURE_ANTHROPIC_HAIKU_ENDPOINT',
     apiKeyEnv: 'AZURE_ANTHROPIC_HAIKU_API_KEY',
   }),
+  gpt: Object.freeze({
+    provider: 'openai',
+    modelNameEnv: 'AZURE_OPENAI_MODEL_NAME',
+    defaultModelName: 'gpt-5.4',
+    endpointEnv: 'AZURE_OPENAI_ENDPOINT',
+    apiKeyEnv: 'AZURE_OPENAI_API_KEY',
+  }),
 });
 
 module.exports = {
@@ -86,5 +93,6 @@ module.exports = {
     opus:   Object.freeze({ input: 15,   cachedInput: 1.875, output: 75 }),
     sonnet: Object.freeze({ input: 3,    cachedInput: 0.375, output: 15 }),
     haiku:  Object.freeze({ input: 0.80, cachedInput: 0.10,  output: 4 }),
+    gpt:    Object.freeze({ input: 2.5,  cachedInput: 1.25,  output: 10 }),
   }),
 };

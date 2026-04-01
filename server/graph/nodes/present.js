@@ -6,7 +6,7 @@
 const { z } = require('zod');
 const EventEmitter = require('events');
 const { getModel, getModelMeta } = require('../../config/llm');
-const { insightPrompt, chartPrompt, buildInsightInputs, buildChartInputs, computeColumnStats, CATEGORY_INSIGHT_GUIDANCE, DEFAULT_INSIGHT_GUIDANCE } = require('../../prompts/present');
+const { insightPrompt, chartPrompt, buildInsightInputs, buildChartInputs, buildMultiQueryInsightInputs, buildPartialResultsNote, computeColumnStats, CATEGORY_INSIGHT_GUIDANCE, DEFAULT_INSIGHT_GUIDANCE } = require('../../prompts/present');
 const {
   INSIGHT_MAX_TOKENS,
   INSIGHT_TEMPERATURE,
@@ -112,6 +112,39 @@ function parseFollowUps(insightText) {
   return { cleanedInsights, followUps };
 }
 
+/**
+ * Post-process LLM insight output to enforce mechanical formatting guardrails.
+ * - Converts raw dollar amounts to millions/thousands shorthand
+ * - Normalizes status emoji in markdown table rows
+ */
+function postProcessInsights(text) {
+  if (!text) return text;
+
+  // Dollar normalization: convert raw amounts >= $1,000 to shorthand
+  let result = text.replace(/\$\s?([\d,]+(?:\.\d+)?)/g, (match, numStr) => {
+    const num = parseFloat(numStr.replace(/,/g, ''));
+    if (isNaN(num) || num < 1000) return match;
+    if (num >= 1e9) return `$${(num / 1e9).toFixed(num % 1e9 === 0 ? 0 : 1)}B`;
+    if (num >= 1e6) return `$${(num / 1e6).toFixed(num % 1e6 === 0 ? 0 : 1)}M`;
+    if (num >= 1e3) return `$${(num / 1e3).toFixed(num % 1e3 === 0 ? 0 : 1)}K`;
+    return match;
+  });
+
+  // Status emoji normalization: only in markdown table rows (lines with |)
+  result = result.split('\n').map((line) => {
+    if (!line.includes('|')) return line;
+    // Skip header separator rows (|---|---|)
+    if (/^\|[\s-|]+$/.test(line)) return line;
+    // Add emoji if status text exists without emoji prefix (word boundaries prevent substring matches)
+    line = line.replace(/(?<![✅⚠️🔴]\s?)\bOn Track\b/g, '✅ On Track');
+    line = line.replace(/(?<![✅⚠️🔴]\s?)\bAt Risk\b/g, '⚠️ At Risk');
+    line = line.replace(/(?<![✅⚠️🔴]\s?)\bBehind\b/g, '🔴 Behind');
+    return line;
+  }).join('\n');
+
+  return result;
+}
+
 function normalizeAxis(val) {
   if (typeof val === 'string') return { key: val, label: val };
   return val;
@@ -146,58 +179,6 @@ function buildChartOutput(raw) {
       groupBy: raw.groupBy || null,
       aggregation: raw.aggregation || null,
     }],
-  };
-}
-
-function buildPartialResultsNote(allQueries) {
-  const failedOrEmpty = allQueries.filter(
-    (q) => !q.execution?.success || (q.execution?.rowCount ?? 0) === 0,
-  );
-  if (failedOrEmpty.length === 0) return { note: '', summary: null };
-  const succeeded = allQueries.length - failedOrEmpty.length;
-  const parts = failedOrEmpty.map((q) => {
-    const err = q.execution?.error || '';
-    const reason = err
-      ? `${q.id}: ${(err.length > 80 ? err.substring(0, 80) + '...' : err)}`
-      : `${q.id}: no data returned`;
-    return reason;
-  });
-  const summary = `${succeeded} of ${allQueries.length} sub-queries returned data. ${failedOrEmpty.length} failed or empty: ${parts.join('; ')}`;
-  const note = `Note: ${summary}\n\nInsights below are based only on the sub-queries that returned data. Interpret and caveat accordingly.\n\n`;
-  return { note, summary };
-}
-
-function buildMultiQueryInsightInputs(state, allQueries) {
-  const category = state.questionCategory || '';
-  const blueprintHint = state.blueprintMeta?.presentationHint || '';
-  const guidance = blueprintHint || CATEGORY_INSIGHT_GUIDANCE[category] || DEFAULT_INSIGHT_GUIDANCE;
-
-  const { note: partialResultsNote, summary: _partialSummary } = buildPartialResultsNote(allQueries);
-
-  let dataSection = '';
-  const allColumnStats = [];
-  for (const q of allQueries) {
-    const exec = q.execution;
-    if (!exec?.success || !exec.rows?.length) continue;
-    const sample = sampleRows(exec.rows, Math.max(5, Math.floor(INSIGHT_SAMPLE_ROWS / allQueries.length)));
-    dataSection += `\n--- Sub-query [${q.id}]: "${q.subQuestion}" (${q.purpose}) ---\n`;
-    dataSection += `Columns: ${(exec.columns || []).join(', ')}\n`;
-    dataSection += `Total rows: ${exec.rowCount}\n`;
-    dataSection += `Sample (${sample.length} rows):\n${JSON.stringify(sample, null, 2)}\n`;
-    allColumnStats.push(`[${q.id}] ${q.subQuestion}:\n${computeColumnStats(exec.rows, exec.columns)}`);
-  }
-
-  return {
-    partialResultsNote: partialResultsNote || '',
-    question: state.question,
-    questionCategory: category || 'GENERAL',
-    questionSubCategory: state.questionSubCategory || 'general',
-    categoryGuidance: guidance,
-    columns: 'See sub-query results below',
-    rowCount: String(allQueries.reduce((sum, q) => sum + (q.execution?.rowCount || 0), 0)),
-    columnStats: allColumnStats.length > 0 ? allColumnStats.join('\n\n') : 'No data available.',
-    sampleCount: 'multiple',
-    sampleData: dataSection,
   };
 }
 
@@ -255,7 +236,7 @@ async function presentNode(state) {
   const insightPromise = wantInsights
     ? (async () => {
         const inputs = isMultiQuery
-          ? buildMultiQueryInsightInputs(state, allQueries)
+          ? buildMultiQueryInsightInputs(state, allQueries, INSIGHT_SAMPLE_ROWS)
           : buildInsightInputs(state, insightSample);
         const messages = await insightPrompt.formatMessages(inputs);
         const model = getModel({
@@ -310,7 +291,8 @@ async function presentNode(state) {
     tail: insightsRaw.slice(-300),
   });
 
-  const { cleanedInsights, followUps } = parseFollowUps(insightsRaw);
+  const processed = postProcessInsights(insightsRaw);
+  const { cleanedInsights, followUps } = parseFollowUps(processed);
   const resolvedChartType = chart?.charts?.[0]?.chartType || null;
 
   const blueprintFollowUps = state.blueprintMeta?.suggestedFollowUps || [];
@@ -364,4 +346,4 @@ async function presentNode(state) {
   };
 }
 
-module.exports = { presentNode, presentEvents: _presentEvents };
+module.exports = { presentNode, presentEvents: _presentEvents, __testables: { postProcessInsights } };

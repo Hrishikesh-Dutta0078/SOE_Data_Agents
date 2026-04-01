@@ -36,11 +36,12 @@ export function analyzeQuestion(
   conversationHistory = [],
   previousEntities = null,
   resolvedQuestions = [],
-  { impersonateContext = null, validationEnabled = true, sessionId, isFollowUp = false, enabledTools = null, nodeModelOverrides } = {},
+  { impersonateContext = null, validationEnabled = true, sessionId, isFollowUp = false, enabledTools = null, nodeModelOverrides, globalModel } = {},
 ) {
   const payload = { question, conversationHistory, previousEntities, resolvedQuestions, impersonateContext, validationEnabled, isFollowUp };
   payload.enabledTools = enabledTools ?? null;
   if (nodeModelOverrides && Object.keys(nodeModelOverrides).length > 0) payload.nodeModelOverrides = nodeModelOverrides;
+  if (globalModel) payload.globalModel = globalModel;
   const headers = {};
   if (sessionId) headers['x-session-id'] = sessionId;
   return request('/api/text-to-sql/analyze', {
@@ -56,7 +57,7 @@ export async function analyzeQuestionStream(
   previousEntities = null,
   resolvedQuestions = [],
   onEvent,
-  { impersonateContext = null, validationEnabled = true, sessionId, isFollowUp = false, previousDashboardSpec = null, dashboardDataSources = null, enabledTools = null, nodeModelOverrides } = {},
+  { impersonateContext = null, validationEnabled = true, sessionId, isFollowUp = false, previousDashboardSpec = null, dashboardDataSources = null, enabledTools = null, nodeModelOverrides, globalModel } = {},
 ) {
   const payload = { question, conversationHistory, previousEntities, resolvedQuestions, impersonateContext, validationEnabled, isFollowUp };
   payload.enabledTools = enabledTools ?? null;
@@ -65,6 +66,7 @@ export async function analyzeQuestionStream(
     payload.dashboardDataSources = dashboardDataSources || [];
   }
   if (nodeModelOverrides && Object.keys(nodeModelOverrides).length > 0) payload.nodeModelOverrides = nodeModelOverrides;
+  if (globalModel) payload.globalModel = globalModel;
   const headers = { 'Content-Type': 'application/json' };
   if (sessionId) headers['x-session-id'] = sessionId;
 
