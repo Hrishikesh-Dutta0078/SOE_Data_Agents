@@ -48,10 +48,10 @@ function buildUsageSnapshot(rawUsage = {}, opts = {}) {
   return usage;
 }
 
-/** Normalize per-node, per-model usage for the client. Ensures researchAgent and sqlWriterAgent have opus/haiku keys. */
+/** Normalize per-node, per-model usage for the client. Ensures contextFetch and generateSql have all model profile keys. */
 function buildUsageBreakdown(rawByNodeAndModel = {}) {
-  const nodes = ['researchAgent', 'sqlWriterAgent'];
-  const models = ['opus', 'haiku'];
+  const nodes = ['contextFetch', 'generateSql'];
+  const models = ['opus', 'sonnet', 'haiku', 'gpt'];
   const out = {};
   for (const nodeKey of nodes) {
     out[nodeKey] = {};
