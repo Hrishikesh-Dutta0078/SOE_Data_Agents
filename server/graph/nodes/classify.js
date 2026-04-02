@@ -21,6 +21,26 @@ const { CLASSIFY_MAX_TOKENS, CLASSIFY_TEMPERATURE } = require('../../config/cons
 
 const EXACT_MATCH_THRESHOLD = 0.8;
 
+/**
+ * Whether prior assistant SQL should be reused as the template for a follow-up turn.
+ * Used after LLM classification when the user or model indicates a follow-up.
+ */
+function shouldReusePriorSqlAsFollowUp({
+  uiRequestedFollowUp,
+  llmDetectedFollowUp,
+  priorCategory,
+  currentCategory,
+  complexity,
+  hasPriorSql,
+}) {
+  if (!uiRequestedFollowUp && !llmDetectedFollowUp) return false;
+  if (!hasPriorSql) return false;
+  const categoryChanged = priorCategory && priorCategory !== currentCategory;
+  if (categoryChanged) return false;
+  if (complexity === 'COMPLEX') return false;
+  return true;
+}
+
 const DASHBOARD_PATTERNS = [
   /^\/dashboard\b/i,
   /^\/create[-\s]?dashboard\b/i,
@@ -492,7 +512,7 @@ Return only what is explicitly stated in the user parameters.`;
     }
   }
 
-  if (!matchType && state.isFollowUp && result.intent === 'SQL_QUERY') {
+  if (!matchType && (state.isFollowUp || result.is_followup) && result.intent === 'SQL_QUERY') {
     const history = state.conversationHistory || [];
     let priorSql = null;
     for (let i = history.length - 1; i >= 0; i--) {
@@ -509,13 +529,16 @@ Return only what is explicitly stated in the user parameters.`;
     const categoryChanged = priorCategory && priorCategory !== currentCategory;
     const isComplex = result.complexity === 'COMPLEX';
 
-    if (categoryChanged || isComplex) {
-      logger.info('  Classify: follow-up flagged but overridden — category changed or complex question, using full research path', {
-        priorCategory,
-        currentCategory,
-        complexity: result.complexity,
-      });
-    } else if (priorSql) {
+    const reuse = shouldReusePriorSqlAsFollowUp({
+      uiRequestedFollowUp: !!state.isFollowUp,
+      llmDetectedFollowUp: !!result.is_followup,
+      priorCategory,
+      currentCategory,
+      complexity: result.complexity,
+      hasPriorSql: !!priorSql,
+    });
+
+    if (reuse) {
       templateSql = priorSql;
       matchType = 'followup';
 
@@ -528,7 +551,13 @@ Return only what is explicitly stated in the user parameters.`;
         hasBrief: !!priorResearchBrief,
         hasPriorEntities: !!priorEntities,
       });
-    } else {
+    } else if (categoryChanged || isComplex) {
+      logger.info('  Classify: follow-up flagged but overridden — category changed or complex question, using full research path', {
+        priorCategory,
+        currentCategory,
+        complexity: result.complexity,
+      });
+    } else if (!priorSql) {
       logger.info('  Classify: follow-up detected but no prior SQL found in history, using normal path');
     }
   }
@@ -600,4 +629,10 @@ Return only what is explicitly stated in the user parameters.`;
   return output;
 }
 
-module.exports = { classifyNode, findExactMatch, loadGoldIndex, loadBlueprints };
+module.exports = {
+  classifyNode,
+  findExactMatch,
+  loadGoldIndex,
+  loadBlueprints,
+  __testables: { shouldReusePriorSqlAsFollowUp },
+};

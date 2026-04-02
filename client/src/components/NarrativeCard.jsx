@@ -1,7 +1,28 @@
 import React, { useState, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Copy, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import ResultsPanel from './ResultsPanel';
+
+const mdTableComponents = {
+  table: ({ children }) => (
+    <div className="overflow-x-auto my-3 rounded-lg" style={{ border: '1px solid rgba(231,229,228,0.6)' }}>
+      <table className="w-full border-collapse text-[13px]">{children}</table>
+    </div>
+  ),
+  thead: ({ children }) => <thead className="bg-stone-50">{children}</thead>,
+  th: ({ children }) => (
+    <th className="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wide border-b border-stone-200" style={{ color: '#78716C' }}>
+      {children}
+    </th>
+  ),
+  td: ({ children }) => (
+    <td className="px-3 py-2 border-b border-stone-100 whitespace-nowrap" style={{ color: '#44403C' }}>
+      {children}
+    </td>
+  ),
+  tr: ({ children }) => <tr className="hover:bg-stone-50/60 transition-colors">{children}</tr>,
+};
 
 /**
  * NarrativeCard — Executive-first response card.
@@ -139,7 +160,9 @@ function InsightBlock({ text, isRisk }) {
       }}
     >
       <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
         components={{
+          ...mdTableComponents,
           p: ({ children }) => <p>{children}</p>,
           strong: ({ children }) => <strong style={{ color: 'var(--color-text-primary)' }}>{children}</strong>,
         }}
@@ -231,7 +254,9 @@ export default function NarrativeCard({
       {body && (
         <div className="text-[13.5px] leading-relaxed mb-4" style={{ ...revealStyle(2), color: '#44403C' }}>
           <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
             components={{
+              ...mdTableComponents,
               p: ({ children }) => <p>{children}</p>,
               strong: ({ children }) => <strong style={{ color: 'var(--color-text-primary)' }}>{children}</strong>,
             }}

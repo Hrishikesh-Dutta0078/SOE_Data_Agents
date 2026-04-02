@@ -53,11 +53,12 @@ function requireAuthorization(req, res, next) {
   if (!req.session || !req.session.okta_user) {
     const accept = req.get('Accept') || '';
     const contentType = req.get('Content-Type') || '';
+    const path = typeof req.path === 'string' ? req.path : '';
     const isApiRequest =
       accept.includes('application/json') ||
       contentType.includes('application/json') ||
       req.xhr ||
-      req.path.startsWith('/api/');
+      path.startsWith('/api/');
     if (isApiRequest) {
       return res.status(401).json({ error: 'Not authenticated' });
     }

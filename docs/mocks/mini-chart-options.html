@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Chart Replacement Options — NarrativeCard</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-bg: #FAFAF9;
+    --color-surface: #FFFFFF;
+    --color-text-primary: #1a1a2e;
+    --color-text-secondary: #6B6B88;
+    --color-text-muted: #8B8BA0;
+    --color-text-faint: #B0B0C8;
+    --color-border: rgba(200, 195, 220, 0.25);
+    --color-border-light: rgba(200, 195, 220, 0.15);
+    --color-accent: #6366F1;
+    --color-accent-light: rgba(99, 102, 241, 0.08);
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    --color-error: #EF4444;
+    --shadow-card: 0 4px 16px rgba(100,80,160,0.06), 0 1px 4px rgba(100,80,160,0.03);
+    --shadow-elevated: 0 8px 32px rgba(100,80,160,0.08), 0 2px 8px rgba(100,80,160,0.04);
+    --gradient-page: linear-gradient(145deg, #E8D5F5 0%, #DBC8F0 15%, #D0C0F0 30%, #C8C5F5 45%, #C0D0F8 60%, #C5DBF5 75%, #D0E5F8 90%, #D8E8FA 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    background: var(--gradient-page);
+    min-height: 100vh;
+    color: var(--color-text-primary);
+    padding: 32px 24px;
+  }
+
+  .page-title {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+  .page-subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin-bottom: 40px;
+  }
+
+  .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .option-wrapper {
+    position: relative;
+  }
+
+  .option-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-accent);
+    background: rgba(99,102,241,0.08);
+    padding: 4px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .option-desc {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  /* The card mimics the NarrativeCard bubble */
+  .card {
+    background: rgba(255,255,255,0.55);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: 0 2px 12px rgba(100,80,160,0.04);
+    overflow: hidden;
+    padding: 20px;
+  }
+
+  /* Confidence header */
+  .conf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .conf-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .conf-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #10B981;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.15);
+  }
+  .conf-text {
+    font-size: 11px;
+    font-weight: 500;
+    color: #059669;
+  }
+  .row-count {
+    font-size: 11px;
+    color: var(--color-text-muted);
+  }
+
+  /* Headline */
+  .headline {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+    margin-bottom: 8px;
+  }
+
+  /* Narrative body */
+  .narrative {
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: #44403C;
+    margin-bottom: 16px;
+  }
+  .narrative strong { color: var(--color-text-primary); }
+
+  /* ===== MINI VIZ SECTION ===== */
+  .mini-viz {
+    border-radius: 11px;
+    padding: 14px;
+    margin-bottom: 16px;
+    background: rgba(99,102,241,0.035);
+  }
+  .mini-viz-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 10px;
+  }
+
+  /* Current mini chart bars */
+  .mini-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    height: 72px;
+    margin-bottom: 6px;
+  }
+  .mini-bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    height: 100%;
+    text-align: center;
+  }
+  .mini-bar {
+    width: 100%;
+    max-width: 44px;
+    border-radius: 4px 4px 0 0;
+  }
+  .mini-bar-labels {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .mini-bar-label-col {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+  }
+  .mini-bar-val {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  .mini-bar-name {
+    font-size: 9px;
+    margin-top: 2px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ===== OPTION 1: SPARKLINE TABLE ===== */
+  .spark-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .spark-table th {
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #78716C;
+    padding: 6px 10px;
+    border-bottom: 1px solid #E7E5E4;
+    background: rgba(245,245,244,0.5);
+  }
+  .spark-table th:last-child { text-align: left; }
+  .spark-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid rgba(231,229,228,0.4);
+    color: #44403C;
+    white-space: nowrap;
+  }
+  .spark-table tr:hover { background: rgba(245,245,244,0.4); }
+  .spark-table .rank {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    width: 28px;
+  }
+  .spark-table .value {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    width: 100px;
+  }
+  .spark-table .bar-cell {
+    width: 40%;
+    padding-right: 16px;
+  }
+  .spark-bar-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .spark-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ===== OPTION 2: KPI SUMMARY CARDS ===== */
+  .kpi-row {
+    display: flex;
+    gap: 10px;
+  }
+  .kpi-card {
+    flex: 1;
+    border-radius: 10px;
+    padding: 12px 14px;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .kpi-card-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .kpi-card-label .arrow { font-size: 13px; }
+  .kpi-card-name {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-bottom: 2px;
+  }
+  .kpi-card-value {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi-card-sub {
+    font-size: 10px;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+  }
+
+  /* ===== OPTION 3: HEATMAP STRIP ===== */
+  .heatmap-strip {
+    display: flex;
+    gap: 3px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .heatmap-cell {
+    flex: 1;
+    padding: 10px 8px;
+    text-align: center;
+    min-width: 0;
+    transition: transform 0.15s ease;
+  }
+  .heatmap-cell:hover {
+    transform: scale(1.03);
+    z-index: 1;
+  }
+  .heatmap-cell-name {
+    font-size: 10px;
+    font-weight: 600;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .heatmap-cell-val {
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ===== OPTION 4: RANKED LIST ===== */
+  .ranked-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ranked-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+  }
+  .ranked-num {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    width: 20px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .ranked-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    width: 80px;
+  }
+  .ranked-bar-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ranked-bar-track {
+    flex: 1;
+    height: 8px;
+    background: rgba(0,0,0,0.03);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .ranked-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ranked-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    width: 70px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .ranked-pct {
+    font-size: 10px;
+    color: var(--color-text-muted);
+    width: 36px;
+    text-align: right;
+  }
+
+  /* ===== PILLS ===== */
+  .pills {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0,0,0,0.04);
+  }
+  .pill {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.04);
+    background: rgba(0,0,0,0.02);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pill.primary {
+    color: #6366F1;
+    background: rgba(99,102,241,0.06);
+    border-color: rgba(99,102,241,0.1);
+    font-weight: 500;
+  }
+  .pill.copy { margin-left: auto; }
+
+  /* Extras / insight block */
+  .insight-block {
+    font-size: 13px;
+    line-height: 1.65;
+    margin-bottom: 10px;
+    padding: 6px 12px;
+    color: var(--color-text-secondary);
+    border-left: 2.5px solid rgba(99,102,241,0.2);
+    border-radius: 0 7px 7px 0;
+    background: rgba(99,102,241,0.02);
+  }
+
+  /* Divider between options */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(99,102,241,0.15), transparent);
+    margin: 8px 0;
+  }
+
+  /* Nav tabs at top */
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .nav-tab {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.5);
+    border: 1px solid rgba(200,195,220,0.2);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .nav-tab:hover {
+    background: rgba(255,255,255,0.8);
+    color: var(--color-text-primary);
+  }
+  .nav-tab.active {
+    background: white;
+    color: var(--color-accent);
+    border-color: rgba(99,102,241,0.2);
+    box-shadow: 0 2px 8px rgba(100,80,160,0.06);
+    font-weight: 600;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ===== OPTION 6: HORIZONTAL BAR CHART ===== */
+  .hbar-list { display: flex; flex-direction: column; gap: 8px; }
+  .hbar-item { display: flex; align-items: center; gap: 10px; }
+  .hbar-label {
+    font-size: 12px; font-weight: 500; color: var(--color-text-primary);
+    width: 70px; text-align: right; white-space: nowrap;
+  }
+  .hbar-track {
+    flex: 1; height: 22px; background: rgba(0,0,0,0.025); border-radius: 6px;
+    overflow: hidden; position: relative;
+  }
+  .hbar-fill {
+    height: 100%; border-radius: 6px; display: flex; align-items: center;
+    padding-left: 8px; font-size: 11px; font-weight: 600; color: white;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    min-width: fit-content;
+  }
+
+  /* ===== OPTION 7: DONUT SUMMARY ===== */
+  .donut-row { display: flex; align-items: center; gap: 20px; }
+  .donut-svg-wrap { flex-shrink: 0; position: relative; width: 110px; height: 110px; }
+  .donut-center {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .donut-center-val { font-size: 16px; font-weight: 700; color: var(--color-text-primary); }
+  .donut-center-label { font-size: 9px; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .donut-legend { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+  .donut-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .donut-legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .donut-legend-name { color: var(--color-text-secondary); flex: 1; }
+  .donut-legend-val { font-weight: 600; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
+  .donut-legend-pct { font-size: 10px; color: var(--color-text-muted); width: 32px; text-align: right; }
+
+  /* ===== OPTION 8: STACKED SEGMENT BAR ===== */
+  .segment-bar-wrap { margin-bottom: 10px; }
+  .segment-bar {
+    display: flex; height: 28px; border-radius: 8px; overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .segment-piece {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600; color: white;
+    transition: flex 0.5s ease; position: relative;
+    min-width: 36px;
+  }
+  .segment-piece:hover { filter: brightness(1.1); }
+  .segment-labels {
+    display: flex; margin-top: 8px; gap: 12px; flex-wrap: wrap;
+  }
+  .segment-label-item {
+    display: flex; align-items: center; gap: 5px; font-size: 11px;
+  }
+  .segment-label-dot { width: 8px; height: 8px; border-radius: 3px; flex-shrink: 0; }
+  .segment-label-text { color: var(--color-text-secondary); }
+  .segment-label-val { font-weight: 600; color: var(--color-text-primary); }
+
+  /* ===== OPTION 9: VALUE PILLS ===== */
+  .value-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .value-pill {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 10px 16px; border-radius: 12px; border: 1px solid;
+    min-width: 90px; transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .value-pill:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+  .value-pill-name {
+    font-size: 11px; font-weight: 500; margin-bottom: 4px;
+  }
+  .value-pill-val {
+    font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+  .value-pill-pct {
+    font-size: 9px; margin-top: 2px;
+    opacity: 0.7;
+  }
+
+  /* ===== OPTION 10: COMPARISON DELTA CARDS ===== */
+  .delta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+  .delta-card {
+    border-radius: 10px; padding: 12px; text-align: center;
+    background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.04);
+  }
+  .delta-card-rank {
+    font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--color-text-muted); margin-bottom: 4px;
+  }
+  .delta-card-name { font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 2px; }
+  .delta-card-val { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+  .delta-card-delta {
+    display: inline-flex; align-items: center; gap: 2px;
+    font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+  }
+
+  /* ===== OPTION 11: MINI DASHBOARD GRID ===== */
+  .mini-dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .mini-dash-card {
+    border-radius: 10px; padding: 12px 14px;
+    background: rgba(255,255,255,0.5); border: 1px solid rgba(0,0,0,0.04);
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .mini-dash-card.span-2 { grid-column: span 2; flex-direction: row; align-items: center; gap: 16px; }
+  .mini-dash-label { font-size: 10px; font-weight: 500; color: var(--color-text-muted); }
+  .mini-dash-val { font-size: 20px; font-weight: 700; color: var(--color-text-primary); font-variant-numeric: tabular-nums; }
+  .mini-dash-sub { font-size: 10px; color: var(--color-text-muted); }
+  .mini-dash-trend {
+    display: flex; align-items: flex-end; gap: 2px; height: 24px; margin-top: 4px;
+  }
+  .mini-dash-trend-bar {
+    flex: 1; border-radius: 2px 2px 0 0; min-width: 4px;
+    background: rgba(99,102,241,0.25);
+  }
+  .mini-dash-trend-bar.highlight { background: var(--color-accent); }
+</style>
+</head>
+<body>
+
+<div class="page-title">Mini Chart Replacement Options</div>
+<div class="page-subtitle">Each option replaces the current bar chart in the NarrativeCard. Click tabs to compare.</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="show('current')">Current</button>
+  <button class="nav-tab" onclick="show('sparkline')">1. Sparkline Table</button>
+  <button class="nav-tab" onclick="show('kpi')">2. KPI Cards</button>
+  <button class="nav-tab" onclick="show('heatmap')">3. Heatmap Strip</button>
+  <button class="nav-tab" onclick="show('ranked')">4. Ranked List</button>
+  <button class="nav-tab" onclick="show('none')">5. Remove It</button>
+  <button class="nav-tab" onclick="show('hbar')">6. Horizontal Bars</button>
+  <button class="nav-tab" onclick="show('donut')">7. Donut Chart</button>
+  <button class="nav-tab" onclick="show('segment')">8. Stacked Segment</button>
+  <button class="nav-tab" onclick="show('pills')">9. Value Pills</button>
+  <button class="nav-tab" onclick="show('delta')">10. Delta Cards</button>
+  <button class="nav-tab" onclick="show('minidash')">11. Mini Dashboard</button>
+</div>
+
+<div class="options-grid">
+
+<!-- ======================== CURRENT ======================== -->
+<div id="sec-current" class="section active">
+  <div class="option-label">Current Design</div>
+  <div class="option-desc">The existing mini bar chart — colored bars sorted by value, top 8 rows.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="mini-viz">
+      <div class="mini-viz-title">Revenue by Region</div>
+      <div class="mini-bars">
+        <div class="mini-bar-col"><div class="mini-bar" style="height:100%;background:linear-gradient(180deg,rgba(16,185,129,0.55),rgba(16,185,129,0.25))"></div></div>
+        <div class="mini-bar-col"><div class="mini-bar" style="height:82%;background:linear-gradient(180deg,rgba(16,185,129,0.55),rgba(16,185,129,0.25))"></div></div>
+        <div class="mini-bar-col"><div class="mini-bar" style="height:62%;background:linear-gradient(180deg,rgba(245,158,11,0.55),rgba(245,158,11,0.25))"></div></div>
+        <div class="mini-bar-col"><div class="mini-bar" style="height:44%;background:linear-gradient(180deg,rgba(245,158,11,0.55),rgba(245,158,11,0.25))"></div></div>
+        <div class="mini-bar-col"><div class="mini-bar" style="height:26%;background:linear-gradient(180deg,rgba(239,68,68,0.55),rgba(239,68,68,0.25))"></div></div>
+      </div>
+      <div class="mini-bar-labels">
+        <div class="mini-bar-label-col"><div class="mini-bar-val">$120,450</div><div class="mini-bar-name">North</div></div>
+        <div class="mini-bar-label-col"><div class="mini-bar-val">$98,230</div><div class="mini-bar-name">West</div></div>
+        <div class="mini-bar-label-col"><div class="mini-bar-val">$75,180</div><div class="mini-bar-name">East</div></div>
+        <div class="mini-bar-label-col"><div class="mini-bar-val">$52,670</div><div class="mini-bar-name">South</div></div>
+        <div class="mini-bar-label-col"><div class="mini-bar-val">$31,420</div><div class="mini-bar-name">Central</div></div>
+      </div>
+    </div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== OPTION 1: SPARKLINE TABLE ======================== -->
+<div id="sec-sparkline" class="section">
+  <div class="option-label">Option 1 — Sparkline Table</div>
+  <div class="option-desc">Compact ranked table with inline progress bars. Data-dense: precise values + visual comparison in one view.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="mini-viz">
+      <div class="mini-viz-title">Revenue by Region</div>
+      <table class="spark-table">
+        <thead>
+          <tr><th>#</th><th>Region</th><th style="text-align:right">Revenue</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="rank">1</td><td>North</td><td class="value">$120,450</td><td class="bar-cell"><div class="spark-bar-track"><div class="spark-bar-fill" style="width:100%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div></td></tr>
+          <tr><td class="rank">2</td><td>West</td><td class="value">$98,230</td><td class="bar-cell"><div class="spark-bar-track"><div class="spark-bar-fill" style="width:82%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div></td></tr>
+          <tr><td class="rank">3</td><td>East</td><td class="value">$75,180</td><td class="bar-cell"><div class="spark-bar-track"><div class="spark-bar-fill" style="width:62%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></div></div></td></tr>
+          <tr><td class="rank">4</td><td>South</td><td class="value">$52,670</td><td class="bar-cell"><div class="spark-bar-track"><div class="spark-bar-fill" style="width:44%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></div></div></td></tr>
+          <tr><td class="rank">5</td><td>Central</td><td class="value">$31,420</td><td class="bar-cell"><div class="spark-bar-track"><div class="spark-bar-fill" style="width:26%;background:linear-gradient(90deg,#EF4444,#F87171)"></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== OPTION 2: KPI CARDS ======================== -->
+<div id="sec-kpi" class="section">
+  <div class="option-label">Option 2 — KPI Summary Cards</div>
+  <div class="option-desc">3 highlight cards: Highest, Lowest, Average. Instant executive glance — loses mid-range detail.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="mini-viz">
+      <div class="mini-viz-title">Revenue by Region</div>
+      <div class="kpi-row">
+        <div class="kpi-card" style="background:rgba(16,185,129,0.04);border-color:rgba(16,185,129,0.12)">
+          <div class="kpi-card-label" style="color:#059669"><span class="arrow">&#9650;</span> Highest</div>
+          <div class="kpi-card-name">North</div>
+          <div class="kpi-card-value" style="color:#059669">$120,450</div>
+        </div>
+        <div class="kpi-card" style="background:rgba(239,68,68,0.04);border-color:rgba(239,68,68,0.12)">
+          <div class="kpi-card-label" style="color:#DC2626"><span class="arrow">&#9660;</span> Lowest</div>
+          <div class="kpi-card-name">Central</div>
+          <div class="kpi-card-value" style="color:#DC2626">$31,420</div>
+        </div>
+        <div class="kpi-card" style="background:rgba(99,102,241,0.04);border-color:rgba(99,102,241,0.12)">
+          <div class="kpi-card-label" style="color:#6366F1">&#216; Average</div>
+          <div class="kpi-card-name">5 regions</div>
+          <div class="kpi-card-value" style="color:#6366F1">$75,590</div>
+          <div class="kpi-card-sub">Total: $377,950</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== OPTION 3: HEATMAP STRIP ======================== -->
+<div id="sec-heatmap" class="section">
+  <div class="option-label">Option 3 — Heatmap Strip</div>
+  <div class="option-desc">Single-row color gradient — most compact, very glanceable. Hover for detail.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="mini-viz">
+      <div class="mini-viz-title">Revenue by Region</div>
+      <div class="heatmap-strip">
+        <div class="heatmap-cell" style="background:rgba(16,185,129,0.18);border-radius:8px 0 0 8px">
+          <div class="heatmap-cell-name" style="color:#047857">North</div>
+          <div class="heatmap-cell-val" style="color:#047857">$120K</div>
+        </div>
+        <div class="heatmap-cell" style="background:rgba(16,185,129,0.12)">
+          <div class="heatmap-cell-name" style="color:#059669">West</div>
+          <div class="heatmap-cell-val" style="color:#059669">$98K</div>
+        </div>
+        <div class="heatmap-cell" style="background:rgba(245,158,11,0.12)">
+          <div class="heatmap-cell-name" style="color:#B45309">East</div>
+          <div class="heatmap-cell-val" style="color:#B45309">$75K</div>
+        </div>
+        <div class="heatmap-cell" style="background:rgba(245,158,11,0.08)">
+          <div class="heatmap-cell-name" style="color:#D97706">South</div>
+          <div class="heatmap-cell-val" style="color:#D97706">$53K</div>
+        </div>
+        <div class="heatmap-cell" style="background:rgba(239,68,68,0.10);border-radius:0 8px 8px 0">
+          <div class="heatmap-cell-name" style="color:#DC2626">Central</div>
+          <div class="heatmap-cell-val" style="color:#DC2626">$31K</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== OPTION 4: RANKED LIST ======================== -->
+<div id="sec-ranked" class="section">
+  <div class="option-label">Option 4 — Ranked List</div>
+  <div class="option-desc">Clean leaderboard with progress bars and relative %. Scannable and intuitive.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="mini-viz">
+      <div class="mini-viz-title">Revenue by Region</div>
+      <div class="ranked-list">
+        <div class="ranked-item">
+          <span class="ranked-num">1</span>
+          <span class="ranked-name">North</span>
+          <div class="ranked-bar-area">
+            <div class="ranked-bar-track"><div class="ranked-bar-fill" style="width:100%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div>
+          </div>
+          <span class="ranked-value">$120,450</span>
+          <span class="ranked-pct">100%</span>
+        </div>
+        <div class="ranked-item">
+          <span class="ranked-num">2</span>
+          <span class="ranked-name">West</span>
+          <div class="ranked-bar-area">
+            <div class="ranked-bar-track"><div class="ranked-bar-fill" style="width:82%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div>
+          </div>
+          <span class="ranked-value">$98,230</span>
+          <span class="ranked-pct">82%</span>
+        </div>
+        <div class="ranked-item">
+          <span class="ranked-num">3</span>
+          <span class="ranked-name">East</span>
+          <div class="ranked-bar-area">
+            <div class="ranked-bar-track"><div class="ranked-bar-fill" style="width:62%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></div></div>
+          </div>
+          <span class="ranked-value">$75,180</span>
+          <span class="ranked-pct">62%</span>
+        </div>
+        <div class="ranked-item">
+          <span class="ranked-num">4</span>
+          <span class="ranked-name">South</span>
+          <div class="ranked-bar-area">
+            <div class="ranked-bar-track"><div class="ranked-bar-fill" style="width:44%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></div></div>
+          </div>
+          <span class="ranked-value">$52,670</span>
+          <span class="ranked-pct">44%</span>
+        </div>
+        <div class="ranked-item">
+          <span class="ranked-num">5</span>
+          <span class="ranked-name">Central</span>
+          <div class="ranked-bar-area">
+            <div class="ranked-bar-track"><div class="ranked-bar-fill" style="width:26%;background:linear-gradient(90deg,#EF4444,#F87171)"></div></div>
+          </div>
+          <span class="ranked-value">$31,420</span>
+          <span class="ranked-pct">26%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== OPTION 5: REMOVE IT ======================== -->
+<div id="sec-none" class="section">
+  <div class="option-label">Option 5 — Remove It</div>
+  <div class="option-desc">No mini visualization. The full data table (expanded by default above) + narrative are enough.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <!-- No mini-viz at all -->
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== OPTION 6: HORIZONTAL BARS ======================== -->
+<div id="sec-hbar" class="section">
+  <div class="option-label">Option 6 — Horizontal Bar Chart</div>
+  <div class="option-desc">Classic horizontal bars with values inside. Clear, familiar, works well with long labels.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="mini-viz">
+      <div class="mini-viz-title">Revenue by Region</div>
+      <div class="hbar-list">
+        <div class="hbar-item">
+          <span class="hbar-label">North</span>
+          <div class="hbar-track"><div class="hbar-fill" style="width:100%;background:linear-gradient(90deg,#10B981,#34D399)">$120,450</div></div>
+        </div>
+        <div class="hbar-item">
+          <span class="hbar-label">West</span>
+          <div class="hbar-track"><div class="hbar-fill" style="width:82%;background:linear-gradient(90deg,#10B981,#6EE7B7)">$98,230</div></div>
+        </div>
+        <div class="hbar-item">
+          <span class="hbar-label">East</span>
+          <div class="hbar-track"><div class="hbar-fill" style="width:62%;background:linear-gradient(90deg,#F59E0B,#FBBF24)">$75,180</div></div>
+        </div>
+        <div class="hbar-item">
+          <span class="hbar-label">South</span>
+          <div class="hbar-track"><div class="hbar-fill" style="width:44%;background:linear-gradient(90deg,#F59E0B,#FCD34D)">$52,670</div></div>
+        </div>
+        <div class="hbar-item">
+          <span class="hbar-label">Central</span>
+          <div class="hbar-track"><div class="hbar-fill" style="width:26%;background:linear-gradient(90deg,#EF4444,#F87171)">$31,420</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== OPTION 7: DONUT CHART ======================== -->
+<div id="sec-donut" class="section">
+  <div class="option-label">Option 7 — Donut Chart</div>
+  <div class="option-desc">Proportional ring with total in center + legend. Great for showing share of whole.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="mini-viz">
+      <div class="mini-viz-title">Revenue by Region</div>
+      <div class="donut-row">
+        <div class="donut-svg-wrap">
+          <svg viewBox="0 0 42 42" width="110" height="110">
+            <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="rgba(0,0,0,0.03)" stroke-width="5"></circle>
+            <!-- North: 31.9% → stroke-dasharray: 31.9 68.1, offset 0 -->
+            <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#10B981" stroke-width="5" stroke-dasharray="31.9 68.1" stroke-dashoffset="25" stroke-linecap="round"></circle>
+            <!-- West: 26% → offset shifts -->
+            <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#34D399" stroke-width="5" stroke-dasharray="26 74" stroke-dashoffset="-6.9" stroke-linecap="round"></circle>
+            <!-- East: 19.9% -->
+            <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#F59E0B" stroke-width="5" stroke-dasharray="19.9 80.1" stroke-dashoffset="-32.9" stroke-linecap="round"></circle>
+            <!-- South: 13.9% -->
+            <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#FBBF24" stroke-width="5" stroke-dasharray="13.9 86.1" stroke-dashoffset="-52.8" stroke-linecap="round"></circle>
+            <!-- Central: 8.3% -->
+            <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="#EF4444" stroke-width="5" stroke-dasharray="8.3 91.7" stroke-dashoffset="-66.7" stroke-linecap="round"></circle>
+          </svg>
+          <div class="donut-center">
+            <div class="donut-center-val">$378K</div>
+            <div class="donut-center-label">Total</div>
+          </div>
+        </div>
+        <div class="donut-legend">
+          <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#10B981"></div><span class="donut-legend-name">North</span><span class="donut-legend-val">$120,450</span><span class="donut-legend-pct">32%</span></div>
+          <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#34D399"></div><span class="donut-legend-name">West</span><span class="donut-legend-val">$98,230</span><span class="donut-legend-pct">26%</span></div>
+          <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#F59E0B"></div><span class="donut-legend-name">East</span><span class="donut-legend-val">$75,180</span><span class="donut-legend-pct">20%</span></div>
+          <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#FBBF24"></div><span class="donut-legend-name">South</span><span class="donut-legend-val">$52,670</span><span class="donut-legend-pct">14%</span></div>
+          <div class="donut-legend-item"><div class="donut-legend-dot" style="background:#EF4444"></div><span class="donut-legend-name">Central</span><span class="donut-legend-val">$31,420</span><span class="donut-legend-pct">8%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== OPTION 8: STACKED SEGMENT BAR ======================== -->
+<div id="sec-segment" class="section">
+  <div class="option-label">Option 8 — Stacked Segment Bar</div>
+  <div class="option-desc">Single horizontal bar divided into proportional segments. Ultra-compact, shows share of whole.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="mini-viz">
+      <div class="mini-viz-title">Revenue by Region — Total $377,950</div>
+      <div class="segment-bar-wrap">
+        <div class="segment-bar">
+          <div class="segment-piece" style="flex:31.9;background:#10B981" title="North: $120,450">32%</div>
+          <div class="segment-piece" style="flex:26;background:#34D399" title="West: $98,230">26%</div>
+          <div class="segment-piece" style="flex:19.9;background:#F59E0B" title="East: $75,180">20%</div>
+          <div class="segment-piece" style="flex:13.9;background:#FBBF24;color:#92400E" title="South: $52,670">14%</div>
+          <div class="segment-piece" style="flex:8.3;background:#EF4444" title="Central: $31,420">8%</div>
+        </div>
+        <div class="segment-labels">
+          <div class="segment-label-item"><div class="segment-label-dot" style="background:#10B981"></div><span class="segment-label-text">North</span><span class="segment-label-val">$120K</span></div>
+          <div class="segment-label-item"><div class="segment-label-dot" style="background:#34D399"></div><span class="segment-label-text">West</span><span class="segment-label-val">$98K</span></div>
+          <div class="segment-label-item"><div class="segment-label-dot" style="background:#F59E0B"></div><span class="segment-label-text">East</span><span class="segment-label-val">$75K</span></div>
+          <div class="segment-label-item"><div class="segment-label-dot" style="background:#FBBF24"></div><span class="segment-label-text">South</span><span class="segment-label-val">$53K</span></div>
+          <div class="segment-label-item"><div class="segment-label-dot" style="background:#EF4444"></div><span class="segment-label-text">Central</span><span class="segment-label-val">$31K</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== OPTION 9: VALUE PILLS ======================== -->
+<div id="sec-pills" class="section">
+  <div class="option-label">Option 9 — Value Pills</div>
+  <div class="option-desc">Color-coded badge/pill per item. Playful, compact, easy to scan. Color intensity maps to value.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="mini-viz">
+      <div class="mini-viz-title">Revenue by Region</div>
+      <div class="value-pills">
+        <div class="value-pill" style="background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.2);color:#047857">
+          <span class="value-pill-name">North</span>
+          <span class="value-pill-val">$120,450</span>
+          <span class="value-pill-pct">32% of total</span>
+        </div>
+        <div class="value-pill" style="background:rgba(16,185,129,0.05);border-color:rgba(16,185,129,0.15);color:#059669">
+          <span class="value-pill-name">West</span>
+          <span class="value-pill-val">$98,230</span>
+          <span class="value-pill-pct">26% of total</span>
+        </div>
+        <div class="value-pill" style="background:rgba(245,158,11,0.06);border-color:rgba(245,158,11,0.15);color:#B45309">
+          <span class="value-pill-name">East</span>
+          <span class="value-pill-val">$75,180</span>
+          <span class="value-pill-pct">20% of total</span>
+        </div>
+        <div class="value-pill" style="background:rgba(245,158,11,0.04);border-color:rgba(245,158,11,0.12);color:#D97706">
+          <span class="value-pill-name">South</span>
+          <span class="value-pill-val">$52,670</span>
+          <span class="value-pill-pct">14% of total</span>
+        </div>
+        <div class="value-pill" style="background:rgba(239,68,68,0.05);border-color:rgba(239,68,68,0.15);color:#DC2626">
+          <span class="value-pill-name">Central</span>
+          <span class="value-pill-val">$31,420</span>
+          <span class="value-pill-pct">8% of total</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== OPTION 10: DELTA CARDS ======================== -->
+<div id="sec-delta" class="section">
+  <div class="option-label">Option 10 — Comparison Delta Cards</div>
+  <div class="option-desc">Grid of cards showing each value with a delta badge (% vs top performer). Great for spotting gaps.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="mini-viz">
+      <div class="mini-viz-title">Revenue by Region</div>
+      <div class="delta-grid">
+        <div class="delta-card" style="border-left:3px solid #10B981">
+          <div class="delta-card-rank">#1</div>
+          <div class="delta-card-name">North</div>
+          <div class="delta-card-val" style="color:#047857">$120,450</div>
+          <div class="delta-card-delta" style="background:rgba(16,185,129,0.1);color:#059669">&#9733; Leader</div>
+        </div>
+        <div class="delta-card" style="border-left:3px solid #34D399">
+          <div class="delta-card-rank">#2</div>
+          <div class="delta-card-name">West</div>
+          <div class="delta-card-val" style="color:#059669">$98,230</div>
+          <div class="delta-card-delta" style="background:rgba(16,185,129,0.08);color:#059669">-18%</div>
+        </div>
+        <div class="delta-card" style="border-left:3px solid #F59E0B">
+          <div class="delta-card-rank">#3</div>
+          <div class="delta-card-name">East</div>
+          <div class="delta-card-val" style="color:#B45309">$75,180</div>
+          <div class="delta-card-delta" style="background:rgba(245,158,11,0.1);color:#D97706">-38%</div>
+        </div>
+        <div class="delta-card" style="border-left:3px solid #FBBF24">
+          <div class="delta-card-rank">#4</div>
+          <div class="delta-card-name">South</div>
+          <div class="delta-card-val" style="color:#D97706">$52,670</div>
+          <div class="delta-card-delta" style="background:rgba(245,158,11,0.1);color:#D97706">-56%</div>
+        </div>
+        <div class="delta-card" style="border-left:3px solid #EF4444">
+          <div class="delta-card-rank">#5</div>
+          <div class="delta-card-name">Central</div>
+          <div class="delta-card-val" style="color:#DC2626">$31,420</div>
+          <div class="delta-card-delta" style="background:rgba(239,68,68,0.1);color:#DC2626">-74%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== OPTION 11: MINI DASHBOARD GRID ======================== -->
+<div id="sec-minidash" class="section">
+  <div class="option-label">Option 11 — Mini Dashboard Grid</div>
+  <div class="option-desc">2x3 card grid with key stats, mini trend bars, and summary. Feels like an embedded dashboard.</div>
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="mini-viz">
+      <div class="mini-viz-title">Revenue by Region</div>
+      <div class="mini-dash-grid">
+        <div class="mini-dash-card">
+          <span class="mini-dash-label">Highest</span>
+          <span class="mini-dash-val" style="color:#059669">$120,450</span>
+          <span class="mini-dash-sub">North</span>
+        </div>
+        <div class="mini-dash-card">
+          <span class="mini-dash-label">Lowest</span>
+          <span class="mini-dash-val" style="color:#DC2626">$31,420</span>
+          <span class="mini-dash-sub">Central</span>
+        </div>
+        <div class="mini-dash-card">
+          <span class="mini-dash-label">Average</span>
+          <span class="mini-dash-val" style="color:#6366F1">$75,590</span>
+          <span class="mini-dash-sub">across 5 regions</span>
+        </div>
+        <div class="mini-dash-card">
+          <span class="mini-dash-label">Spread</span>
+          <span class="mini-dash-val" style="color:#D97706">$89,030</span>
+          <span class="mini-dash-sub">max − min gap</span>
+        </div>
+        <div class="mini-dash-card span-2">
+          <div style="flex:1">
+            <span class="mini-dash-label">Distribution</span>
+            <span class="mini-dash-sub">Sorted high → low</span>
+          </div>
+          <div class="mini-dash-trend" style="flex:2">
+            <div class="mini-dash-trend-bar highlight" style="height:100%"></div>
+            <div class="mini-dash-trend-bar highlight" style="height:82%"></div>
+            <div class="mini-dash-trend-bar" style="height:62%"></div>
+            <div class="mini-dash-trend-bar" style="height:44%"></div>
+            <div class="mini-dash-trend-bar" style="height:26%"></div>
+          </div>
+          <div style="display:flex;gap:12px;font-size:10px;color:var(--color-text-muted)">
+            <span>N</span><span>W</span><span>E</span><span>S</span><span>C</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <div class="pills">
+      <button class="pill primary">&#x25BC; Table</button>
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /options-grid -->
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>

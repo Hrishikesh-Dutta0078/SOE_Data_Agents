@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Dashboard Mock — Full NarrativeCard Layout</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-bg: #FAFAF9;
+    --color-surface: #FFFFFF;
+    --color-text-primary: #1a1a2e;
+    --color-text-secondary: #6B6B88;
+    --color-text-muted: #8B8BA0;
+    --color-text-faint: #B0B0C8;
+    --color-border: rgba(200, 195, 220, 0.25);
+    --color-accent: #6366F1;
+    --color-accent-light: rgba(99, 102, 241, 0.08);
+    --color-success: #10B981;
+    --color-warning: #F59E0B;
+    --color-error: #EF4444;
+    --shadow-card: 0 4px 16px rgba(100,80,160,0.06), 0 1px 4px rgba(100,80,160,0.03);
+    --gradient-page: linear-gradient(145deg, #E8D5F5 0%, #DBC8F0 15%, #D0C0F0 30%, #C8C5F5 45%, #C0D0F8 60%, #C5DBF5 75%, #D0E5F8 90%, #D8E8FA 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body {
+    font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    background: var(--gradient-page);
+    min-height: 100vh;
+    color: var(--color-text-primary);
+    padding: 32px 24px;
+  }
+
+  .page-title { text-align: center; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .page-subtitle { text-align: center; font-size: 13px; color: var(--color-text-muted); margin-bottom: 36px; }
+
+  /* Nav tabs */
+  .nav-tabs { display: flex; gap: 4px; justify-content: center; margin-bottom: 32px; flex-wrap: wrap; }
+  .nav-tab {
+    font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 10px;
+    background: rgba(255,255,255,0.5); border: 1px solid rgba(200,195,220,0.2);
+    color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s ease;
+  }
+  .nav-tab:hover { background: rgba(255,255,255,0.8); color: var(--color-text-primary); }
+  .nav-tab.active { background: white; color: var(--color-accent); border-color: rgba(99,102,241,0.2); box-shadow: 0 2px 8px rgba(100,80,160,0.06); font-weight: 600; }
+
+  .section { display: none; max-width: 720px; margin: 0 auto; }
+  .section.active { display: block; }
+  .section-label {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; font-weight: 600; color: var(--color-accent);
+    background: rgba(99,102,241,0.08); padding: 4px 12px; border-radius: 8px;
+    margin-bottom: 8px; letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .section-desc { font-size: 12px; color: var(--color-text-muted); margin-bottom: 14px; line-height: 1.5; }
+
+  /* ===== CARD (NarrativeCard bubble) ===== */
+  .card {
+    background: rgba(255,255,255,0.55); border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.5);
+    box-shadow: 0 2px 12px rgba(100,80,160,0.04);
+    overflow: hidden; padding: 20px;
+  }
+  .conf-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .conf-badge { display: flex; align-items: center; gap: 6px; }
+  .conf-dot { width: 7px; height: 7px; border-radius: 50%; background: #10B981; box-shadow: 0 0 0 3px rgba(16,185,129,0.15); }
+  .conf-text { font-size: 11px; font-weight: 500; color: #059669; }
+  .row-count { font-size: 11px; color: var(--color-text-muted); }
+
+  /* ===== DATA TABLE (shown first, collapsible) ===== */
+  .table-section { margin-bottom: 16px; }
+  .table-toggle {
+    font-size: 11px; font-weight: 500; padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(99,102,241,0.1);
+    background: rgba(99,102,241,0.10); color: #6366F1; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-bottom: 8px;
+  }
+  .table-toggle.collapsed { background: rgba(99,102,241,0.06); }
+  .data-table {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+    border-radius: 10px; overflow: hidden;
+  }
+  .data-table th {
+    text-align: left; font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; color: #78716C; padding: 7px 12px;
+    border-bottom: 1px solid #E7E5E4; background: rgba(245,245,244,0.6);
+  }
+  .data-table td {
+    padding: 6px 12px; border-bottom: 1px solid rgba(231,229,228,0.4);
+    color: #44403C; white-space: nowrap;
+  }
+  .data-table tr:hover { background: rgba(245,245,244,0.4); }
+  .data-table tr:nth-child(even) { background: rgba(245,245,244,0.2); }
+  .data-table .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+  .table-scroll { overflow-x: auto; max-height: 420px; overflow-y: auto; border-radius: 8px; border: 1px solid rgba(231,229,228,0.5); }
+  .table-scroll::-webkit-scrollbar { height: 5px; width: 5px; }
+  .table-scroll::-webkit-scrollbar-track { background: transparent; }
+  .table-scroll::-webkit-scrollbar-thumb { background: rgba(180,175,210,0.4); border-radius: 3px; }
+  .table-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 10px; color: var(--color-text-muted); margin-top: 8px; padding: 0 2px;
+  }
+  .table-actions { display: flex; gap: 6px; justify-content: flex-end; margin-bottom: 4px; }
+  .table-action {
+    font-size: 10px; color: #78716C; background: none; border: none; cursor: pointer;
+    display: flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 4px;
+  }
+  .table-action:hover { background: rgba(0,0,0,0.04); color: #44403C; }
+  .pagination { display: flex; align-items: center; gap: 4px; }
+  .page-btn {
+    font-size: 10px; padding: 3px 9px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.06);
+    background: white; color: var(--color-text-secondary); cursor: pointer; min-width: 28px; text-align: center;
+    transition: all 0.15s ease;
+  }
+  .page-btn:hover:not(:disabled):not(.active) { background: rgba(99,102,241,0.06); color: var(--color-accent); border-color: rgba(99,102,241,0.15); }
+  .page-btn.active { background: var(--color-accent); color: white; border-color: var(--color-accent); font-weight: 600; }
+  .page-btn:disabled { opacity: 0.3; cursor: default; }
+  .page-btn.nav { font-weight: 600; padding: 3px 8px; }
+  .page-info { font-size: 10px; color: var(--color-text-muted); }
+
+  /* ===== MINI DASHBOARD ===== */
+  .mini-dash { border-radius: 11px; padding: 14px; margin-bottom: 16px; background: rgba(99,102,241,0.035); }
+  .mini-dash-title { font-size: 11px; font-weight: 500; color: var(--color-text-muted); margin-bottom: 10px; }
+
+  .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .kpi-card {
+    border-radius: 10px; padding: 10px 12px; background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(0,0,0,0.04); display: flex; flex-direction: column; gap: 1px;
+  }
+  .kpi-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; display: flex; align-items: center; gap: 4px; }
+  .kpi-label .icon { font-size: 11px; }
+  .kpi-sublabel { font-size: 10px; color: var(--color-text-muted); margin-top: 1px; }
+  .kpi-value { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; margin-top: 2px; }
+
+  /* Ranking */
+  .ranking-section { margin-top: 10px; }
+  .ranking-header { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-text-muted); margin-bottom: 6px; }
+  .ranking-list { display: flex; flex-direction: column; gap: 5px; }
+  .ranking-item { display: flex; align-items: center; gap: 8px; }
+  .ranking-num { font-size: 11px; font-weight: 700; color: var(--color-text-muted); width: 16px; text-align: right; font-variant-numeric: tabular-nums; }
+  .ranking-name { font-size: 12px; font-weight: 500; color: var(--color-text-primary); width: 72px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ranking-bar-area { flex: 1; display: flex; align-items: center; }
+  .ranking-bar-track { width: 100%; height: 7px; background: rgba(0,0,0,0.03); border-radius: 4px; overflow: hidden; }
+  .ranking-bar-fill { height: 100%; border-radius: 4px; }
+  .ranking-value { font-size: 11px; font-weight: 600; color: var(--color-text-primary); width: 68px; text-align: right; font-variant-numeric: tabular-nums; }
+  .ranking-pct { font-size: 10px; color: var(--color-text-muted); width: 34px; text-align: right; }
+
+  /* ===== HEADLINE + NARRATIVE ===== */
+  .headline { font-size: 17px; font-weight: 700; line-height: 1.3; color: var(--color-text-primary); letter-spacing: -0.01em; margin-bottom: 8px; }
+  .narrative { font-size: 13.5px; line-height: 1.65; color: #44403C; margin-bottom: 16px; }
+  .narrative strong { color: var(--color-text-primary); }
+  .insight-block {
+    font-size: 13px; line-height: 1.65; margin-bottom: 10px; padding: 6px 12px;
+    color: var(--color-text-secondary); border-left: 2.5px solid rgba(99,102,241,0.2);
+    border-radius: 0 7px 7px 0; background: rgba(99,102,241,0.02);
+  }
+  .insight-block strong { color: var(--color-text-primary); }
+
+  /* ===== PILLS ===== */
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; padding-top: 12px; border-top: 1px solid rgba(0,0,0,0.04); }
+  .pill {
+    font-size: 11px; font-weight: 500; padding: 6px 12px; border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.04); background: rgba(0,0,0,0.02);
+    color: var(--color-text-muted); cursor: pointer; display: flex; align-items: center; gap: 4px;
+  }
+  .pill.primary { color: #6366F1; background: rgba(99,102,241,0.06); border-color: rgba(99,102,241,0.1); }
+  .pill.copy { margin-left: auto; }
+
+  /* ===== Separator ===== */
+  .card-sep { height: 1px; background: rgba(0,0,0,0.04); margin: 16px 0; }
+
+  /* ===== Annotations (pointing out what's new) ===== */
+  .annotation {
+    position: relative; margin-bottom: 4px; font-size: 10px; font-weight: 600;
+    color: var(--color-accent); background: rgba(99,102,241,0.06);
+    padding: 3px 8px; border-radius: 4px; display: inline-block; letter-spacing: 0.02em;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-title">Mini Dashboard — Full Card Mock</div>
+<div class="page-subtitle">Three data shapes showing the new NarrativeCard layout: Table first, Mini Dashboard, then Narrative.</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="show('example1')">Revenue by Region (5 rows)</button>
+  <button class="nav-tab" onclick="show('example2')">Monthly Sales (12 rows)</button>
+  <button class="nav-tab" onclick="show('example3')">Single Aggregate (1 row)</button>
+  <button class="nav-tab" onclick="show('example4')">Employee List (25 rows)</button>
+</div>
+
+<!-- ======================== EXAMPLE 1: Revenue by Region ======================== -->
+<div id="sec-example1" class="section active">
+  <div class="section-label">Example 1 — Metric + Dimension (5 rows)</div>
+  <div class="section-desc">Question: "Show me revenue by region"</div>
+
+  <div class="card">
+    <!-- Confidence header -->
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">5 rows</span>
+    </div>
+
+    <!-- ==================== TABLE (shown first, horizontally scrollable) ==================== -->
+    <div class="annotation">DATA TABLE — horizontally scrollable, collapsible</div>
+    <div class="table-section">
+      <button class="table-toggle" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'; this.classList.toggle('collapsed')">
+        &#x25BC; Table &middot; 5 rows
+      </button>
+      <div>
+        <div class="table-actions">
+          <button class="table-action">&#x2913; Excel</button>
+          <button class="table-action">&#x2913; CSV</button>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead><tr><th>Region</th><th style="text-align:right">Revenue</th><th style="text-align:right">Cost</th><th style="text-align:right">Profit</th><th style="text-align:right">Margin %</th><th style="text-align:right">Orders</th><th style="text-align:right">Avg Order Value</th><th style="text-align:right">Employees</th></tr></thead>
+            <tbody>
+              <tr><td>North</td><td class="num">$120,450</td><td class="num">$68,200</td><td class="num">$52,250</td><td class="num">43.4%</td><td class="num">1,842</td><td class="num">$65.39</td><td class="num">245</td></tr>
+              <tr><td>West</td><td class="num">$98,230</td><td class="num">$61,400</td><td class="num">$36,830</td><td class="num">37.5%</td><td class="num">1,523</td><td class="num">$64.50</td><td class="num">198</td></tr>
+              <tr><td>East</td><td class="num">$75,180</td><td class="num">$48,900</td><td class="num">$26,280</td><td class="num">35.0%</td><td class="num">1,189</td><td class="num">$63.23</td><td class="num">156</td></tr>
+              <tr><td>South</td><td class="num">$52,670</td><td class="num">$35,100</td><td class="num">$17,570</td><td class="num">33.4%</td><td class="num">892</td><td class="num">$59.05</td><td class="num">112</td></tr>
+              <tr><td>Central</td><td class="num">$31,420</td><td class="num">$22,800</td><td class="num">$8,620</td><td class="num">27.4%</td><td class="num">534</td><td class="num">$58.84</td><td class="num">78</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span>Showing 1–5 of 5 rows</span>
+          <span style="font-size:9px;color:var(--color-text-faint)">&#x2194; Scroll for more columns</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== MINI DASHBOARD ==================== -->
+    <div class="annotation">MINI DASHBOARD — auto-computed from data</div>
+    <div class="mini-dash">
+      <div class="mini-dash-title">Revenue — Summary</div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-left: 3px solid #10B981">
+          <div class="kpi-label" style="color:#059669"><span class="icon">&#9650;</span> Highest</div>
+          <div class="kpi-sublabel">North</div>
+          <div class="kpi-value" style="color:#047857">$120,450</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #EF4444">
+          <div class="kpi-label" style="color:#DC2626"><span class="icon">&#9660;</span> Lowest</div>
+          <div class="kpi-sublabel">Central</div>
+          <div class="kpi-value" style="color:#DC2626">$31,420</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #6366F1">
+          <div class="kpi-label" style="color:#6366F1"><span class="icon">&Sigma;</span> Total</div>
+          <div class="kpi-sublabel">5 regions</div>
+          <div class="kpi-value" style="color:#4F46E5">$377,950</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #8B5CF6">
+          <div class="kpi-label" style="color:#7C3AED"><span class="icon">&mu;</span> Average</div>
+          <div class="kpi-sublabel">per region</div>
+          <div class="kpi-value" style="color:#7C3AED">$75,590</div>
+        </div>
+      </div>
+
+      <div class="ranking-section">
+        <div class="ranking-header">Ranking</div>
+        <div class="ranking-list">
+          <div class="ranking-item">
+            <span class="ranking-num">1</span><span class="ranking-name">North</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:100%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div></div>
+            <span class="ranking-value">$120,450</span><span class="ranking-pct">100%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">2</span><span class="ranking-name">West</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:82%;background:linear-gradient(90deg,#10B981,#6EE7B7)"></div></div></div>
+            <span class="ranking-value">$98,230</span><span class="ranking-pct">82%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">3</span><span class="ranking-name">East</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:62%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></div></div></div>
+            <span class="ranking-value">$75,180</span><span class="ranking-pct">62%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">4</span><span class="ranking-name">South</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:44%;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div></div></div>
+            <span class="ranking-value">$52,670</span><span class="ranking-pct">44%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">5</span><span class="ranking-name">Central</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:26%;background:linear-gradient(90deg,#EF4444,#F87171)"></div></div></div>
+            <span class="ranking-value">$31,420</span><span class="ranking-pct">26%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== NARRATIVE (below dashboard) ==================== -->
+    <div class="annotation">NARRATIVE — streams in below after dashboard</div>
+    <div class="headline">North region leads with $120K in revenue</div>
+    <div class="narrative"><strong>Revenue distribution across regions</strong> shows a clear leader in the North at $120,450, followed by West ($98,230) and East ($75,180). Central trails at $31,420, representing just 26% of the top performer.</div>
+
+    <div class="insight-block"><strong>Key gap:</strong> Central region's $31K represents a 74% shortfall compared to North. This may indicate under-investment or market-size differences worth investigating.</div>
+
+    <!-- Pills -->
+    <div class="pills">
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== EXAMPLE 2: Monthly Sales ======================== -->
+<div id="sec-example2" class="section">
+  <div class="section-label">Example 2 — Time Series (12 rows)</div>
+  <div class="section-desc">Question: "Show me monthly sales for FY 2025"</div>
+
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">12 rows</span>
+    </div>
+
+    <!-- TABLE (paginated, 10 per page) -->
+    <div class="table-section" id="table2">
+      <button class="table-toggle" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'; this.classList.toggle('collapsed')">
+        &#x25BC; Table &middot; 12 rows
+      </button>
+      <div>
+        <div class="table-actions">
+          <button class="table-action">&#x2913; Excel</button>
+          <button class="table-action">&#x2913; CSV</button>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="paginated-table-2">
+            <thead><tr><th>Month</th><th style="text-align:right">Sales</th><th style="text-align:right">Qty Sold</th><th style="text-align:right">Avg Price</th><th style="text-align:right">Returns</th><th style="text-align:right">Net Sales</th></tr></thead>
+            <tbody>
+              <tr><td>Jan 2025</td><td class="num">$62,400</td><td class="num">1,248</td><td class="num">$50.00</td><td class="num">62</td><td class="num">$59,300</td></tr>
+              <tr><td>Feb 2025</td><td class="num">$71,800</td><td class="num">1,396</td><td class="num">$51.43</td><td class="num">48</td><td class="num">$69,332</td></tr>
+              <tr><td>Mar 2025</td><td class="num">$145,200</td><td class="num">2,720</td><td class="num">$53.38</td><td class="num">95</td><td class="num">$140,128</td></tr>
+              <tr><td>Apr 2025</td><td class="num">$98,500</td><td class="num">1,892</td><td class="num">$52.06</td><td class="num">71</td><td class="num">$94,808</td></tr>
+              <tr><td>May 2025</td><td class="num">$112,300</td><td class="num">2,098</td><td class="num">$53.53</td><td class="num">83</td><td class="num">$107,851</td></tr>
+              <tr><td>Jun 2025</td><td class="num">$88,700</td><td class="num">1,715</td><td class="num">$51.69</td><td class="num">59</td><td class="num">$85,651</td></tr>
+              <tr><td>Jul 2025</td><td class="num">$95,100</td><td class="num">1,802</td><td class="num">$52.77</td><td class="num">64</td><td class="num">$91,724</td></tr>
+              <tr><td>Aug 2025</td><td class="num">$103,400</td><td class="num">1,945</td><td class="num">$53.17</td><td class="num">72</td><td class="num">$99,572</td></tr>
+              <tr><td>Sep 2025</td><td class="num">$118,600</td><td class="num">2,215</td><td class="num">$53.54</td><td class="num">78</td><td class="num">$114,422</td></tr>
+              <tr><td>Oct 2025</td><td class="num">$132,900</td><td class="num">2,480</td><td class="num">$53.59</td><td class="num">88</td><td class="num">$128,184</td></tr>
+              <tr style="display:none"><td>Nov 2025</td><td class="num">$127,500</td><td class="num">2,391</td><td class="num">$53.32</td><td class="num">82</td><td class="num">$123,130</td></tr>
+              <tr style="display:none"><td>Dec 2025</td><td class="num">$78,200</td><td class="num">1,512</td><td class="num">$51.72</td><td class="num">55</td><td class="num">$75,358</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span id="page-info-2">Showing 1–10 of 12 rows</span>
+          <div class="pagination">
+            <button class="page-btn nav" id="prev-2" onclick="goPage2(-1)" disabled>&#x2039;</button>
+            <button class="page-btn active" id="p2-1" onclick="setPage2(1)">1</button>
+            <button class="page-btn" id="p2-2" onclick="setPage2(2)">2</button>
+            <button class="page-btn nav" id="next-2" onclick="goPage2(1)">&#x203A;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINI DASHBOARD -->
+    <div class="mini-dash">
+      <div class="mini-dash-title">Sales — Summary</div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-left: 3px solid #10B981">
+          <div class="kpi-label" style="color:#059669"><span class="icon">&#9650;</span> Peak Month</div>
+          <div class="kpi-sublabel">Mar 2025</div>
+          <div class="kpi-value" style="color:#047857">$145,200</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #EF4444">
+          <div class="kpi-label" style="color:#DC2626"><span class="icon">&#9660;</span> Low Month</div>
+          <div class="kpi-sublabel">Jan 2025</div>
+          <div class="kpi-value" style="color:#DC2626">$62,400</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #6366F1">
+          <div class="kpi-label" style="color:#6366F1"><span class="icon">&Sigma;</span> YTD Total</div>
+          <div class="kpi-sublabel">12 months</div>
+          <div class="kpi-value" style="color:#4F46E5">$1,234,600</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #8B5CF6">
+          <div class="kpi-label" style="color:#7C3AED"><span class="icon">&mu;</span> Monthly Avg</div>
+          <div class="kpi-sublabel">per month</div>
+          <div class="kpi-value" style="color:#7C3AED">$102,883</div>
+        </div>
+      </div>
+
+      <div class="ranking-section">
+        <div class="ranking-header">Ranking (top 8)</div>
+        <div class="ranking-list">
+          <div class="ranking-item">
+            <span class="ranking-num">1</span><span class="ranking-name">Mar 2025</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:100%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div></div>
+            <span class="ranking-value">$145,200</span><span class="ranking-pct">100%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">2</span><span class="ranking-name">Oct 2025</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:92%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div></div>
+            <span class="ranking-value">$132,900</span><span class="ranking-pct">92%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">3</span><span class="ranking-name">Nov 2025</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:88%;background:linear-gradient(90deg,#10B981,#6EE7B7)"></div></div></div>
+            <span class="ranking-value">$127,500</span><span class="ranking-pct">88%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">4</span><span class="ranking-name">Sep 2025</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:82%;background:linear-gradient(90deg,#10B981,#6EE7B7)"></div></div></div>
+            <span class="ranking-value">$118,600</span><span class="ranking-pct">82%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">5</span><span class="ranking-name">May 2025</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:77%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></div></div></div>
+            <span class="ranking-value">$112,300</span><span class="ranking-pct">77%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">6</span><span class="ranking-name">Aug 2025</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:71%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></div></div></div>
+            <span class="ranking-value">$103,400</span><span class="ranking-pct">71%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">7</span><span class="ranking-name">Apr 2025</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:68%;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div></div></div>
+            <span class="ranking-value">$98,500</span><span class="ranking-pct">68%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">8</span><span class="ranking-name">Jul 2025</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:65%;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div></div></div>
+            <span class="ranking-value">$95,100</span><span class="ranking-pct">65%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NARRATIVE -->
+    <div class="headline">March 2025 was the peak sales month at $145K</div>
+    <div class="narrative"><strong>Full-year sales totaled $1.23M</strong> across 12 months, averaging $103K/month. March was the standout at $145K, likely driven by end-of-quarter push. January ($62K) was the weakest month, typical for post-holiday slowdown.</div>
+
+    <div class="insight-block"><strong>Trend:</strong> Q4 showed strong recovery (Oct-Nov both above $125K) before a December dip to $78K, suggesting seasonal patterns worth monitoring.</div>
+
+    <div class="pills">
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== EXAMPLE 3: Single Aggregate ======================== -->
+<div id="sec-example3" class="section">
+  <div class="section-label">Example 3 — Single Aggregate (1 row)</div>
+  <div class="section-desc">Question: "What is total revenue for FY 2025?"</div>
+
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">1 row</span>
+    </div>
+
+    <!-- TABLE (single row) -->
+    <div class="table-section">
+      <button class="table-toggle" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'; this.classList.toggle('collapsed')">
+        &#x25BC; Table &middot; 1 row
+      </button>
+      <div>
+        <div class="table-scroll">
+          <table class="data-table">
+            <thead><tr><th style="text-align:right">Total Revenue</th></tr></thead>
+            <tbody>
+              <tr><td class="num">$4,567,890</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span>Showing 1–1 of 1 row</span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINI DASHBOARD — simplified for single value -->
+    <div class="mini-dash">
+      <div style="text-align:center; padding: 12px 0">
+        <div style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--color-text-muted); margin-bottom:6px">Total Revenue — FY 2025</div>
+        <div style="font-size:32px; font-weight:700; color:#4F46E5; letter-spacing:-0.02em; font-variant-numeric:tabular-nums">$4,567,890</div>
+        <div style="font-size:11px; color:var(--color-text-muted); margin-top:4px">Single aggregate result</div>
+      </div>
+    </div>
+
+    <!-- NARRATIVE -->
+    <div class="headline">FY 2025 total revenue: $4.57M</div>
+    <div class="narrative"><strong>Total revenue for fiscal year 2025</strong> was $4,567,890. This represents the sum across all regions, product lines, and channels for the 12-month period ending March 2025.</div>
+
+    <div class="pills">
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== EXAMPLE 4: Large paginated set ======================== -->
+<div id="sec-example4" class="section">
+  <div class="section-label">Example 4 — Large Set with Pagination (25 rows, 3 pages)</div>
+  <div class="section-desc">Question: "Show me all employees and their salaries"</div>
+
+  <div class="card">
+    <div class="conf-header">
+      <div class="conf-badge"><div class="conf-dot"></div><span class="conf-text">High confidence</span></div>
+      <span class="row-count">25 rows</span>
+    </div>
+
+    <div class="table-section" id="table4">
+      <button class="table-toggle" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'; this.classList.toggle('collapsed')">
+        &#x25BC; Table &middot; 25 rows
+      </button>
+      <div>
+        <div class="table-actions">
+          <button class="table-action">&#x2913; Excel</button>
+          <button class="table-action">&#x2913; CSV</button>
+        </div>
+        <div class="table-scroll">
+          <table class="data-table" id="paginated-table-4">
+            <thead><tr><th>#</th><th>Employee</th><th>Department</th><th>Title</th><th style="text-align:right">Salary</th><th style="text-align:right">Bonus</th><th style="text-align:right">Total Comp</th><th>Location</th><th style="text-align:right">Tenure (yrs)</th></tr></thead>
+            <tbody id="tbody-4">
+              <tr><td>1</td><td>Sarah Chen</td><td>Engineering</td><td>Sr. Engineer</td><td class="num">$185,000</td><td class="num">$28,500</td><td class="num">$213,500</td><td>San Francisco</td><td class="num">8</td></tr>
+              <tr><td>2</td><td>James Wilson</td><td>Engineering</td><td>Staff Engineer</td><td class="num">$172,000</td><td class="num">$25,800</td><td class="num">$197,800</td><td>San Francisco</td><td class="num">6</td></tr>
+              <tr><td>3</td><td>Maria Garcia</td><td>Product</td><td>Sr. PM</td><td class="num">$165,000</td><td class="num">$24,750</td><td class="num">$189,750</td><td>New York</td><td class="num">7</td></tr>
+              <tr><td>4</td><td>David Kim</td><td>Engineering</td><td>Sr. Engineer</td><td class="num">$158,000</td><td class="num">$23,700</td><td class="num">$181,700</td><td>Seattle</td><td class="num">5</td></tr>
+              <tr><td>5</td><td>Emily Johnson</td><td>Design</td><td>Design Lead</td><td class="num">$152,000</td><td class="num">$22,800</td><td class="num">$174,800</td><td>New York</td><td class="num">6</td></tr>
+              <tr><td>6</td><td>Robert Taylor</td><td>Sales</td><td>Sales Director</td><td class="num">$148,000</td><td class="num">$44,400</td><td class="num">$192,400</td><td>Chicago</td><td class="num">9</td></tr>
+              <tr><td>7</td><td>Lisa Anderson</td><td>Engineering</td><td>Engineer</td><td class="num">$135,000</td><td class="num">$20,250</td><td class="num">$155,250</td><td>Austin</td><td class="num">4</td></tr>
+              <tr><td>8</td><td>Michael Brown</td><td>Marketing</td><td>Marketing Mgr</td><td class="num">$128,000</td><td class="num">$19,200</td><td class="num">$147,200</td><td>Chicago</td><td class="num">5</td></tr>
+              <tr><td>9</td><td>Jennifer Lee</td><td>Product</td><td>PM</td><td class="num">$125,000</td><td class="num">$18,750</td><td class="num">$143,750</td><td>San Francisco</td><td class="num">3</td></tr>
+              <tr><td>10</td><td>Chris Martinez</td><td>Engineering</td><td>Engineer</td><td class="num">$122,000</td><td class="num">$18,300</td><td class="num">$140,300</td><td>Austin</td><td class="num">3</td></tr>
+              <tr style="display:none"><td>11</td><td>Amanda White</td><td>Sales</td><td>Account Exec</td><td class="num">$115,000</td><td class="num">$34,500</td><td class="num">$149,500</td><td>New York</td><td class="num">4</td></tr>
+              <tr style="display:none"><td>12</td><td>Kevin Thomas</td><td>Design</td><td>Sr. Designer</td><td class="num">$112,000</td><td class="num">$16,800</td><td class="num">$128,800</td><td>Seattle</td><td class="num">3</td></tr>
+              <tr style="display:none"><td>13</td><td>Rachel Davis</td><td>HR</td><td>HR Manager</td><td class="num">$108,000</td><td class="num">$16,200</td><td class="num">$124,200</td><td>Chicago</td><td class="num">5</td></tr>
+              <tr style="display:none"><td>14</td><td>Daniel Moore</td><td>Finance</td><td>Financial Analyst</td><td class="num">$105,000</td><td class="num">$15,750</td><td class="num">$120,750</td><td>New York</td><td class="num">2</td></tr>
+              <tr style="display:none"><td>15</td><td>Ashley Clark</td><td>Marketing</td><td>Content Lead</td><td class="num">$98,000</td><td class="num">$14,700</td><td class="num">$112,700</td><td>Austin</td><td class="num">3</td></tr>
+              <tr style="display:none"><td>16</td><td>Ryan Lewis</td><td>Engineering</td><td>Jr. Engineer</td><td class="num">$95,000</td><td class="num">$14,250</td><td class="num">$109,250</td><td>Austin</td><td class="num">1</td></tr>
+              <tr style="display:none"><td>17</td><td>Jessica Hall</td><td>Sales</td><td>SDR</td><td class="num">$88,000</td><td class="num">$26,400</td><td class="num">$114,400</td><td>Chicago</td><td class="num">2</td></tr>
+              <tr style="display:none"><td>18</td><td>Andrew Young</td><td>Product</td><td>Associate PM</td><td class="num">$85,000</td><td class="num">$12,750</td><td class="num">$97,750</td><td>San Francisco</td><td class="num">1</td></tr>
+              <tr style="display:none"><td>19</td><td>Nicole King</td><td>Design</td><td>Designer</td><td class="num">$82,000</td><td class="num">$12,300</td><td class="num">$94,300</td><td>Seattle</td><td class="num">2</td></tr>
+              <tr style="display:none"><td>20</td><td>Brandon Wright</td><td>Finance</td><td>Jr. Analyst</td><td class="num">$78,000</td><td class="num">$11,700</td><td class="num">$89,700</td><td>New York</td><td class="num">1</td></tr>
+              <tr style="display:none"><td>21</td><td>Megan Scott</td><td>HR</td><td>Recruiter</td><td class="num">$72,000</td><td class="num">$10,800</td><td class="num">$82,800</td><td>Chicago</td><td class="num">2</td></tr>
+              <tr style="display:none"><td>22</td><td>Tyler Green</td><td>Marketing</td><td>Coordinator</td><td class="num">$65,000</td><td class="num">$9,750</td><td class="num">$74,750</td><td>Austin</td><td class="num">1</td></tr>
+              <tr style="display:none"><td>23</td><td>Lauren Adams</td><td>Sales</td><td>BDR</td><td class="num">$62,000</td><td class="num">$18,600</td><td class="num">$80,600</td><td>Chicago</td><td class="num">1</td></tr>
+              <tr style="display:none"><td>24</td><td>Jason Baker</td><td>Engineering</td><td>Intern</td><td class="num">$55,000</td><td class="num">$0</td><td class="num">$55,000</td><td>Austin</td><td class="num">0</td></tr>
+              <tr style="display:none"><td>25</td><td>Olivia Nelson</td><td>Design</td><td>Intern</td><td class="num">$52,000</td><td class="num">$0</td><td class="num">$52,000</td><td>Seattle</td><td class="num">0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span id="page-info-4">Showing 1–10 of 25 rows</span>
+          <div class="pagination">
+            <button class="page-btn nav" id="prev-4" onclick="goPage4(-1)" disabled>&#x2039;</button>
+            <button class="page-btn active" id="p4-1" onclick="setPage4(1)">1</button>
+            <button class="page-btn" id="p4-2" onclick="setPage4(2)">2</button>
+            <button class="page-btn" id="p4-3" onclick="setPage4(3)">3</button>
+            <button class="page-btn nav" id="next-4" onclick="goPage4(1)">&#x203A;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MINI DASHBOARD -->
+    <div class="mini-dash">
+      <div class="mini-dash-title">Salary — Summary</div>
+      <div class="kpi-grid">
+        <div class="kpi-card" style="border-left: 3px solid #10B981">
+          <div class="kpi-label" style="color:#059669"><span class="icon">&#9650;</span> Highest</div>
+          <div class="kpi-sublabel">Sarah Chen</div>
+          <div class="kpi-value" style="color:#047857">$185,000</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #EF4444">
+          <div class="kpi-label" style="color:#DC2626"><span class="icon">&#9660;</span> Lowest</div>
+          <div class="kpi-sublabel">Olivia Nelson</div>
+          <div class="kpi-value" style="color:#DC2626">$52,000</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #6366F1">
+          <div class="kpi-label" style="color:#6366F1"><span class="icon">&Sigma;</span> Total Payroll</div>
+          <div class="kpi-sublabel">25 employees</div>
+          <div class="kpi-value" style="color:#4F46E5">$2,660,000</div>
+        </div>
+        <div class="kpi-card" style="border-left: 3px solid #8B5CF6">
+          <div class="kpi-label" style="color:#7C3AED"><span class="icon">&mu;</span> Average</div>
+          <div class="kpi-sublabel">per employee</div>
+          <div class="kpi-value" style="color:#7C3AED">$106,400</div>
+        </div>
+      </div>
+      <div class="ranking-section">
+        <div class="ranking-header">Ranking (top 8)</div>
+        <div class="ranking-list">
+          <div class="ranking-item">
+            <span class="ranking-num">1</span><span class="ranking-name">S. Chen</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:100%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div></div>
+            <span class="ranking-value">$185,000</span><span class="ranking-pct">100%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">2</span><span class="ranking-name">J. Wilson</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:93%;background:linear-gradient(90deg,#10B981,#34D399)"></div></div></div>
+            <span class="ranking-value">$172,000</span><span class="ranking-pct">93%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">3</span><span class="ranking-name">M. Garcia</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:89%;background:linear-gradient(90deg,#10B981,#6EE7B7)"></div></div></div>
+            <span class="ranking-value">$165,000</span><span class="ranking-pct">89%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">4</span><span class="ranking-name">D. Kim</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:85%;background:linear-gradient(90deg,#10B981,#6EE7B7)"></div></div></div>
+            <span class="ranking-value">$158,000</span><span class="ranking-pct">85%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">5</span><span class="ranking-name">E. Johnson</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:82%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></div></div></div>
+            <span class="ranking-value">$152,000</span><span class="ranking-pct">82%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">6</span><span class="ranking-name">R. Taylor</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:80%;background:linear-gradient(90deg,#F59E0B,#FBBF24)"></div></div></div>
+            <span class="ranking-value">$148,000</span><span class="ranking-pct">80%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">7</span><span class="ranking-name">L. Anderson</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:73%;background:linear-gradient(90deg,#F59E0B,#FCD34D)"></div></div></div>
+            <span class="ranking-value">$135,000</span><span class="ranking-pct">73%</span>
+          </div>
+          <div class="ranking-item">
+            <span class="ranking-num">8</span><span class="ranking-name">M. Brown</span>
+            <div class="ranking-bar-area"><div class="ranking-bar-track"><div class="ranking-bar-fill" style="width:69%;background:linear-gradient(90deg,#EF4444,#F87171)"></div></div></div>
+            <span class="ranking-value">$128,000</span><span class="ranking-pct">69%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NARRATIVE -->
+    <div class="headline">Engineering leads compensation with 7 of top 10 earners</div>
+    <div class="narrative"><strong>Total payroll across 25 employees is $2.66M</strong>, averaging $106K per person. Sarah Chen tops the list at $185K, while interns start at $52-55K. The $133K spread between top and bottom indicates a standard compensation range for a mid-sized tech company.</div>
+
+    <div class="insight-block"><strong>Distribution note:</strong> 12 of 25 employees (48%) earn above the average of $106K, indicating a slight top-heavy distribution. Sales roles show outsized total comp due to bonus structures (up to 30% of base).</div>
+
+    <div class="pills">
+      <button class="pill">SQL</button>
+      <button class="pill">Reasoning</button>
+      <button class="pill copy">Copy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+/* ===== Pagination for Example 2 (12 rows, 10 per page) ===== */
+let page2 = 1;
+const perPage = 10;
+const total2 = 12;
+const totalPages2 = Math.ceil(total2 / perPage);
+
+function setPage2(p) {
+  page2 = p;
+  renderPage2();
+}
+function goPage2(dir) {
+  page2 = Math.max(1, Math.min(totalPages2, page2 + dir));
+  renderPage2();
+}
+function renderPage2() {
+  const rows = document.querySelectorAll('#paginated-table-2 tbody tr');
+  const start = (page2 - 1) * perPage;
+  const end = Math.min(start + perPage, total2);
+  rows.forEach((r, i) => { r.style.display = (i >= start && i < end) ? '' : 'none'; });
+  document.getElementById('page-info-2').textContent = `Showing ${start + 1}\u2013${end} of ${total2} rows`;
+  document.getElementById('prev-2').disabled = page2 === 1;
+  document.getElementById('next-2').disabled = page2 === totalPages2;
+  for (let i = 1; i <= totalPages2; i++) {
+    const btn = document.getElementById('p2-' + i);
+    if (btn) btn.className = 'page-btn' + (i === page2 ? ' active' : '');
+  }
+}
+
+/* ===== Pagination for Example 4 (25 rows, 10 per page) ===== */
+let page4 = 1;
+const total4 = 25;
+const totalPages4 = Math.ceil(total4 / perPage);
+
+function setPage4(p) {
+  page4 = p;
+  renderPage4();
+}
+function goPage4(dir) {
+  page4 = Math.max(1, Math.min(totalPages4, page4 + dir));
+  renderPage4();
+}
+function renderPage4() {
+  const rows = document.querySelectorAll('#paginated-table-4 tbody tr');
+  const start = (page4 - 1) * perPage;
+  const end = Math.min(start + perPage, total4);
+  rows.forEach((r, i) => { r.style.display = (i >= start && i < end) ? '' : 'none'; });
+  document.getElementById('page-info-4').textContent = `Showing ${start + 1}\u2013${end} of ${total4} rows`;
+  document.getElementById('prev-4').disabled = page4 === 1;
+  document.getElementById('next-4').disabled = page4 === totalPages4;
+  for (let i = 1; i <= totalPages4; i++) {
+    const btn = document.getElementById('p4-' + i);
+    if (btn) btn.className = 'page-btn' + (i === page4 ? ' active' : '');
+  }
+}
+</script>
+
+</body>
+</html>

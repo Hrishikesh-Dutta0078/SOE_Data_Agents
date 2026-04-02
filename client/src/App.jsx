@@ -150,7 +150,7 @@ export default function App() {
             `}
             style={{ borderRight: '1px solid var(--color-border)' }}
           >
-            <div className="text-[10px] font-mono mb-3" style={{ color: 'var(--color-text-faint)', animation: 'slide-in-left 0.5s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both' }}>v0.2</div>
+            <div className="text-[10px] font-mono mb-3" style={{ color: 'var(--color-text-faint)', animation: 'slide-in-left 0.5s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both' }}>v0.3</div>
             <div className="text-lg font-bold mb-4 tracking-tight" style={{ color: 'var(--color-text-primary)', animation: 'slide-in-left 0.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both' }}>
               Welcome{userName ? `, ${userName}` : ''}
             </div>
